@@ -1,0 +1,394 @@
+import z from 'zod/v4';
+import Papa from 'papaparse';
+import { v4 as uuidv4 } from 'uuid';
+import { List } from './list.svelte';
+import { GradeSchema, type Grade } from './awards.svelte';
+
+export const TeamNumberSchema = z
+	.string()
+	.nonempty()
+	.max(10)
+	.regex(/^[A-Z0-9]+$/, {
+		message: 'Team number must only contain uppercase letters (A-Z) and digits (0-9)'
+	});
+
+export const TeamGroupNameSchema = z
+	.string()
+	.nonempty()
+	.max(100)
+	.regex(/^\S.*\S$|^\S$/, {
+		message: 'Team group name must not have leading or trailing whitespace'
+	});
+
+export const TeamInfoSchema = z.object({
+	id: z.uuidv4(),
+	number: TeamNumberSchema,
+	name: z.string(),
+	city: z.string(),
+	state: z.string(),
+	country: z.string(),
+	shortName: z.string(),
+	school: z.string(),
+	grade: GradeSchema,
+	group: TeamGroupNameSchema
+});
+
+export type TeamInfo = z.infer<typeof TeamInfoSchema>;
+
+export const TeamDataSchema = z.object({
+	notebookLink: z.string(),
+	excluded: z.boolean()
+});
+
+export type TeamData = z.infer<typeof TeamDataSchema>;
+
+// Factory functions
+export function createTeamInfo(
+	id: string,
+	number: string,
+	name: string,
+	city: string,
+	state: string,
+	country: string,
+	shortName: string,
+	school: string,
+	grade: Grade,
+	group: string
+): TeamInfo {
+	return {
+		id,
+		number,
+		name,
+		city,
+		state,
+		country,
+		shortName,
+		school,
+		grade,
+		group
+	};
+}
+
+export function createTeamData(notebookLink: string, excluded: boolean): TeamData {
+	return {
+		notebookLink,
+		excluded
+	};
+}
+
+export class Team {
+	public readonly id: string;
+	public info: TeamInfo;
+	public data: TeamData;
+
+	constructor(info: TeamInfo, data: TeamData) {
+		this.id = info.id;
+		this.info = $state(info);
+		this.data = $state(data);
+	}
+
+	// Convenience getters for backward compatibility
+	get number() {
+		return this.info.number;
+	}
+	get name() {
+		return this.info.name;
+	}
+	set name(value: string) {
+		this.info.name = value;
+	}
+
+	get city() {
+		return this.info.city;
+	}
+	set city(value: string) {
+		this.info.city = value;
+	}
+
+	get state() {
+		return this.info.state;
+	}
+	set state(value: string) {
+		this.info.state = value;
+	}
+
+	get country() {
+		return this.info.country;
+	}
+	set country(value: string) {
+		this.info.country = value;
+	}
+
+	get shortName() {
+		return this.info.shortName;
+	}
+	set shortName(value: string) {
+		this.info.shortName = value;
+	}
+
+	get school() {
+		return this.info.school;
+	}
+	set school(value: string) {
+		this.info.school = value;
+	}
+
+	get grade() {
+		return this.info.grade;
+	}
+	set grade(value: Grade) {
+		this.info.grade = value;
+	}
+
+	get group() {
+		return this.info.group;
+	}
+	set group(value: string) {
+		this.info.group = value;
+	}
+
+	get notebookLink() {
+		return this.data.notebookLink;
+	}
+	set notebookLink(value: string) {
+		this.data.notebookLink = value;
+	}
+
+	get excluded() {
+		return this.data.excluded;
+	}
+	set excluded(value: boolean) {
+		this.data.excluded = value;
+	}
+}
+
+export class TeamList extends List<Team, 'id'> {
+	constructor(initialItems: Team[] = []) {
+		super('id', initialItems);
+	}
+}
+
+// Type for Tournament Manager CSV row
+interface TMCSVRow {
+	Number: string;
+	Name: string;
+	City: string;
+	State: string;
+	Country: string;
+	'Short Name': string;
+	School: string;
+	Sponsor: string;
+	Grade: string;
+	'Emergency Phone': string;
+	'Primary Coach Name': string;
+	'Primary Coach Email': string;
+	Location: string;
+}
+
+// Update the return type to use the legacy format for compatibility
+export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfo & TeamData>[] {
+	const parseResult = Papa.parse<TMCSVRow>(csvContent, {
+		header: true,
+		skipEmptyLines: true,
+		transformHeader: (header: string) => header.trim()
+	});
+
+	if (parseResult.errors.length > 0) {
+		console.error('CSV parsing errors:', parseResult.errors);
+		throw new Error(`CSV parsing failed: ${parseResult.errors.map((e) => e.message).join(', ')}`);
+	}
+
+	const teams: Partial<TeamInfo & TeamData>[] = [];
+	const seenTeamNumbers = new Set<string>();
+	const validationErrors: string[] = [];
+
+	parseResult.data.forEach((row, index) => {
+		const rowNumber = index + 2; // +2 because Papa Parse starts from 0 and there's a header row
+		const teamNumber = row.Number?.trim();
+
+		// Validate team number exists
+		if (!teamNumber) {
+			validationErrors.push(`Row ${rowNumber}: Team number is required`);
+			return;
+		}
+
+		// Validate team number format (A-Z and 0-9 only, max 10 chars)
+		try {
+			TeamNumberSchema.parse(teamNumber);
+		} catch {
+			validationErrors.push(
+				`Row ${rowNumber}: Invalid team number "${teamNumber}" - must only contain uppercase letters (A-Z) and digits (0-9), max 10 characters`
+			);
+			return;
+		}
+
+		// Check for duplicate team numbers
+		if (seenTeamNumbers.has(teamNumber)) {
+			validationErrors.push(`Row ${rowNumber}: Duplicate team number "${teamNumber}"`);
+			return;
+		}
+
+		seenTeamNumbers.add(teamNumber);
+
+		// Extract and validate team group name
+		const groupName = extractGroupFromTeamNumber(teamNumber);
+		try {
+			TeamGroupNameSchema.parse(groupName);
+		} catch {
+			validationErrors.push(
+				`Row ${rowNumber}: Invalid team group name "${groupName}" derived from team number "${teamNumber}" - must not have leading/trailing whitespace and be max 100 characters`
+			);
+			return;
+		}
+
+		const team: Partial<TeamInfo & TeamData> = {
+			number: teamNumber,
+			name: row.Name || '',
+			city: row.City || '',
+			state: row.State || '',
+			country: row.Country || '',
+			shortName: row['Short Name'] || '',
+			school: row.School || '',
+			grade: mapGradeToGradeLevel(row.Grade || ''),
+			notebookLink: '',
+			excluded: false,
+			group: groupName
+		};
+
+		teams.push(team);
+	});
+
+	// Throw error if there were validation issues
+	if (validationErrors.length > 0) {
+		throw new Error(`CSV validation failed:\n${validationErrors.join('\n')}`);
+	}
+
+	return teams;
+}
+
+// Type for notebook TSV row (flexible to handle different column names)
+interface NotebookTSVRow {
+	[key: string]: string;
+}
+
+export function parseNotebookData(tsvContent: string): Record<string, string> {
+	const parseResult = Papa.parse<NotebookTSVRow>(tsvContent, {
+		delimiter: '\t',
+		header: true,
+		skipEmptyLines: true,
+		transformHeader: (header: string) => header.trim()
+	});
+
+	if (parseResult.errors.length > 0) {
+		console.error('TSV parsing errors:', parseResult.errors);
+		throw new Error(
+			`Notebook data parsing failed: ${parseResult.errors.map((e) => e.message).join(', ')}`
+		);
+	}
+
+	const notebookLinks: Record<string, string> = {};
+	const validationErrors: string[] = [];
+
+	parseResult.data.forEach((row, index) => {
+		const rowNumber = index + 2; // +2 because Papa Parse starts from 0 and there's a header row
+		const teamNumber = row.team || row.Team || '';
+		const link = row.notebook_link || row['Notebook Link'] || '';
+
+		if (teamNumber && link && link !== 'none') {
+			// Validate team number format
+			try {
+				TeamNumberSchema.parse(teamNumber);
+				notebookLinks[teamNumber] = link;
+			} catch {
+				validationErrors.push(
+					`Row ${rowNumber}: Invalid team number "${teamNumber}" in notebook data - must only contain uppercase letters (A-Z) and digits (0-9), max 10 characters`
+				);
+			}
+		}
+	});
+
+	// Just warn about validation errors for notebook data since it's optional
+	if (validationErrors.length > 0) {
+		console.warn(`Notebook data validation warnings:\n${validationErrors.join('\n')}`);
+	}
+
+	return notebookLinks;
+}
+
+export function extractGroupFromTeamNumber(teamNumber: string): string {
+	// If team number is empty or single character, return as is
+	if (teamNumber.length <= 1) {
+		return teamNumber;
+	}
+
+	// Check if the team number contains any digits
+	const hasDigits = /[0-9]/.test(teamNumber);
+
+	// If team number is all letters (no digits), keep it as is (e.g., "APPLE" -> "APPLE")
+	if (!hasDigits) {
+		return teamNumber;
+	}
+
+	// If team number contains digits, remove the last character
+	// This handles cases like "BANANA1" -> "BANANA", "123A" -> "123", "BLRS1" -> "BLRS"
+	return teamNumber.slice(0, -1);
+}
+
+export function mapGradeToGradeLevel(gradeString: string): Grade {
+	// Normalize and map common grade strings to Grade enum values
+	const normalizedGrade = gradeString.trim().toLowerCase();
+
+	if (normalizedGrade.includes('elementary') || normalizedGrade.includes('elem')) {
+		return 'Elementary School';
+	} else if (normalizedGrade.includes('middle') || normalizedGrade.includes('junior')) {
+		return 'Middle School';
+	} else if (normalizedGrade.includes('high') || normalizedGrade.includes('secondary')) {
+		return 'High School';
+	} else if (normalizedGrade.includes('college') || normalizedGrade.includes('university')) {
+		return 'College';
+	}
+
+	// Default to College if no match found
+	return 'College';
+}
+
+export function mergeTeamData(
+	csvTeams: Partial<TeamInfo & TeamData>[],
+	notebookLinks: Record<string, string>
+): Team[] {
+	return csvTeams.map((team) => {
+		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
+		const notebookLink = notebookLinks[teamNumber] || '';
+
+		const teamInfo = createTeamInfo(
+			uuidv4(),
+			teamNumber,
+			team.name || '',
+			team.city || '',
+			team.state || '',
+			team.country || '',
+			team.shortName || '',
+			team.school || '',
+			team.grade || 'College',
+			team.group || ''
+		);
+
+		const teamData = createTeamData(notebookLink, team.excluded || false);
+
+		return new Team(teamInfo, teamData);
+	});
+}
+
+export function groupTeamsByGroup(teams: Team[]): Record<string, Team[]> {
+	const groups: Record<string, Team[]> = {};
+
+	teams.forEach((team) => {
+		const groupName = team.group || 'Ungrouped';
+		if (!groups[groupName]) {
+			groups[groupName] = [];
+		}
+		groups[groupName].push(team);
+	});
+
+	return groups;
+}
