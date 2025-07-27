@@ -1,5 +1,5 @@
 {
-	"name": "web",
+	"name": "@judging.jerryio/web",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -45,6 +45,7 @@
 		"vitest-browser-svelte": "^0.1.0"
 	},
 	"dependencies": {
+		"@judging.jerryio/worker": "workspace:*",
 		"crypto-js": "^4.2.0",
 		"events": "^3.3.0",
 		"papaparse": "^5.5.3",
