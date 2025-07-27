@@ -13,7 +13,7 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "bun run test:unit -- --run"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
@@ -23,6 +23,8 @@
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/node": "^24.1.0",
+		"@types/papaparse": "^5.3.16",
+		"@types/qrcode": "^1.5.5",
 		"@vitest/browser": "^3.2.3",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
@@ -43,6 +45,11 @@
 		"vitest-browser-svelte": "^0.1.0"
 	},
 	"dependencies": {
+		"crypto-js": "^4.2.0",
+		"events": "^3.3.0",
+		"papaparse": "^5.5.3",
+		"qrcode": "^1.5.4",
+		"svelte-dnd-action": "^0.9.64",
 		"zod": "^4.0.10"
 	}
 }

@@ -2,6 +2,7 @@ import z from 'zod/v4';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { List } from './list.svelte';
+import { SvelteSet } from 'svelte/reactivity';
 import { GradeSchema, type Grade } from './awards.svelte';
 
 export const TeamNumberSchema = z
@@ -199,7 +200,7 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfo 
 	}
 
 	const teams: Partial<TeamInfo & TeamData>[] = [];
-	const seenTeamNumbers = new Set<string>();
+	const seenTeamNumbers = new SvelteSet<string>();
 	const validationErrors: string[] = [];
 
 	parseResult.data.forEach((row, index) => {
