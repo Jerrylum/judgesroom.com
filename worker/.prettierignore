@@ -1,0 +1,4 @@
+.vscode/settings.json
+package.json
+worker-configuration.d.ts
+wrangler.jsonc
