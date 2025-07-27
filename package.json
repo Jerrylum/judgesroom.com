@@ -1,0 +1,10 @@
+{
+  "name": "judging.jerryio",
+  "private": true,
+  "workspaces": [
+    "*"
+  ],
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
