@@ -1,9 +1,6 @@
 <script lang="ts">
   import { useWRPC } from '../lib/use-wrpc';
   import { onMount } from 'svelte';
-  import type { AppRouter } from '@judging.jerryio/worker/src/AppRouter';
-	import type { InferClientType, ProcedureDefinition } from '@judging.jerryio/worker/src/types';
-
 
   const wrpc = useWRPC();
   
@@ -30,7 +27,7 @@
     }
   }
 
-  function bindInterests() {
+  $effect(() => {
     const unsubscribe = wrpc.updateInterests.subscribe(['programming'], {
       onData: (data: string[]) => {
         console.log('Received interests:', data);
@@ -44,10 +41,8 @@
       }
     });
 
-    return unsubscribe;
-  }
-
-  let unsubscribeInterests: (() => void) | null = null;
+    return () => unsubscribe();
+  });
 </script>
 
 <h1>wRPC Test</h1>

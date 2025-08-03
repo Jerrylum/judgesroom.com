@@ -1,5 +1,5 @@
 import { createWRPCClient } from './wrpc-client';
-import type { AppRouter } from '@judging.jerryio/worker/src/AppRouter';
+import type { AppRouter } from '@judging.jerryio/worker/src/router';
 import type { InferClient } from '@judging.jerryio/worker/src/types';
 import { generateUUID, getDeviceNameFromUserAgent } from './utils.svelte';
 

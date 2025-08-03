@@ -2,7 +2,7 @@ import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { WRPC } from './wrpc/wrpc';
 import { appRouter } from './router';
-import type { WRPCRequest, WRPCResponse, WRPCSubscriptionMessage } from './wrpc/types';
+import type { WRPCRequest, WRPCResponse } from './wrpc/types';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),

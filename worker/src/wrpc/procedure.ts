@@ -31,6 +31,10 @@ export type Procedure<TType extends ProcedureType, TDef extends BuiltProcedureDe
 		};
 		type: TType;
 		meta: TDef['meta'];
+		// Runtime properties for implementation
+		_resolver?: (opts: { input: unknown }) => Promise<unknown> | unknown;
+		_inputSchemas?: unknown[];
+		_outputSchema?: unknown;
 	};
 };
 
