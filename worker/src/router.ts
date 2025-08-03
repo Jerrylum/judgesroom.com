@@ -1,16 +1,18 @@
 import { z } from 'zod';
-import { wrpc } from './wrpc/wrpc';
+import { initWRPC } from './wrpc/initWRPC';
 
-export const appRouter = wrpc.router({
-	getName: wrpc.procedure.input(z.string()).query(async ({ input }) => {
+const w = initWRPC.create();
+
+export const appRouter = w.router({
+	getName: w.procedure.input(z.string()).query(async ({ input }) => {
 		return `Hello, ${input}!`;
 	}),
 
-	setAge: wrpc.procedure.input(z.number()).mutation(async ({ input }) => {
+	setAge: w.procedure.input(z.number()).mutation(async ({ input }) => {
 		return `You are ${input} years old!`;
 	}),
 
-	// updateInterests: wrpc.procedure.subscribe(async ({ input }) => {
+	// updateInterests: w.procedure.subscribe(async ({ input }) => {
 	// 	return ['Svelte', 'TypeScript'];
 	// })
 });

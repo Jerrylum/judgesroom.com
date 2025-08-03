@@ -59,19 +59,6 @@ export interface WRPCResponse {
 	};
 }
 
-export interface WRPCSubscriptionMessage {
-	id: string;
-	type: 'subscription';
-	path: string;
-	result: {
-		type: 'data' | 'error' | 'complete';
-		data?: unknown;
-		error?: {
-			message: string;
-			code?: string;
-		};
-	};
-}
 
 // Procedure context
 export interface ProcedureContext {
@@ -81,12 +68,11 @@ export interface ProcedureContext {
 	sessionId?: string;
 }
 
-// Builder types
+// Legacy builder types (now replaced by proper implementation)
 // export interface ProcedureBuilder<TInput = unknown> {
 // 	input<TSchema extends z.ZodType>(schema: TSchema): ProcedureBuilder<InferParser<TSchema>>;
 // 	query<TOutput>(handler: (ctx: { input: TInput }) => MaybePromise<TOutput>): QueryProcedure<TInput, TOutput>;
 // 	mutation<TOutput>(handler: (ctx: { input: TInput }) => MaybePromise<TOutput>): MutationProcedure<TInput, TOutput>;
-// 	subscribe<TOutput>(handler: (ctx: { input: TInput }) => MaybePromise<TOutput>): SubscriptionProcedure<TInput, TOutput>;
 // }
 
 // Router types

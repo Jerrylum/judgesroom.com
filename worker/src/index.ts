@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { WRPC } from './wrpc/wrpc';
+import { createWebSocketHandler } from './wrpc/websocketHandler';
 import { appRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './wrpc/types';
 
@@ -15,10 +15,12 @@ type Intention = z.infer<typeof IntentionSchema>;
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class WebSocketHibernationServer extends DurableObject<Env> {
-	private wrpc: WRPC;
-	private requestHandler: (request: WRPCRequest) => Promise<WRPCResponse>;
-	private subscriptionHandler: (request: WRPCRequest) => AsyncGenerator<WRPCResponse>;
-	private activeSubscriptions: Map<string, { ws: WebSocket; generator: AsyncGenerator<WRPCResponse> }> = new Map();
+	private wsHandler = createWebSocketHandler({
+		router: appRouter,
+		onError: (opts) => {
+			console.error('WRPC Error:', opts.error.message, opts.error);
+		},
+	});
 
 	/**
 	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
@@ -29,20 +31,6 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	 */
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
-		this.wrpc = new WRPC();
-		this.requestHandler = this.wrpc.createHandler(appRouter);
-		this.subscriptionHandler = this.wrpc.createSubscriptionHandler(appRouter);
-	}
-
-	/**
-	 * The Durable Object exposes an RPC method sayHello which will be invoked when when a Durable
-	 *  Object instance receives a request from a Worker via the same method invocation on the stub
-	 *
-	 * @param name - The name provided to a Durable Object instance from a Worker
-	 * @returns The greeting to be sent back to the Worker
-	 */
-	async sayHello(name: string): Promise<string> {
-		return `Hello, ${name}!`;
 	}
 
 	async fetch(request: Request): Promise<Response> {
@@ -81,138 +69,30 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// (run the `constructor`) and deliver the message to the appropriate handler.
 		this.ctx.acceptWebSocket(ws, [clientId]);
 
-		// TODO: Implement
+		// Set up connection with the WebSocket handler
+		this.wsHandler.handleConnection(ws, {
+			sessionId,
+			clientId,
+			deviceName,
+		});
 	}
 
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
-		try {
-			// Convert ArrayBuffer to string if necessary
-			const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
-
-			// Parse the WRPC request
-			const request: WRPCRequest = JSON.parse(messageStr);
-
-			if (request.type === 'subscription') {
-				await this.handleSubscription(ws, request);
-			} else {
-				// Handle query and mutation
-				const response = await this.requestHandler(request);
-				ws.send(JSON.stringify(response));
-			}
-		} catch (error) {
-			console.error('Error processing WebSocket message:', error);
-			// Send error response if we can parse the request ID
-			try {
-				const request = JSON.parse(typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage));
-				const errorResponse: WRPCResponse = {
-					id: request.id || 'unknown',
-					result: {
-						type: 'error',
-						error: {
-							message: error instanceof Error ? error.message : 'Unknown error',
-							code: 'MESSAGE_PARSE_ERROR'
-						}
-					}
-				};
-				ws.send(JSON.stringify(errorResponse));
-			} catch {
-				// If we can't even parse for an ID, send a generic error
-				ws.send(
-					JSON.stringify({
-						id: 'unknown',
-						result: {
-							type: 'error',
-							error: {
-								message: 'Failed to parse message',
-								code: 'MESSAGE_PARSE_ERROR'
-							}
-						}
-					})
-				);
-			}
-		}
-	}
-
-	private async handleSubscription(ws: WebSocket, request: WRPCRequest): Promise<void> {
-		const subscriptionKey = `${request.id}`;
-
-		// Clean up existing subscription if any
-		const existing = this.activeSubscriptions.get(subscriptionKey);
-		if (existing) {
-			try {
-				await existing.generator.return(undefined);
-			} catch {
-				// Ignore cleanup errors
-			}
-		}
-
-		// Create new subscription
-		const generator = this.subscriptionHandler(request);
-		this.activeSubscriptions.set(subscriptionKey, { ws, generator });
-
-		// Process subscription messages
-		try {
-			for await (const response of generator) {
-				if (ws.readyState === WebSocket.OPEN) {
-					ws.send(JSON.stringify(response));
-				} else {
-					// WebSocket is closed, cleanup subscription
-					break;
-				}
-
-				// If this is a complete message, cleanup
-				if (response.result?.type === 'complete') {
-					break;
-				}
-			}
-		} catch (error) {
-			console.error('Error in subscription:', error);
-			// Send error and cleanup
-			if (ws.readyState === WebSocket.OPEN) {
-				const errorResponse: WRPCResponse = {
-					id: request.id,
-					result: {
-						type: 'error',
-						error: {
-							message: error instanceof Error ? error.message : 'Subscription error',
-							code: 'SUBSCRIPTION_ERROR'
-						}
-					}
-				};
-				ws.send(JSON.stringify(errorResponse));
-			}
-		} finally {
-			this.activeSubscriptions.delete(subscriptionKey);
-		}
+		// Convert ArrayBuffer to string if necessary
+		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
+		
+		// Delegate to the WebSocket handler
+		await this.wsHandler.handleMessage(ws, messageStr);
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
-		// Cleanup any active subscriptions for this WebSocket
-		for (const [key, subscription] of this.activeSubscriptions) {
-			if (subscription.ws === ws) {
-				try {
-					await subscription.generator.return(undefined);
-				} catch {
-					// Ignore cleanup errors
-				}
-				this.activeSubscriptions.delete(key);
-			}
-		}
+		// Delegate to the WebSocket handler
+		this.wsHandler.handleClose(ws, code, reason);
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
-		console.error('WebSocket error:', error);
-		// Cleanup any active subscriptions for this WebSocket
-		for (const [key, subscription] of this.activeSubscriptions) {
-			if (subscription.ws === ws) {
-				try {
-					await subscription.generator.return(undefined);
-				} catch {
-					// Ignore cleanup errors
-				}
-				this.activeSubscriptions.delete(key);
-			}
-		}
+		// Delegate to the WebSocket handler
+		this.wsHandler.handleError(ws, error);
 	}
 }
 

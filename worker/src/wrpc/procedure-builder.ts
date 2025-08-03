@@ -1,6 +1,6 @@
-import { InferParser, MaybePromise, Simplify, TypeError } from './types';
+import { InferParser, MaybePromise, Simplify } from './types';
 import { UnsetMarker } from './utils';
-import { AnyMutationProcedure, AnyProcedure, AnyQueryProcedure, MutationProcedure, ProcedureType, QueryProcedure, SubscriptionProcedure } from './procedure';
+import { AnyMutationProcedure, AnyProcedure, AnyQueryProcedure, MutationProcedure, ProcedureType, QueryProcedure } from './procedure';
 import { z } from 'zod';
 
 type IntersectIfDefined<TType, TWith> = TType extends UnsetMarker ? TWith : TWith extends UnsetMarker ? TType : Simplify<TType & TWith>;
@@ -20,7 +20,7 @@ type ProcedureBuilderDef<TMeta> = {
 type AnyProcedureBuilderDef = ProcedureBuilderDef<any>;
 
 /**
- * Procedure resolver options (what the `.query()`, `.mutation()`, and `.subscription()` functions receive)
+ * Procedure resolver options (what the `.query()` and `.mutation()` functions receive)
  * @internal
  */
 export interface ProcedureResolverOptions<
@@ -76,12 +76,6 @@ export interface ProcedureBuilder<
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
 	}>;
-
-	// subscribe<$Output>(resolver: ProcedureResolver<TInput, $Output>): SubscriptionProcedure<{
-	// 	input: DefaultValue<TInput, void>;
-	// 	output: DefaultValue<TOutput, $Output>;
-	// 	meta: TMeta;
-	// }>;
 }
 
 type ProcedureBuilderResolver = (

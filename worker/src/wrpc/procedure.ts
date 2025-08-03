@@ -1,7 +1,8 @@
 // This file is heavily inspired by the tRPC procedure.ts file
 // https://github.com/trpc/trpc/blob/main/packages/server/src/unstable-core-do-not-import/procedure.ts
 
-export const procedureTypes = ['query', 'mutation', 'subscription'] as const;
+// Different from tRPC, we don't have a subscription type
+export const procedureTypes = ['query', 'mutation'] as const;
 
 /**
  * @public
@@ -42,16 +43,12 @@ export type QueryProcedure<TDef extends BuiltProcedureDef> = Procedure<'query', 
 
 export type MutationProcedure<TDef extends BuiltProcedureDef> = Procedure<'mutation', TDef>;
 
-export type SubscriptionProcedure<TDef extends BuiltProcedureDef> = Procedure<'subscription', TDef>;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyQueryProcedure = QueryProcedure<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyMutationProcedure = MutationProcedure<any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnySubscriptionProcedure = SubscriptionProcedure<any>;
 
-export type AnyProcedure = AnyQueryProcedure | AnyMutationProcedure | AnySubscriptionProcedure;
+export type AnyProcedure = AnyQueryProcedure | AnyMutationProcedure;
 
 export type inferProcedureInput<TProcedure extends AnyProcedure> = undefined extends inferProcedureParams<TProcedure>['$types']['input']
 	? void | inferProcedureParams<TProcedure>['$types']['input']
