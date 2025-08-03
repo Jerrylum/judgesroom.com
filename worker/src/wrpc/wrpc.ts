@@ -1,131 +1,9 @@
 import { z } from 'zod';
-import { ProcedureBuilder, ProcedureResolverOptions } from './procedure-builder';
-import { MutationProcedure, QueryProcedure, SubscriptionProcedure } from './procedure';
+import { createBuilder, ProcedureBuilder, ProcedureResolver, ProcedureResolverOptions } from './procedure-builder';
 import { AnyRouter, BuiltRouter, Router, RouterRecord } from './router';
 import { RootConfig } from './root-config';
 import { UnsetMarker } from './utils';
-import { MaybePromise, WRPCRequest, WRPCResponse, WRPCError, InferParser, TypeError } from './types';
-
-// Simplified procedure builder implementation
-class ProcedureBuilderImpl<TMeta, TInput, TOutput> {
-	private inputSchemas: z.ZodType<unknown>[] = [];
-	private outputSchema?: z.ZodType<unknown>;
-	private metaData?: TMeta;
-
-	constructor(
-		inputSchemas: z.ZodType<unknown>[] = [],
-		outputSchema?: z.ZodType<unknown>,
-		metaData?: TMeta
-	) {
-		this.inputSchemas = inputSchemas;
-		this.outputSchema = outputSchema;
-		this.metaData = metaData;
-	}
-
-	input<TSchema extends z.ZodType>(
-		schema: TSchema
-	): ProcedureBuilderImpl<TMeta, InferParser<TSchema>, TOutput> {
-		return new ProcedureBuilderImpl<TMeta, InferParser<TSchema>, TOutput>(
-			[...this.inputSchemas, schema],
-			this.outputSchema,
-			this.metaData
-		);
-	}
-
-	output<TSchema extends z.ZodType>(
-		schema: TSchema
-	): ProcedureBuilderImpl<TMeta, TInput, InferParser<TSchema>> {
-		return new ProcedureBuilderImpl<TMeta, TInput, InferParser<TSchema>>(
-			this.inputSchemas,
-			schema,
-			this.metaData
-		);
-	}
-
-	query<$Output>(
-		resolver: (opts: ProcedureResolverOptions<TInput>) => MaybePromise<$Output>
-	): QueryProcedure<{
-		input: TInput extends UnsetMarker ? void : TInput;
-		output: TOutput extends UnsetMarker ? $Output : TOutput;
-		meta: TMeta;
-	}> {
-		return {
-			_def: {
-				procedure: true,
-				$types: {
-					input: undefined as never,
-					output: undefined as never,
-				},
-				type: 'query',
-				meta: this.metaData,
-				// Runtime properties for implementation
-				_resolver: resolver,
-				_inputSchemas: this.inputSchemas,
-				_outputSchema: this.outputSchema,
-			}
-		} as QueryProcedure<{
-			input: TInput extends UnsetMarker ? void : TInput;
-			output: TOutput extends UnsetMarker ? $Output : TOutput;
-			meta: TMeta;
-		}>;
-	}
-
-	mutation<$Output>(
-		resolver: (opts: ProcedureResolverOptions<TInput>) => MaybePromise<$Output>
-	): MutationProcedure<{
-		input: TInput extends UnsetMarker ? void : TInput;
-		output: TOutput extends UnsetMarker ? $Output : TOutput;
-		meta: TMeta;
-	}> {
-		return {
-			_def: {
-				procedure: true,
-				$types: {
-					input: undefined as never,
-					output: undefined as never,
-				},
-				type: 'mutation',
-				meta: this.metaData,
-				// Runtime properties for implementation
-				_resolver: resolver,
-				_inputSchemas: this.inputSchemas,
-				_outputSchema: this.outputSchema,
-			}
-		} as MutationProcedure<{
-			input: TInput extends UnsetMarker ? void : TInput;
-			output: TOutput extends UnsetMarker ? $Output : TOutput;
-			meta: TMeta;
-		}>;
-	}
-
-	subscribe<$Output>(
-		resolver: (opts: ProcedureResolverOptions<TInput>) => MaybePromise<$Output>
-	): SubscriptionProcedure<{
-		input: TInput extends UnsetMarker ? void : TInput;
-		output: TOutput extends UnsetMarker ? $Output : TOutput;
-		meta: TMeta;
-	}> {
-		return {
-			_def: {
-				procedure: true,
-				$types: {
-					input: undefined as never,
-					output: undefined as never,
-				},
-				type: 'subscription',
-				meta: this.metaData,
-				// Runtime properties for implementation
-				_resolver: resolver,
-				_inputSchemas: this.inputSchemas,
-				_outputSchema: this.outputSchema,
-			}
-		} as SubscriptionProcedure<{
-			input: TInput extends UnsetMarker ? void : TInput;
-			output: TOutput extends UnsetMarker ? $Output : TOutput;
-			meta: TMeta;
-		}>;
-	}
-}
+import { MaybePromise, WRPCRequest, WRPCResponse, WRPCError } from './types';
 
 // Type for runtime procedure with implementation details
 interface RuntimeProcedure {
@@ -151,7 +29,7 @@ export class WRPC<TConfig extends RootConfig = RootConfig> {
 	 * Create a new procedure builder
 	 */
 	get procedure(): ProcedureBuilder<TConfig['meta'], UnsetMarker, UnsetMarker> {
-		return new ProcedureBuilderImpl<TConfig['meta'], UnsetMarker, UnsetMarker>();
+		return createBuilder({});
 	}
 
 	/**
