@@ -1,8 +1,8 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { wRPC } from './wrpc';
-import { appRouter } from './AppRouter';
-import type { WRPCRequest, WRPCResponse, WRPCSubscriptionMessage } from './types';
+import { WRPC } from './wrpc/wrpc';
+import { appRouter } from './router';
+import type { WRPCRequest, WRPCResponse, WRPCSubscriptionMessage } from './wrpc/types';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
@@ -15,7 +15,7 @@ type Intention = z.infer<typeof IntentionSchema>;
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class WebSocketHibernationServer extends DurableObject<Env> {
-	private wrpc: wRPC;
+	private wrpc: WRPC;
 	private requestHandler: (request: WRPCRequest) => Promise<WRPCResponse>;
 	private subscriptionHandler: (request: WRPCRequest) => AsyncGenerator<WRPCResponse>;
 	private activeSubscriptions: Map<string, { ws: WebSocket; generator: AsyncGenerator<WRPCResponse> }> = new Map();
@@ -29,7 +29,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	 */
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
-		this.wrpc = new wRPC();
+		this.wrpc = new WRPC();
 		this.requestHandler = this.wrpc.createHandler(appRouter);
 		this.subscriptionHandler = this.wrpc.createSubscriptionHandler(appRouter);
 	}

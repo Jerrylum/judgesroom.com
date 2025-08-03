@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { wRPC } from './wrpc';
+import { WRPC } from './wrpc/wrpc';
 
-const wrpc = new wRPC();
+const wrpc = new WRPC();
 
 export const appRouter = wrpc.router({
 	getName: wrpc.procedure.input(z.array(z.string())).query(async ({ input }) => {
