@@ -54,8 +54,8 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		}
 
 		// Remove existing client data if reconnecting
-		this.serverData!.clients = this.serverData!.clients.filter(c => c.clientId !== clientId);
-		
+		this.serverData!.clients = this.serverData!.clients.filter((c) => c.clientId !== clientId);
+
 		// Add new client data
 		this.serverData!.clients.push({
 			sessionId,
@@ -75,7 +75,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 			return; // Don't throw error during cleanup
 		}
 
-		this.serverData!.clients = this.serverData!.clients.filter(c => c.clientId !== clientId);
+		this.serverData!.clients = this.serverData!.clients.filter((c) => c.clientId !== clientId);
 		await this.save();
 
 		// Reject any pending requests for this client
@@ -95,7 +95,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
-		return this.serverData!.clients.find(c => c.clientId === clientId) || null;
+		return this.serverData!.clients.find((c) => c.clientId === clientId) || null;
 	}
 
 	/**
@@ -106,9 +106,9 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		return webSockets[0] || null;
 	}
 
-  getClientIdByWebSocket(ws: WebSocket): string | null {
-    return this.ctx.getTags(ws)[0] || null;
-  }
+	getClientIdByWebSocket(ws: WebSocket): string | null {
+		return this.ctx.getTags(ws)[0] || null;
+	}
 
 	/**
 	 * Handle response from client
@@ -213,9 +213,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 			return [];
 		}
 		// Filter clients that actually have active WebSocket connections
-		return this.serverData!.clients
-			.filter(client => this.getWebSocket(client.clientId) !== null)
-			.map(client => client.clientId);
+		return this.serverData!.clients.filter((client) => this.getWebSocket(client.clientId) !== null).map((client) => client.clientId);
 	}
 
 	/**

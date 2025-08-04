@@ -2,8 +2,9 @@
  * WebSocket handler for WRPC, inspired by tRPC's fetchRequestHandler
  */
 import type { AnyRouter } from './router';
-import { WRPCRequest, WRPCResponse, WRPCError, parseWRPCMessage } from './types';
-import { AnyProcedure } from './procedure';
+import type { WRPCRequest, WRPCResponse } from './types';
+import { WRPCError, parseWRPCMessage } from './types';
+import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connectionManager';
 import { createSession, type Session } from './session';
 
@@ -171,11 +172,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 				}
 			} catch (parseError) {
 				// Handle JSON parsing errors, validation errors, or malformed requests
-				const error = new WRPCError(
-					parseError instanceof Error ? parseError.message : 'Invalid message format', 
-					'PARSE_ERROR', 
-					parseError
-				);
+				const error = new WRPCError(parseError instanceof Error ? parseError.message : 'Invalid message format', 'PARSE_ERROR', parseError);
 
 				// Send error response with unknown id
 				const errorResponse: WRPCResponse = {

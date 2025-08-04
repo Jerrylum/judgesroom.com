@@ -84,7 +84,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
 		// Convert ArrayBuffer to string if necessary
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
-		
+
 		// For hibernation, we'll extract clientId from the message or use connection manager to find it
 		// The connection manager will handle finding the right client based on the WebSocket
 		await this.wsHandler.handleMessage(ws, messageStr);
@@ -92,14 +92,14 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
 		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
-		
+
 		// Delegate to the WebSocket handler
 		await this.wsHandler.handleClose(ws, code, reason, { clientId: clientId ?? undefined });
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
 		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
-		
+
 		// Delegate to the WebSocket handler
 		this.wsHandler.handleError(ws, error, { clientId: clientId ?? undefined });
 	}

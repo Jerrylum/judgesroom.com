@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { AnyProcedure, Procedure, ProcedureType } from './procedure';
-import { AnyRouter, BuiltRouter } from './router';
+import type { AnyProcedure, Procedure, ProcedureType } from './procedure';
+import type { AnyRouter, BuiltRouter } from './router';
 
 /**
  * ================================
@@ -52,30 +52,30 @@ export type WRPCRequest = InferParser<typeof WRPCRequestSchema>;
 export const WRPCResponseSchema = z.object({
 	kind: z.literal('response'),
 	id: z.string(),
-	result: z.object({
-		type: z.enum(['data', 'error', 'complete']),
-		data: z.unknown().optional(),
-		error: z.object({
-			message: z.string(),
-			code: z.string().optional()
-		}).optional()
-	}).optional()
+	result: z
+		.object({
+			type: z.enum(['data', 'error', 'complete']),
+			data: z.unknown().optional(),
+			error: z
+				.object({
+					message: z.string(),
+					code: z.string().optional()
+				})
+				.optional()
+		})
+		.optional()
 });
 
 export type WRPCResponse = InferParser<typeof WRPCResponseSchema>;
 
 // Proper discriminated union using the 'kind' field
-export const WRPCMessageSchema = z.discriminatedUnion('kind', [
-	WRPCRequestSchema,
-	WRPCResponseSchema
-]);
+export const WRPCMessageSchema = z.discriminatedUnion('kind', [WRPCRequestSchema, WRPCResponseSchema]);
 
 // Helper function to parse and validate WRPC messages
 export function parseWRPCMessage(data: string): WRPCRequest | WRPCResponse {
 	const parsed = JSON.parse(data);
 	return WRPCMessageSchema.parse(parsed);
 }
-
 
 // Procedure context
 export interface ProcedureContext {
