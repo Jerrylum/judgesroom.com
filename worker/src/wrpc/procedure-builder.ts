@@ -1,9 +1,9 @@
-import { InferParser, MaybePromise, Simplify } from './types';
-import { UnsetMarker } from './utils';
-import { AnyMutationProcedure, AnyProcedure, AnyQueryProcedure, MutationProcedure, ProcedureType, QueryProcedure } from './procedure';
-import { Session } from './session';
-import { AnyRouter } from './router';
-import { z } from 'zod';
+import type { InferParser, MaybePromise, Simplify } from './types';
+import type { UnsetMarker } from './utils';
+import type { AnyMutationProcedure, AnyProcedure, AnyQueryProcedure, MutationProcedure, ProcedureType, QueryProcedure } from './procedure';
+import type { Session } from './session';
+import type { AnyRouter } from './router';
+import type { z } from 'zod';
 
 type IntersectIfDefined<TType, TWith> = TType extends UnsetMarker ? TWith : TWith extends UnsetMarker ? TType : Simplify<TType & TWith>;
 
