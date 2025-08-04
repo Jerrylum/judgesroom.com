@@ -4,14 +4,12 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "judging",
+	"name": "judging-jerryio",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-26",
 	"migrations": [
 		{
-			"new_sqlite_classes": [
-				"WebSocketHibernationServer"
-			],
+			"new_sqlite_classes": ["WebSocketHibernationServer"],
 			"tag": "v1"
 		}
 	],
@@ -23,6 +21,15 @@
 			}
 		]
 	},
+	"compatibility_flags": ["nodejs_compat"],
+	"d1_databases": [
+		{
+			"binding": "BINDING_NAME",
+			"database_name": "YOUR_DB_NAME",
+			"database_id": "YOUR_DB_ID",
+			"migrations_dir": "drizzle/migrations"
+		}
+	],
 	"observability": {
 		"enabled": true
 	}
