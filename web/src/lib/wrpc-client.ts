@@ -7,11 +7,11 @@ import { parseWRPCMessage } from '@judging.jerryio/worker/src/wrpc/types';
 type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
 
 type InferClientType<TProcedure> =
-	TProcedure extends Procedure<infer TType, infer TDef>
+	TProcedure extends { _def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } } }
 		? TType extends 'query'
-			? { query: InputOutputFunction<TDef['input'], TDef['output']> }
+			? { query: InputOutputFunction<TInput, TOutput> }
 			: TType extends 'mutation'
-				? { mutation: InputOutputFunction<TDef['input'], TDef['output']> }
+				? { mutation: InputOutputFunction<TInput, TOutput> }
 				: never
 		: never;
 
