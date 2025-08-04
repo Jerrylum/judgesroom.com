@@ -31,7 +31,6 @@ export type Dict<TType> = Record<string, TType | undefined>;
 export type MaybePromise<TType> = Promise<TType> | TType;
 
 export type InferParser<T> = T extends z.ZodType<infer U> ? U : never;
-// export type InferOutput<T> = T extends (...args: unknown[]) => infer U ? Awaited<U> : T;
 
 const _errorSymbol = Symbol();
 export type ErrorSymbol = typeof _errorSymbol;

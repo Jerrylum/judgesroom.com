@@ -6,6 +6,7 @@ import { type UnsetMarker } from './utils';
 export interface WRPCRootObject<
 	TMeta extends object,
 	TOptions extends RuntimeConfigOptions<TMeta>,
+	TClientRouter extends AnyRouter = AnyRouter,
 	$Root extends AnyRootTypes = CreateRootTypes<{
 		meta: TMeta;
 		context: Record<string, never>;
@@ -20,7 +21,7 @@ export interface WRPCRootObject<
 	/**
 	 * Builder object for creating procedures
 	 */
-	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker>;
+	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TClientRouter>;
 
 	/**
 	 * Create a router
@@ -30,9 +31,7 @@ export interface WRPCRootObject<
 	/**
 	 * Merge Routers
 	 */
-	mergeRouters: <TRouters extends AnyRouter[]>(
-		...routerList: [...TRouters]
-	) => MergeRouters<TRouters>;
+	mergeRouters: <TRouters extends AnyRouter[]>(...routerList: [...TRouters]) => MergeRouters<TRouters>;
 }
 
 /** @internal */
@@ -52,11 +51,11 @@ class WRPCBuilder<TMeta extends object> {
 	}
 
 	/**
-	 * Create the root object
+	 * Create the root object with client router type
 	 */
-	create<TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+	create<TClientRouter extends AnyRouter = AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
 		opts?: TOptions
-	): WRPCRootObject<TMeta, TOptions> {
+	): WRPCRootObject<TMeta, TOptions, TClientRouter> {
 		type $Root = CreateRootTypes<{
 			meta: TMeta;
 			context: Record<string, never>;
@@ -64,7 +63,7 @@ class WRPCBuilder<TMeta extends object> {
 
 		const config: RootConfig<$Root> = {
 			meta: (opts?.defaultMeta || {}) as TMeta,
-			$types: null as unknown as $Root,
+			$types: null as unknown as $Root
 		};
 
 		return {
@@ -76,7 +75,7 @@ class WRPCBuilder<TMeta extends object> {
 			/**
 			 * Builder object for creating procedures
 			 */
-			procedure: createBuilder<TMeta>({}),
+			procedure: createBuilder<TMeta, TClientRouter>({}),
 			/**
 			 * Create a router
 			 */
@@ -84,7 +83,7 @@ class WRPCBuilder<TMeta extends object> {
 			/**
 			 * Merge Routers
 			 */
-			mergeRouters,
+			mergeRouters
 		};
 	}
 }

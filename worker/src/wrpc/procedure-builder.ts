@@ -1,6 +1,8 @@
 import { InferParser, MaybePromise, Simplify } from './types';
 import { UnsetMarker } from './utils';
 import { AnyMutationProcedure, AnyProcedure, AnyQueryProcedure, MutationProcedure, ProcedureType, QueryProcedure } from './procedure';
+import { Session } from './session';
+import { AnyRouter } from './router';
 import { z } from 'zod';
 
 type IntersectIfDefined<TType, TWith> = TType extends UnsetMarker ? TWith : TWith extends UnsetMarker ? TType : Simplify<TType & TWith>;
@@ -23,55 +25,47 @@ type AnyProcedureBuilderDef = ProcedureBuilderDef<any>;
  * Procedure resolver options (what the `.query()` and `.mutation()` functions receive)
  * @internal
  */
-export interface ProcedureResolverOptions<
-	TInput
-	// TContext,
-	// TContextOverridesIn,
-	// _TMeta,
-> {
+export interface ProcedureResolverOptions<TInput, TClientRouter extends AnyRouter = AnyRouter> {
 	input: TInput extends UnsetMarker ? undefined : TInput;
-	// ctx: Simplify<Overwrite<TContext, TContextOverridesIn>>;
-	// /**
-	//  * The AbortSignal of the request
-	//  */
-	// signal: AbortSignal | undefined;
+	/**
+	 * Session for server-to-client communication
+	 */
+	session: Session<TClientRouter>;
 }
 
 /**
  * A procedure resolver
  */
-export type ProcedureResolver<TInput, TOutput> = (opts: ProcedureResolverOptions<TInput>) => MaybePromise<TOutput>;
+export type ProcedureResolver<TInput, TOutput, TClientRouter extends AnyRouter = AnyRouter> = (
+	opts: ProcedureResolverOptions<TInput, TClientRouter>
+) => MaybePromise<TOutput>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyResolver = ProcedureResolver<any, any>;
+type AnyResolver = ProcedureResolver<any, any, any>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyProcedureBuilder = ProcedureBuilder<any, any, any>;
+type AnyProcedureBuilder = ProcedureBuilder<any, any, any, any>;
 
-export interface ProcedureBuilder<
-	TMeta,
-	TInput,
-	TOutput
-> {
+export interface ProcedureBuilder<TMeta, TInput, TOutput, TClientRouter extends AnyRouter = AnyRouter> {
 	_def: ProcedureBuilderDef<TMeta>;
 
 	input<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput>;
+	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput, TClientRouter>;
 
 	output<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>>;
+	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>, TClientRouter>;
 
-	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput>;
+	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TClientRouter>;
 
-	query<$Output>(resolver: ProcedureResolver<TInput, $Output>): QueryProcedure<{
+	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TClientRouter>): QueryProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
 	}>;
 
-	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output>): MutationProcedure<{
+	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TClientRouter>): MutationProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
@@ -80,27 +74,21 @@ export interface ProcedureBuilder<
 
 type ProcedureBuilderResolver = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	opts: ProcedureResolverOptions<any>
+	opts: ProcedureResolverOptions<any, any>
 ) => Promise<unknown>;
 
-function createNewBuilder(
-	def1: AnyProcedureBuilderDef,
-	def2: Partial<AnyProcedureBuilderDef>
-): AnyProcedureBuilder {
+function createNewBuilder(def1: AnyProcedureBuilderDef, def2: Partial<AnyProcedureBuilderDef>): AnyProcedureBuilder {
 	const { inputs = [], meta, ...rest } = def2;
 
 	return createBuilder({
 		...def1,
 		...rest,
 		inputs: [...def1.inputs, ...inputs],
-		meta: def1.meta && meta ? { ...def1.meta, ...meta } : (meta ?? def1.meta),
+		meta: def1.meta && meta ? { ...def1.meta, ...meta } : (meta ?? def1.meta)
 	});
 }
 
-function createResolver(
-	_defIn: AnyProcedureBuilderDef & { type: ProcedureType },
-	resolver: AnyResolver
-): AnyProcedure {
+function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }, resolver: AnyResolver): AnyProcedure {
 	const _def: AnyProcedure['_def'] = {
 		procedure: true,
 		$types: null as unknown as { input: unknown; output: unknown },
@@ -108,19 +96,19 @@ function createResolver(
 		meta: _defIn.meta,
 		_resolver: resolver,
 		_inputSchemas: _defIn.inputs,
-		_outputSchema: _defIn.output,
+		_outputSchema: _defIn.output
 	};
 
 	// Create a callable procedure function
-	const procedure = async (opts: { input: unknown }) => {
+	const procedure = async (opts: { input: unknown; session: Session }) => {
 		// Validate input against schemas if they exist
 		let validatedInput = opts.input;
 		for (const inputSchema of _defIn.inputs) {
 			validatedInput = inputSchema.parse(validatedInput);
 		}
 
-		// Call the resolver with validated input
-		const result = await resolver({ input: validatedInput });
+		// Call the resolver with validated input and session
+		const result = await resolver({ input: validatedInput, session: opts.session });
 
 		// Validate output if schema exists
 		if (_defIn.output) {
@@ -136,9 +124,9 @@ function createResolver(
 	return procedure as AnyProcedure;
 }
 
-export function createBuilder<TMeta>(
+export function createBuilder<TMeta, TClientRouter extends AnyRouter = AnyRouter>(
 	initDef: Partial<AnyProcedureBuilderDef> = {}
-): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker> {
+): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TClientRouter> {
 	const _def: AnyProcedureBuilderDef = {
 		procedure: true,
 		inputs: [],
@@ -150,35 +138,29 @@ export function createBuilder<TMeta>(
 
 		input(inputSchema) {
 			return createNewBuilder(_def, {
-				inputs: [inputSchema],
+				inputs: [inputSchema]
 			});
 		},
 
 		output(outputSchema) {
 			return createNewBuilder(_def, {
-				output: outputSchema,
+				output: outputSchema
 			});
 		},
 
 		meta(meta) {
 			return createNewBuilder(_def, {
-				meta,
+				meta
 			});
 		},
 
 		query(resolver) {
-			return createResolver(
-				{ ..._def, type: 'query' },
-				resolver
-			) as AnyQueryProcedure;
+			return createResolver({ ..._def, type: 'query' }, resolver) as AnyQueryProcedure;
 		},
 
 		mutation(resolver) {
-			return createResolver(
-				{ ..._def, type: 'mutation' },
-				resolver
-			) as AnyMutationProcedure;
-		},
+			return createResolver({ ..._def, type: 'mutation' }, resolver) as AnyMutationProcedure;
+		}
 	};
 
 	return builder;

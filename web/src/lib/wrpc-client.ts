@@ -1,240 +1,307 @@
-import type {
-  RouterDefinition,
-  InferClient,
-  CreateClientOptions,
-  WRPCRequest,
-  WRPCResponse
-} from '@judging.jerryio/worker/src/types';
+import type { AnyProcedure, Procedure } from '@judging.jerryio/worker/src/wrpc/procedure';
+import type { AnyRouter } from '@judging.jerryio/worker/src/wrpc/router';
+import type { Session } from '@judging.jerryio/worker/src/wrpc/session';
+import type { WRPCRequest, WRPCResponse } from '@judging.jerryio/worker/src/wrpc/types';
+
+type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
+
+type InferClientType<TProcedure> =
+	TProcedure extends Procedure<infer TType, infer TDef>
+		? TType extends 'query'
+			? { query: InputOutputFunction<TDef['input'], TDef['output']> }
+			: TType extends 'mutation'
+				? { mutation: InputOutputFunction<TDef['input'], TDef['output']> }
+				: never
+		: never;
+
+export type WRPCClient<TRouter extends AnyRouter> = {
+	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
+		? InferClientType<TRouter['_def']['record'][K]>
+		: TRouter['_def']['record'][K] extends AnyRouter
+			? WRPCClient<TRouter['_def']['record'][K]>
+			: never;
+};
 
 interface PendingRequest {
-  resolve: (value: unknown) => void;
-  reject: (error: Error) => void;
-  type: 'query' | 'mutation';
+	resolve: (value: unknown) => void;
+	reject: (error: Error) => void;
 }
 
-interface ActiveSubscription {
-  observer: {
-    onData?: (data: unknown) => void;
-    onError?: (error: Error) => void;
-    onComplete?: () => void;
-  };
-  unsubscribe: () => void;
+interface ClientOptions {
+	wsUrl: string;
+	sessionId?: string;
+	clientId?: string;
+	deviceName?: string;
 }
 
-export class WRPCClient<TRouter extends RouterDefinition> {
-  private ws: WebSocket | null = null;
-  private requestId = 0;
-  private pendingRequests = new Map<string, PendingRequest>();
-  private activeSubscriptions = new Map<string, ActiveSubscription>();
-  private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
-  private reconnectDelay = 1000;
+/**
+ * WRPC WebSocket client implementation
+ */
+export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter> {
+	private ws: WebSocket | null = null;
+	private requestId = 0;
+	private pendingRequests = new Map<string, PendingRequest>();
+	private reconnectAttempts = 0;
+	private maxReconnectAttempts = 5;
+	private reconnectDelay = 1000;
+	private clientRouter: TClientRouter;
 
-  constructor(private options: CreateClientOptions) { }
+	constructor(
+		private options: ClientOptions,
+		clientRouter: TClientRouter
+	) {
+		this.clientRouter = clientRouter;
+	}
 
-  private generateRequestId(): string {
-    return `req_${++this.requestId}_${Date.now()}`;
-  }
+	private generateRequestId(): string {
+		return `req_${++this.requestId}_${Date.now()}`;
+	}
 
-  private async connect(): Promise<WebSocket> {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      return this.ws;
-    }
+	private async connect(): Promise<WebSocket> {
+		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+			return this.ws;
+		}
 
-    return new Promise((resolve, reject) => {
-      const { wsUrl, sessionId, clientId, deviceName } = this.options;
-      const url = new URL(wsUrl);
+		return new Promise((resolve, reject) => {
+			const { wsUrl, sessionId, clientId, deviceName } = this.options;
+			const url = new URL(wsUrl);
 
-      if (sessionId) url.searchParams.set('sessionId', sessionId);
-      if (clientId) url.searchParams.set('clientId', clientId);
-      if (deviceName) url.searchParams.set('deviceName', deviceName);
-      url.searchParams.set('action', 'join');
+			if (sessionId) url.searchParams.set('sessionId', sessionId);
+			if (clientId) url.searchParams.set('clientId', clientId);
+			if (deviceName) url.searchParams.set('deviceName', deviceName);
+			url.searchParams.set('action', 'join');
 
-      const ws = new WebSocket(url.toString());
+			const ws = new WebSocket(url.toString());
 
-      ws.onopen = () => {
-        this.ws = ws;
-        this.reconnectAttempts = 0;
-        resolve(ws);
-      };
+			ws.onopen = () => {
+				this.ws = ws;
+				this.reconnectAttempts = 0;
+				resolve(ws);
+			};
 
-      ws.onerror = (error) => {
-        reject(new Error(`WebSocket connection failed: ${error}`));
-      };
+			ws.onerror = (error) => {
+				reject(new Error(`WebSocket connection failed: ${error}`));
+			};
 
-      ws.onmessage = (event) => {
-        this.handleMessage(event.data);
-      };
+			ws.onmessage = (event) => {
+				this.handleMessage(event.data);
+			};
 
-      ws.onclose = (event) => {
-        this.handleClose(event);
-      };
-    });
-  }
+			ws.onclose = (event) => {
+				this.handleClose(event);
+			};
+		});
+	}
 
-  private handleMessage(data: string): void {
-    try {
-      const response: WRPCResponse = JSON.parse(data);
+	private async handleMessage(data: string): Promise<void> {
+		try {
+			const message: WRPCRequest | WRPCResponse = JSON.parse(data);
 
-      // Handle regular request/response
-      const pendingRequest = this.pendingRequests.get(response.id);
-      if (pendingRequest) {
-        this.pendingRequests.delete(response.id);
+			// Check if this is a response to our request
+			if ('result' in message) {
+				this.handleResponse(message as WRPCResponse);
+				return;
+			}
 
-        if (response.result?.type === 'error') {
-          const error = new Error(response.result.error?.message || 'Unknown error');
-          (error as Error & { code?: string }).code = response.result.error?.code;
-          pendingRequest.reject(error);
-        } else if (response.result?.type === 'data') {
-          pendingRequest.resolve(response.result.data);
-        }
-        return;
-      }
+			// This is a request from server - handle it with our client router
+			await this.handleServerRequest(message as WRPCRequest);
+		} catch (error) {
+			console.error('Error parsing WebSocket message:', error);
+		}
+	}
 
-      // Handle subscription
-      const subscription = this.activeSubscriptions.get(response.id);
-      if (subscription) {
-        if (response.result?.type === 'error') {
-          const error = new Error(response.result.error?.message || 'Subscription error');
-          (error as Error & { code?: string }).code = response.result.error?.code;
-          subscription.observer.onError?.(error);
-        } else if (response.result?.type === 'data') {
-          subscription.observer.onData?.(response.result.data);
-        } else if (response.result?.type === 'complete') {
-          subscription.observer.onComplete?.();
-          this.activeSubscriptions.delete(response.id);
-        }
-      }
-    } catch (error) {
-      console.error('Error parsing WebSocket message:', error);
-    }
-  }
+	private handleResponse(response: WRPCResponse): void {
+		const pendingRequest = this.pendingRequests.get(response.id);
+		if (!pendingRequest) {
+			console.warn('Received response for unknown request:', response.id);
+			return;
+		}
 
-  private async handleClose(event: CloseEvent): Promise<void> {
-    this.ws = null;
+		this.pendingRequests.delete(response.id);
 
-    // Reject all pending requests
-    for (const [id, request] of this.pendingRequests) {
-      request.reject(new Error('WebSocket connection closed'));
-    }
-    this.pendingRequests.clear();
+		if (response.result?.type === 'error') {
+			const error = new Error(response.result.error?.message || 'Unknown error');
+			(error as Error & { code?: string }).code = response.result.error?.code;
+			pendingRequest.reject(error);
+		} else if (response.result?.type === 'data') {
+			pendingRequest.resolve(response.result.data);
+		}
+	}
 
-    // Notify subscriptions of disconnection
-    for (const [id, subscription] of this.activeSubscriptions) {
-      subscription.observer.onError?.(new Error('WebSocket connection closed'));
-    }
+	private async handleServerRequest(request: WRPCRequest): Promise<void> {
+		const ws = this.ws;
+		if (!ws || ws.readyState !== WebSocket.OPEN) {
+			console.error('WebSocket not connected when handling server request');
+			return;
+		}
 
-    // Attempt to reconnect if not intentionally closed
-    if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
-      setTimeout(() => {
-        this.reconnectAttempts++;
-        this.connect().catch(console.error);
-      }, this.reconnectDelay * Math.pow(2, this.reconnectAttempts));
-    }
-  }
+		try {
+			// Find the procedure in our client router
+			const procedure = this.getProcedureAtPath(this.clientRouter, request.path);
 
-  private async sendRequest(request: WRPCRequest): Promise<unknown> {
-    const ws = await this.connect();
+			if (!procedure) {
+				throw new Error(`No procedure found at path: ${request.path}`);
+			}
 
-    if (request.type === 'subscription') {
-      // Subscriptions are handled differently - they don't return promises
-      ws.send(JSON.stringify(request));
-      return;
-    }
+			// Call the procedure (it will handle input validation internally)
+			const result = await this.callProcedure(procedure, request.input);
 
-    return new Promise((resolve, reject) => {
-      this.pendingRequests.set(request.id, {
-        resolve,
-        reject,
-        type: request.type as 'query' | 'mutation'
-      });
-      ws.send(JSON.stringify(request));
+			// Send response back to server
+			const response: WRPCResponse = {
+				id: request.id,
+				result: {
+					type: 'data',
+					data: result
+				}
+			};
 
-      // Set timeout for request
-      setTimeout(() => {
-        if (this.pendingRequests.has(request.id)) {
-          this.pendingRequests.delete(request.id);
-          reject(new Error('Request timeout'));
-        }
-      }, 30000); // 30 seconds timeout
-    });
-  }
+			ws.send(JSON.stringify(response));
+		} catch (error) {
+			// Send error response
+			const response: WRPCResponse = {
+				id: request.id,
+				result: {
+					type: 'error',
+					error: {
+						message: error instanceof Error ? error.message : 'Unknown error',
+						code: 'CLIENT_ERROR'
+					}
+				}
+			};
 
-  query(path: string, input: unknown): Promise<unknown> {
-    const request: WRPCRequest = {
-      id: this.generateRequestId(),
-      type: 'query',
-      path,
-      input,
-    };
-    return this.sendRequest(request);
-  }
+			ws.send(JSON.stringify(response));
+		}
+	}
 
-  mutation(path: string, input: unknown): Promise<unknown> {
-    const request: WRPCRequest = {
-      id: this.generateRequestId(),
-      type: 'mutation',
-      path,
-      input,
-    };
-    return this.sendRequest(request);
-  }
+	private getProcedureAtPath(router: AnyRouter, path: string): AnyProcedure | null {
+		const parts = path.split('.');
+		let current: unknown = router;
 
-  subscribe(
-    path: string,
-    input: unknown,
-    observer: {
-      onData?: (data: unknown) => void;
-      onError?: (error: Error) => void;
-      onComplete?: () => void;
-    }
-  ): () => void {
-    const request: WRPCRequest = {
-      id: this.generateRequestId(),
-      type: 'subscription',
-      path,
-      input,
-    };
+		for (const part of parts) {
+			if (!current || typeof current !== 'object') {
+				return null;
+			}
+			current = (current as Record<string, unknown>)[part];
+		}
 
-    const unsubscribe = () => {
-      this.activeSubscriptions.delete(request.id);
-      // Note: In a full implementation, you might want to send an unsubscribe message
-    };
+		// Check if it's a valid procedure
+		if (typeof current === 'function') {
+			const fn = current as unknown as AnyProcedure;
+			if (typeof fn._def === 'object' && fn._def && fn._def.procedure === true) {
+				return fn;
+			}
+		}
 
-    this.activeSubscriptions.set(request.id, { observer, unsubscribe });
-    this.sendRequest(request);
+		return null;
+	}
 
-    return unsubscribe;
-  }
+	private async callProcedure(procedure: AnyProcedure, input: unknown): Promise<unknown> {
+		const procedureFn = procedure as unknown as (opts: { input: unknown; session: Session }) => Promise<unknown>;
+		return await procedureFn({ input, session: null as unknown as Session });
+	}
 
-  disconnect(): void {
-    if (this.ws) {
-      this.ws.close(1000, 'Client disconnect');
-      this.ws = null;
-    }
-  }
+	private async handleClose(event: CloseEvent): Promise<void> {
+		this.ws = null;
+
+		// Reject all pending requests
+		for (const [id, request] of this.pendingRequests) {
+			request.reject(new Error('WebSocket connection closed'));
+		}
+		this.pendingRequests.clear();
+
+		// Attempt to reconnect if not intentionally closed
+		if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+			setTimeout(
+				() => {
+					this.reconnectAttempts++;
+					this.connect().catch(console.error);
+				},
+				this.reconnectDelay * Math.pow(2, this.reconnectAttempts)
+			);
+		}
+	}
+
+	private async sendRequest(request: WRPCRequest): Promise<unknown> {
+		const ws = await this.connect();
+
+		return new Promise((resolve, reject) => {
+			this.pendingRequests.set(request.id, {
+				resolve,
+				reject
+			});
+			ws.send(JSON.stringify(request));
+
+			// Set timeout for request
+			setTimeout(() => {
+				if (this.pendingRequests.has(request.id)) {
+					this.pendingRequests.delete(request.id);
+					reject(new Error('Request timeout'));
+				}
+			}, 30000); // 30 seconds timeout
+		});
+	}
+
+	/**
+	 * Call a query procedure on the server
+	 */
+	query(path: string, input: unknown): Promise<unknown> {
+		const request: WRPCRequest = {
+			id: this.generateRequestId(),
+			type: 'query',
+			path,
+			input
+		};
+		return this.sendRequest(request);
+	}
+
+	/**
+	 * Call a mutation procedure on the server
+	 */
+	mutation(path: string, input: unknown): Promise<unknown> {
+		const request: WRPCRequest = {
+			id: this.generateRequestId(),
+			type: 'mutation',
+			path,
+			input
+		};
+		return this.sendRequest(request);
+	}
+
+	/**
+	 * Disconnect the WebSocket
+	 */
+	disconnect(): void {
+		if (this.ws) {
+			this.ws.close(1000, 'Client disconnect');
+			this.ws = null;
+		}
+	}
 }
 
-// Create a proxy to provide the type-safe interface
-export function createWRPCClient<TRouter extends RouterDefinition>(
-  options: CreateClientOptions
-): InferClient<TRouter> {
-  const client = new WRPCClient<TRouter>(options);
+/**
+ * Create a type-safe WRPC client proxy
+ */
+export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
+	options: ClientOptions,
+	clientRouter: TClientRouter
+): WRPCClient<TServerRouter> {
+	const client = new WebsocketClient<TServerRouter, TClientRouter>(options, clientRouter);
 
-  return new Proxy({} as InferClient<TRouter>, {
-    get(target, prop: string) {
-      return new Proxy({}, {
-        get(target, method: string) {
-          if (method === 'query') {
-            return (input: unknown) => client.query(prop, input);
-          } else if (method === 'mutation') {
-            return (input: unknown) => client.mutation(prop, input);
-          } else if (method === 'subscribe') {
-            return (input: unknown, observer: unknown) => client.subscribe(prop, input, observer as Parameters<typeof client.subscribe>[2]);
-          }
-          throw new Error(`Unknown method: ${method}`);
-        }
-      });
-    }
-  });
-} 
+	return new Proxy({} as WRPCClient<TServerRouter>, {
+		get(target, prop: string) {
+			return new Proxy(
+				{},
+				{
+					get(target, method: string) {
+						if (method === 'query') {
+							return (input: unknown) => client.query(prop, input);
+						} else if (method === 'mutation') {
+							return (input: unknown) => client.mutation(prop, input);
+						}
+						throw new Error(`Unknown method: ${method}`);
+					}
+				}
+			);
+		}
+	});
+}

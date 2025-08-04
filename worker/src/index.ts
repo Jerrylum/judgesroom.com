@@ -1,7 +1,8 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { createWebSocketHandler } from './wrpc/websocketHandler';
-import { appRouter } from './router';
+import { serverRouter } from './server-router';
+import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRequest, WRPCResponse } from './wrpc/types';
 
 const IntentionSchema = z.object({
@@ -15,11 +16,12 @@ type Intention = z.infer<typeof IntentionSchema>;
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class WebSocketHibernationServer extends DurableObject<Env> {
-	private wsHandler = createWebSocketHandler({
-		router: appRouter,
+	private wsHandler = createWebSocketHandler<typeof serverRouter, ClientRouter>({
+		router: serverRouter,
+		ctx: this.ctx,
 		onError: (opts) => {
 			console.error('WRPC Error:', opts.error.message, opts.error);
-		},
+		}
 	});
 
 	/**
@@ -31,6 +33,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	 */
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
+		// Initialize the WebSocket handler with hibernation support
+		this.wsHandler.initialize().catch(console.error);
 	}
 
 	async fetch(request: Request): Promise<Response> {
@@ -69,11 +73,11 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// (run the `constructor`) and deliver the message to the appropriate handler.
 		this.ctx.acceptWebSocket(ws, [clientId]);
 
-		// Set up connection with the WebSocket handler
-		this.wsHandler.handleConnection(ws, {
+		// Set up connection with the WebSocket handler (now async for storage)
+		await this.wsHandler.handleConnection(ws, {
 			sessionId,
 			clientId,
-			deviceName,
+			deviceName
 		});
 	}
 
@@ -81,18 +85,23 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Convert ArrayBuffer to string if necessary
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 		
-		// Delegate to the WebSocket handler
+		// For hibernation, we'll extract clientId from the message or use connection manager to find it
+		// The connection manager will handle finding the right client based on the WebSocket
 		await this.wsHandler.handleMessage(ws, messageStr);
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
+		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
+		
 		// Delegate to the WebSocket handler
-		this.wsHandler.handleClose(ws, code, reason);
+		await this.wsHandler.handleClose(ws, code, reason, { clientId: clientId ?? undefined });
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
+		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
+		
 		// Delegate to the WebSocket handler
-		this.wsHandler.handleError(ws, error);
+		this.wsHandler.handleError(ws, error, { clientId: clientId ?? undefined });
 	}
 }
 

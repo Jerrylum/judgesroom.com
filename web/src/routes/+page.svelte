@@ -1,48 +1,44 @@
 <script lang="ts">
   import { useWRPC } from '../lib/use-wrpc';
-  import { onMount } from 'svelte';
+  import { subscribeToClientState, getClientState } from '../lib/client-state';
+  import { onMount, onDestroy } from 'svelte';
 
   const wrpc = useWRPC();
   
   let name = '';
   let ageResult = '';
-  let interests: string[] = [];
+  let clientState = getClientState();
+
+  // Subscribe to client state updates
+  const unsubscribeFromClientState = subscribeToClientState((newState) => {
+    clientState = newState;
+  });
 
   onMount(async () => {
     try {
-      // Test query
-      const nameResult = await wrpc.getName.query(["Jerry"]);
+      // Test query - call server's getName procedure
+      const nameResult = await wrpc.getName.query("Jerry");
       name = nameResult as string;
+      console.log('Name result:', nameResult);
     } catch (error) {
       console.error('Error calling getName:', error);
     }
   });
 
+  onDestroy(() => {
+    unsubscribeFromClientState();
+  });
+
   async function setAge() {
     try {
-      const result = await wrpc.setAge.mutation([20]);
+      const age = 20 + Math.floor(Math.random() * 30); // Random age between 20-49
+      const result = await wrpc.setAge.mutation(age);
       ageResult = result as string;
+      console.log('Age result:', result);
     } catch (error) {
       console.error('Error calling setAge:', error);
     }
   }
-
-  $effect(() => {
-    const unsubscribe = wrpc.updateInterests.subscribe(['programming'], {
-      onData: (data: string[]) => {
-        console.log('Received interests:', data);
-        interests = data as string[];
-      },
-      onError: (error: Error) => {
-        console.error('Subscription error:', error);
-      },
-      onComplete: () => {
-        console.log('Subscription completed');
-      }
-    });
-
-    return () => unsubscribe();
-  });
 </script>
 
 <h1>wRPC Test</h1>
@@ -55,22 +51,19 @@
 
 <div class="demo-section">
   <h2>Mutation Test</h2>
-  <button on:click={setAge}>Set Age to 20</button>
+  <button on:click={setAge}>Set Random Age</button>
   {#if ageResult}
     <p>Result: <strong>{ageResult}</strong></p>
   {/if}
 </div>
 
 <div class="demo-section">
-  <h2>Subscription Test</h2>
-  
-  {#if interests.length > 0}
-    <p>Current interests:</p>
-    <ul>
-      {#each interests as interest}
-        <li>{interest}</li>
-      {/each}
-    </ul>
+  <h2>Server-to-Client Communication</h2>
+  <p>When you click "Set Random Age", the server will also call the client's <code>updateAge</code> procedure.</p>
+  <p>Check the browser console to see the client-side procedure being called.</p>
+  <p>Server call count: <strong>{clientState.serverCallCount}</strong></p>
+  {#if clientState.lastUpdateAge > 0}
+    <p>Last age update from server: <strong>{clientState.lastUpdateAge}</strong></p>
   {/if}
 </div>
 
