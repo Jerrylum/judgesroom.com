@@ -189,6 +189,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 			} catch (error) {
 				// Return error response for failed broadcasts
 				return {
+					kind: 'response' as const,
 					id: clientRequest.id,
 					result: {
 						type: 'error' as const,

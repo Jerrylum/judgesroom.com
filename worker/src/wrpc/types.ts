@@ -38,24 +38,42 @@ export type TypeError<TMessage extends string> = TMessage & {
 	_: typeof _errorSymbol;
 };
 
-// Message types for WebSocket communication
-export interface WRPCRequest {
-	id: string;
-	type: ProcedureType;
-	path: string;
-	input: unknown;
-}
+// Zod schemas for runtime validation
+export const WRPCRequestSchema = z.object({
+	kind: z.literal('request'),
+	id: z.string(),
+	type: z.enum(['query', 'mutation']), // ProcedureType values
+	path: z.string(),
+	input: z.unknown()
+});
 
-export interface WRPCResponse {
-	id: string;
-	result?: {
-		type: 'data' | 'error' | 'complete';
-		data?: unknown;
-		error?: {
-			message: string;
-			code?: string;
-		};
-	};
+export type WRPCRequest = InferParser<typeof WRPCRequestSchema>;
+
+export const WRPCResponseSchema = z.object({
+	kind: z.literal('response'),
+	id: z.string(),
+	result: z.object({
+		type: z.enum(['data', 'error', 'complete']),
+		data: z.unknown().optional(),
+		error: z.object({
+			message: z.string(),
+			code: z.string().optional()
+		}).optional()
+	}).optional()
+});
+
+export type WRPCResponse = InferParser<typeof WRPCResponseSchema>;
+
+// Proper discriminated union using the 'kind' field
+export const WRPCMessageSchema = z.discriminatedUnion('kind', [
+	WRPCRequestSchema,
+	WRPCResponseSchema
+]);
+
+// Helper function to parse and validate WRPC messages
+export function parseWRPCMessage(data: string): WRPCRequest | WRPCResponse {
+	const parsed = JSON.parse(data);
+	return WRPCMessageSchema.parse(parsed);
 }
 
 
@@ -66,25 +84,6 @@ export interface ProcedureContext {
 	clientId?: string;
 	sessionId?: string;
 }
-
-// Legacy builder types (now replaced by proper implementation)
-// export interface ProcedureBuilder<TInput = unknown> {
-// 	input<TSchema extends z.ZodType>(schema: TSchema): ProcedureBuilder<InferParser<TSchema>>;
-// 	query<TOutput>(handler: (ctx: { input: TInput }) => MaybePromise<TOutput>): QueryProcedure<TInput, TOutput>;
-// 	mutation<TOutput>(handler: (ctx: { input: TInput }) => MaybePromise<TOutput>): MutationProcedure<TInput, TOutput>;
-// }
-
-// Router types
-// export interface RouterRecord {
-// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// 	[key: string]: Procedure<any, any> | RouterRecord;
-// }
-
-// export interface RouterDefinition<TRecord extends RouterRecord = RouterRecord> {
-// 	_def: {
-// 		record: TRecord;
-// 	};
-// }
 
 // Type inference helpers
 export type inferRouterInputs<TRouter extends AnyRouter> = {
@@ -110,19 +109,6 @@ export type CreateClientOptions = {
 	clientId?: string;
 	deviceName?: string;
 };
-
-// export interface ClientProcedure<TInput, TOutput> {
-// 	query: (input: TInput) => Promise<TOutput>;
-// 	mutation: (input: TInput) => Promise<TOutput>;
-// 	subscribe: (
-// 		input: TInput,
-// 		observer: {
-// 			onData?: (data: TOutput) => void;
-// 			onError?: (error: Error) => void;
-// 			onComplete?: () => void;
-// 		}
-// 	) => () => void; // Returns unsubscribe function
-// }
 
 // Error types
 export class WRPCError extends Error {

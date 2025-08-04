@@ -2,7 +2,7 @@
  * WebSocket handler for WRPC, inspired by tRPC's fetchRequestHandler
  */
 import type { AnyRouter } from './router';
-import { WRPCRequest, WRPCResponse, WRPCError } from './types';
+import { WRPCRequest, WRPCResponse, WRPCError, parseWRPCMessage } from './types';
 import { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connectionManager';
 import { createSession, type Session } from './session';
@@ -89,22 +89,24 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 		 */
 		async handleMessage(ws: WebSocket, message: string, connectionOpts?: WebSocketConnectionOptions): Promise<void> {
 			try {
-				const request: WRPCRequest = JSON.parse(message);
+				// Parse and validate the message using Zod
+				const parsedMessage = parseWRPCMessage(message);
 
 				// Find clientId if not provided in connectionOpts
 				const clientId = connectionOpts?.clientId || connectionManager.getClientIdByWebSocket(ws);
 
-				// Check if this is a response from client (for server-to-client calls)
-				if (request.id && clientId) {
-					// Check if this might be a response to a server-initiated request
-					connectionManager.handleResponse(request as unknown as WRPCResponse, clientId);
+				// Handle responses from client (for server-to-client calls)
+				if (parsedMessage.kind === 'response') {
+					if (clientId) {
+						connectionManager.handleResponse(parsedMessage, clientId);
+					} else {
+						console.warn('Received response but could not identify client');
+					}
 					return;
 				}
 
-				// Validate request structure
-				if (!request.id || !request.type || !request.path) {
-					throw new WRPCError('Invalid request structure');
-				}
+				// Handle requests from client
+				const request = parsedMessage;
 
 				try {
 					const procedure = getProcedureAtPath(opts.router, request.path);
@@ -133,6 +135,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 					const result = await callProcedure(procedure, request.input, session);
 
 					const response: WRPCResponse = {
+						kind: 'response',
 						id: request.id,
 						result: {
 							type: 'data',
@@ -146,6 +149,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 						procedureError instanceof WRPCError ? procedureError : new WRPCError('Internal server error', 'INTERNAL_ERROR', procedureError);
 
 					const errorResponse: WRPCResponse = {
+						kind: 'response',
 						id: request.id,
 						result: {
 							type: 'error',
@@ -166,11 +170,16 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 					});
 				}
 			} catch (parseError) {
-				// Handle JSON parsing errors or malformed requests
-				const error = new WRPCError('Invalid JSON or malformed request', 'PARSE_ERROR', parseError);
+				// Handle JSON parsing errors, validation errors, or malformed requests
+				const error = new WRPCError(
+					parseError instanceof Error ? parseError.message : 'Invalid message format', 
+					'PARSE_ERROR', 
+					parseError
+				);
 
 				// Send error response with unknown id
 				const errorResponse: WRPCResponse = {
+					kind: 'response',
 					id: 'unknown',
 					result: {
 						type: 'error',
@@ -185,7 +194,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 
 				opts.onError?.({
 					error,
-					req: { id: 'unknown', type: 'query', path: 'unknown', input: null } as WRPCRequest,
+					req: { kind: 'request', id: 'unknown', type: 'query', path: 'unknown', input: null } as WRPCRequest,
 					ws
 				});
 			}

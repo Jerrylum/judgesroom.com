@@ -13,7 +13,7 @@ export const serverRouter = w.router({
 
 	setAge: w.procedure.input(z.number()).mutation(async ({ input, session }) => {
 		// Server can now call client procedures
-		await session.getClient('some-client-id').updateAge.mutation(input);
+		// await session.getClient('some-client-id').updateAge.mutation(input);
 
 		// Or broadcast to all clients
 		await session.broadcast.updateAge.mutation(input);

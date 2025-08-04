@@ -2,6 +2,7 @@ import type { AnyProcedure, Procedure } from '@judging.jerryio/worker/src/wrpc/p
 import type { AnyRouter } from '@judging.jerryio/worker/src/wrpc/router';
 import type { Session } from '@judging.jerryio/worker/src/wrpc/session';
 import type { WRPCRequest, WRPCResponse } from '@judging.jerryio/worker/src/wrpc/types';
+import { parseWRPCMessage } from '@judging.jerryio/worker/src/wrpc/types';
 
 type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
 
@@ -95,18 +96,19 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 
 	private async handleMessage(data: string): Promise<void> {
 		try {
-			const message: WRPCRequest | WRPCResponse = JSON.parse(data);
+			// Parse and validate the message using Zod
+			const parsedMessage = parseWRPCMessage(data);
 
-			// Check if this is a response to our request
-			if ('result' in message) {
-				this.handleResponse(message as WRPCResponse);
+			// Handle responses to our requests
+			if (parsedMessage.kind === 'response') {
+				this.handleResponse(parsedMessage);
 				return;
 			}
 
-			// This is a request from server - handle it with our client router
-			await this.handleServerRequest(message as WRPCRequest);
+			// Handle requests from server
+			await this.handleServerRequest(parsedMessage);
 		} catch (error) {
-			console.error('Error parsing WebSocket message:', error);
+			console.error('Error parsing or validating WebSocket message:', error);
 		}
 	}
 
@@ -148,6 +150,7 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 
 			// Send response back to server
 			const response: WRPCResponse = {
+				kind: 'response',
 				id: request.id,
 				result: {
 					type: 'data',
@@ -159,6 +162,7 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 		} catch (error) {
 			// Send error response
 			const response: WRPCResponse = {
+				kind: 'response',
 				id: request.id,
 				result: {
 					type: 'error',
@@ -246,6 +250,7 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 	 */
 	query(path: string, input: unknown): Promise<unknown> {
 		const request: WRPCRequest = {
+			kind: 'request',
 			id: this.generateRequestId(),
 			type: 'query',
 			path,
@@ -259,6 +264,7 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 	 */
 	mutation(path: string, input: unknown): Promise<unknown> {
 		const request: WRPCRequest = {
+			kind: 'request',
 			id: this.generateRequestId(),
 			type: 'mutation',
 			path,

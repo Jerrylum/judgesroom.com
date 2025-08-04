@@ -95,6 +95,7 @@ export function createSession<TClientRouter extends AnyRouter>(
 							if (method === 'query' || method === 'mutation') {
 								return async (input: unknown) => {
 									const request: WRPCRequest = {
+										kind: 'request',
 										id: crypto.randomUUID(),
 										type: method as 'query' | 'mutation',
 										path: prop,
