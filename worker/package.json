@@ -24,7 +24,8 @@
 	},
 	"dependencies": {
 		"@judging.jerryio/web": "workspace:*",
+		"@judging.jerryio/wrpc": "workspace:*",
 		"drizzle-orm": "^0.44.4",
-		"zod": "^4.0.10"
+		"zod": "^4.0.15"
 	}
 }

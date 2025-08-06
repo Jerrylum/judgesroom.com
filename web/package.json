@@ -1,7 +1,7 @@
 {
 	"name": "@judging.jerryio/web",
+	"version": "0.0.0",
 	"private": true,
-	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -37,7 +37,7 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"tailwindcss": "^4.0.0",
-		"typescript": "^5.0.0",
+		"typescript": "^5.5.2",
 		"typescript-eslint": "^8.20.0",
 		"vite": "^7.0.4",
 		"vite-plugin-devtools-json": "^0.2.0",
@@ -46,11 +46,12 @@
 	},
 	"dependencies": {
 		"@judging.jerryio/worker": "workspace:*",
+		"@judging.jerryio/wrpc": "workspace:*",
 		"crypto-js": "^4.2.0",
 		"events": "^3.3.0",
 		"papaparse": "^5.5.3",
 		"qrcode": "^1.5.4",
 		"svelte-dnd-action": "^0.9.64",
-		"zod": "^4.0.10"
+		"zod": "^4.0.15"
 	}
 }
