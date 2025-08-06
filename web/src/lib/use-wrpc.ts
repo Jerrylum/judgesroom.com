@@ -18,7 +18,7 @@ export function useWRPC() {
     
     // Generate a client ID for this session
     const clientId = generateUUID();
-    const sessionId = generateUUID();
+    const sessionId = "5cda73e1-c7e2-425a-82e6-ec3f32b4115f";
     const deviceName = getDeviceNameFromUserAgent();
 
     clientInstance = createWRPCClient<ServerRouter, ClientRouter>({
