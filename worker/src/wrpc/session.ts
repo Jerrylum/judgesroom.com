@@ -1,3 +1,4 @@
+import type { AnyProcedure } from './procedure';
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './types';
 
@@ -23,19 +24,27 @@ export interface Session<TClientRouter extends AnyRouter = AnyRouter> {
 	deviceName?: string;
 }
 
+type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
+
+type InferClientType<TProcedure> = TProcedure extends {
+	_def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } };
+}
+	? TType extends 'query'
+		? { query: InputOutputFunction<TInput, TOutput> }
+		: TType extends 'mutation'
+			? { mutation: InputOutputFunction<TInput, TOutput> }
+			: never
+	: never;
+
 /**
  * Client proxy type that mirrors the client router structure
  */
 export type ClientProxy<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends infer $Procedure
-		? $Procedure extends { _def: { type: 'query' } }
-			? { query: (input: unknown) => Promise<unknown> }
-			: $Procedure extends { _def: { type: 'mutation' } }
-				? { mutation: (input: unknown) => Promise<unknown> }
-				: TRouter['_def']['record'][K] extends AnyRouter
-					? ClientProxy<TRouter['_def']['record'][K]>
-					: never
-		: never;
+	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
+		? InferClientType<TRouter['_def']['record'][K]>
+		: TRouter['_def']['record'][K] extends AnyRouter
+			? ClientProxy<TRouter['_def']['record'][K]>
+			: never;
 };
 
 /**
