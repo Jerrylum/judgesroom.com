@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { createWebSocketHandler } from './wrpc/websocketHandler';
 import { serverRouter } from './server-router';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
-import type { WRPCRequest, WRPCResponse } from './wrpc/types';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
