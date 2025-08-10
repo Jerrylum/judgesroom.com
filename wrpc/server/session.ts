@@ -5,7 +5,7 @@ import type { WRPCRequest, WRPCResponse } from './types';
 /**
  * Session interface for server-to-client communication
  */
-export interface Session<TClientRouter extends AnyRouter = AnyRouter> {
+export interface Session<TClientRouter extends AnyRouter> {
 	/**
 	 * Get a client proxy to call procedures on a specific client
 	 */

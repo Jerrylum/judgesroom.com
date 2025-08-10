@@ -1,6 +1,7 @@
 // This file is heavily inspired by the tRPC procedure.ts file
 // https://github.com/trpc/trpc/blob/main/packages/server/src/unstable-core-do-not-import/procedure.ts
 
+import type { AnyRouter } from './router';
 import type { Session } from './session';
 
 // Different from tRPC, we don't have a subscription type
@@ -35,7 +36,7 @@ export type Procedure<TType extends ProcedureType, TDef extends BuiltProcedureDe
 		type: TType;
 		meta: TDef['meta'];
 		// Runtime properties for implementation
-		_resolver?: (opts: { input: unknown; session: Session }) => Promise<unknown> | unknown;
+		_resolver?: (opts: { input: unknown; session: Session<AnyRouter> }) => Promise<unknown> | unknown;
 		_inputSchemas?: unknown[];
 		_outputSchema?: unknown;
 	};
@@ -52,9 +53,9 @@ export type AnyMutationProcedure = MutationProcedure<any>;
 
 export type AnyProcedure = AnyQueryProcedure | AnyMutationProcedure;
 
-export type inferProcedureInput<TProcedure extends AnyProcedure> = undefined extends inferProcedureParams<TProcedure>['$types']['input']
-	? void | inferProcedureParams<TProcedure>['$types']['input']
-	: inferProcedureParams<TProcedure>['$types']['input'];
+export type InferProcedureInput<TProcedure extends AnyProcedure> = undefined extends InferProcedureParams<TProcedure>['$types']['input']
+	? void | InferProcedureParams<TProcedure>['$types']['input']
+	: InferProcedureParams<TProcedure>['$types']['input'];
 
-export type inferProcedureParams<TProcedure> = TProcedure extends AnyProcedure ? TProcedure['_def'] : never;
-export type inferProcedureOutput<TProcedure> = inferProcedureParams<TProcedure>['$types']['output'];
+export type InferProcedureParams<TProcedure> = TProcedure extends AnyProcedure ? TProcedure['_def'] : never;
+export type InferProcedureOutput<TProcedure> = InferProcedureParams<TProcedure>['$types']['output'];

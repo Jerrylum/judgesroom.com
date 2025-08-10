@@ -1,17 +1,12 @@
-import { createWRPCClient, WebsocketClient } from './wrpc-client';
-import type { ServerRouter } from '../../../worker/src/server-router';
+import { createClientManager } from '@judging.jerryio/wrpc/client';
+import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import type { ClientRouter } from './client-router';
 import { clientRouter } from './client-router';
 import { generateUUID, getDeviceNameFromUserAgent } from './utils.svelte';
 
-// Global client instance
-let clientInstance: ReturnType<typeof createWRPCClient<ServerRouter, ClientRouter>> | null = null;
-
-/**
- * Get or create the WRPC client instance
- */
-export function useWRPC() {
-  if (!clientInstance) {
+// Create the client manager
+const clientManager = createClientManager<ServerRouter, ClientRouter>(
+  () => {
     // Determine the WebSocket URL based on the current environment
     const isDevelopment = import.meta.env.DEV;
     const wsUrl = isDevelopment ? 'ws://localhost:8787/ws' : 'wss://judging.jerryio.workers.dev/ws';
@@ -21,35 +16,33 @@ export function useWRPC() {
     const sessionId = "5cda73e1-c7e2-425a-82e6-ec3f32b4115f";
     const deviceName = getDeviceNameFromUserAgent();
 
-    clientInstance = createWRPCClient<ServerRouter, ClientRouter>({
+    return {
       wsUrl,
       clientId,
       sessionId,
       deviceName,
-    }, clientRouter);
-  }
+    };
+  },
+  clientRouter
+);
 
-  return clientInstance;
+/**
+ * Get or create the WRPC client instance
+ */
+export function useWRPC() {
+  return clientManager.getClient();
 }
 
 /**
  * Reset the WRPC client (useful for testing or logout)
  */
 export function resetWRPCClient(): void {
-  if (clientInstance) {
-    // If the client has a disconnect method, call it
-    const client = clientInstance as ReturnType<typeof createWRPCClient<ServerRouter, ClientRouter>> & { disconnect?: () => void };
-    if (client.disconnect && typeof client.disconnect === 'function') {
-      client.disconnect();
-    }
-  }
-  clientInstance = null;
+  clientManager.resetClient();
 }
 
 /**
  * Check if the client is connected (if implemented in the future)
  */
 export function isWRPCConnected(): boolean {
-  // This could be enhanced to check the actual connection status
-  return clientInstance !== null;
+  return clientManager.isConnected();
 }

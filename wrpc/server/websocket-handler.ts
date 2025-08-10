@@ -3,20 +3,43 @@
  */
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './types';
-import { WRPCError, parseWRPCMessage } from './types';
+import { WRPCError } from './types';
 import type { AnyProcedure } from './procedure';
-import { WebSocketConnectionManager } from './connectionManager';
+import { WebSocketConnectionManager } from './connection-manager';
 import { createSession, type Session } from './session';
+import { parseWRPCMessage } from './utils';
 
 export interface WebSocketHandlerOptions<TRouter extends AnyRouter, TClientRouter extends AnyRouter = AnyRouter> {
 	/**
 	 * The router instance
 	 */
 	router: TRouter;
+
 	/**
-	 * Durable Object state for hibernation support
+	 * Load data from Durable Object storage
 	 */
-	ctx: DurableObjectState;
+	loadData: () => Promise<unknown>;
+
+	/**
+	 * Save data to Durable Object storage
+	 */
+	saveData: (data: unknown) => Promise<void>;
+
+	/**
+	 * Destroy all data (for cleanup)
+	 */
+	destroy: () => Promise<void>;
+
+	/**
+	 * Get WebSocket by clientId
+	 */
+	getWebSocket: (clientId: string) => WebSocket | null;
+
+	/**
+	 * Get clientId by WebSocket
+	 */
+	getClientIdByWebSocket: (ws: WebSocket) => string | null;
+
 	/**
 	 * Called when an error occurs
 	 */
@@ -70,7 +93,7 @@ async function callProcedure(procedure: AnyProcedure, input: unknown, session: S
 export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter extends AnyRouter = AnyRouter>(
 	opts: WebSocketHandlerOptions<TRouter, TClientRouter>
 ) {
-	const connectionManager = new WebSocketConnectionManager(opts.ctx);
+	const connectionManager = new WebSocketConnectionManager(opts);
 
 	return {
 		/**
@@ -94,7 +117,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 				const parsedMessage = parseWRPCMessage(message);
 
 				// Find clientId if not provided in connectionOpts
-				const clientId = connectionOpts?.clientId || connectionManager.getClientIdByWebSocket(ws);
+				const clientId = connectionOpts?.clientId || opts.getClientIdByWebSocket(ws);
 
 				// Handle responses from client (for server-to-client calls)
 				if (parsedMessage.kind === 'response') {

@@ -35,7 +35,7 @@ export interface WRPCRootObject<
 }
 
 /** @internal */
-export interface RuntimeConfigOptions<TMeta extends object> {
+interface RuntimeConfigOptions<TMeta extends object> {
 	/**
 	 * Default meta to be applied to all procedures
 	 */
@@ -53,7 +53,7 @@ class WRPCBuilder<TMeta extends object> {
 	/**
 	 * Create the root object with client router type
 	 */
-	create<TClientRouter extends AnyRouter = AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+	createServer<TClientRouter extends AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
 		opts?: TOptions
 	): WRPCRootObject<TMeta, TOptions, TClientRouter> {
 		type $Root = CreateRootTypes<{
@@ -83,6 +83,27 @@ class WRPCBuilder<TMeta extends object> {
 			/**
 			 * Merge Routers
 			 */
+			mergeRouters
+		};
+	}
+
+	clientClient<TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+		opts?: TOptions
+	): WRPCRootObject<TMeta, TOptions, never> {
+		type $Root = CreateRootTypes<{
+			meta: TMeta;
+			context: Record<string, never>;
+		}>;
+
+		const config: RootConfig<$Root> = {
+			meta: (opts?.defaultMeta || {}) as TMeta,
+			$types: null as unknown as $Root
+		};
+
+		return {
+			_config: config,
+			procedure: createBuilder<TMeta, never>({}),
+			router: createRouterFactory<$Root>(config),
 			mergeRouters
 		};
 	}

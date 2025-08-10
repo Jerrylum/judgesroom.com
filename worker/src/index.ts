@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { createWebSocketHandler } from './wrpc/websocketHandler';
+import { createWebSocketHandler } from '@judging.jerryio/wrpc/server';
 import { serverRouter } from './server-router';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
@@ -17,7 +17,12 @@ type Intention = z.infer<typeof IntentionSchema>;
 export class WebSocketHibernationServer extends DurableObject<Env> {
 	private wsHandler = createWebSocketHandler<typeof serverRouter, ClientRouter>({
 		router: serverRouter,
-		ctx: this.ctx,
+		// ctx: this.ctx,
+		loadData: () => this.ctx.storage.get('wrpc-data'),
+		saveData: (data) => this.ctx.storage.put('wrpc-data', data),
+		destroy: () => this.ctx.storage.deleteAll(),
+		getWebSocket: (clientId) => this.ctx.getWebSockets(clientId)[0] || null,
+		getClientIdByWebSocket: (ws) => this.ctx.getTags(ws)[0] || null,
 		onError: (opts) => {
 			console.error('WRPC Error:', opts.error.message, opts.error);
 		}
@@ -38,28 +43,21 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 	async fetch(request: Request): Promise<Response> {
 		const url = new URL(request.url);
-		const sessionId = url.searchParams.get('sessionId');
-		const clientId = url.searchParams.get('clientId');
-		const deviceName = url.searchParams.get('deviceName');
-		const action = url.searchParams.get('action');
+		// const sessionId = url.searchParams.get('sessionId');
+		// const clientId = url.searchParams.get('clientId');
+		// const deviceName = url.searchParams.get('deviceName');
+		// const action = url.searchParams.get('action');
 
-		const intention = IntentionSchema.parse({ sessionId, clientId, deviceName, action });
+		// const intention = IntentionSchema.parse({ sessionId, clientId, deviceName, action });
+		const { sessionId, clientId, deviceName, action } = IntentionSchema.parse(url.searchParams);
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
-		const [client, server] = Object.values(webSocketPair);
+		const [_, ws] = Object.values(webSocketPair);
 
-		if (!client || !server) {
+		if (!_ || !ws) {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
 		}
-
-		await this.handleWebSocket(server, intention);
-
-		return new Response(null, { status: 101, webSocket: client });
-	}
-
-	private async handleWebSocket(ws: WebSocket, intention: Intention) {
-		const { sessionId, clientId, deviceName, action } = intention;
 
 		// Calling `acceptWebSocket()` informs the runtime that this WebSocket is to begin terminating
 		// request within the Durable Object. It has the effect of "accepting" the connection,
@@ -78,6 +76,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			clientId,
 			deviceName
 		});
+
+		return new Response(null, { status: 101, webSocket: _ });
 	}
 
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
@@ -90,17 +90,21 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
-		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
+		const clientId = this.getClientIdByWebSocket(ws);
 
 		// Delegate to the WebSocket handler
 		await this.wsHandler.handleClose(ws, code, reason, { clientId: clientId ?? undefined });
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
-		const clientId = this.wsHandler.connectionManager.getClientIdByWebSocket(ws);
+		const clientId = this.getClientIdByWebSocket(ws);
 
 		// Delegate to the WebSocket handler
 		this.wsHandler.handleError(ws, error, { clientId: clientId ?? undefined });
+	}
+
+	private getClientIdByWebSocket(ws: WebSocket): string | null {
+		return this.ctx.getTags(ws)[0] || null;
 	}
 }
 

@@ -100,7 +100,7 @@ function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }
 	};
 
 	// Create a callable procedure function
-	const procedure = async (opts: { input: unknown; session: Session }) => {
+	const procedure = async (opts: { input: unknown; session: Session<AnyRouter> }) => {
 		// Validate input against schemas if they exist
 		let validatedInput = opts.input;
 		for (const inputSchema of _defIn.inputs) {

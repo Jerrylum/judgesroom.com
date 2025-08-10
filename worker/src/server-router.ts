@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { initWRPC } from './wrpc/initWRPC';
+import { initWRPC } from '@judging.jerryio/wrpc/server';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
-const w = initWRPC.create<ClientRouter>();
+const w = initWRPC.createServer<ClientRouter>();
 
 export const serverRouter = w.router({
 	getName: w.procedure.input(z.string()).query(async ({ input }) => {

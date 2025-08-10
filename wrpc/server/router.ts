@@ -1,4 +1,4 @@
-import type { AnyProcedure, inferProcedureInput, inferProcedureOutput } from './procedure';
+import type { AnyProcedure, InferProcedureInput, InferProcedureOutput } from './procedure';
 import type { RootConfig, RootTypes } from './root-config';
 
 export interface RouterRecord {
@@ -6,8 +6,8 @@ export interface RouterRecord {
 }
 
 type DecorateProcedure<TProcedure extends AnyProcedure> = (
-	input: inferProcedureInput<TProcedure>
-) => Promise<inferProcedureOutput<TProcedure>>;
+	input: InferProcedureInput<TProcedure>
+) => Promise<InferProcedureOutput<TProcedure>>;
 
 /**
  * @internal

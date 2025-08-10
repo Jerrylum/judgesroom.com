@@ -71,12 +71,6 @@ export type WRPCResponse = InferParser<typeof WRPCResponseSchema>;
 // Proper discriminated union using the 'kind' field
 export const WRPCMessageSchema = z.discriminatedUnion('kind', [WRPCRequestSchema, WRPCResponseSchema]);
 
-// Helper function to parse and validate WRPC messages
-export function parseWRPCMessage(data: string): WRPCRequest | WRPCResponse {
-	const parsed = JSON.parse(data);
-	return WRPCMessageSchema.parse(parsed);
-}
-
 // Procedure context
 export interface ProcedureContext {
 	input: unknown;
@@ -86,19 +80,19 @@ export interface ProcedureContext {
 }
 
 // Type inference helpers
-export type inferRouterInputs<TRouter extends AnyRouter> = {
+export type InferRouterInputs<TRouter extends AnyRouter> = {
 	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends Procedure<ProcedureType, infer TDef>
 		? TDef['input']
 		: TRouter['_def']['record'][K] extends AnyRouter
-			? inferRouterInputs<TRouter['_def']['record'][K]>
+			? InferRouterInputs<TRouter['_def']['record'][K]>
 			: never;
 };
 
-export type inferRouterOutputs<TRouter extends AnyRouter> = {
+export type InferRouterOutputs<TRouter extends AnyRouter> = {
 	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends Procedure<ProcedureType, infer TDef>
 		? TDef['output']
 		: TRouter['_def']['record'][K] extends AnyRouter
-			? inferRouterOutputs<TRouter['_def']['record'][K]>
+			? InferRouterOutputs<TRouter['_def']['record'][K]>
 			: never;
 };
 

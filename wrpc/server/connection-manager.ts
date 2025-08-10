@@ -1,5 +1,7 @@
+import type { AnyRouter } from './router';
 import type { ConnectionManager } from './session';
 import type { WRPCRequest, WRPCResponse } from './types';
+import type { WebSocketHandlerOptions } from './websocket-handler';
 
 /**
  * Client data stored in Durable Object storage
@@ -22,7 +24,7 @@ interface ServerData {
  * Implementation of ConnectionManager for Cloudflare WebSocket Hibernation Server
  */
 export class WebSocketConnectionManager implements ConnectionManager {
-	private ctx: DurableObjectState;
+	private opts: WebSocketHandlerOptions<AnyRouter, AnyRouter>;
 	private serverData: ServerData | null = null;
 	private isLoaded = false;
 	private pendingRequests = new Map<
@@ -34,8 +36,8 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		}
 	>();
 
-	constructor(ctx: DurableObjectState) {
-		this.ctx = ctx;
+	constructor(opts: WebSocketHandlerOptions<AnyRouter, AnyRouter>) {
+		this.opts = opts;
 	}
 
 	/**
@@ -99,18 +101,6 @@ export class WebSocketConnectionManager implements ConnectionManager {
 	}
 
 	/**
-	 * Get WebSocket connection by clientId using hibernation-compatible method
-	 */
-	getWebSocket(clientId: string): WebSocket | null {
-		const webSockets = this.ctx.getWebSockets(clientId);
-		return webSockets[0] || null;
-	}
-
-	getClientIdByWebSocket(ws: WebSocket): string | null {
-		return this.ctx.getTags(ws)[0] || null;
-	}
-
-	/**
 	 * Handle response from client
 	 */
 	handleResponse(response: WRPCResponse, clientId: string) {
@@ -141,7 +131,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		}
 
 		// Get WebSocket using hibernation-compatible method
-		const ws = this.getWebSocket(clientId);
+		const ws = this.opts.getWebSocket(clientId);
 		if (!ws) {
 			throw new Error(`Client ${clientId} WebSocket not found`);
 		}
@@ -159,7 +149,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 			this.pendingRequests.set(requestKey, {
 				resolve,
 				reject,
-				timeout
+				timeout: timeout as unknown as number
 			});
 
 			// Send request to client
@@ -213,14 +203,14 @@ export class WebSocketConnectionManager implements ConnectionManager {
 			return [];
 		}
 		// Filter clients that actually have active WebSocket connections
-		return this.serverData!.clients.filter((client) => this.getWebSocket(client.clientId) !== null).map((client) => client.clientId);
+		return this.serverData!.clients.filter((client) => this.opts.getWebSocket(client.clientId) !== null).map((client) => client.clientId);
 	}
 
 	/**
 	 * Check if a client is connected (hibernation-compatible)
 	 */
 	isClientConnected(clientId: string): boolean {
-		return this.getWebSocket(clientId) !== null;
+		return this.opts.getWebSocket(clientId) !== null;
 	}
 
 	/**
@@ -244,8 +234,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 	 * Load data from Durable Object storage
 	 */
 	private async load() {
-		const data = await this.ctx.storage.get<ServerData>('wrpc-data');
-		this.serverData = data || { clients: [] };
+		this.serverData = ((await this.opts.loadData()) || { clients: [] }) as ServerData;
 		this.isLoaded = true;
 	}
 
@@ -256,7 +245,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
-		await this.ctx.storage.put<ServerData>('wrpc-data', this.serverData!);
+		await this.opts.saveData(this.serverData!);
 	}
 
 	/**
@@ -264,6 +253,6 @@ export class WebSocketConnectionManager implements ConnectionManager {
 	 */
 	async destroy() {
 		this.serverData = null;
-		await this.ctx.storage.deleteAll();
+		await this.opts.destroy();
 	}
 }

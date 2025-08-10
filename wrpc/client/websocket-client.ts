@@ -1,39 +1,9 @@
-import type { AnyProcedure, Procedure } from '@judging.jerryio/worker/src/wrpc/procedure';
-import type { AnyRouter } from '@judging.jerryio/worker/src/wrpc/router';
-import type { Session } from '@judging.jerryio/worker/src/wrpc/session';
-import type { WRPCRequest, WRPCResponse } from '@judging.jerryio/worker/src/wrpc/types';
-import { parseWRPCMessage } from '@judging.jerryio/worker/src/wrpc/types';
-
-type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
-
-type InferClientType<TProcedure> =
-	TProcedure extends { _def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } } }
-		? TType extends 'query'
-			? { query: InputOutputFunction<TInput, TOutput> }
-			: TType extends 'mutation'
-				? { mutation: InputOutputFunction<TInput, TOutput> }
-				: never
-		: never;
-
-export type WRPCClient<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
-		? InferClientType<TRouter['_def']['record'][K]>
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? WRPCClient<TRouter['_def']['record'][K]>
-			: never;
-};
-
-interface PendingRequest {
-	resolve: (value: unknown) => void;
-	reject: (error: Error) => void;
-}
-
-interface ClientOptions {
-	wsUrl: string;
-	sessionId?: string;
-	clientId?: string;
-	deviceName?: string;
-}
+import type { AnyProcedure } from '../server/procedure';
+import type { AnyRouter } from '../server/router';
+import type { Session } from '../server/session';
+import type { WRPCRequest, WRPCResponse } from '../server/types';
+import { parseWRPCMessage } from '../server/utils';
+import type { ClientOptions, PendingRequest } from './types';
 
 /**
  * WRPC WebSocket client implementation
@@ -200,8 +170,21 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 	}
 
 	private async callProcedure(procedure: AnyProcedure, input: unknown): Promise<unknown> {
-		const procedureFn = procedure as unknown as (opts: { input: unknown; session: Session }) => Promise<unknown>;
-		return await procedureFn({ input, session: null as unknown as Session });
+		const procedureFn = procedure as unknown as (opts: { input: unknown; session: Session<never> }) => Promise<unknown>;
+		return await procedureFn({
+			input,
+			session: {
+				getClient: () => {
+					throw new Error('Client cannot call getClient');
+				},
+				broadcast: () => {
+					throw new Error('Client cannot call broadcast');
+				},
+				sessionId: '',
+				clientId: '',
+				deviceName: '' // TODO: get device name from client
+			} as unknown as Session<never>
+		});
 	}
 
 	private async handleClose(event: CloseEvent): Promise<void> {
@@ -282,32 +265,4 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 			this.ws = null;
 		}
 	}
-}
-
-/**
- * Create a type-safe WRPC client proxy
- */
-export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
-	options: ClientOptions,
-	clientRouter: TClientRouter
-): WRPCClient<TServerRouter> {
-	const client = new WebsocketClient<TServerRouter, TClientRouter>(options, clientRouter);
-
-	return new Proxy({} as WRPCClient<TServerRouter>, {
-		get(target, prop: string) {
-			return new Proxy(
-				{},
-				{
-					get(target, method: string) {
-						if (method === 'query') {
-							return (input: unknown) => client.query(prop, input);
-						} else if (method === 'mutation') {
-							return (input: unknown) => client.mutation(prop, input);
-						}
-						throw new Error(`Unknown method: ${method}`);
-					}
-				}
-			);
-		}
-	});
 }

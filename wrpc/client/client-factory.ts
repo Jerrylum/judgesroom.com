@@ -1,0 +1,31 @@
+import type { AnyRouter } from '../server/router';
+import { WebsocketClient } from './websocket-client';
+import type { WRPCClient, ClientOptions } from './types';
+
+/**
+ * Create a type-safe WRPC client proxy
+ */
+export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
+	options: ClientOptions,
+	clientRouter: TClientRouter
+): WRPCClient<TServerRouter> {
+	const client = new WebsocketClient<TServerRouter, TClientRouter>(options, clientRouter);
+
+	return new Proxy({} as WRPCClient<TServerRouter>, {
+		get(target, prop: string) {
+			return new Proxy(
+				{},
+				{
+					get(target, method: string) {
+						if (method === 'query') {
+							return (input: unknown) => client.query(prop, input);
+						} else if (method === 'mutation') {
+							return (input: unknown) => client.mutation(prop, input);
+						}
+						throw new Error(`Unknown method: ${method}`);
+					}
+				}
+			);
+		}
+	});
+}
