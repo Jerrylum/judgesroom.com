@@ -8,6 +8,7 @@ import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';
 import { createSession, type Session } from './session';
 import { parseWRPCMessage } from './utils';
+import type { ProcedureResolver } from './procedure-builder';
 
 export interface WebSocketHandlerOptions<TRouter extends AnyRouter, TClientRouter extends AnyRouter = AnyRouter> {
 	/**
@@ -80,10 +81,10 @@ function getProcedureAtPath(router: AnyRouter, path: string): AnyProcedure | nul
 /**
  * Call a procedure with the given input and session
  */
-async function callProcedure(procedure: AnyProcedure, input: unknown, session: Session): Promise<unknown> {
+async function callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>): Promise<unknown> {
 	// The procedure is a function that validates input and calls the resolver
 	// Cast to function since we know it's callable from the procedure definition
-	const procedureFn = procedure as unknown as (opts: { input: unknown; session: Session }) => Promise<unknown>;
+	const procedureFn = procedure as unknown as ProcedureResolver<unknown, never, AnyRouter>;
 	return await procedureFn({ input, session });
 }
 

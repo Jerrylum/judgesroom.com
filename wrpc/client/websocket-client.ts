@@ -1,4 +1,5 @@
 import type { AnyProcedure } from '../server/procedure';
+import type { ProcedureResolver } from '../server/procedure-builder';
 import type { AnyRouter } from '../server/router';
 import type { Session } from '../server/session';
 import type { WRPCRequest, WRPCResponse } from '../server/types';
@@ -170,7 +171,7 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 	}
 
 	private async callProcedure(procedure: AnyProcedure, input: unknown): Promise<unknown> {
-		const procedureFn = procedure as unknown as (opts: { input: unknown; session: Session<never> }) => Promise<unknown>;
+		const procedureFn = procedure as unknown as ProcedureResolver<unknown, unknown, AnyRouter>;
 		return await procedureFn({
 			input,
 			session: {

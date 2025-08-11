@@ -20,7 +20,5 @@ export {
 	type CreateRouterOptions,
 	type DecorateCreateRouterOptions
 } from './router';
-export { type Session, type ClientProxy, type ConnectionManager, type SessionFactory, type createSession } from './session';
-// export * from './types';
-// export * from './utils';
+export { type Session, type ClientProxy, type ConnectionManager } from './session';
 export { type WebSocketHandlerOptions, type WebSocketConnectionOptions, createWebSocketHandler } from './websocket-handler';
