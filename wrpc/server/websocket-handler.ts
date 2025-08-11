@@ -6,7 +6,7 @@ import type { WRPCRequest, WRPCResponse } from './types';
 import { WRPCError } from './types';
 import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';
-import { createSession, type Session } from './session';
+import { createServerSideSession, type Session } from './session';
 import { parseWRPCMessage } from './utils';
 import type { ProcedureResolver } from './procedure-builder';
 
@@ -149,7 +149,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(
 					const clientData = clientId ? connectionManager.getClientData(clientId) : null;
 
 					// Create session for this request
-					const session = createSession<TRouter>(
+					const session = createServerSideSession(
 						connectionManager,
 						clientData?.sessionId || connectionOpts?.sessionId || 'unknown',
 						clientId || 'unknown',

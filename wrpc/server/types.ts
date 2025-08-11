@@ -115,3 +115,26 @@ export class WRPCError extends Error {
 		this.name = 'WRPCError';
 	}
 }
+
+export type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
+
+export type InferClientType<TProcedure> = TProcedure extends {
+	_def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } };
+}
+	? TType extends 'query'
+		? { query: InputOutputFunction<TInput, TOutput> }
+		: TType extends 'mutation'
+			? { mutation: InputOutputFunction<TInput, TOutput> }
+			: never
+	: never;
+
+/**
+ * Client proxy type that mirrors the client router structure
+ */
+export type RouterProxy<TRouter extends AnyRouter> = {
+	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
+		? InferClientType<TRouter['_def']['record'][K]>
+		: TRouter['_def']['record'][K] extends AnyRouter
+			? RouterProxy<TRouter['_def']['record'][K]>
+			: never;
+};

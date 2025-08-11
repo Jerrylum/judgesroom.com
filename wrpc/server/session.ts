@@ -1,6 +1,6 @@
 import type { AnyProcedure } from './procedure';
 import type { AnyRouter } from './router';
-import type { WRPCRequest, WRPCResponse } from './types';
+import type { InferClientType, RouterProxy, WRPCRequest, WRPCResponse } from './types';
 
 /**
  * Session interface for server-to-client communication
@@ -9,14 +9,14 @@ export interface Session<TServerRouter extends AnyRouter> {
 	/**
 	 * Get a client proxy to call procedures on a specific client
 	 */
-	getClient<TClientRouter extends AnyRouter>(clientId: string): ClientProxy<TClientRouter>;
+	getClient<TClientRouter extends AnyRouter>(clientId: string): RouterProxy<TClientRouter>;
 
 	/**
 	 * Broadcast proxy to call procedures on all connected clients
 	 */
-	broadcast<TClientRouter extends AnyRouter>(): ClientProxy<TClientRouter>;
+	broadcast<TClientRouter extends AnyRouter>(): RouterProxy<TClientRouter>;
 
-	getServer(): TServerRouter;
+	getServer(): RouterProxy<TServerRouter>;
 
 	/**
 	 * Current session metadata
@@ -31,29 +31,6 @@ export interface Session<TServerRouter extends AnyRouter> {
 		deviceName: string;
 	};
 }
-
-type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
-
-type InferClientType<TProcedure> = TProcedure extends {
-	_def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } };
-}
-	? TType extends 'query'
-		? { query: InputOutputFunction<TInput, TOutput> }
-		: TType extends 'mutation'
-			? { mutation: InputOutputFunction<TInput, TOutput> }
-			: never
-	: never;
-
-/**
- * Client proxy type that mirrors the client router structure
- */
-export type ClientProxy<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
-		? InferClientType<TRouter['_def']['record'][K]>
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? ClientProxy<TRouter['_def']['record'][K]>
-			: never;
-};
 
 /**
  * WebSocket connection manager interface
@@ -93,17 +70,17 @@ export type SessionFactory<TServerRouter extends AnyRouter> = (
 /**
  * Create a session instance
  */
-export function createSession<TServerRouter extends AnyRouter>(
+export function createServerSideSession(
 	connectionManager: ConnectionManager,
 	sessionId: string,
 	clientId: string,
 	deviceName: string
-): Session<TServerRouter> {
+): Session<never> {
 	/**
 	 * Create a client proxy that can call procedures on the client
 	 */
-	function createClientProxy(targetClientId?: string): ClientProxy<TServerRouter> {
-		return new Proxy({} as ClientProxy<TServerRouter>, {
+	function createClientProxy<TClientRouter extends AnyRouter>(targetClientId?: string): RouterProxy<TClientRouter> {
+		return new Proxy({} as RouterProxy<TClientRouter>, {
 			get(target, prop: string) {
 				return new Proxy(
 					{},

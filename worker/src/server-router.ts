@@ -18,7 +18,6 @@ export const serverRouter = w.router({
 		// Or broadcast to all clients
 		await session.broadcast<ClientRouter>().updateAge.mutation(input);
 
-
 		return `You are ${input} years old!`;
 	})
 

@@ -12,6 +12,12 @@ export const clientRouter = w.router({
 
 	updateAge: w.procedure.input(z.number()).mutation(async ({ session, input }) => {
 		// Handle the server's call to update age
+		
+		// await session.broadcast<ClientRouter>().updateAge.mutation(input);
+
+		const name = await session.getServer().getName.query('Jerry');
+		console.log('name', name);
+
 		clientHandlers.onUpdateAge(input);
 		return `Age updated to ${input}`;
 	})

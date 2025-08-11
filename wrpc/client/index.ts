@@ -2,7 +2,7 @@
 export { createWRPCClient } from './client-factory';
 export { WebsocketClient } from './websocket-client';
 export { WRPCClientManager, createClientManager } from './client-manager';
-export type { WRPCClient, ClientOptions, PendingRequest, InputOutputFunction, InferClientType } from './types';
+export type { WRPCClient, ClientOptions, PendingRequest } from './types';
 
 // Re-export server types and utilities that clients need
 export { type WRPCRootObject, initWRPC } from '../server/initWRPC';
@@ -26,4 +26,5 @@ export {
 	type CreateRouterOptions,
 	type DecorateCreateRouterOptions
 } from '../server/router';
-export type { Session } from '../server/session';
+export { type Session } from '../server/session';
+export { type RouterProxy } from '../server/types';
