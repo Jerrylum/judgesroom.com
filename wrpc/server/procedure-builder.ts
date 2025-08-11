@@ -25,19 +25,19 @@ type AnyProcedureBuilderDef = ProcedureBuilderDef<any>;
  * Procedure resolver options (what the `.query()` and `.mutation()` functions receive)
  * @internal
  */
-export interface ProcedureResolverOptions<TInput, TClientRouter extends AnyRouter = AnyRouter> {
+export interface ProcedureResolverOptions<TInput, TServerRouter extends AnyRouter = AnyRouter> {
 	input: TInput extends UnsetMarker ? undefined : TInput;
 	/**
 	 * Session for server-to-client communication
 	 */
-	session: Session<TClientRouter>;
+	session: Session<TServerRouter>;
 }
 
 /**
  * A procedure resolver
  */
-export type ProcedureResolver<TInput, TOutput, TClientRouter extends AnyRouter = AnyRouter> = (
-	opts: ProcedureResolverOptions<TInput, TClientRouter>
+export type ProcedureResolver<TInput, TOutput, TServerRouter extends AnyRouter = AnyRouter> = (
+	opts: ProcedureResolverOptions<TInput, TServerRouter>
 ) => MaybePromise<TOutput>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,26 +46,26 @@ type AnyResolver = ProcedureResolver<any, any, any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyProcedureBuilder = ProcedureBuilder<any, any, any, any>;
 
-export interface ProcedureBuilder<TMeta, TInput, TOutput, TClientRouter extends AnyRouter = AnyRouter> {
+export interface ProcedureBuilder<TMeta, TInput, TOutput, TServerRouter extends AnyRouter = AnyRouter> {
 	_def: ProcedureBuilderDef<TMeta>;
 
 	input<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput, TClientRouter>;
+	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput, TServerRouter>;
 
 	output<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>, TClientRouter>;
+	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>, TServerRouter>;
 
-	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TClientRouter>;
+	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TServerRouter>;
 
-	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TClientRouter>): QueryProcedure<{
+	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TServerRouter>): QueryProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
 	}>;
 
-	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TClientRouter>): MutationProcedure<{
+	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TServerRouter>): MutationProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
@@ -124,9 +124,9 @@ function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }
 	return procedure as AnyProcedure;
 }
 
-export function createBuilder<TMeta, TClientRouter extends AnyRouter = AnyRouter>(
+export function createBuilder<TMeta, TServerRouter extends AnyRouter = AnyRouter>(
 	initDef: Partial<AnyProcedureBuilderDef> = {}
-): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TClientRouter> {
+): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TServerRouter> {
 	const _def: AnyProcedureBuilderDef = {
 		procedure: true,
 		inputs: [],

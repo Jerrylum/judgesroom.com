@@ -1,8 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { createWebSocketHandler } from '@judging.jerryio/wrpc/server';
-import { serverRouter } from './server-router';
-import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import { ServerRouter, serverRouter } from './server-router';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
@@ -15,9 +14,8 @@ type Intention = z.infer<typeof IntentionSchema>;
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class WebSocketHibernationServer extends DurableObject<Env> {
-	private wsHandler = createWebSocketHandler<typeof serverRouter, ClientRouter>({
+	private wsHandler = createWebSocketHandler<ServerRouter>({
 		router: serverRouter,
-		// ctx: this.ctx,
 		loadData: () => this.ctx.storage.get('wrpc-data'),
 		saveData: (data) => this.ctx.storage.put('wrpc-data', data),
 		destroy: () => this.ctx.storage.deleteAll(),

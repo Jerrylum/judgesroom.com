@@ -10,7 +10,7 @@ import { createSession, type Session } from './session';
 import { parseWRPCMessage } from './utils';
 import type { ProcedureResolver } from './procedure-builder';
 
-export interface WebSocketHandlerOptions<TRouter extends AnyRouter, TClientRouter extends AnyRouter = AnyRouter> {
+export interface WebSocketHandlerOptions<TRouter extends AnyRouter> {
 	/**
 	 * The router instance
 	 */
@@ -91,8 +91,8 @@ async function callProcedure(procedure: AnyProcedure, input: unknown, session: S
 /**
  * Create a WebSocket message handler for a WRPC router
  */
-export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter extends AnyRouter = AnyRouter>(
-	opts: WebSocketHandlerOptions<TRouter, TClientRouter>
+export function createWebSocketHandler<TRouter extends AnyRouter>(
+	opts: WebSocketHandlerOptions<TRouter>
 ) {
 	const connectionManager = new WebSocketConnectionManager(opts);
 
@@ -149,11 +149,11 @@ export function createWebSocketHandler<TRouter extends AnyRouter, TClientRouter 
 					const clientData = clientId ? connectionManager.getClientData(clientId) : null;
 
 					// Create session for this request
-					const session = createSession<TClientRouter>(
+					const session = createSession<TRouter>(
 						connectionManager,
 						clientData?.sessionId || connectionOpts?.sessionId || 'unknown',
 						clientId || 'unknown',
-						clientData?.deviceName || connectionOpts?.deviceName
+						clientData?.deviceName || connectionOpts?.deviceName || 'unknown'
 					);
 
 					// Handle query and mutation only

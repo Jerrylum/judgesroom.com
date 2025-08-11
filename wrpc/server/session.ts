@@ -5,23 +5,31 @@ import type { WRPCRequest, WRPCResponse } from './types';
 /**
  * Session interface for server-to-client communication
  */
-export interface Session<TClientRouter extends AnyRouter> {
+export interface Session<TServerRouter extends AnyRouter> {
 	/**
 	 * Get a client proxy to call procedures on a specific client
 	 */
-	getClient(clientId: string): ClientProxy<TClientRouter>;
+	getClient<TClientRouter extends AnyRouter>(clientId: string): ClientProxy<TClientRouter>;
 
 	/**
 	 * Broadcast proxy to call procedures on all connected clients
 	 */
-	broadcast: ClientProxy<TClientRouter>;
+	broadcast<TClientRouter extends AnyRouter>(): ClientProxy<TClientRouter>;
+
+	getServer(): TServerRouter;
 
 	/**
 	 * Current session metadata
 	 */
-	sessionId: string;
-	clientId: string;
-	deviceName?: string;
+	readonly sessionId: string;
+
+	/**
+	 * Current client metadata
+	 */
+	readonly currentClient: {
+		clientId: string;
+		deviceName: string;
+	};
 }
 
 type InputOutputFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput>;
@@ -75,27 +83,27 @@ export interface ConnectionManager {
 /**
  * Session factory function type
  */
-export type SessionFactory<TClientRouter extends AnyRouter> = (
+export type SessionFactory<TServerRouter extends AnyRouter> = (
 	connectionManager: ConnectionManager,
 	sessionId: string,
 	clientId: string,
 	deviceName?: string
-) => Session<TClientRouter>;
+) => Session<TServerRouter>;
 
 /**
  * Create a session instance
  */
-export function createSession<TClientRouter extends AnyRouter>(
+export function createSession<TServerRouter extends AnyRouter>(
 	connectionManager: ConnectionManager,
 	sessionId: string,
 	clientId: string,
-	deviceName?: string
-): Session<TClientRouter> {
+	deviceName: string
+): Session<TServerRouter> {
 	/**
 	 * Create a client proxy that can call procedures on the client
 	 */
-	function createClientProxy(targetClientId?: string): ClientProxy<TClientRouter> {
-		return new Proxy({} as ClientProxy<TClientRouter>, {
+	function createClientProxy(targetClientId?: string): ClientProxy<TServerRouter> {
+		return new Proxy({} as ClientProxy<TServerRouter>, {
 			get(target, prop: string) {
 				return new Proxy(
 					{},
@@ -133,9 +141,14 @@ export function createSession<TClientRouter extends AnyRouter>(
 
 	return {
 		getClient: (clientId: string) => createClientProxy(clientId),
-		broadcast: createClientProxy(), // No specific client ID = broadcast
+		broadcast: () => createClientProxy(), // No specific client ID = broadcast
+		getServer: () => {
+			throw new Error('Not implemented');
+		},
 		sessionId,
-		clientId,
-		deviceName
+		currentClient: {
+			clientId,
+			deviceName
+		}
 	};
 }

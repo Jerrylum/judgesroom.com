@@ -24,7 +24,7 @@ interface ServerData {
  * Implementation of ConnectionManager for Cloudflare WebSocket Hibernation Server
  */
 export class WebSocketConnectionManager implements ConnectionManager {
-	private opts: WebSocketHandlerOptions<AnyRouter, AnyRouter>;
+	private opts: WebSocketHandlerOptions<AnyRouter>;
 	private serverData: ServerData | null = null;
 	private isLoaded = false;
 	private pendingRequests = new Map<
@@ -36,7 +36,7 @@ export class WebSocketConnectionManager implements ConnectionManager {
 		}
 	>();
 
-	constructor(opts: WebSocketHandlerOptions<AnyRouter, AnyRouter>) {
+	constructor(opts: WebSocketHandlerOptions<AnyRouter>) {
 		this.opts = opts;
 	}
 

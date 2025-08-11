@@ -6,7 +6,7 @@ import { type UnsetMarker } from './utils';
 export interface WRPCRootObject<
 	TMeta extends object,
 	TOptions extends RuntimeConfigOptions<TMeta>,
-	TClientRouter extends AnyRouter = AnyRouter,
+	TServerRouter extends AnyRouter = AnyRouter,
 	$Root extends AnyRootTypes = CreateRootTypes<{
 		meta: TMeta;
 		context: Record<string, never>;
@@ -21,7 +21,7 @@ export interface WRPCRootObject<
 	/**
 	 * Builder object for creating procedures
 	 */
-	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TClientRouter>;
+	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TServerRouter>;
 
 	/**
 	 * Create a router
@@ -53,9 +53,9 @@ class WRPCBuilder<TMeta extends object> {
 	/**
 	 * Create the root object with client router type
 	 */
-	createServer<TClientRouter extends AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+	createServer<TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
 		opts?: TOptions
-	): WRPCRootObject<TMeta, TOptions, TClientRouter> {
+	): WRPCRootObject<TMeta, TOptions, never> {
 		type $Root = CreateRootTypes<{
 			meta: TMeta;
 			context: Record<string, never>;
@@ -75,7 +75,7 @@ class WRPCBuilder<TMeta extends object> {
 			/**
 			 * Builder object for creating procedures
 			 */
-			procedure: createBuilder<TMeta, TClientRouter>({}),
+			procedure: createBuilder<TMeta, never>({}),
 			/**
 			 * Create a router
 			 */
@@ -87,9 +87,9 @@ class WRPCBuilder<TMeta extends object> {
 		};
 	}
 
-	clientClient<TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+	createClient<TServerRouter extends AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
 		opts?: TOptions
-	): WRPCRootObject<TMeta, TOptions, never> {
+	): WRPCRootObject<TMeta, TOptions, TServerRouter> {
 		type $Root = CreateRootTypes<{
 			meta: TMeta;
 			context: Record<string, never>;
@@ -102,7 +102,7 @@ class WRPCBuilder<TMeta extends object> {
 
 		return {
 			_config: config,
-			procedure: createBuilder<TMeta, never>({}),
+			procedure: createBuilder<TMeta, TServerRouter>({}),
 			router: createRouterFactory<$Root>(config),
 			mergeRouters
 		};
