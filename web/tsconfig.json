@@ -4,6 +4,8 @@
 		"esModuleInterop": true,
 		"sourceMap": true,
 
+		"allowImportingTsExtensions": true,
+
 		/* Enable importing .json files */
 		"resolveJsonModule": true,
 
@@ -26,7 +28,7 @@
 		"strict": true,
 
 		/* Skip type checking all .d.ts files. */
-		"skipLibCheck": true,
+		"skipLibCheck": true
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
