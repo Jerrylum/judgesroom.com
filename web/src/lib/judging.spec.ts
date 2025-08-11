@@ -35,16 +35,7 @@ describe('Judging Schema Validation', () => {
 
 	describe('JudgeNameSchema', () => {
 		it('should validate valid judge names', () => {
-			const validNames = [
-				'John Doe',
-				'Jane Smith',
-				'A',
-				'Dr. Johnson',
-				"Mary-Anne O'Connor",
-				'Judge #1',
-				'김철수',
-				'José García'
-			];
+			const validNames = ['John Doe', 'Jane Smith', 'A', 'Dr. Johnson', "Mary-Anne O'Connor", 'Judge #1', '김철수', 'José García'];
 			validNames.forEach((name) => {
 				expect(() => JudgeNameSchema.parse(name)).not.toThrow();
 			});
@@ -70,15 +61,7 @@ describe('Judging Schema Validation', () => {
 
 	describe('JudgeGroupNameSchema', () => {
 		it('should validate valid judge group names', () => {
-			const validNames = [
-				'Group A',
-				'Technical Judges',
-				'Design Panel',
-				'1',
-				'Group-1',
-				'Judges_Team_Alpha',
-				'裁判グループ1'
-			];
+			const validNames = ['Group A', 'Technical Judges', 'Design Panel', '1', 'Group-1', 'Judges_Team_Alpha', '裁判グループ1'];
 			validNames.forEach((name) => {
 				expect(() => JudgeGroupNameSchema.parse(name)).not.toThrow();
 			});
@@ -235,48 +218,15 @@ describe('JudgeGroupClass', () => {
 		// Create mock teams
 		mockTeams = [
 			new Team(
-				createTeamInfo(
-					uuidv4(),
-					'123A',
-					'Team Alpha',
-					'City A',
-					'State A',
-					'Country A',
-					'TA',
-					'School A',
-					'High School',
-					'123'
-				),
+				createTeamInfo(uuidv4(), '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
 				createTeamData('https://example.com/notebook-a', false)
 			),
 			new Team(
-				createTeamInfo(
-					uuidv4(),
-					'456B',
-					'Team Beta',
-					'City B',
-					'State B',
-					'Country B',
-					'TB',
-					'School B',
-					'Middle School',
-					'456'
-				),
+				createTeamInfo(uuidv4(), '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
 				createTeamData('https://example.com/notebook-b', false)
 			),
 			new Team(
-				createTeamInfo(
-					uuidv4(),
-					'789C',
-					'Team Gamma',
-					'City C',
-					'State C',
-					'Country C',
-					'TC',
-					'School C',
-					'College',
-					'789'
-				),
+				createTeamInfo(uuidv4(), '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
 				createTeamData('https://example.com/notebook-c', false)
 			)
 		];
@@ -286,9 +236,7 @@ describe('JudgeGroupClass', () => {
 		expect(judgeGroup.name).toBe('Technical Judges');
 		expect(judgeGroup.assignedTeams).toEqual([]);
 		expect(typeof judgeGroup.id).toBe('string');
-		expect(judgeGroup.id).toMatch(
-			/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-		);
+		expect(judgeGroup.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
 	});
 
 	it('should allow modification of name', () => {
@@ -352,9 +300,7 @@ describe('createJudgeFromString', () => {
 		expect(judge.name).toBe('John Doe');
 		expect(judge.groupId).toBe(groupId);
 		expect(typeof judge.id).toBe('string');
-		expect(judge.id).toMatch(
-			/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-		);
+		expect(judge.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
 	});
 
 	it('should trim whitespace from name', () => {
@@ -453,20 +399,13 @@ describe('randomlyAssignTeamsToGroups', () => {
 		);
 
 		// Create judge groups
-		judgeGroups = [
-			new JudgeGroupClass('Group A'),
-			new JudgeGroupClass('Group B'),
-			new JudgeGroupClass('Group C')
-		];
+		judgeGroups = [new JudgeGroupClass('Group A'), new JudgeGroupClass('Group B'), new JudgeGroupClass('Group C')];
 	});
 
 	it('should assign all teams to groups', () => {
 		randomlyAssignTeamsToGroups(mockTeams, judgeGroups);
 
-		const totalAssignedTeams = judgeGroups.reduce(
-			(sum, group) => sum + group.assignedTeams.length,
-			0
-		);
+		const totalAssignedTeams = judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0);
 		expect(totalAssignedTeams).toBe(mockTeams.length);
 	});
 
@@ -503,10 +442,7 @@ describe('randomlyAssignTeamsToGroups', () => {
 		randomlyAssignTeamsToGroups(mockTeams, judgeGroups);
 
 		// Check that all teams are still assigned (no duplicates or missing teams)
-		const totalAssignedTeams = judgeGroups.reduce(
-			(sum, group) => sum + group.assignedTeams.length,
-			0
-		);
+		const totalAssignedTeams = judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0);
 		expect(totalAssignedTeams).toBe(mockTeams.length);
 	});
 
@@ -535,10 +471,7 @@ describe('randomlyAssignTeamsToGroups', () => {
 
 		randomlyAssignTeamsToGroups(mockTeams, manyGroups);
 
-		const totalAssignedTeams = manyGroups.reduce(
-			(sum, group) => sum + group.assignedTeams.length,
-			0
-		);
+		const totalAssignedTeams = manyGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0);
 		expect(totalAssignedTeams).toBe(mockTeams.length);
 
 		// Some groups should be empty
@@ -606,9 +539,7 @@ describe('Integration Tests', () => {
 		const group2 = new JudgeGroupClass('Design Panel');
 
 		// Create judges
-		const judgeNames = parseJudgeNamesFromInput(
-			'John Doe, Jane Smith\nBob Johnson, Alice Williams'
-		);
+		const judgeNames = parseJudgeNamesFromInput('John Doe, Jane Smith\nBob Johnson, Alice Williams');
 		const judges1 = judgeNames.slice(0, 2).map((name) => createJudgeFromString(name, group1.id));
 		const judges2 = judgeNames.slice(2).map((name) => createJudgeFromString(name, group2.id));
 		const allJudges = [...judges1, ...judges2];
@@ -666,18 +597,7 @@ describe('Integration Tests', () => {
 		const singleGroup = new JudgeGroupClass('Single Group');
 		const singleJudge = createJudgeFromString('Solo Judge', singleGroup.id);
 		const singleTeam = new Team(
-			createTeamInfo(
-				uuidv4(),
-				'100A',
-				'Solo Team',
-				'City',
-				'State',
-				'Country',
-				'ST',
-				'School',
-				'High School',
-				'100'
-			),
+			createTeamInfo(uuidv4(), '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
 			createTeamData('https://example.com/notebook', false)
 		);
 

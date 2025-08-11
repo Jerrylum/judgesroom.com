@@ -1,20 +1,9 @@
 import { z } from 'zod/v4';
-import {
-	AwardSchema,
-	CompetitionTypeSchema,
-	type CompetitionType,
-	type Grade
-} from './awards.svelte';
+import { AwardSchema, CompetitionTypeSchema, type CompetitionType, type Grade } from './awards.svelte';
 import { TeamInfoSchema } from './teams.svelte';
 import { JudgeGroupSchema, JudgingMethodSchema } from './judging.svelte';
 
-export const EventGradeLevelSchema = z.enum([
-	'ES Only',
-	'MS Only',
-	'HS Only',
-	'Blended',
-	'College Only'
-]);
+export const EventGradeLevelSchema = z.enum(['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only']);
 export type EventGradeLevel = z.infer<typeof EventGradeLevelSchema>;
 
 export interface EventGradeLevelOptions {
@@ -23,9 +12,7 @@ export interface EventGradeLevelOptions {
 	grades: Grade[];
 }
 
-export function getEventGradeLevelOptions(
-	competitionType: CompetitionType
-): EventGradeLevelOptions[] {
+export function getEventGradeLevelOptions(competitionType: CompetitionType): EventGradeLevelOptions[] {
 	switch (competitionType) {
 		case 'VIQRC':
 			return [

@@ -4,6 +4,7 @@ import type { AnyRouter } from '../server/router';
 import type { Session } from '../server/session';
 import type { WRPCRequest, WRPCResponse } from '../server/types';
 import { parseWRPCMessage } from '../server/utils';
+import { createClientSideSession } from './session';
 import type { ClientOptions, PendingRequest } from './types';
 
 /**
@@ -174,17 +175,12 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 		const procedureFn = procedure as unknown as ProcedureResolver<unknown, unknown, AnyRouter>;
 		return await procedureFn({
 			input,
-			session: {
-				getClient: () => {
-					throw new Error('Client cannot call getClient');
-				},
-				broadcast: () => {
-					throw new Error('Client cannot call broadcast');
-				},
-				sessionId: '',
-				clientId: '',
-				deviceName: '' // TODO: get device name from client
-			} as unknown as Session<never>
+			session: createClientSideSession(
+				this,
+				this.options.sessionId || 'unknown',
+				this.options.clientId || 'unknown',
+				this.options.deviceName || 'unknown'
+			)
 		});
 	}
 

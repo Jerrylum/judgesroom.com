@@ -47,7 +47,12 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// const action = url.searchParams.get('action');
 
 		// const intention = IntentionSchema.parse({ sessionId, clientId, deviceName, action });
-		const { sessionId, clientId, deviceName, action } = IntentionSchema.parse(url.searchParams);
+		const { sessionId, clientId, deviceName, action } = IntentionSchema.parse({
+			sessionId: url.searchParams.get('sessionId'),
+			clientId: url.searchParams.get('clientId'),
+			deviceName: url.searchParams.get('deviceName'),
+			action: url.searchParams.get('action')
+		});
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();

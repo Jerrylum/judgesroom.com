@@ -4,18 +4,27 @@ import type { InferClientType, RouterProxy, WRPCRequest, WRPCResponse } from './
 
 /**
  * Session interface for server-to-client communication
+ * 
+ * Server-side sessions can call client procedures but cannot call server procedures.
+ * Client-side sessions can call server procedures but cannot call client procedures or broadcast.
  */
 export interface Session<TServerRouter extends AnyRouter> {
 	/**
 	 * Get a client proxy to call procedures on a specific client
+	 * @throws Error when called from client-side session
 	 */
 	getClient<TClientRouter extends AnyRouter>(clientId: string): RouterProxy<TClientRouter>;
 
 	/**
 	 * Broadcast proxy to call procedures on all connected clients
+	 * @throws Error when called from client-side session
 	 */
 	broadcast<TClientRouter extends AnyRouter>(): RouterProxy<TClientRouter>;
 
+	/**
+	 * Get a server proxy to call procedures on the server
+	 * @throws Error when called from server-side session
+	 */
 	getServer(): RouterProxy<TServerRouter>;
 
 	/**
@@ -100,7 +109,7 @@ export function createServerSideSession(
 										// Send to specific client
 										return await connectionManager.sendToClient(targetClientId, request);
 									} else {
-										// Broadcast to all clients
+										// Broadcast to all clients										
 										const responses = await connectionManager.broadcast(request);
 										return responses; // Return array of responses for broadcast
 									}
@@ -120,7 +129,7 @@ export function createServerSideSession(
 		getClient: (clientId: string) => createClientProxy(clientId),
 		broadcast: () => createClientProxy(), // No specific client ID = broadcast
 		getServer: () => {
-			throw new Error('Not implemented');
+			throw new Error('getServer() cannot be called from server-side session. Server procedures should be called directly.');
 		},
 		sessionId,
 		currentClient: {

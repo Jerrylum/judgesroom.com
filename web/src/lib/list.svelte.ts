@@ -84,10 +84,7 @@ export class List<T, KeyField extends keyof T> {
 		return this.items.every(callback);
 	}
 
-	reduce<U>(
-		callback: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U,
-		initialValue: U
-	): U {
+	reduce<U>(callback: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U {
 		return this.items.reduce(callback, initialValue);
 	}
 

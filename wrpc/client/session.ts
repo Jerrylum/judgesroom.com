@@ -35,11 +35,11 @@ export function createClientSideSession<TServerRouter extends AnyRouter, TClient
 
 	return {
 		getClient: (clientId: string) => {
-			throw new Error('Not implemented');
+			throw new Error('getClient() cannot be called from client-side session. Clients cannot call other clients directly.');
 		},
 		broadcast: () => {
-			throw new Error('Not implemented');
-		}, // No specific client ID = broadcast
+			throw new Error('broadcast() cannot be called from client-side session. Clients cannot broadcast to other clients.');
+		},
 		getServer: () => createServerProxy(),
 		sessionId,
 		currentClient: {

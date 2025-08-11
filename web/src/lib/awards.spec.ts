@@ -277,32 +277,14 @@ describe('AwardOptions Class', () => {
 	});
 
 	it('should handle single type in possibleTypes', () => {
-		const singleTypeOptions = new AwardOptions(
-			'Single Type Award',
-			['V5RC'],
-			['performance'],
-			['High School'],
-			1,
-			false,
-			true,
-			true
-		);
+		const singleTypeOptions = new AwardOptions('Single Type Award', ['V5RC'], ['performance'], ['High School'], 1, false, true, true);
 
 		expect(singleTypeOptions.selectedType).toBe('performance');
 		expect(singleTypeOptions.possibleTypes).toEqual(['performance']);
 	});
 
 	it('should handle empty possibleTypes gracefully', () => {
-		const emptyTypeOptions = new AwardOptions(
-			'Empty Type Award',
-			['V5RC'],
-			[],
-			['High School'],
-			1,
-			false,
-			true,
-			true
-		);
+		const emptyTypeOptions = new AwardOptions('Empty Type Award', ['V5RC'], [], ['High School'], 1, false, true, true);
 
 		expect(emptyTypeOptions.possibleTypes).toEqual([]);
 		expect(emptyTypeOptions.selectedType).toBeUndefined();
@@ -377,9 +359,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Should include awards that accept either grade
 			awards.forEach((award) => {
-				expect(
-					award.acceptedGrades.some((grade) => grade === 'High School' || grade === 'Middle School')
-				).toBe(true);
+				expect(award.acceptedGrades.some((grade) => grade === 'High School' || grade === 'Middle School')).toBe(true);
 			});
 		});
 	});
@@ -566,14 +546,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 describe('createCustomAwardOptions', () => {
 	it('should create custom award options with correct properties', () => {
-		const customAward = createCustomAwardOptions(
-			'My Custom Award',
-			'V5RC',
-			'judged',
-			['High School', 'College'],
-			3,
-			true
-		);
+		const customAward = createCustomAwardOptions('My Custom Award', 'V5RC', 'judged', ['High School', 'College'], 3, true);
 
 		expect(customAward.name).toBe('My Custom Award');
 		expect(customAward.possibleCompetitionTypes).toEqual(['V5RC']);
@@ -587,14 +560,7 @@ describe('createCustomAwardOptions', () => {
 	});
 
 	it('should create performance custom award', () => {
-		const customAward = createCustomAwardOptions(
-			'Custom Performance Award',
-			'VIQRC',
-			'performance',
-			['Elementary School'],
-			5,
-			false
-		);
+		const customAward = createCustomAwardOptions('Custom Performance Award', 'VIQRC', 'performance', ['Elementary School'], 5, false);
 
 		expect(customAward.name).toBe('Custom Performance Award');
 		expect(customAward.possibleCompetitionTypes).toEqual(['VIQRC']);
@@ -607,14 +573,7 @@ describe('createCustomAwardOptions', () => {
 	});
 
 	it('should create volunteer nominated custom award', () => {
-		const customAward = createCustomAwardOptions(
-			'Custom Volunteer Award',
-			'VURC',
-			'volunteer_nominated',
-			['College'],
-			1,
-			false
-		);
+		const customAward = createCustomAwardOptions('Custom Volunteer Award', 'VURC', 'volunteer_nominated', ['College'], 1, false);
 
 		expect(customAward.name).toBe('Custom Volunteer Award');
 		expect(customAward.possibleCompetitionTypes).toEqual(['VURC']);
@@ -627,14 +586,7 @@ describe('createCustomAwardOptions', () => {
 	});
 
 	it('should generate correct Award object from custom options', () => {
-		const customAward = createCustomAwardOptions(
-			'Test Custom Award',
-			'V5RC',
-			'judged',
-			['Middle School'],
-			2,
-			true
-		);
+		const customAward = createCustomAwardOptions('Test Custom Award', 'V5RC', 'judged', ['Middle School'], 2, true);
 
 		const award = customAward.generateAward();
 
@@ -660,14 +612,7 @@ describe('Integration Tests', () => {
 		}
 
 		// Test custom awards
-		const customAward = createCustomAwardOptions(
-			'Integration Test Award',
-			'V5RC',
-			'performance',
-			['High School'],
-			1,
-			false
-		);
+		const customAward = createCustomAwardOptions('Integration Test Award', 'V5RC', 'performance', ['High School'], 1, false);
 		const award = customAward.generateAward();
 		expect(() => AwardSchema.parse(award)).not.toThrow();
 	});

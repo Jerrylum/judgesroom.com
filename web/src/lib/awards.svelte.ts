@@ -79,10 +79,7 @@ export class AwardOptions {
  *   Award, Amaze Award, Build Award, Create Award, Judges Award, Inspire Award,
  *   Sportsmanship Award, Energy Award.
  */
-export function getOfficialAwardOptionsList(
-	competitionType: CompetitionType,
-	possibleGrades: Grade[]
-): AwardOptions[] {
+export function getOfficialAwardOptionsList(competitionType: CompetitionType, possibleGrades: Grade[]): AwardOptions[] {
 	return [
 		new AwardOptions(
 			'Tournament Champions',
@@ -124,56 +121,11 @@ export function getOfficialAwardOptionsList(
 			true,
 			false
 		),
-		new AwardOptions(
-			'Teamwork Champion Award',
-			['VIQRC'],
-			['performance'],
-			['Elementary School', 'Middle School'],
-			2,
-			false,
-			true,
-			true
-		),
-		new AwardOptions(
-			'Teamwork 2nd Place Award',
-			['VIQRC'],
-			['performance'],
-			['Elementary School', 'Middle School'],
-			2,
-			false,
-			true,
-			true
-		),
-		new AwardOptions(
-			'Teamwork 3rd Place Award',
-			['VIQRC'],
-			['performance'],
-			['Elementary School', 'Middle School'],
-			2,
-			false,
-			true,
-			true
-		),
-		new AwardOptions(
-			'Teamwork 4rd Place Award',
-			['VIQRC'],
-			['performance'],
-			['Elementary School', 'Middle School'],
-			2,
-			false,
-			true,
-			false
-		),
-		new AwardOptions(
-			'Teamwork 5rd Place Award',
-			['VIQRC'],
-			['performance'],
-			['Elementary School', 'Middle School'],
-			2,
-			false,
-			true,
-			false
-		),
+		new AwardOptions('Teamwork Champion Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
+		new AwardOptions('Teamwork 2nd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
+		new AwardOptions('Teamwork 3rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
+		new AwardOptions('Teamwork 4rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, false),
+		new AwardOptions('Teamwork 5rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, false),
 		new AwardOptions(
 			'Robot Skills Champion',
 			['VIQRC', 'V5RC', 'VURC'],
@@ -214,36 +166,9 @@ export function getOfficialAwardOptionsList(
 			true,
 			true
 		),
-		new AwardOptions(
-			'Excellence Award - High School',
-			['V5RC'],
-			['judged'],
-			['High School'],
-			1,
-			true,
-			true,
-			false
-		),
-		new AwardOptions(
-			'Excellence Award - Middle School',
-			['VIQRC', 'V5RC'],
-			['judged'],
-			['Middle School'],
-			1,
-			true,
-			true,
-			false
-		),
-		new AwardOptions(
-			'Excellence Award - Elementary School',
-			['VIQRC'],
-			['judged'],
-			['Elementary School'],
-			1,
-			true,
-			true,
-			false
-		),
+		new AwardOptions('Excellence Award - High School', ['V5RC'], ['judged'], ['High School'], 1, true, true, false),
+		new AwardOptions('Excellence Award - Middle School', ['VIQRC', 'V5RC'], ['judged'], ['Middle School'], 1, true, true, false),
+		new AwardOptions('Excellence Award - Elementary School', ['VIQRC'], ['judged'], ['Elementary School'], 1, true, true, false),
 		new AwardOptions(
 			'Design Award',
 			['VIQRC', 'V5RC', 'VURC'],
@@ -370,14 +295,5 @@ export function createCustomAwardOptions(
 	possibleWinners: number,
 	requireNotebook: boolean
 ): AwardOptions {
-	return new AwardOptions(
-		name,
-		[competitionType],
-		[type],
-		acceptedGrades,
-		possibleWinners,
-		requireNotebook,
-		false,
-		true
-	);
+	return new AwardOptions(name, [competitionType], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
 }

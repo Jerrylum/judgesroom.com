@@ -282,9 +282,7 @@ export function parseNotebookData(tsvContent: string): Record<string, string> {
 
 	if (parseResult.errors.length > 0) {
 		console.error('TSV parsing errors:', parseResult.errors);
-		throw new Error(
-			`Notebook data parsing failed: ${parseResult.errors.map((e) => e.message).join(', ')}`
-		);
+		throw new Error(`Notebook data parsing failed: ${parseResult.errors.map((e) => e.message).join(', ')}`);
 	}
 
 	const notebookLinks: Record<string, string> = {};
@@ -353,10 +351,7 @@ export function mapGradeToGradeLevel(gradeString: string): Grade {
 	return 'College';
 }
 
-export function mergeTeamData(
-	csvTeams: Partial<TeamInfo & TeamData>[],
-	notebookLinks: Record<string, string>
-): Team[] {
+export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebookLinks: Record<string, string>): Team[] {
 	return csvTeams.map((team) => {
 		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
 		const notebookLink = notebookLinks[teamNumber] || '';

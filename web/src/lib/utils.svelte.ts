@@ -48,10 +48,7 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Debounce function calls
  */
-export function debounce<T extends (...args: Parameters<T>) => void>(
-	func: T,
-	wait: number
-): (...args: Parameters<T>) => void {
+export function debounce<T extends (...args: Parameters<T>) => void>(func: T, wait: number): (...args: Parameters<T>) => void {
 	let timeout: NodeJS.Timeout | undefined;
 
 	return function executedFunction(...args: Parameters<T>) {
