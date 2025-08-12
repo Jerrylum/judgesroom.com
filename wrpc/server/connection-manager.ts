@@ -1,6 +1,7 @@
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
 import type { WebSocketHandlerOptions } from './websocket-handler';
+import type { Network } from './types';
 
 /**
  * Client data stored in Durable Object storage
@@ -17,32 +18,6 @@ export interface ClientData {
  */
 interface ServerData {
 	clients: ClientData[];
-}
-
-/**
- * WebSocket connection manager interface
- */
-
-export interface Network {
-	/**
-	 * Send a request to a specific client
-	 */
-	sendToClient(clientId: string, request: WRPCRequest): Promise<WRPCResponse>;
-
-	/**
-	 * Broadcast a request to all connected clients
-	 */
-	broadcast(request: WRPCRequest): Promise<WRPCResponse[]>;
-
-	/**
-	 * Get all connected client IDs
-	 */
-	getConnectedClients(): string[];
-
-	/**
-	 * Check if a client is connected
-	 */
-	isClientConnected(clientId: string): boolean;
 }
 
 /**

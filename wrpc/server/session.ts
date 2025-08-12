@@ -1,7 +1,7 @@
 import type { AnyRouter } from './router';
 import type { RouterProxy } from './types';
 import type { WRPCRequest } from './messages';
-import type { Network } from './connection-manager';
+import type { Network } from './types';
 
 /**
  * Session interface for server-to-client communication

@@ -1,6 +1,7 @@
 import type z from 'zod';
 import type { AnyProcedure, Procedure, ProcedureType } from './procedure';
-import type { AnyRouter, BuiltRouter } from './router';
+import type { AnyRouter } from './router';
+import type { WRPCRequest, WRPCResponse } from './messages';
 
 /**
  * ================================
@@ -105,3 +106,29 @@ export type RouterProxy<TRouter extends AnyRouter> = {
 			? RouterProxy<TRouter['_def']['record'][K]>
 			: never;
 };
+
+/**
+ * Network interface
+ */
+
+export interface Network {
+	/**
+	 * Send a request to a specific client
+	 */
+	sendToClient(clientId: string, request: WRPCRequest): Promise<WRPCResponse>;
+
+	/**
+	 * Broadcast a request to all connected clients
+	 */
+	broadcast(request: WRPCRequest): Promise<WRPCResponse[]>;
+
+	/**
+	 * Get all connected client IDs
+	 */
+	getConnectedClients(): string[];
+
+	/**
+	 * Check if a client is connected
+	 */
+	isClientConnected(clientId: string): boolean;
+}
