@@ -1,6 +1,6 @@
 import type { AnyRouter } from './router';
 import type { ConnectionManager } from './session';
-import type { WRPCRequest, WRPCResponse } from './types';
+import type { WRPCRequest, WRPCResponse } from './messages';
 import type { WebSocketHandlerOptions } from './websocket-handler';
 
 /**

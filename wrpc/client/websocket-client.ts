@@ -1,8 +1,7 @@
 import type { AnyProcedure } from '../server/procedure';
 import type { ProcedureResolver } from '../server/procedure-builder';
 import type { AnyRouter } from '../server/router';
-import type { Session } from '../server/session';
-import type { WRPCRequest, WRPCResponse } from '../server/types';
+import type { WRPCRequest, WRPCResponse } from '../server/messages';
 import { parseWRPCMessage } from '../server/utils';
 import { createClientSideSession } from './session';
 import type { ClientOptions, PendingRequest } from './types';

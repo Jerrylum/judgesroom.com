@@ -2,7 +2,7 @@
  * WebSocket handler for WRPC, inspired by tRPC's fetchRequestHandler
  */
 import type { AnyRouter } from './router';
-import type { WRPCRequest, WRPCResponse } from './types';
+import type { WRPCRequest, WRPCResponse } from './messages';
 import { WRPCError } from './types';
 import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';

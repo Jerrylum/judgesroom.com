@@ -1,6 +1,7 @@
 import type { AnyProcedure } from './procedure';
 import type { AnyRouter } from './router';
-import type { InferClientType, RouterProxy, WRPCRequest, WRPCResponse } from './types';
+import type { InferClientType, RouterProxy } from './types';
+import type { WRPCRequest, WRPCResponse } from './messages';
 
 /**
  * Session interface for server-to-client communication
