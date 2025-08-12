@@ -5,7 +5,7 @@ import type { WebsocketClient } from './websocket-client';
  * Create a session instance
  */
 export function createClientSideSession<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
-	wsClient: WebsocketClient<TServerRouter, TClientRouter>,
+	wsClient: WebsocketClient<TClientRouter>,
 	sessionId: string,
 	clientId: string,
 	deviceName: string

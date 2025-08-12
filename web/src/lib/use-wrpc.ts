@@ -43,7 +43,7 @@ const clientManager = createClientManager<ServerRouter, ClientRouter>(
  * @returns Typed client proxy for calling server procedures
  */
 export function useWRPC() {
-	return clientManager.getClient();
+	return clientManager.getClient()[1];
 }
 
 /**

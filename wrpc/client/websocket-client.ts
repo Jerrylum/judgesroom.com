@@ -9,7 +9,7 @@ import type { ClientOptions, PendingRequest } from './types';
 /**
  * WRPC WebSocket client implementation
  */
-export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter> {
+export class WebsocketClient<TClientRouter extends AnyRouter> {
 	private ws: WebSocket | null = null;
 	private requestId = 0;
 	private pendingRequests = new Map<string, PendingRequest>();
@@ -260,5 +260,12 @@ export class WebsocketClient<TServerRouter extends AnyRouter, TClientRouter exte
 			this.ws.close(1000, 'Client disconnect');
 			this.ws = null;
 		}
+	}
+
+	/**
+	 * Check if the WebSocket is connected
+	 */
+	isConnected(): this is { ws: WebSocket } {
+		return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
 	}
 }

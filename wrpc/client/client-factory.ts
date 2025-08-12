@@ -8,10 +8,10 @@ import type { WRPCClient, ClientOptions } from './types';
 export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
 	options: ClientOptions,
 	clientRouter: TClientRouter
-): WRPCClient<TServerRouter> {
-	const client = new WebsocketClient<TServerRouter, TClientRouter>(options, clientRouter);
+): [WebsocketClient<TClientRouter>, WRPCClient<TServerRouter>] {
+	const client = new WebsocketClient<TClientRouter>(options, clientRouter);
 
-	return new Proxy({} as WRPCClient<TServerRouter>, {
+	const wrpc = new Proxy({} as WRPCClient<TServerRouter>, {
 		get(target, prop: string) {
 			return new Proxy(
 				{},
@@ -28,4 +28,6 @@ export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter 
 			);
 		}
 	});
+
+	return [client, wrpc];
 }

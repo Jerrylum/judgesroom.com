@@ -1,13 +1,14 @@
 import type { AnyRouter } from '../server/router';
 import { createWRPCClient } from './client-factory';
 import type { WRPCClient, ClientOptions } from './types';
+import type { WebsocketClient } from './websocket-client';
 
 /**
  * Generic client manager for WRPC connections
  * This provides a reusable pattern for managing client instances
  */
 export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter> {
-	private clientInstance: WRPCClient<TServerRouter> | null = null;
+	private clientInstance: [WebsocketClient<TClientRouter>, WRPCClient<TServerRouter>] | null = null;
 
 	constructor(
 		private createOptions: () => ClientOptions,
@@ -17,7 +18,7 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
 	/**
 	 * Get or create the WRPC client instance
 	 */
-	getClient(): WRPCClient<TServerRouter> {
+	getClient(): [WebsocketClient<TClientRouter>, WRPCClient<TServerRouter>] {
 		if (!this.clientInstance) {
 			this.clientInstance = createWRPCClient<TServerRouter, TClientRouter>(this.createOptions(), this.clientRouter);
 		}
@@ -30,20 +31,17 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
 	resetClient(): void {
 		if (this.clientInstance) {
 			// If the client has a disconnect method, call it
-			const client = this.clientInstance as WRPCClient<TServerRouter> & { disconnect?: () => void };
-			if (client.disconnect && typeof client.disconnect === 'function') {
-				client.disconnect();
-			}
+			const [client, _] = this.clientInstance;
+			client.disconnect();
 		}
 		this.clientInstance = null;
 	}
 
 	/**
-	 * Check if the client is connected (if implemented in the future)
+	 * Check if the client is connected
 	 */
 	isConnected(): boolean {
-		// This could be enhanced to check the actual connection status
-		return this.clientInstance !== null;
+		return this.clientInstance !== null && this.clientInstance[0].isConnected();
 	}
 }
 
