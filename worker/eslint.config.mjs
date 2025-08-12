@@ -31,24 +31,24 @@ export default ts.config(
 			parserOptions: {
 				projectService: true
 			}
-		// },
-		// rules: {
-		// 	// Enforce consistent type imports to catch verbatimModuleSyntax issues
-		// 	'@typescript-eslint/consistent-type-imports': [
-		// 		'error',
-		// 		{
-		// 			prefer: 'type-imports',
-		// 			disallowTypeAnnotations: false,
-		// 			fixStyle: 'separate-type-imports'
-		// 		}
-		// 	],
-		// 	// Ensure consistent type exports as well
-		// 	'@typescript-eslint/consistent-type-exports': [
-		// 		'error',
-		// 		{
-		// 			fixMixedExportsWithInlineTypeSpecifier: false
-		// 		}
-		// 	]
+			// },
+			// rules: {
+			// 	// Enforce consistent type imports to catch verbatimModuleSyntax issues
+			// 	'@typescript-eslint/consistent-type-imports': [
+			// 		'error',
+			// 		{
+			// 			prefer: 'type-imports',
+			// 			disallowTypeAnnotations: false,
+			// 			fixStyle: 'separate-type-imports'
+			// 		}
+			// 	],
+			// 	// Ensure consistent type exports as well
+			// 	'@typescript-eslint/consistent-type-exports': [
+			// 		'error',
+			// 		{
+			// 			fixMixedExportsWithInlineTypeSpecifier: false
+			// 		}
+			// 	]
 		}
 	}
 );

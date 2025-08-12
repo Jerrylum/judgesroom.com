@@ -31,7 +31,7 @@ const serverRouter = w.router({
 	 */
 	setAge: w.procedure.input(z.number()).mutation(async ({ input, session }: { input: number; session: Session<never> }) => {
 		console.log('🎂 Server setAge called with:', input);
-		
+
 		// Broadcast age update to all connected clients
 		await session.broadcast<ClientRouter>().updateAge.mutation(input);
 
@@ -43,7 +43,7 @@ const serverRouter = w.router({
 	 */
 	broadcastNotification: w.procedure.input(z.string()).mutation(async ({ input, session }: { input: string; session: Session<never> }) => {
 		console.log('📢 Broadcasting notification:', input);
-		
+
 		await session.broadcast<ClientRouter>().receiveNotification.mutation(input);
 		return `Notification "${input}" sent to all clients`;
 	}),
@@ -51,20 +51,23 @@ const serverRouter = w.router({
 	/**
 	 * Get a personalized message from a specific client
 	 */
-	getClientGreeting: w.procedure.input(z.object({
-		clientId: z.string(),
-		message: z.string()
-	})).mutation(async ({ input, session }: { input: { clientId: string; message: string }; session: Session<never> }): Promise<string> => {
-		console.log('💬 Getting greeting from client:', input.clientId);
-		
-		try {
-			const response: string = await session.getClient<ClientRouter>(input.clientId)
-				.getPersonalGreeting.query(input.message);
-			return `Client ${input.clientId} responded: ${response}`;
-		} catch (error) {
-			return `Failed to get greeting from client ${input.clientId}: ${error}`;
-		}
-	})
+	getClientGreeting: w.procedure
+		.input(
+			z.object({
+				clientId: z.string(),
+				message: z.string()
+			})
+		)
+		.mutation(async ({ input, session }: { input: { clientId: string; message: string }; session: Session<never> }): Promise<string> => {
+			console.log('💬 Getting greeting from client:', input.clientId);
+
+			try {
+				const response: string = await session.getClient<ClientRouter>(input.clientId).getPersonalGreeting.query(input.message);
+				return `Client ${input.clientId} responded: ${response}`;
+			} catch (error) {
+				return `Failed to get greeting from client ${input.clientId}: ${error}`;
+			}
+		})
 });
 
 export { serverRouter };
@@ -74,4 +77,3 @@ export { serverRouter };
  * Used by client-side code to get type-safe server procedure calls
  */
 export type ServerRouter = typeof serverRouter;
-
