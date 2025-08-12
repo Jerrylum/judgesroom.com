@@ -1,5 +1,5 @@
 import type { AnyRouter } from './router';
-import type { RouterProxy } from './types';
+import type { RouterBroadcastProxy, RouterProxy } from './types';
 import type { WRPCRequest } from './messages';
 import type { Network } from './types';
 
@@ -20,7 +20,7 @@ export interface Session<TServerRouter extends AnyRouter> {
 	 * Broadcast proxy to call procedures on all connected clients
 	 * @throws Error when called from client-side session
 	 */
-	broadcast<TClientRouter extends AnyRouter>(): RouterProxy<TClientRouter>;
+	broadcast<TClientRouter extends AnyRouter>(): RouterBroadcastProxy<TClientRouter>;
 
 	/**
 	 * Get a server proxy to call procedures on the server
@@ -83,7 +83,12 @@ export function createServerSideSession(
 
 									if (targetClientId) {
 										// Send to specific client
-										return await connectionManager.sendToClient(targetClientId, request);
+										const response = await connectionManager.sendToClient(targetClientId, request);
+										if (response.result.type === 'data') {
+											return response.result.data;
+										} else {
+											throw new Error(response.result.error.message);
+										}
 									} else {
 										// Broadcast to all clients										
 										const responses = await connectionManager.broadcast(request);

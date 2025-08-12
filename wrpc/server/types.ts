@@ -107,6 +107,29 @@ export type RouterProxy<TRouter extends AnyRouter> = {
 			: never;
 };
 
+export type InputOutputBroadcastFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput[]>;
+
+export type InferBroadcastClientType<TProcedure> = TProcedure extends {
+	_def: { type: infer TType; $types: { input: infer TInput; output: infer TOutput } };
+}
+	? TType extends 'query'
+		? { query: InputOutputBroadcastFunction<TInput, TOutput> }
+		: TType extends 'mutation'
+			? { mutation: InputOutputBroadcastFunction<TInput, TOutput> }
+			: never
+	: never;
+
+/**
+ * Client proxy type that mirrors the client router structure
+ */
+export type RouterBroadcastProxy<TRouter extends AnyRouter> = {
+	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
+		? InferBroadcastClientType<TRouter['_def']['record'][K]>
+		: TRouter['_def']['record'][K] extends AnyRouter
+			? RouterBroadcastProxy<TRouter['_def']['record'][K]>
+			: never;
+};
+
 /**
  * Network interface
  */

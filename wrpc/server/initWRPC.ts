@@ -113,4 +113,4 @@ class WRPCBuilder<TMeta extends object> {
  * Builder to initialize the WRPC root object - use this exactly once per backend
  */
 export const initWRPC = new WRPCBuilder();
-export type { WRPCBuilder };
+export { WRPCBuilder };

@@ -14,7 +14,7 @@ const serverRouter = w.router({
 	/**
 	 * Simple query that returns a greeting
 	 */
-	getName: w.procedure.input(z.string()).query(async ({ input }: { input: string }) => {
+	getName: w.procedure.input(z.string()).query(async ({ input }) => {
 		console.log('👋 Server getName called with:', input);
 		return `Hello from server, ${input}!`;
 	}),
@@ -29,7 +29,7 @@ const serverRouter = w.router({
 	/**
 	 * Sets age and demonstrates server-to-client communication
 	 */
-	setAge: w.procedure.input(z.number()).mutation(async ({ input, session }: { input: number; session: Session<never> }) => {
+	setAge: w.procedure.input(z.number()).mutation(async ({ input, session }) => {
 		console.log('🎂 Server setAge called with:', input);
 
 		// Broadcast age update to all connected clients
@@ -41,11 +41,14 @@ const serverRouter = w.router({
 	/**
 	 * Send notification to all clients
 	 */
-	broadcastNotification: w.procedure.input(z.string()).mutation(async ({ input, session }: { input: string; session: Session<never> }) => {
+	broadcastNotification: w.procedure.input(z.string()).mutation(async ({ input, session }) => {
 		console.log('📢 Broadcasting notification:', input);
 
-		await session.broadcast<ClientRouter>().receiveNotification.mutation(input);
-		return `Notification "${input}" sent to all clients`;
+		const broadcast = session.broadcast<ClientRouter>();
+		// explicit type definition is needed to suppress circularly references error ts(2456)
+		const allResult: string[] = await broadcast.receiveNotification.mutation(input);
+
+		return `Notification "${input}" sent to all clients. They responded: ${allResult.join(', ')}`;
 	}),
 
 	/**
