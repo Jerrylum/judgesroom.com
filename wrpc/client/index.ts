@@ -27,4 +27,4 @@ export {
 	type DecorateCreateRouterOptions
 } from '../server/router';
 export { type Session } from '../server/session';
-export { type RouterProxy } from '../server/types';
+export { type RouterProxy, type Network } from '../server/types';

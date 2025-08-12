@@ -16,18 +16,19 @@ export type WRPCRequest = InferParser<typeof WRPCRequestSchema>;
 export const WRPCResponseSchema = z.object({
 	kind: z.literal('response'),
 	id: z.string(),
-	result: z
-		.object({
-			type: z.enum(['data', 'error']),
-			data: z.unknown().optional(),
-			error: z
-				.object({
-					message: z.string(),
-					code: z.string().optional()
-				})
-				.optional()
+	result: z.discriminatedUnion('type', [
+		z.object({
+			type: z.literal('data'),
+			data: z.unknown()
+		}),
+		z.object({
+			type: z.literal('error'),
+			error: z.object({
+				message: z.string(),
+				code: z.string().optional()
+			})
 		})
-		.optional()
+	])
 });
 
 export type WRPCResponse = InferParser<typeof WRPCResponseSchema>;

@@ -92,11 +92,11 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 		this.pendingRequests.delete(response.id);
 
-		if (response.result?.type === 'error') {
-			const error = new Error(response.result.error?.message || 'Unknown error');
-			(error as Error & { code?: string }).code = response.result.error?.code;
+		if (response.result.type === 'error') {
+			const error = new Error(response.result.error.message);
+			(error as Error & { code?: string }).code = response.result.error.code;
 			pendingRequest.reject(error);
-		} else if (response.result?.type === 'data') {
+		} else if (response.result.type === 'data') {
 			pendingRequest.resolve(response.result.data);
 		}
 	}
