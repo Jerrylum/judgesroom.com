@@ -16,7 +16,13 @@ export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter 
 			return new Proxy(
 				{},
 				{
-					get(target, method: string) {
+					get(target, method: string | symbol) {
+						if (typeof method === 'symbol') {
+							return undefined;
+						}
+						if (method === 'constructor') {
+							return undefined;
+						}
 						if (method === 'query') {
 							return (input: unknown) => client.query(prop, input);
 						} else if (method === 'mutation') {

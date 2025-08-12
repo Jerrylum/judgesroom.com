@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { WebSocketConnectionManager, type ClientData } from './connection-manager';
 import type { WebSocketHandlerOptions } from './websocket-handler';

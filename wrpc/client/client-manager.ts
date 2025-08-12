@@ -32,7 +32,9 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
 		if (this.clientInstance) {
 			// If the client has a disconnect method, call it
 			const [client, _] = this.clientInstance;
-			client.disconnect();
+			if (typeof client.disconnect === 'function') {
+				client.disconnect();
+			}
 		}
 		this.clientInstance = null;
 	}
