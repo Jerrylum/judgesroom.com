@@ -1,7 +1,7 @@
-import type { AnyProcedure } from './procedure';
 import type { AnyRouter } from './router';
-import type { InferClientType, RouterProxy } from './types';
-import type { WRPCRequest, WRPCResponse } from './messages';
+import type { RouterProxy } from './types';
+import type { WRPCRequest } from './messages';
+import type { Network } from './connection-manager';
 
 /**
  * Session interface for server-to-client communication
@@ -43,35 +43,10 @@ export interface Session<TServerRouter extends AnyRouter> {
 }
 
 /**
- * WebSocket connection manager interface
- */
-export interface ConnectionManager {
-	/**
-	 * Send a request to a specific client
-	 */
-	sendToClient(clientId: string, request: WRPCRequest): Promise<WRPCResponse>;
-
-	/**
-	 * Broadcast a request to all connected clients
-	 */
-	broadcast(request: WRPCRequest): Promise<WRPCResponse[]>;
-
-	/**
-	 * Get all connected client IDs
-	 */
-	getConnectedClients(): string[];
-
-	/**
-	 * Check if a client is connected
-	 */
-	isClientConnected(clientId: string): boolean;
-}
-
-/**
  * Session factory function type
  */
 export type SessionFactory<TServerRouter extends AnyRouter> = (
-	connectionManager: ConnectionManager,
+	connectionManager: Network,
 	sessionId: string,
 	clientId: string,
 	deviceName?: string
@@ -81,7 +56,7 @@ export type SessionFactory<TServerRouter extends AnyRouter> = (
  * Create a session instance
  */
 export function createServerSideSession(
-	connectionManager: ConnectionManager,
+	connectionManager: Network,
 	sessionId: string,
 	clientId: string,
 	deviceName: string

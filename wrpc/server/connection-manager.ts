@@ -1,5 +1,4 @@
 import type { AnyRouter } from './router';
-import type { ConnectionManager } from './session';
 import type { WRPCRequest, WRPCResponse } from './messages';
 import type { WebSocketHandlerOptions } from './websocket-handler';
 
@@ -21,9 +20,35 @@ interface ServerData {
 }
 
 /**
+ * WebSocket connection manager interface
+ */
+
+export interface Network {
+	/**
+	 * Send a request to a specific client
+	 */
+	sendToClient(clientId: string, request: WRPCRequest): Promise<WRPCResponse>;
+
+	/**
+	 * Broadcast a request to all connected clients
+	 */
+	broadcast(request: WRPCRequest): Promise<WRPCResponse[]>;
+
+	/**
+	 * Get all connected client IDs
+	 */
+	getConnectedClients(): string[];
+
+	/**
+	 * Check if a client is connected
+	 */
+	isClientConnected(clientId: string): boolean;
+}
+
+/**
  * Implementation of ConnectionManager for Cloudflare WebSocket Hibernation Server
  */
-export class WebSocketConnectionManager implements ConnectionManager {
+export class WebSocketConnectionManager implements Network {
 	private opts: WebSocketHandlerOptions<AnyRouter>;
 	private serverData: ServerData | null = null;
 	private isLoaded = false;
