@@ -10,6 +10,7 @@ import type { ClientOptions, PendingRequest } from './types';
  * WRPC WebSocket client implementation
  */
 export class WebsocketClient<TClientRouter extends AnyRouter> {
+	private connectingPromise: Promise<WebSocket> | null = null;
 	private ws: WebSocket | null = null;
 	private requestId = 0;
 	private pendingRequests = new Map<string, PendingRequest>();
@@ -34,7 +35,11 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			return this.ws;
 		}
 
-		return new Promise((resolve, reject) => {
+		if (this.connectingPromise) {
+			return this.connectingPromise;
+		}
+
+		this.connectingPromise = new Promise((resolve, reject) => {
 			const { wsUrl, sessionId, clientId, deviceName } = this.options;
 			const url = new URL(wsUrl);
 
@@ -48,10 +53,12 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			ws.onopen = () => {
 				this.ws = ws;
 				this.reconnectAttempts = 0;
+				this.connectingPromise = null;
 				resolve(ws);
 			};
 
 			ws.onerror = (error) => {
+				this.connectingPromise = null;
 				reject(new Error(`WebSocket connection failed: ${error}`));
 			};
 
@@ -63,6 +70,8 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				this.handleClose(event);
 			};
 		});
+
+		return this.connectingPromise;
 	}
 
 	private async handleMessage(data: string): Promise<void> {
