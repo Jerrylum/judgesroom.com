@@ -68,7 +68,7 @@ const MockWebSocket = vi.fn().mockImplementation((url: string) => {
 global.WebSocket = MockWebSocket as any;
 
 describe('WebsocketClient', () => {
-	let clientOptions: ClientOptions;
+	let clientOptions: ClientOptions<AnyRouter>;
 	let clientRouter: AnyRouter;
 	let wsClient: WebsocketClient<AnyRouter>;
 
@@ -77,7 +77,8 @@ describe('WebsocketClient', () => {
 			wsUrl: 'ws://localhost:8080/ws',
 			sessionId: 'test-session',
 			clientId: 'test-client',
-			deviceName: 'Test Device'
+			deviceName: 'Test Device',
+			onContext: async () => ({})
 		};
 
 		// Create a test client router
@@ -124,8 +125,12 @@ describe('WebsocketClient', () => {
 		});
 
 		it('should handle connection without optional parameters', async () => {
-			const minimalOptions: ClientOptions = {
-				wsUrl: 'ws://localhost:8080/ws'
+			const minimalOptions: ClientOptions<AnyRouter> = {
+				wsUrl: 'ws://localhost:8080/ws',
+				sessionId: 'test-session',
+				clientId: 'test-client',
+				deviceName: 'Test Device',
+				onContext: async () => ({})
 			};
 
 			const minimalClient = new WebsocketClient(minimalOptions, clientRouter);
@@ -133,7 +138,9 @@ describe('WebsocketClient', () => {
 
 			await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(MockWebSocket).toHaveBeenCalledWith('ws://localhost:8080/ws?action=join');
+			expect(MockWebSocket).toHaveBeenCalledWith(
+				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceName=Test+Device&action=join'
+			);
 
 			minimalClient.disconnect();
 		});

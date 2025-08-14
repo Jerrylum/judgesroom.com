@@ -25,47 +25,45 @@ type AnyProcedureBuilderDef = ProcedureBuilderDef<any>;
  * Procedure resolver options (what the `.query()` and `.mutation()` functions receive)
  * @internal
  */
-export interface ProcedureResolverOptions<TInput, TServerRouter extends AnyRouter = AnyRouter> {
+export interface ProcedureResolverOptions<TInput, TContext, TServerRouter extends AnyRouter = AnyRouter> {
 	input: TInput extends UnsetMarker ? undefined : TInput;
-	/**
-	 * Session for server-to-client communication
-	 */
 	session: Session<TServerRouter>;
+	ctx: TContext;
 }
 
 /**
  * A procedure resolver
  */
-export type ProcedureResolver<TInput, TOutput, TServerRouter extends AnyRouter = AnyRouter> = (
-	opts: ProcedureResolverOptions<TInput, TServerRouter>
+export type ProcedureResolver<TInput, TOutput, TContext, TServerRouter extends AnyRouter = AnyRouter> = (
+	opts: ProcedureResolverOptions<TInput, TContext, TServerRouter>
 ) => MaybePromise<TOutput>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyResolver = ProcedureResolver<any, any, any>;
+type AnyResolver = ProcedureResolver<any, any, any, any>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyProcedureBuilder = ProcedureBuilder<any, any, any, any>;
+type AnyProcedureBuilder = ProcedureBuilder<any, any, any, any, any>;
 
-export interface ProcedureBuilder<TMeta, TInput, TOutput, TServerRouter extends AnyRouter = AnyRouter> {
+export interface ProcedureBuilder<TMeta, TInput, TOutput, TContext, TServerRouter extends AnyRouter = AnyRouter> {
 	_def: ProcedureBuilderDef<TMeta>;
 
 	input<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput, TServerRouter>;
+	): ProcedureBuilder<TMeta, IntersectIfDefined<TInput, InferParser<TSchema>>, TOutput, TContext, TServerRouter>;
 
 	output<TSchema extends z.ZodType>(
 		schema: TSchema
-	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>, TServerRouter>;
+	): ProcedureBuilder<TMeta, TInput, IntersectIfDefined<TOutput, InferParser<TSchema>>, TContext, TServerRouter>;
 
-	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TServerRouter>;
+	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TContext, TServerRouter>;
 
-	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TServerRouter>): QueryProcedure<{
+	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TContext, TServerRouter>): QueryProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
 	}>;
 
-	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TServerRouter>): MutationProcedure<{
+	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TContext, TServerRouter>): MutationProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
@@ -74,7 +72,7 @@ export interface ProcedureBuilder<TMeta, TInput, TOutput, TServerRouter extends 
 
 type ProcedureBuilderResolver = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	opts: ProcedureResolverOptions<any, any>
+	opts: ProcedureResolverOptions<any, any, any>
 ) => Promise<unknown>;
 
 function createNewBuilder(def1: AnyProcedureBuilderDef, def2: Partial<AnyProcedureBuilderDef>): AnyProcedureBuilder {
@@ -100,7 +98,7 @@ function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }
 	};
 
 	// Create a callable procedure function
-	const procedure = async (opts: { input: unknown; session: Session<AnyRouter> }) => {
+	const procedure = async (opts: ProcedureResolverOptions<unknown, unknown, AnyRouter>) => {
 		// Validate input against schemas if they exist
 		let validatedInput = opts.input;
 		for (const inputSchema of _defIn.inputs) {
@@ -108,7 +106,7 @@ function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }
 		}
 
 		// Call the resolver with validated input and session
-		const result = await resolver({ input: validatedInput, session: opts.session });
+		const result = await resolver({ input: validatedInput, session: opts.session, ctx: opts.ctx });
 
 		// Validate output if schema exists
 		if (_defIn.output) {
@@ -124,9 +122,9 @@ function createResolver(_defIn: AnyProcedureBuilderDef & { type: ProcedureType }
 	return procedure as AnyProcedure;
 }
 
-export function createBuilder<TMeta, TServerRouter extends AnyRouter = AnyRouter>(
+export function createBuilder<TMeta, TContext, TServerRouter extends AnyRouter = AnyRouter>(
 	initDef: Partial<AnyProcedureBuilderDef> = {}
-): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TServerRouter> {
+): ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TContext, TServerRouter> {
 	const _def: AnyProcedureBuilderDef = {
 		procedure: true,
 		inputs: [],

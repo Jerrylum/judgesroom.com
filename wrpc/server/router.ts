@@ -25,18 +25,18 @@ export type DecorateRouterRecord<TRecord extends RouterRecord> = {
 /**
  * @internal
  */
-export interface RouterDef<TRoot, TRecord extends RouterRecord> {
+export interface RouterDef<TRoot extends RootTypes, TRecord extends RouterRecord> {
 	_config: TRoot;
 	router: true;
 	procedure?: never;
 	record: TRecord;
 }
 
-export interface Router<TRoot, TRecord extends RouterRecord> {
+export interface Router<TRoot extends RootTypes, TRecord extends RouterRecord> {
 	_def: RouterDef<TRoot, TRecord>;
 }
 
-export type BuiltRouter<TRoot, TRecord extends RouterRecord> = Router<TRoot, TRecord> & TRecord;
+export type BuiltRouter<TRoot extends RootTypes, TRecord extends RouterRecord> = Router<TRoot, TRecord> & TRecord;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyRouter = Router<any, any>;
@@ -136,7 +136,7 @@ function isRouter(value: unknown): value is AnyRouter {
 /** @internal */
 export type MergeRouters<
 	TRouters extends AnyRouter[],
-	TRoot = TRouters[0]['_def']['_config'],
+	TRoot extends RootTypes = TRouters[0]['_def']['_config'],
 	TRecord extends RouterRecord = Record<string, never>
 > = TRouters extends [infer Head extends AnyRouter, ...infer Tail extends AnyRouter[]]
 	? MergeRouters<Tail, TRoot, Head['_def']['record'] & TRecord>

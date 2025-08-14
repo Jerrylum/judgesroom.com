@@ -1,6 +1,6 @@
-import type { AnyProcedure } from '../server/procedure';
+import type { WRPCRequest } from '../server/messages';
 import type { AnyRouter } from '../server/router';
-import type { RouterProxy } from '../server/types';
+import type { InferRouterContext, RouterProxy } from '../server/types';
 
 /**
  * Client-specific types for WRPC
@@ -8,11 +8,12 @@ import type { RouterProxy } from '../server/types';
 
 export type WRPCClient<TRouter extends AnyRouter> = RouterProxy<TRouter>;
 
-export interface ClientOptions {
+export interface ClientOptions<TRouter extends AnyRouter> {
 	wsUrl: string;
-	sessionId?: string;
-	clientId?: string;
+	sessionId: string;
+	clientId: string;
 	deviceName?: string;
+	onContext: (request: WRPCRequest) => Promise<InferRouterContext<TRouter>>;
 }
 
 export interface PendingRequest {

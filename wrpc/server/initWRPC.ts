@@ -5,11 +5,12 @@ import { type UnsetMarker } from './utils';
 
 export interface WRPCRootObject<
 	TMeta extends object,
+	TContext extends object,
 	TOptions extends RuntimeConfigOptions<TMeta>,
 	TServerRouter extends AnyRouter = AnyRouter,
 	$Root extends AnyRootTypes = CreateRootTypes<{
 		meta: TMeta;
-		context: Record<string, never>;
+		context: TContext;
 	}>
 > {
 	/**
@@ -21,7 +22,7 @@ export interface WRPCRootObject<
 	/**
 	 * Builder object for creating procedures
 	 */
-	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TServerRouter>;
+	procedure: ProcedureBuilder<TMeta, UnsetMarker, UnsetMarker, TContext, TServerRouter>;
 
 	/**
 	 * Create a router
@@ -53,12 +54,12 @@ class WRPCBuilder<TMeta extends object> {
 	/**
 	 * Create the root object with client router type
 	 */
-	createServer<TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
+	createServer<TContext extends object = Record<string, never>, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
 		opts?: TOptions
-	): WRPCRootObject<TMeta, TOptions, never> {
+	): WRPCRootObject<TMeta, TContext, TOptions, never> {
 		type $Root = CreateRootTypes<{
 			meta: TMeta;
-			context: Record<string, never>;
+			context: TContext;
 		}>;
 
 		const config: RootConfig<$Root> = {
@@ -87,12 +88,14 @@ class WRPCBuilder<TMeta extends object> {
 		};
 	}
 
-	createClient<TServerRouter extends AnyRouter, TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>>(
-		opts?: TOptions
-	): WRPCRootObject<TMeta, TOptions, TServerRouter> {
+	createClient<
+		TServerRouter extends AnyRouter,
+		TContext extends object = Record<string, never>,
+		TOptions extends RuntimeConfigOptions<TMeta> = Record<string, never>
+	>(opts?: TOptions): WRPCRootObject<TMeta, TContext, TOptions, TServerRouter> {
 		type $Root = CreateRootTypes<{
 			meta: TMeta;
-			context: Record<string, never>;
+			context: TContext;
 		}>;
 
 		const config: RootConfig<$Root> = {
@@ -102,7 +105,7 @@ class WRPCBuilder<TMeta extends object> {
 
 		return {
 			_config: config,
-			procedure: createBuilder<TMeta, TServerRouter>({}),
+			procedure: createBuilder<TMeta, TContext, TServerRouter>({}),
 			router: createRouterFactory<$Root>(config),
 			mergeRouters
 		};

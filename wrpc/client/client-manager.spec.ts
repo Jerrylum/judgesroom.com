@@ -9,7 +9,7 @@ import { z } from 'zod';
 // Mock WebsocketClient
 class MockWebsocketClient {
 	constructor(
-		public options: ClientOptions,
+		public options: ClientOptions<AnyRouter>,
 		public clientRouter: AnyRouter
 	) {}
 
@@ -21,7 +21,7 @@ class MockWebsocketClient {
 
 // Mock createWRPCClient
 vi.mock('./client-factory', () => ({
-	createWRPCClient: vi.fn().mockImplementation((options: ClientOptions, clientRouter: AnyRouter) => {
+	createWRPCClient: vi.fn().mockImplementation((options: ClientOptions<AnyRouter>, clientRouter: AnyRouter) => {
 		const mockClient = new MockWebsocketClient(options, clientRouter);
 		const mockWRPC = {
 			testProcedure: {
@@ -39,7 +39,7 @@ vi.mock('./client-factory', () => ({
 
 describe('WRPCClientManager', () => {
 	let clientManager: WRPCClientManager<AnyRouter, AnyRouter>;
-	let mockCreateOptions: () => ClientOptions;
+	let mockCreateOptions: () => ClientOptions<AnyRouter>;
 	let clientRouter: AnyRouter;
 
 	beforeEach(() => {
@@ -99,7 +99,8 @@ describe('WRPCClientManager', () => {
 				wsUrl: 'ws://localhost:8080/ws',
 				sessionId: 'test-session',
 				clientId: 'test-client',
-				deviceName: 'Test Device'
+				deviceName: 'Test Device',
+				onContext: async () => ({})
 			};
 
 			vi.mocked(mockCreateOptions).mockReturnValue(expectedOptions);
@@ -201,7 +202,8 @@ describe('WRPCClientManager', () => {
 				wsUrl: 'ws://localhost:8080/ws',
 				sessionId,
 				clientId: 'test-client',
-				deviceName: 'Test Device'
+				deviceName: 'Test Device',
+				onContext: async () => ({})
 			}));
 
 			const [wsClient1] = clientManager.getClient();
@@ -216,7 +218,16 @@ describe('WRPCClientManager', () => {
 		});
 
 		it('should handle multiple client managers independently', () => {
-			const manager2 = new WRPCClientManager(() => ({ wsUrl: 'ws://other:8080/ws' }), clientRouter);
+			const manager2 = new WRPCClientManager(
+				() => ({
+					wsUrl: 'ws://other:8080/ws',
+					sessionId: 'test-session',
+					clientId: 'test-client',
+					deviceName: 'Test Device',
+					onContext: async () => ({})
+				}),
+				clientRouter
+			);
 
 			const [client1] = clientManager.getClient();
 			const [client2] = manager2.getClient();
@@ -231,7 +242,11 @@ describe('WRPCClientManager', () => {
 describe('createClientManager', () => {
 	it('should create WRPCClientManager instance', () => {
 		const mockCreateOptions = () => ({
-			wsUrl: 'ws://localhost:8080/ws'
+			wsUrl: 'ws://localhost:8080/ws',
+			sessionId: 'test-session',
+			clientId: 'test-client',
+			deviceName: 'Test Device',
+			onContext: async () => ({})
 		});
 
 		const w = initWRPC.createClient();

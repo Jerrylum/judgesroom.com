@@ -3,7 +3,7 @@
  */
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
-import { WRPCError } from './types';
+import { WRPCError, type InferRouterContext } from './types';
 import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';
 import { createServerSideSession, type Session } from './session';
@@ -81,11 +81,11 @@ function getProcedureAtPath(router: AnyRouter, path: string): AnyProcedure | nul
 /**
  * Call a procedure with the given input and session
  */
-async function callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>): Promise<unknown> {
+async function callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>, ctx: object): Promise<unknown> {
 	// The procedure is a function that validates input and calls the resolver
 	// Cast to function since we know it's callable from the procedure definition
-	const procedureFn = procedure as unknown as ProcedureResolver<unknown, never, AnyRouter>;
-	return await procedureFn({ input, session });
+	const procedureFn = procedure as unknown as ProcedureResolver<unknown, never, object, AnyRouter>;
+	return await procedureFn({ input, session, ctx });
 }
 
 /**
@@ -110,7 +110,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 		/**
 		 * Handle incoming WebSocket messages
 		 */
-		async handleMessage(ws: WebSocket, message: string): Promise<void> {
+		async handleMessage(ws: WebSocket, message: string, ctx: InferRouterContext<TRouter>): Promise<void> {
 			try {
 				// Parse and validate the message using Zod
 				const parsedMessage = parseWRPCMessage(message);
@@ -155,7 +155,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 					);
 
 					// Handle query and mutation only
-					const result = await callProcedure(procedure, request.input, session);
+					const result = await callProcedure(procedure, request.input, session, ctx);
 
 					const response: WRPCResponse = {
 						kind: 'response',

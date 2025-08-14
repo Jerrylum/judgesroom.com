@@ -39,14 +39,6 @@ export type TypeError<TMessage extends string> = TMessage & {
 	_: typeof _errorSymbol;
 };
 
-// Procedure context
-export interface ProcedureContext {
-	input: unknown;
-	ws?: WebSocket;
-	clientId?: string;
-	sessionId?: string;
-}
-
 // Type inference helpers
 export type InferRouterInputs<TRouter extends AnyRouter> = {
 	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends Procedure<ProcedureType, infer TDef>
@@ -63,6 +55,8 @@ export type InferRouterOutputs<TRouter extends AnyRouter> = {
 			? InferRouterOutputs<TRouter['_def']['record'][K]>
 			: never;
 };
+
+export type InferRouterContext<TRouter extends AnyRouter> = TRouter['_def']['_config']['$types']['context'];
 
 // Client types
 export type CreateClientOptions = {

@@ -121,7 +121,7 @@ describe('WebSocket Handler', () => {
 				input: 'World'
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -144,7 +144,7 @@ describe('WebSocket Handler', () => {
 				input: { id: '123', name: 'John Doe' }
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -167,7 +167,7 @@ describe('WebSocket Handler', () => {
 				input: null
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -195,7 +195,7 @@ describe('WebSocket Handler', () => {
 				input: null
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -221,7 +221,7 @@ describe('WebSocket Handler', () => {
 				input: 'World'
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -239,7 +239,7 @@ describe('WebSocket Handler', () => {
 		});
 
 		it('should handle malformed JSON message', async () => {
-			await wsHandler.handleMessage(mockWs as any, 'invalid json');
+			await wsHandler.handleMessage(mockWs as any, 'invalid json', {});
 
 			// Verify that an error response was sent
 			expect(mockWs.send).toHaveBeenCalledTimes(1);
@@ -271,7 +271,7 @@ describe('WebSocket Handler', () => {
 			// Mock the connection manager's handleResponse method
 			const handleResponseSpy = vi.spyOn(wsHandler.connectionManager, 'handleResponse');
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(response));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(response), {});
 
 			expect(handleResponseSpy).toHaveBeenCalledWith(response, 'test-client');
 		});
@@ -288,7 +288,7 @@ describe('WebSocket Handler', () => {
 				result: { type: 'data', data: 'client response' }
 			};
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(response));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(response), {});
 
 			expect(consoleSpy).toHaveBeenCalledWith('Received response but could not identify client');
 
@@ -305,7 +305,7 @@ describe('WebSocket Handler', () => {
 			};
 
 			// Don't provide connection options, rely on getClientIdByWebSocket
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -390,7 +390,7 @@ describe('WebSocket Handler', () => {
 			// Mock getClientData to verify it's called
 			const getClientDataSpy = vi.spyOn(wsHandler.connectionManager, 'getClientData');
 
-			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request));
+			await wsHandler.handleMessage(mockWs as any, JSON.stringify(request), {});
 
 			expect(getClientDataSpy).toHaveBeenCalledWith('test-client');
 		});

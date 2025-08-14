@@ -6,7 +6,7 @@ import type { WRPCClient, ClientOptions } from './types';
  * Create a type-safe WRPC client proxy
  */
 export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
-	options: ClientOptions,
+	options: ClientOptions<TClientRouter>,
 	clientRouter: TClientRouter
 ): [WebsocketClient<TClientRouter>, WRPCClient<TServerRouter>] {
 	const client = new WebsocketClient<TClientRouter>(options, clientRouter);

@@ -5,6 +5,8 @@ import type { WRPCRequest, WRPCResponse } from '../server/messages';
 import { parseWRPCMessage } from '../server/utils';
 import { createClientSideSession } from './session';
 import type { ClientOptions, PendingRequest } from './types';
+import type { InferRouterContext } from '../server/types';
+import type { Session } from '../server/session';
 
 /**
  * WRPC WebSocket client implementation
@@ -20,7 +22,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	private clientRouter: TClientRouter;
 
 	constructor(
-		private options: ClientOptions,
+		private options: ClientOptions<TClientRouter>,
 		clientRouter: TClientRouter
 	) {
 		this.clientRouter = clientRouter;
@@ -85,8 +87,10 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				return;
 			}
 
+			const ctx = await this.options.onContext(parsedMessage);
+
 			// Handle requests from server
-			await this.handleServerRequest(parsedMessage);
+			await this.handleServerRequest(parsedMessage, ctx);
 		} catch (error) {
 			console.error('Error parsing or validating WebSocket message:', error);
 		}
@@ -110,7 +114,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		}
 	}
 
-	private async handleServerRequest(request: WRPCRequest): Promise<void> {
+	private async handleServerRequest(request: WRPCRequest, ctx: InferRouterContext<TClientRouter>): Promise<void> {
 		const ws = this.ws;
 		if (!ws || ws.readyState !== WebSocket.OPEN) {
 			console.error('WebSocket not connected when handling server request');
@@ -125,8 +129,15 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				throw new Error(`No procedure found at path: ${request.path}`);
 			}
 
+			const session = createClientSideSession(
+				this,
+				this.options.sessionId || 'unknown',
+				this.options.clientId || 'unknown',
+				this.options.deviceName || 'unknown'
+			);
+
 			// Call the procedure (it will handle input validation internally)
-			const result = await this.callProcedure(procedure, request.input);
+			const result = await this.callProcedure(procedure, request.input, session, ctx);
 
 			// Send response back to server
 			const response: WRPCResponse = {
@@ -179,17 +190,9 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		return null;
 	}
 
-	private async callProcedure(procedure: AnyProcedure, input: unknown): Promise<unknown> {
+	private async callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>, ctx: object): Promise<unknown> {
 		const procedureFn = procedure as unknown as ProcedureResolver<unknown, unknown, AnyRouter>;
-		return await procedureFn({
-			input,
-			session: createClientSideSession(
-				this,
-				this.options.sessionId || 'unknown',
-				this.options.clientId || 'unknown',
-				this.options.deviceName || 'unknown'
-			)
-		});
+		return await procedureFn({ input, session, ctx });
 	}
 
 	private async handleClose(event: CloseEvent): Promise<void> {

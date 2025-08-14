@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 // Mock WebsocketClient
 vi.mock('./websocket-client', () => ({
-	WebsocketClient: vi.fn().mockImplementation((options: ClientOptions, clientRouter: AnyRouter) => ({
+	WebsocketClient: vi.fn().mockImplementation((options: ClientOptions<AnyRouter>, clientRouter: AnyRouter) => ({
 		options,
 		clientRouter,
 		query: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock('./websocket-client', () => ({
 }));
 
 describe('createWRPCClient', () => {
-	let clientOptions: ClientOptions;
+	let clientOptions: ClientOptions<AnyRouter>;
 	let clientRouter: AnyRouter;
 
 	beforeEach(() => {
@@ -28,7 +28,8 @@ describe('createWRPCClient', () => {
 			wsUrl: 'ws://localhost:8080/ws',
 			sessionId: 'test-session',
 			clientId: 'test-client',
-			deviceName: 'Test Device'
+			deviceName: 'Test Device',
+			onContext: async () => ({})
 		};
 
 		// Create a test client router

@@ -11,7 +11,7 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
 	private clientInstance: [WebsocketClient<TClientRouter>, WRPCClient<TServerRouter>] | null = null;
 
 	constructor(
-		private createOptions: () => ClientOptions,
+		private createOptions: () => ClientOptions<TClientRouter>,
 		private clientRouter: TClientRouter
 	) {}
 
@@ -51,7 +51,7 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
  * Create a client manager with the given configuration
  */
 export function createClientManager<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
-	createOptions: () => ClientOptions,
+	createOptions: () => ClientOptions<TClientRouter>,
 	clientRouter: TClientRouter
 ): WRPCClientManager<TServerRouter, TClientRouter> {
 	return new WRPCClientManager(createOptions, clientRouter);

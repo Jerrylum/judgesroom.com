@@ -1,8 +1,8 @@
 // This file is heavily inspired by the tRPC procedure.ts file
 // https://github.com/trpc/trpc/blob/main/packages/server/src/unstable-core-do-not-import/procedure.ts
 
+import type { ProcedureResolverOptions } from './procedure-builder';
 import type { AnyRouter } from './router';
-import type { Session } from './session';
 
 // Different from tRPC, we don't have a subscription type
 export const procedureTypes = ['query', 'mutation'] as const;
@@ -36,7 +36,7 @@ export type Procedure<TType extends ProcedureType, TDef extends BuiltProcedureDe
 		type: TType;
 		meta: TDef['meta'];
 		// Runtime properties for implementation
-		_resolver?: (opts: { input: unknown; session: Session<AnyRouter> }) => Promise<unknown> | unknown;
+		_resolver?: (opts: ProcedureResolverOptions<TDef['input'], object, AnyRouter>) => Promise<TDef['output']>;
 		_inputSchemas?: unknown[];
 		_outputSchema?: unknown;
 	};
