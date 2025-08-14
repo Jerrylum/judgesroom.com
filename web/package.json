@@ -45,6 +45,7 @@
 		"vitest-browser-svelte": "^0.1.0"
 	},
 	"dependencies": {
+		"@judging.jerryio/protocol": "workspace:*",
 		"@judging.jerryio/worker": "workspace:*",
 		"@judging.jerryio/wrpc": "workspace:*",
 		"crypto-js": "^4.2.0",
