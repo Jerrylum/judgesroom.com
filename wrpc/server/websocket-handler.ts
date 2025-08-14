@@ -112,13 +112,13 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(
 		/**
 		 * Handle incoming WebSocket messages
 		 */
-		async handleMessage(ws: WebSocket, message: string, connectionOpts?: WebSocketConnectionOptions): Promise<void> {
+		async handleMessage(ws: WebSocket, message: string): Promise<void> {
 			try {
 				// Parse and validate the message using Zod
 				const parsedMessage = parseWRPCMessage(message);
 
 				// Find clientId if not provided in connectionOpts
-				const clientId = connectionOpts?.clientId || opts.getClientIdByWebSocket(ws);
+				const clientId = opts.getClientIdByWebSocket(ws);
 
 				// Handle responses from client (for server-to-client calls)
 				if (parsedMessage.kind === 'response') {
@@ -151,9 +151,9 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(
 					// Create session for this request
 					const session = createServerSideSession(
 						connectionManager,
-						clientData?.sessionId || connectionOpts?.sessionId || 'unknown',
+						clientData?.sessionId || 'unknown',
 						clientId || 'unknown',
-						clientData?.deviceName || connectionOpts?.deviceName || 'unknown'
+						clientData?.deviceName || 'unknown'
 					);
 
 					// Handle query and mutation only
@@ -240,9 +240,10 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(
 		 * Handle WebSocket close event
 		 * This should be called from webSocketClose() in the Durable Object
 		 */
-		async handleClose(ws: WebSocket, code: number, reason: string, connectionOpts?: WebSocketConnectionOptions) {
-			if (connectionOpts?.clientId) {
-				await connectionManager.removeConnection(connectionOpts.clientId);
+		async handleClose(ws: WebSocket, code: number, reason: string) {
+			const clientId = opts.getClientIdByWebSocket(ws);
+			if (clientId) {
+				await connectionManager.removeConnection(clientId);
 			}
 			console.log(`WebSocket closed with code ${code}: ${reason}`);
 		},
@@ -251,7 +252,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(
 		 * Handle WebSocket error event
 		 * This should be called from webSocketError() in the Durable Object
 		 */
-		handleError(ws: WebSocket, error: Error, connectionOpts?: WebSocketConnectionOptions) {
+		handleError(ws: WebSocket, error: Error) {
 			console.error('WebSocket error:', error);
 		}
 	};

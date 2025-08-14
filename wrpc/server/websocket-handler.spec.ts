@@ -329,14 +329,20 @@ describe('WebSocket Handler', () => {
 	describe('handleClose', () => {
 		it('should handle connection close', async () => {
 			const mockWs = new MockWebSocket();
+			mockWebSockets.set('test-client', mockWs);
+
 			const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-			await wsHandler.handleClose(mockWs as any, 1000, 'Normal closure', {
-				clientId: 'test-client'
+			await wsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'test-client',
+				deviceName: 'Test Device'
 			});
 
+			await wsHandler.handleClose(mockWs as any, 1000, 'Normal closure');
+
 			expect(consoleSpy).toHaveBeenCalledWith('WebSocket closed with code 1000: Normal closure');
-			expect(mockOptions.saveData).toHaveBeenCalled(); // From removeConnection
+			expect(mockOptions.saveData).toHaveBeenCalledTimes(2); // From removeConnection
 			
 			consoleSpy.mockRestore();
 		});
@@ -359,7 +365,7 @@ describe('WebSocket Handler', () => {
 			const error = new Error('WebSocket error');
 			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-			wsHandler.handleError(mockWs as any, error, { clientId: 'test-client' });
+			wsHandler.handleError(mockWs as any, error);
 
 			expect(consoleSpy).toHaveBeenCalledWith('WebSocket error:', error);
 			
