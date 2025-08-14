@@ -1,5 +1,5 @@
 import { z } from 'zod/v4';
-import { TeamNumberSchema } from './teams.svelte';
+import { TeamNumberSchema } from '@judging.jerryio/protocol/src/team';
 
 export const EngineeringNotebookRubricSchema = z.object({
 	id: z.uuidv4(),

@@ -1,47 +1,9 @@
-import z from 'zod/v4';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { List } from './list.svelte';
 import { SvelteSet } from 'svelte/reactivity';
-import { GradeSchema, type Grade } from './awards.svelte';
-
-export const TeamNumberSchema = z
-	.string()
-	.nonempty()
-	.max(10)
-	.regex(/^[A-Z0-9]+$/, {
-		message: 'Team number must only contain uppercase letters (A-Z) and digits (0-9)'
-	});
-
-export const TeamGroupNameSchema = z
-	.string()
-	.nonempty()
-	.max(100)
-	.regex(/^\S.*\S$|^\S$/, {
-		message: 'Team group name must not have leading or trailing whitespace'
-	});
-
-export const TeamInfoSchema = z.object({
-	id: z.uuidv4(),
-	number: TeamNumberSchema,
-	name: z.string(),
-	city: z.string(),
-	state: z.string(),
-	country: z.string(),
-	shortName: z.string(),
-	school: z.string(),
-	grade: GradeSchema,
-	group: TeamGroupNameSchema
-});
-
-export type TeamInfo = z.infer<typeof TeamInfoSchema>;
-
-export const TeamDataSchema = z.object({
-	notebookLink: z.string(),
-	excluded: z.boolean()
-});
-
-export type TeamData = z.infer<typeof TeamDataSchema>;
+import { type Grade } from '@judging.jerryio/protocol/src/award';
+import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
 
 // Factory functions
 export function createTeamInfo(
