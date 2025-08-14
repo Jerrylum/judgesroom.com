@@ -1,7 +1,7 @@
 import { z } from 'zod/v4';
-import { AwardSchema, CompetitionTypeSchema, type CompetitionType, type Grade } from './awards.svelte';
-import { TeamInfoSchema } from './teams.svelte';
-import { JudgeGroupSchema, JudgingMethodSchema } from './judging.svelte';
+import { AwardSchema, CompetitionTypeSchema, type CompetitionType, type Grade } from '@judging.jerryio/protocol/src/award';
+import { TeamInfoSchema } from '@judging.jerryio/protocol/src/team';
+import { JudgeGroupSchema, JudgingMethodSchema } from '@judging.jerryio/protocol/src/judging';
 
 export const EventGradeLevelSchema = z.enum(['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only']);
 export type EventGradeLevel = z.infer<typeof EventGradeLevelSchema>;

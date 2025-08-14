@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { v4 as uuidv4 } from 'uuid';
 import { EventGradeLevelSchema, EventNameSchema, EventSetupSchema, getEventGradeLevelOptions, type EventSetup } from './event.svelte';
-import type { CompetitionType } from './awards.svelte';
+import { type CompetitionType } from '@judging.jerryio/protocol/src/award';
 
 describe('Event Schema Validation', () => {
 	describe('EventGradeLevelSchema', () => {
