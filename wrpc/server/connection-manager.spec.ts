@@ -78,12 +78,7 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(
-				mockWs as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Test Device'
-			);
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
 
 			const clientData = connectionManager.getClientData('client1');
 			expect(clientData).toEqual({
@@ -102,21 +97,11 @@ describe('WebSocketConnectionManager', () => {
 			mockWebSockets.set('client1', mockWs1);
 
 			// Add initial connection
-			await connectionManager.addConnection(
-				mockWs1 as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Device1'
-			);
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'Device1');
 
 			// Add reconnection with same client ID
 			mockWebSockets.set('client1', mockWs2);
-			await connectionManager.addConnection(
-				mockWs2 as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Device1 Updated'
-			);
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client1', 'Device1 Updated');
 
 			const allClients = connectionManager.getAllClientData();
 			expect(allClients).toHaveLength(1);
@@ -127,12 +112,7 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(
-				mockWs as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Test Device'
-			);
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
 
 			await connectionManager.removeConnection('client1');
 
@@ -143,9 +123,7 @@ describe('WebSocketConnectionManager', () => {
 		});
 
 		it('should handle removing non-existent connection gracefully', async () => {
-			await expect(
-				connectionManager.removeConnection('non-existent')
-			).resolves.not.toThrow();
+			await expect(connectionManager.removeConnection('non-existent')).resolves.not.toThrow();
 		});
 	});
 
@@ -154,12 +132,7 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(
-				mockWs as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Test Device'
-			);
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
 		});
 
 		it('should get client data by ID', () => {
@@ -196,12 +169,7 @@ describe('WebSocketConnectionManager', () => {
 		it('should filter out clients without active WebSocket connections', async () => {
 			// Add another client but don't add WebSocket
 			const mockWs2 = new MockWebSocket();
-			await connectionManager.addConnection(
-				mockWs2 as unknown as WebSocket,
-				'session2',
-				'client2',
-				'Device2'
-			);
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session2', 'client2', 'Device2');
 
 			// Remove WebSocket for client2 (simulating disconnection)
 			mockWebSockets.delete('client2');
@@ -219,12 +187,7 @@ describe('WebSocketConnectionManager', () => {
 			mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(
-				mockWs as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Test Device'
-			);
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
 
 			testRequest = {
 				kind: 'request',
@@ -253,18 +216,14 @@ describe('WebSocketConnectionManager', () => {
 		});
 
 		it('should throw error for non-existent client', async () => {
-			await expect(
-				connectionManager.sendToClient('non-existent', testRequest)
-			).rejects.toThrow('Client non-existent is not connected');
+			await expect(connectionManager.sendToClient('non-existent', testRequest)).rejects.toThrow('Client non-existent is not connected');
 		});
 
 		it('should throw error if WebSocket not found', async () => {
 			// Remove WebSocket but keep client data
 			mockWebSockets.delete('client1');
 
-			await expect(
-				connectionManager.sendToClient('client1', testRequest)
-			).rejects.toThrow('Client client1 WebSocket not found');
+			await expect(connectionManager.sendToClient('client1', testRequest)).rejects.toThrow('Client client1 WebSocket not found');
 		});
 
 		it('should handle timeout', async () => {
@@ -287,9 +246,9 @@ describe('WebSocketConnectionManager', () => {
 			const errorResponse: WRPCResponse = {
 				kind: 'response',
 				id: 'test-request-id',
-				result: { 
-					type: 'error', 
-					error: { 
+				result: {
+					type: 'error',
+					error: {
 						message: 'Test error',
 						code: 'TEST_ERROR'
 					}
@@ -311,12 +270,7 @@ describe('WebSocketConnectionManager', () => {
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set(`client${i}`, mockWs);
 
-				await connectionManager.addConnection(
-					mockWs as unknown as WebSocket,
-					'session1',
-					`client${i}`,
-					`Device${i}`
-				);
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', `client${i}`, `Device${i}`);
 			}
 
 			testRequest = {
@@ -386,8 +340,8 @@ describe('WebSocketConnectionManager', () => {
 			expect(results).toHaveLength(2);
 
 			// Only client1 and client3 should have responses since client2 was disconnected
-			const client1Response = results.find(r => r.id === 'broadcast-request-client1');
-			const client3Response = results.find(r => r.id === 'broadcast-request-client3');
+			const client1Response = results.find((r) => r.id === 'broadcast-request-client1');
+			const client3Response = results.find((r) => r.id === 'broadcast-request-client3');
 			expect(client1Response?.result.type).toBe('data');
 			expect(client3Response?.result.type).toBe('data');
 		});
@@ -410,12 +364,7 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(
-				mockWs as unknown as WebSocket,
-				'session1',
-				'client1',
-				'Test Device'
-			);
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
 
 			// Start a request
 			const testRequest: WRPCRequest = {

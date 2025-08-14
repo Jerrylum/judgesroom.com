@@ -53,12 +53,9 @@ describe('WRPCClientManager', () => {
 		// Create a test client router
 		const w = initWRPC.createClient();
 		clientRouter = w.router({
-			onNotification: w.procedure
-				.input(z.string())
-				.mutation(async ({ input }) => ({ received: true, message: input })),
+			onNotification: w.procedure.input(z.string()).mutation(async ({ input }) => ({ received: true, message: input })),
 
-			getStatus: w.procedure
-				.query(async () => ({ status: 'online' }))
+			getStatus: w.procedure.query(async () => ({ status: 'online' }))
 		});
 
 		clientManager = new WRPCClientManager(mockCreateOptions, clientRouter);
@@ -219,10 +216,7 @@ describe('WRPCClientManager', () => {
 		});
 
 		it('should handle multiple client managers independently', () => {
-			const manager2 = new WRPCClientManager(
-				() => ({ wsUrl: 'ws://other:8080/ws' }),
-				clientRouter
-			);
+			const manager2 = new WRPCClientManager(() => ({ wsUrl: 'ws://other:8080/ws' }), clientRouter);
 
 			const [client1] = clientManager.getClient();
 			const [client2] = manager2.getClient();

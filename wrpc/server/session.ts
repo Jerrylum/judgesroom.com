@@ -5,7 +5,7 @@ import type { Network } from './types';
 
 /**
  * Session interface for server-to-client communication
- * 
+ *
  * Server-side sessions can call client procedures but cannot call server procedures.
  * Client-side sessions can call server procedures but cannot call client procedures or broadcast.
  */
@@ -90,7 +90,7 @@ export function createServerSideSession(
 											throw new Error(response.result.error.message);
 										}
 									} else {
-										// Broadcast to all clients										
+										// Broadcast to all clients
 										const responses = await connectionManager.broadcast(request);
 										return responses; // Return array of responses for broadcast
 									}

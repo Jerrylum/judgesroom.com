@@ -26,18 +26,15 @@ describe('WebSocket Handler', () => {
 		// Create a test router
 		const w = initWRPC.createServer();
 		testRouter = w.router({
-			hello: w.procedure
-				.input(z.string())
-				.query(async ({ input }) => `Hello, ${input}!`),
-			
+			hello: w.procedure.input(z.string()).query(async ({ input }) => `Hello, ${input}!`),
+
 			updateUser: w.procedure
 				.input(z.object({ id: z.string(), name: z.string() }))
 				.mutation(async ({ input }) => ({ success: true, user: input })),
 
-			throwError: w.procedure
-				.query(async () => {
-					throw new Error('Test error');
-				})
+			throwError: w.procedure.query(async () => {
+				throw new Error('Test error');
+			})
 		});
 
 		mockOptions = {
@@ -95,10 +92,7 @@ describe('WebSocket Handler', () => {
 
 			await wsHandler.handleConnection(mockWs as any, {});
 
-			expect(consoleSpy).toHaveBeenCalledWith(
-				'WebSocket connection missing clientId or sessionId',
-				{}
-			);
+			expect(consoleSpy).toHaveBeenCalledWith('WebSocket connection missing clientId or sessionId', {});
 
 			consoleSpy.mockRestore();
 		});
@@ -251,7 +245,7 @@ describe('WebSocket Handler', () => {
 			expect(mockWs.send).toHaveBeenCalledTimes(1);
 			const sentMessage = mockWs.send.mock.calls[0][0];
 			const response = JSON.parse(sentMessage);
-			
+
 			expect(response).toEqual({
 				kind: 'response',
 				id: 'unknown',
@@ -284,7 +278,7 @@ describe('WebSocket Handler', () => {
 
 		it('should handle response without client identification', async () => {
 			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-			
+
 			// Mock getClientIdByWebSocket to return null
 			vi.mocked(mockOptions.getClientIdByWebSocket).mockReturnValue(null);
 
@@ -297,7 +291,7 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleMessage(mockWs as any, JSON.stringify(response));
 
 			expect(consoleSpy).toHaveBeenCalledWith('Received response but could not identify client');
-			
+
 			consoleSpy.mockRestore();
 		});
 
@@ -343,7 +337,7 @@ describe('WebSocket Handler', () => {
 
 			expect(consoleSpy).toHaveBeenCalledWith('WebSocket closed with code 1000: Normal closure');
 			expect(mockOptions.saveData).toHaveBeenCalledTimes(2); // From removeConnection
-			
+
 			consoleSpy.mockRestore();
 		});
 
@@ -354,7 +348,7 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleClose(mockWs as any, 1000, 'Normal closure');
 
 			expect(consoleSpy).toHaveBeenCalledWith('WebSocket closed with code 1000: Normal closure');
-			
+
 			consoleSpy.mockRestore();
 		});
 	});
@@ -368,7 +362,7 @@ describe('WebSocket Handler', () => {
 			wsHandler.handleError(mockWs as any, error);
 
 			expect(consoleSpy).toHaveBeenCalledWith('WebSocket error:', error);
-			
+
 			consoleSpy.mockRestore();
 		});
 	});

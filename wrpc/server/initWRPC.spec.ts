@@ -47,13 +47,13 @@ describe('initWRPC', () => {
 				}
 
 				const metaBuilder = builder.meta<TestMeta>();
-				const defaultMeta = { 
+				const defaultMeta = {
 					description: 'Test server',
-					version: 1 
+					version: 1
 				};
 
-				const server = metaBuilder.createServer({ 
-					defaultMeta 
+				const server = metaBuilder.createServer({
+					defaultMeta
 				});
 
 				expect(server._config.meta).toEqual(defaultMeta);
@@ -61,7 +61,7 @@ describe('initWRPC', () => {
 
 			it('should provide a working procedure builder', () => {
 				const server = builder.createServer();
-				
+
 				expect(server.procedure).toBeDefined();
 				expect(server.procedure._def).toEqual({
 					procedure: true,
@@ -126,13 +126,13 @@ describe('initWRPC', () => {
 				}
 
 				const metaBuilder = builder.meta<TestMeta>();
-				const defaultMeta = { 
+				const defaultMeta = {
 					description: 'Test client',
-					timeout: 5000 
+					timeout: 5000
 				};
 
-				const client = metaBuilder.createClient({ 
-					defaultMeta 
+				const client = metaBuilder.createClient({
+					defaultMeta
 				});
 
 				expect(client._config.meta).toEqual(defaultMeta);
@@ -140,7 +140,7 @@ describe('initWRPC', () => {
 
 			it('should provide a working procedure builder for client', () => {
 				const client = builder.createClient();
-				
+
 				expect(client.procedure).toBeDefined();
 				expect(client.procedure._def).toEqual({
 					procedure: true,
@@ -190,7 +190,7 @@ describe('initWRPC', () => {
 
 		it('should create working server instances', () => {
 			const server = initWRPC.createServer();
-			
+
 			expect(server).toBeDefined();
 			expect(server._config).toBeDefined();
 			expect(server.procedure).toBeDefined();
@@ -199,7 +199,7 @@ describe('initWRPC', () => {
 
 		it('should create working client instances', () => {
 			const client = initWRPC.createClient();
-			
+
 			expect(client).toBeDefined();
 			expect(client._config).toBeDefined();
 			expect(client.procedure).toBeDefined();
@@ -212,16 +212,12 @@ describe('initWRPC', () => {
 			const server = initWRPC.createServer();
 
 			const testRouter = server.router({
-				hello: server.procedure
-					.input(z.string())
-					.query(async ({ input }) => `Hello, ${input}!`),
-				
-				update: server.procedure
-					.input(z.object({ id: z.string(), data: z.any() }))
-					.mutation(async ({ input }) => ({ 
-						success: true, 
-						id: input.id 
-					}))
+				hello: server.procedure.input(z.string()).query(async ({ input }) => `Hello, ${input}!`),
+
+				update: server.procedure.input(z.object({ id: z.string(), data: z.any() })).mutation(async ({ input }) => ({
+					success: true,
+					id: input.id
+				}))
 			});
 
 			expect(testRouter.hello).toBeDefined();
@@ -234,15 +230,12 @@ describe('initWRPC', () => {
 			const client = initWRPC.createClient();
 
 			const clientRouter = client.router({
-				onNotification: client.procedure
-					.input(z.string())
-					.mutation(async ({ input }) => {
-						console.log('Notification:', input);
-						return { received: true };
-					}),
+				onNotification: client.procedure.input(z.string()).mutation(async ({ input }) => {
+					console.log('Notification:', input);
+					return { received: true };
+				}),
 
-				getStatus: client.procedure
-					.query(async () => ({ status: 'online' }))
+				getStatus: client.procedure.query(async () => ({ status: 'online' }))
 			});
 
 			expect(clientRouter.onNotification).toBeDefined();
@@ -279,14 +272,11 @@ describe('initWRPC', () => {
 			const server = initWRPC.createServer();
 
 			const userRouter = server.router({
-				getUser: server.procedure
-					.input(z.string())
-					.query(async ({ input }) => ({ id: input, name: 'Test User' }))
+				getUser: server.procedure.input(z.string()).query(async ({ input }) => ({ id: input, name: 'Test User' }))
 			});
 
 			const postRouter = server.router({
-				getPosts: server.procedure
-					.query(async () => [{ id: '1', title: 'Test Post' }])
+				getPosts: server.procedure.query(async () => [{ id: '1', title: 'Test Post' }])
 			});
 
 			const mergedRouter = server.mergeRouters(userRouter, postRouter);

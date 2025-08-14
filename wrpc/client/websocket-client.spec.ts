@@ -17,7 +17,7 @@ const MockWebSocket = vi.fn().mockImplementation((url: string) => {
 		addEventListener: vi.fn(),
 		removeEventListener: vi.fn(),
 		dispatchEvent: vi.fn(),
-		
+
 		// Event handlers
 		onopen: null as any,
 		onmessage: null as any,
@@ -83,23 +83,19 @@ describe('WebsocketClient', () => {
 		// Create a test client router
 		const w = initWRPC.createClient();
 		clientRouter = w.router({
-			onNotification: w.procedure
-				.input(z.string())
-				.mutation(async ({ input }) => {
-					console.log('Notification received:', input);
-					return { received: true };
-				}),
+			onNotification: w.procedure.input(z.string()).mutation(async ({ input }) => {
+				console.log('Notification received:', input);
+				return { received: true };
+			}),
 
-			getClientInfo: w.procedure
-				.query(async () => ({ 
-					clientId: 'test-client',
-					status: 'online'
-				})),
+			getClientInfo: w.procedure.query(async () => ({
+				clientId: 'test-client',
+				status: 'online'
+			})),
 
-			throwError: w.procedure
-				.mutation(async () => {
-					throw new Error('Client error');
-				})
+			throwError: w.procedure.mutation(async () => {
+				throw new Error('Client error');
+			})
 		});
 
 		wsClient = new WebsocketClient(clientOptions, clientRouter);
@@ -116,7 +112,7 @@ describe('WebsocketClient', () => {
 			const queryPromise = wsClient.query('test', 'input');
 
 			// Wait for connection to establish
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			// Check that WebSocket was created with correct URL
 			expect(MockWebSocket).toHaveBeenCalledWith(
@@ -135,11 +131,9 @@ describe('WebsocketClient', () => {
 			const minimalClient = new WebsocketClient(minimalOptions, clientRouter);
 			const queryPromise = minimalClient.query('test', 'input');
 
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(MockWebSocket).toHaveBeenCalledWith(
-				'ws://localhost:8080/ws?action=join'
-			);
+			expect(MockWebSocket).toHaveBeenCalledWith('ws://localhost:8080/ws?action=join');
 
 			minimalClient.disconnect();
 		});
@@ -162,18 +156,18 @@ describe('WebsocketClient', () => {
 		it('should reuse existing open connection', async () => {
 			// First request - this will trigger connection creation
 			const promise1 = wsClient.query('test1', 'input1');
-			
+
 			// Wait for connection to be established
-			await new Promise(resolve => setTimeout(resolve, 20));
-			
+			await new Promise((resolve) => setTimeout(resolve, 20));
+
 			// Verify first connection was created
 			expect(MockWebSocket).toHaveBeenCalledTimes(1);
 
 			// Second request should reuse the existing connection
 			const promise2 = wsClient.query('test2', 'input2');
-			
+
 			// Wait a bit more to ensure no new connection is created
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			// Only one WebSocket should be created (connection reused)
 			expect(MockWebSocket).toHaveBeenCalledTimes(1);
@@ -185,18 +179,18 @@ describe('WebsocketClient', () => {
 			const queryPromise = wsClient.query('getUserData', { userId: '123' });
 
 			// Wait for connection
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			// Get the mock WebSocket instance
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
 			// Verify request was sent
 			expect(mockWs.send).toHaveBeenCalledTimes(1);
-			
+
 			// Parse and verify the sent request
 			const requestCall = mockWs.send.mock.calls[0][0];
 			const request = JSON.parse(requestCall);
-			
+
 			expect(request).toEqual({
 				kind: 'request',
 				id: expect.any(String),
@@ -227,7 +221,7 @@ describe('WebsocketClient', () => {
 		it('should handle query with error response', async () => {
 			const queryPromise = wsClient.query('failingQuery', null);
 
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 			const requestCall = mockWs.send.mock.calls[0][0];
@@ -269,22 +263,22 @@ describe('WebsocketClient', () => {
 
 	describe('mutation', () => {
 		it('should send mutation request and handle response', async () => {
-			const mutationPromise = wsClient.mutation('updateUser', { 
-				id: '123', 
-				name: 'Jane Doe' 
+			const mutationPromise = wsClient.mutation('updateUser', {
+				id: '123',
+				name: 'Jane Doe'
 			});
 
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
 			// Verify request was sent
 			expect(mockWs.send).toHaveBeenCalledTimes(1);
-			
+
 			// Parse and verify the sent request
 			const requestCall = mockWs.send.mock.calls[0][0];
 			const request = JSON.parse(requestCall);
-			
+
 			expect(request).toEqual({
 				kind: 'request',
 				id: expect.any(String),
@@ -316,7 +310,7 @@ describe('WebsocketClient', () => {
 		it('should handle server request and send response', async () => {
 			// Establish connection
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -334,7 +328,7 @@ describe('WebsocketClient', () => {
 			mockWs.simulateMessage(JSON.stringify(serverRequest));
 
 			// Wait for async handling
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			// Verify response was sent
 			expect(mockWs.send).toHaveBeenCalledWith(
@@ -356,7 +350,7 @@ describe('WebsocketClient', () => {
 
 		it('should handle server request for non-existent procedure', async () => {
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -369,7 +363,7 @@ describe('WebsocketClient', () => {
 			};
 
 			mockWs.simulateMessage(JSON.stringify(serverRequest));
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -390,7 +384,7 @@ describe('WebsocketClient', () => {
 
 		it('should handle server request that throws error', async () => {
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -403,7 +397,7 @@ describe('WebsocketClient', () => {
 			};
 
 			mockWs.simulateMessage(JSON.stringify(serverRequest));
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			expect(mockWs.send).toHaveBeenCalledWith(
 				JSON.stringify({
@@ -426,18 +420,15 @@ describe('WebsocketClient', () => {
 			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
 			// Send invalid JSON
 			mockWs.simulateMessage('invalid json');
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(consoleSpy).toHaveBeenCalledWith(
-				'Error parsing or validating WebSocket message:',
-				expect.any(Error)
-			);
+			expect(consoleSpy).toHaveBeenCalledWith('Error parsing or validating WebSocket message:', expect.any(Error));
 
 			consoleSpy.mockRestore();
 			wsClient.disconnect();
@@ -447,7 +438,7 @@ describe('WebsocketClient', () => {
 	describe('connection management', () => {
 		it('should handle connection close and reject pending requests', async () => {
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -481,7 +472,7 @@ describe('WebsocketClient', () => {
 
 		it('should not reconnect on normal close', async () => {
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -489,7 +480,7 @@ describe('WebsocketClient', () => {
 			mockWs.simulateClose(1000, 'Normal closure');
 			expect(queryPromise).rejects.toThrow('WebSocket connection closed');
 
-			await new Promise(resolve => setTimeout(resolve, 100));
+			await new Promise((resolve) => setTimeout(resolve, 100));
 
 			// Should not create additional WebSocket
 			expect(MockWebSocket).toHaveBeenCalledTimes(1);
@@ -498,7 +489,7 @@ describe('WebsocketClient', () => {
 		it('should disconnect gracefully', async () => {
 			const queryPromise = wsClient.query('test', null);
 
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			wsClient.disconnect();
 
@@ -510,7 +501,7 @@ describe('WebsocketClient', () => {
 			expect(wsClient.isConnected()).toBe(false);
 
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			expect(wsClient.isConnected()).toBe(true);
 
@@ -524,7 +515,7 @@ describe('WebsocketClient', () => {
 			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
 			const queryPromise = wsClient.query('test', null);
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 
@@ -539,12 +530,9 @@ describe('WebsocketClient', () => {
 			};
 
 			mockWs.simulateMessage(JSON.stringify(unknownResponse));
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(consoleSpy).toHaveBeenCalledWith(
-				'Received response for unknown request:',
-				'unknown-request-id'
-			);
+			expect(consoleSpy).toHaveBeenCalledWith('Received response for unknown request:', 'unknown-request-id');
 
 			consoleSpy.mockRestore();
 			wsClient.disconnect();
@@ -556,7 +544,7 @@ describe('WebsocketClient', () => {
 			const promise1 = wsClient.query('test1', null);
 			const promise2 = wsClient.query('test2', null);
 
-			await new Promise(resolve => setTimeout(resolve, 10));
+			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
 			const calls = mockWs.send.mock.calls;

@@ -91,9 +91,7 @@ async function callProcedure(procedure: AnyProcedure, input: unknown, session: S
 /**
  * Create a WebSocket message handler for a WRPC router
  */
-export function createWebSocketHandler<TRouter extends AnyRouter>(
-	opts: WebSocketHandlerOptions<TRouter>
-) {
+export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocketHandlerOptions<TRouter>) {
 	const connectionManager = new WebSocketConnectionManager(opts);
 
 	return {

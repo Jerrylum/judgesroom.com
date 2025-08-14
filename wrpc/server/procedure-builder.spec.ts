@@ -47,7 +47,7 @@ describe('Procedure Builder', () => {
 			it('should add input schema', () => {
 				const builder = createBuilder();
 				const inputSchema = z.string();
-				
+
 				const builderWithInput = builder.input(inputSchema);
 
 				expect(builderWithInput._def.inputs).toContain(inputSchema);
@@ -57,7 +57,7 @@ describe('Procedure Builder', () => {
 				const builder = createBuilder();
 				const schema1 = z.string();
 				const schema2 = z.number();
-				
+
 				const builderWithInputs = builder.input(schema1).input(schema2);
 
 				expect(builderWithInputs._def.inputs).toEqual([schema1, schema2]);
@@ -68,7 +68,7 @@ describe('Procedure Builder', () => {
 			it('should add output schema', () => {
 				const builder = createBuilder();
 				const outputSchema = z.object({ result: z.string() });
-				
+
 				const builderWithOutput = builder.output(outputSchema);
 
 				expect(builderWithOutput._def.output).toBe(outputSchema);
@@ -78,7 +78,7 @@ describe('Procedure Builder', () => {
 				const builder = createBuilder();
 				const schema1 = z.string();
 				const schema2 = z.number();
-				
+
 				const builderWithOutput = builder.output(schema1).output(schema2);
 
 				expect(builderWithOutput._def.output).toBe(schema2);
@@ -89,7 +89,7 @@ describe('Procedure Builder', () => {
 			it('should add meta information', () => {
 				const builder = createBuilder();
 				const meta = { description: 'test', version: '1.0' };
-				
+
 				const builderWithMeta = builder.meta(meta);
 
 				expect(builderWithMeta._def.meta).toEqual(meta);
@@ -99,7 +99,7 @@ describe('Procedure Builder', () => {
 				const initialMeta = { description: 'initial' };
 				const builder = createBuilder({ meta: initialMeta });
 				const additionalMeta = { version: '1.0' };
-				
+
 				const builderWithMeta = builder.meta(additionalMeta);
 
 				expect(builderWithMeta._def.meta).toEqual({
@@ -113,7 +113,7 @@ describe('Procedure Builder', () => {
 			it('should create a query procedure', async () => {
 				const builder = createBuilder();
 				const resolver = vi.fn().mockResolvedValue('query result');
-				
+
 				const procedure = builder.query(resolver);
 
 				expect(procedure._def).toEqual(
@@ -131,7 +131,7 @@ describe('Procedure Builder', () => {
 				const builder = createBuilder();
 				const inputSchema = z.string();
 				const resolver = vi.fn().mockResolvedValue('query result');
-				
+
 				const procedure = builder.input(inputSchema).query(resolver);
 
 				// Test that the procedure can be called
@@ -148,37 +148,29 @@ describe('Procedure Builder', () => {
 				const builder = createBuilder();
 				const inputSchema = z.string();
 				const resolver = vi.fn().mockResolvedValue('query result');
-				
+
 				const procedure = builder.input(inputSchema).query(resolver);
 
 				// Valid input should work
-				await expect(
-					(procedure as any)({ input: 'valid string', session: mockSession })
-				).resolves.toBe('query result');
+				await expect((procedure as any)({ input: 'valid string', session: mockSession })).resolves.toBe('query result');
 
 				// Invalid input should throw
-				await expect(
-					(procedure as any)({ input: 123, session: mockSession })
-				).rejects.toThrow();
+				await expect((procedure as any)({ input: 123, session: mockSession })).rejects.toThrow();
 			});
 
 			it('should validate output against schema', async () => {
 				const builder = createBuilder();
 				const outputSchema = z.string();
 				const resolver = vi.fn().mockResolvedValue('valid output');
-				
+
 				const procedure = builder.output(outputSchema).query(resolver);
 
 				// Valid output should work
-				await expect(
-					(procedure as any)({ input: undefined, session: mockSession })
-				).resolves.toBe('valid output');
+				await expect((procedure as any)({ input: undefined, session: mockSession })).resolves.toBe('valid output');
 
 				// Invalid output should throw
 				resolver.mockResolvedValue(123);
-				await expect(
-					(procedure as any)({ input: undefined, session: mockSession })
-				).rejects.toThrow();
+				await expect((procedure as any)({ input: undefined, session: mockSession })).rejects.toThrow();
 			});
 
 			it('should handle multiple input schemas in sequence', async () => {
@@ -186,18 +178,14 @@ describe('Procedure Builder', () => {
 				const schema1 = z.string();
 				const schema2 = z.string().min(5);
 				const resolver = vi.fn().mockResolvedValue('result');
-				
+
 				const procedure = builder.input(schema1).input(schema2).query(resolver);
 
 				// Should validate against both schemas
-				await expect(
-					(procedure as any)({ input: 'hello', session: mockSession })
-				).resolves.toBe('result');
+				await expect((procedure as any)({ input: 'hello', session: mockSession })).resolves.toBe('result');
 
 				// Should fail if any schema fails
-				await expect(
-					(procedure as any)({ input: 'hi', session: mockSession })
-				).rejects.toThrow();
+				await expect((procedure as any)({ input: 'hi', session: mockSession })).rejects.toThrow();
 			});
 		});
 
@@ -205,7 +193,7 @@ describe('Procedure Builder', () => {
 			it('should create a mutation procedure', async () => {
 				const builder = createBuilder();
 				const resolver = vi.fn().mockResolvedValue('mutation result');
-				
+
 				const procedure = builder.mutation(resolver);
 
 				expect(procedure._def).toEqual(
@@ -224,15 +212,12 @@ describe('Procedure Builder', () => {
 				const inputSchema = z.object({ value: z.number() });
 				const outputSchema = z.object({ success: z.boolean() });
 				const resolver = vi.fn().mockResolvedValue({ success: true });
-				
-				const procedure = builder
-					.input(inputSchema)
-					.output(outputSchema)
-					.mutation(resolver);
 
-				const result = await (procedure as any)({ 
-					input: { value: 42 }, 
-					session: mockSession 
+				const procedure = builder.input(inputSchema).output(outputSchema).mutation(resolver);
+
+				const result = await (procedure as any)({
+					input: { value: 42 },
+					session: mockSession
 				});
 
 				expect(resolver).toHaveBeenCalledWith({
@@ -250,17 +235,9 @@ describe('Procedure Builder', () => {
 				const outputSchema = z.boolean();
 				const meta = { description: 'test' };
 
-				const procedure1 = builder
-					.input(inputSchema)
-					.output(outputSchema)
-					.meta(meta)
-					.query(vi.fn());
+				const procedure1 = builder.input(inputSchema).output(outputSchema).meta(meta).query(vi.fn());
 
-				const procedure2 = builder
-					.meta(meta)
-					.output(outputSchema)
-					.input(inputSchema)
-					.query(vi.fn());
+				const procedure2 = builder.meta(meta).output(outputSchema).input(inputSchema).query(vi.fn());
 
 				expect(procedure1._def.meta).toEqual(meta);
 				expect(procedure1._def._inputSchemas).toContain(inputSchema);
@@ -288,21 +265,19 @@ describe('Procedure Builder', () => {
 				const builder = createBuilder();
 				const error = new Error('Resolver error');
 				const resolver = vi.fn().mockRejectedValue(error);
-				
+
 				const procedure = builder.query(resolver);
 
-				await expect(
-					(procedure as any)({ input: undefined, session: mockSession })
-				).rejects.toThrow('Resolver error');
+				await expect((procedure as any)({ input: undefined, session: mockSession })).rejects.toThrow('Resolver error');
 			});
 
 			it('should handle async resolvers', async () => {
 				const builder = createBuilder();
 				const resolver = vi.fn().mockImplementation(async ({ input }) => {
-					await new Promise(resolve => setTimeout(resolve, 10));
+					await new Promise((resolve) => setTimeout(resolve, 10));
 					return `async result: ${input}`;
 				});
-				
+
 				const procedure = builder.query(resolver);
 
 				const result = await (procedure as any)({ input: 'test', session: mockSession });

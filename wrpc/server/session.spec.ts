@@ -16,12 +16,7 @@ describe('Server-side Session', () => {
 			isClientConnected: vi.fn()
 		};
 
-		session = createServerSideSession(
-			mockNetwork,
-			'test-session-id',
-			'test-client-id',
-			'Test Device'
-		);
+		session = createServerSideSession(mockNetwork, 'test-session-id', 'test-client-id', 'Test Device');
 	});
 
 	describe('session metadata', () => {

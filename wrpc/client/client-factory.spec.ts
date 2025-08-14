@@ -34,17 +34,12 @@ describe('createWRPCClient', () => {
 		// Create a test client router
 		const w = initWRPC.createClient();
 		clientRouter = w.router({
-			onNotification: w.procedure
-				.input(z.string())
-				.mutation(async ({ input }) => ({ received: true, message: input })),
+			onNotification: w.procedure.input(z.string()).mutation(async ({ input }) => ({ received: true, message: input })),
 
-			getStatus: w.procedure
-				.query(async () => ({ status: 'online' })),
+			getStatus: w.procedure.query(async () => ({ status: 'online' })),
 
 			nested: w.router({
-				deepProcedure: w.procedure
-					.input(z.number())
-					.query(async ({ input }) => input * 2)
+				deepProcedure: w.procedure.input(z.number()).query(async ({ input }) => input * 2)
 			})
 		});
 	});
@@ -74,7 +69,7 @@ describe('createWRPCClient', () => {
 	describe('WRPC proxy functionality', () => {
 		it('should create proxy that delegates query calls to WebsocketClient', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			vi.mocked(wsClient.query).mockResolvedValue({ status: 'online' });
 
 			const result = await (wrpcProxy as any).getStatus.query();
@@ -85,7 +80,7 @@ describe('createWRPCClient', () => {
 
 		it('should create proxy that delegates mutation calls to WebsocketClient', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			vi.mocked(wsClient.mutation).mockResolvedValue({ received: true, message: 'test' });
 
 			const result = await (wrpcProxy as any).onNotification.mutation('test message');
@@ -96,7 +91,7 @@ describe('createWRPCClient', () => {
 
 		it('should handle different input types', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			vi.mocked(wsClient.query).mockResolvedValue(42);
 			vi.mocked(wsClient.mutation).mockResolvedValue({ success: true });
 
@@ -128,7 +123,7 @@ describe('createWRPCClient', () => {
 
 		it('should handle nested procedure paths', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			vi.mocked(wsClient.query).mockResolvedValue(10);
 
 			const result = await (wrpcProxy as any).nested.query(5);
@@ -139,13 +134,13 @@ describe('createWRPCClient', () => {
 
 		it('should handle dynamic procedure names', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			vi.mocked(wsClient.query).mockResolvedValue('dynamic result');
 			vi.mocked(wsClient.mutation).mockResolvedValue('dynamic mutation result');
 
 			// Test dynamic property access
 			const dynamicProcedureName = 'dynamicProcedure';
-			
+
 			await (wrpcProxy as any)[dynamicProcedureName].query('test input');
 			expect(wsClient.query).toHaveBeenCalledWith(dynamicProcedureName, 'test input');
 
@@ -193,7 +188,7 @@ describe('createWRPCClient', () => {
 	describe('error handling', () => {
 		it('should propagate WebsocketClient query errors', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			const error = new Error('Query failed');
 			vi.mocked(wsClient.query).mockRejectedValue(error);
 
@@ -202,7 +197,7 @@ describe('createWRPCClient', () => {
 
 		it('should propagate WebsocketClient mutation errors', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
-			
+
 			const error = new Error('Mutation failed');
 			vi.mocked(wsClient.mutation).mockRejectedValue(error);
 
@@ -216,9 +211,9 @@ describe('createWRPCClient', () => {
 			});
 
 			expect(() => createWRPCClient(clientOptions, clientRouter)).toThrow('WebSocket creation failed');
-			
+
 			// Restore the original mock
-			vi.mocked(WebsocketClient).mockImplementation(originalMock.getMockImplementation() || (() => ({} as any)));
+			vi.mocked(WebsocketClient).mockImplementation(originalMock.getMockImplementation() || (() => ({}) as any));
 		});
 	});
 

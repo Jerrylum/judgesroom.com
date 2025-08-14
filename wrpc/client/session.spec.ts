@@ -16,12 +16,7 @@ describe('Client-side Session', () => {
 			isConnected: vi.fn()
 		} as unknown as WebsocketClient<AnyRouter>;
 
-		session = createClientSideSession(
-			mockWsClient,
-			'test-session-id',
-			'test-client-id',
-			'Test Device'
-		);
+		session = createClientSideSession(mockWsClient, 'test-session-id', 'test-client-id', 'Test Device');
 	});
 
 	describe('session metadata', () => {
@@ -60,7 +55,7 @@ describe('Client-side Session', () => {
 
 		it('should throw error for unknown methods', async () => {
 			const serverProxy = session.getServer();
-			
+
 			expect(() => {
 				(serverProxy as any).testProcedure.unknownMethod('input');
 			}).toThrow('Unknown method: unknownMethod');
