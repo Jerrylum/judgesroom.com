@@ -2,6 +2,9 @@ import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { createWebSocketHandler } from '@judging.jerryio/wrpc/server';
 import { ServerRouter, serverRouter } from './server-router';
+import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
+import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
+import migrations from '../drizzle/migrations';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
@@ -11,6 +14,22 @@ const IntentionSchema = z.object({
 });
 
 type Intention = z.infer<typeof IntentionSchema>;
+
+function parseIntention(request: Request): Intention | null {
+	const url = new URL(request.url);
+	const result = IntentionSchema.safeParse({
+		sessionId: url.searchParams.get('sessionId'),
+		clientId: url.searchParams.get('clientId'),
+		deviceName: url.searchParams.get('deviceName'),
+		action: url.searchParams.get('action')
+	});
+
+	if (!result.success) {
+		return null;
+	}
+
+	return result.data;
+}
 
 /** A Durable Object's behavior is defined in an exported Javascript class */
 export class WebSocketHibernationServer extends DurableObject<Env> {
@@ -25,6 +44,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			console.error('WRPC Error:', opts.error.message, opts.error);
 		}
 	});
+	private db: DrizzleSqliteDODatabase;
 
 	/**
 	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
@@ -37,22 +57,22 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		super(ctx, env);
 		// Initialize the WebSocket handler with hibernation support
 		this.wsHandler.initialize().catch(console.error);
+		this.db = drizzle(this.ctx.storage);
+
+		// Make sure all migrations complete before accepting queries.
+		// Otherwise you will need to run `this.migrate()` in any function
+		// that accesses the Drizzle database `this.db`.
+		ctx.blockConcurrencyWhile(async () => {
+			await migrate(this.db, migrations);
+		});
 	}
 
 	async fetch(request: Request): Promise<Response> {
-		const url = new URL(request.url);
-		// const sessionId = url.searchParams.get('sessionId');
-		// const clientId = url.searchParams.get('clientId');
-		// const deviceName = url.searchParams.get('deviceName');
-		// const action = url.searchParams.get('action');
-
-		// const intention = IntentionSchema.parse({ sessionId, clientId, deviceName, action });
-		const { sessionId, clientId, deviceName, action } = IntentionSchema.parse({
-			sessionId: url.searchParams.get('sessionId'),
-			clientId: url.searchParams.get('clientId'),
-			deviceName: url.searchParams.get('deviceName'),
-			action: url.searchParams.get('action')
-		});
+		const intention = parseIntention(request);
+		if (!intention) {
+			return new Response('Invalid request', { status: 400 });
+		}
+		const { sessionId, clientId, deviceName } = intention;
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
@@ -93,21 +113,13 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
-		const clientId = this.getClientIdByWebSocket(ws);
-
 		// Delegate to the WebSocket handler
-		await this.wsHandler.handleClose(ws, code, reason, { clientId: clientId ?? undefined });
+		await this.wsHandler.handleClose(ws, code, reason);
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
-		const clientId = this.getClientIdByWebSocket(ws);
-
 		// Delegate to the WebSocket handler
-		this.wsHandler.handleError(ws, error, { clientId: clientId ?? undefined });
-	}
-
-	private getClientIdByWebSocket(ws: WebSocket): string | null {
-		return this.ctx.getTags(ws)[0] || null;
+		this.wsHandler.handleError(ws, error);
 	}
 }
 
@@ -125,8 +137,13 @@ export default {
 
 		// Handle WebSocket upgrade requests
 		if (request.headers.get('Upgrade') === 'websocket' || url.pathname === '/ws') {
+			const intention = parseIntention(request);
+			if (!intention) {
+				return new Response('Invalid request', { status: 400 });
+			}
+			const { sessionId } = intention;
+
 			// Create a `DurableObjectId` for the WebSocket session
-			const sessionId = url.searchParams.get('sessionId') || 'default';
 			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(sessionId);
 
 			// Create a stub to open a communication channel with the Durable Object instance
