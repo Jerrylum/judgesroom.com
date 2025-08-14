@@ -53,6 +53,15 @@ export interface WebSocketConnectionOptions {
 	deviceName?: string;
 }
 
+export interface WebSocketHandler<TRouter extends AnyRouter> {
+	connectionManager: WebSocketConnectionManager;
+	initialize: () => Promise<void>;
+	handleMessage: (ws: WebSocket, message: string, ctx: InferRouterContext<TRouter>) => Promise<void>;
+	handleConnection: (ws: WebSocket, connectionOpts?: WebSocketConnectionOptions) => Promise<void>;
+	handleClose: (ws: WebSocket, code: number, reason: string) => Promise<void>;
+	handleError: (ws: WebSocket, error: Error) => void;
+}
+
 /**
  * Get a procedure from the router by path
  */
@@ -91,7 +100,7 @@ async function callProcedure(procedure: AnyProcedure, input: unknown, session: S
 /**
  * Create a WebSocket message handler for a WRPC router
  */
-export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocketHandlerOptions<TRouter>) {
+export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocketHandlerOptions<TRouter>): WebSocketHandler<TRouter> {
 	const connectionManager = new WebSocketConnectionManager(opts);
 
 	return {

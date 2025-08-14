@@ -22,4 +22,9 @@ export {
 } from './router';
 export { type Session } from './session';
 export { type RouterProxy, type Network } from './types';
-export { type WebSocketHandlerOptions, type WebSocketConnectionOptions, createWebSocketHandler } from './websocket-handler';
+export {
+	type WebSocketHandlerOptions,
+	type WebSocketConnectionOptions,
+	type WebSocketHandler,
+	createWebSocketHandler
+} from './websocket-handler';

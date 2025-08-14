@@ -56,7 +56,7 @@ export type InferRouterOutputs<TRouter extends AnyRouter> = {
 			: never;
 };
 
-export type InferRouterContext<TRouter extends AnyRouter> = TRouter['_def']['_config']['$types']['context'];
+export type InferRouterContext<TRouter extends AnyRouter> = TRouter['_def']['_config']['context'];
 
 // Client types
 export type CreateClientOptions = {
