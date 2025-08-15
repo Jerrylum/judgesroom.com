@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { WRPCClientManager, createClientManager } from './client-manager';
 import type { ClientOptions } from './types';
 import type { AnyRouter } from '../server/router';
+import type { ConnectionState } from './websocket-client';
 import { initWRPC } from '../server/initWRPC';
 import { z } from 'zod';
 
@@ -17,6 +18,7 @@ class MockWebsocketClient {
 	mutation = vi.fn();
 	disconnect = vi.fn();
 	isConnected = vi.fn().mockReturnValue(true);
+	getConnectionState = vi.fn().mockReturnValue('connected' as ConnectionState);
 }
 
 // Mock createWRPCClient
@@ -175,23 +177,68 @@ describe('WRPCClientManager', () => {
 		});
 	});
 
+	describe('getConnectionState', () => {
+		it('should return offline when no client exists', () => {
+			expect(clientManager.getConnectionState()).toBe('offline');
+		});
+
+		it('should return client connection state when client exists', () => {
+			const [wsClient] = clientManager.getClient();
+			vi.mocked(wsClient.getConnectionState).mockReturnValue('connected');
+
+			expect(clientManager.getConnectionState()).toBe('connected');
+
+			vi.mocked(wsClient.getConnectionState).mockReturnValue('connecting');
+			expect(clientManager.getConnectionState()).toBe('connecting');
+
+			vi.mocked(wsClient.getConnectionState).mockReturnValue('error');
+			expect(clientManager.getConnectionState()).toBe('error');
+
+			vi.mocked(wsClient.getConnectionState).mockReturnValue('reconnecting');
+			expect(clientManager.getConnectionState()).toBe('reconnecting');
+		});
+
+		it('should return offline after client reset', () => {
+			const [wsClient] = clientManager.getClient();
+			vi.mocked(wsClient.getConnectionState).mockReturnValue('connected');
+			expect(clientManager.getConnectionState()).toBe('connected');
+
+			clientManager.resetClient();
+			expect(clientManager.getConnectionState()).toBe('offline');
+		});
+
+		it('should handle all connection states', () => {
+			const [wsClient] = clientManager.getClient();
+			const states: ConnectionState[] = ['offline', 'connecting', 'connected', 'reconnecting', 'error'];
+
+			states.forEach(state => {
+				vi.mocked(wsClient.getConnectionState).mockReturnValue(state);
+				expect(clientManager.getConnectionState()).toBe(state);
+			});
+		});
+	});
+
 	describe('integration scenarios', () => {
 		it('should handle client lifecycle properly', () => {
-			// Initially not connected
+			// Initially not connected and offline
 			expect(clientManager.isConnected()).toBe(false);
+			expect(clientManager.getConnectionState()).toBe('offline');
 
 			// Create client
 			const [wsClient1, wrpcClient1] = clientManager.getClient();
 			expect(clientManager.isConnected()).toBe(true);
+			expect(clientManager.getConnectionState()).toBe('connected');
 
 			// Reset client
 			clientManager.resetClient();
 			expect(clientManager.isConnected()).toBe(false);
+			expect(clientManager.getConnectionState()).toBe('offline');
 			expect(wsClient1.disconnect).toHaveBeenCalled();
 
 			// Create new client
 			const [wsClient2, wrpcClient2] = clientManager.getClient();
 			expect(clientManager.isConnected()).toBe(true);
+			expect(clientManager.getConnectionState()).toBe('connected');
 			expect(wsClient2).not.toBe(wsClient1);
 			expect(wrpcClient2).not.toBe(wrpcClient1);
 		});
@@ -235,6 +282,15 @@ describe('WRPCClientManager', () => {
 			expect(client1).not.toBe(client2);
 			expect((client1 as any).options.wsUrl).toBe('ws://localhost:8080/ws');
 			expect((client2 as any).options.wsUrl).toBe('ws://other:8080/ws');
+
+			// Both should have their own connection states
+			expect(clientManager.getConnectionState()).toBe('connected');
+			expect(manager2.getConnectionState()).toBe('connected');
+
+			// Reset one shouldn't affect the other
+			clientManager.resetClient();
+			expect(clientManager.getConnectionState()).toBe('offline');
+			expect(manager2.getConnectionState()).toBe('connected');
 		});
 	});
 });

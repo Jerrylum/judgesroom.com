@@ -1,7 +1,7 @@
 import type { AnyRouter } from '../server/router';
 import { createWRPCClient } from './client-factory';
 import type { WRPCClient, ClientOptions } from './types';
-import type { WebsocketClient } from './websocket-client';
+import type { WebsocketClient, ConnectionState } from './websocket-client';
 
 /**
  * Generic client manager for WRPC connections
@@ -44,6 +44,16 @@ export class WRPCClientManager<TServerRouter extends AnyRouter, TClientRouter ex
 	 */
 	isConnected(): boolean {
 		return this.clientInstance !== null && this.clientInstance[0].isConnected();
+	}
+
+	/**
+	 * Get the current connection state
+	 */
+	getConnectionState(): ConnectionState {
+		if (this.clientInstance === null) {
+			return 'offline';
+		}
+		return this.clientInstance[0].getConnectionState();
 	}
 }
 

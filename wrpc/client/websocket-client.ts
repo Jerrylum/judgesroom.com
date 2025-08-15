@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { AnyProcedure } from '../server/procedure';
 import type { ProcedureResolver } from '../server/procedure-builder';
 import type { AnyRouter } from '../server/router';
@@ -7,6 +8,20 @@ import { createClientSideSession } from './session';
 import type { ClientOptions, PendingRequest } from './types';
 import type { InferRouterContext } from '../server/types';
 import type { Session } from '../server/session';
+
+
+// ============================================================================
+// Connection State
+// ============================================================================
+
+export const ConnectionStateSchema = z.enum([
+	'offline',
+	'connecting',
+	'connected',
+	'reconnecting',
+	'error'
+]);
+export type ConnectionState = z.infer<typeof ConnectionStateSchema>;
 
 /**
  * WRPC WebSocket client implementation
@@ -20,6 +35,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	private maxReconnectAttempts = 5;
 	private reconnectDelay = 1000;
 	private clientRouter: TClientRouter;
+	private connectionState: ConnectionState = 'offline';
 
 	constructor(
 		private options: ClientOptions<TClientRouter>,
@@ -41,6 +57,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			return this.connectingPromise;
 		}
 
+		this.connectionState = 'connecting';
 		this.connectingPromise = new Promise((resolve, reject) => {
 			const { wsUrl, sessionId, clientId, deviceName } = this.options;
 			const url = new URL(wsUrl);
@@ -55,11 +72,13 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			ws.onopen = () => {
 				this.ws = ws;
 				this.reconnectAttempts = 0;
+				this.connectionState = 'connected';
 				this.connectingPromise = null;
 				resolve(ws);
 			};
 
 			ws.onerror = (error) => {
+				this.connectionState = 'error';
 				this.connectingPromise = null;
 				reject(new Error(`WebSocket connection failed: ${error}`));
 			};
@@ -206,6 +225,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 		// Attempt to reconnect if not intentionally closed
 		if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+			this.connectionState = 'reconnecting';
 			setTimeout(
 				() => {
 					this.reconnectAttempts++;
@@ -213,6 +233,8 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				},
 				this.reconnectDelay * Math.pow(2, this.reconnectAttempts)
 			);
+		} else {
+			this.connectionState = 'offline';
 		}
 	}
 
@@ -272,6 +294,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			this.ws.close(1000, 'Client disconnect');
 			this.ws = null;
 		}
+		this.connectionState = 'offline';
 	}
 
 	/**
@@ -279,5 +302,12 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	 */
 	isConnected(): this is { ws: WebSocket } {
 		return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+	}
+
+	/**
+	 * Get the current connection state
+	 */
+	getConnectionState(): ConnectionState {
+		return this.connectionState;
 	}
 }
