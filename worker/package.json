@@ -8,11 +8,19 @@
 		"start": "wrangler dev",
 		"cf-typegen": "wrangler types",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+    "check": "tsc --noEmit",
+		"lint": "prettier --check . && eslint .",
+		"db:generate": "drizzle-kit generate --name migration",
+		"db:generate-overwrite": "rm -rf drizzle/migrations/meta && rm -rf drizzle/migrations/*.sql && drizzle-kit generate --name migration",
+		"test:unit": "vitest",
+		"test": "bun run test:unit -- --run"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
+		"@types/better-sqlite3": "^7.6.11",
+		"@types/node": "^24.2.1",
+		"better-sqlite3": "^11.3.0",
 		"drizzle-kit": "^0.31.4",
 		"eslint": "^9.32.0",
 		"eslint-config-prettier": "^10.1.8",
@@ -20,6 +28,7 @@
 		"prettier": "^3.6.2",
 		"typescript": "^5.5.2",
 		"typescript-eslint": "^8.20.0",
+		"vitest": "^3.2.3",
 		"wrangler": "^4.26.0"
 	},
 	"dependencies": {
