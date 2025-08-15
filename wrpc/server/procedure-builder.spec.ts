@@ -301,7 +301,13 @@ describe('Procedure Builder', () => {
 
 		describe('query procedures with context', () => {
 			it('should pass context to query resolver', async () => {
-				const resolver: ProcedureResolver<string, string, TestContext> = async ({ input, ctx }: { input: string; ctx: TestContext }) => {
+				const resolver: ProcedureResolver<string, string, string, TestContext> = async ({
+					input,
+					ctx
+				}: {
+					input: string;
+					ctx: TestContext;
+				}) => {
 					return `Hello ${input}, user: ${ctx.userId}, role: ${ctx.role}`;
 				};
 
@@ -323,7 +329,7 @@ describe('Procedure Builder', () => {
 			});
 
 			it('should use context for authorization in queries', async () => {
-				const resolver: ProcedureResolver<void, string, TestContext> = async ({ ctx }: { ctx: TestContext }) => {
+				const resolver: ProcedureResolver<void, string, string, TestContext> = async ({ ctx }: { ctx: TestContext }) => {
 					if (!ctx.permissions.includes('admin')) {
 						throw new Error('Admin permission required');
 					}
@@ -365,13 +371,12 @@ describe('Procedure Builder', () => {
 
 		describe('mutation procedures with context', () => {
 			it('should pass context to mutation resolver', async () => {
-				const resolver: ProcedureResolver<{ action: string }, { success: boolean; performedBy: string }, TestContext> = async ({
-					input,
-					ctx
-				}: {
-					input: { action: string };
-					ctx: TestContext;
-				}) => {
+				const resolver: ProcedureResolver<
+					{ action: string },
+					{ success: boolean; performedBy: string },
+					{ success: boolean; performedBy: string },
+					TestContext
+				> = async ({ input, ctx }: { input: { action: string }; ctx: TestContext }) => {
 					return {
 						success: true,
 						performedBy: ctx.userId
@@ -399,13 +404,12 @@ describe('Procedure Builder', () => {
 			});
 
 			it('should use context for role-based mutations', async () => {
-				const resolver: ProcedureResolver<{ data: string }, { result: string; audit: string }, TestContext> = async ({
-					input,
-					ctx
-				}: {
-					input: { data: string };
-					ctx: TestContext;
-				}) => {
+				const resolver: ProcedureResolver<
+					{ data: string },
+					{ result: string; audit: string },
+					{ result: string; audit: string },
+					TestContext
+				> = async ({ input, ctx }: { input: { data: string }; ctx: TestContext }) => {
 					const auditInfo = `Action performed by ${ctx.userId} with role ${ctx.role}`;
 
 					if (ctx.role === 'admin') {
@@ -477,6 +481,7 @@ describe('Procedure Builder', () => {
 				const resolver: ProcedureResolver<
 					{ resourceId: string; action: string },
 					{ allowed: boolean; reason?: string },
+					{ allowed: boolean; reason?: string },
 					TestContext
 				> = async ({ input, ctx }: { input: { resourceId: string; action: string }; ctx: TestContext }) => {
 					// Complex permission logic
@@ -540,13 +545,12 @@ describe('Procedure Builder', () => {
 			});
 
 			it('should handle context modifications during procedure execution', async () => {
-				const resolver: ProcedureResolver<{ increment: number }, { newValue: number; context: TestContext }, TestContext> = async ({
-					input,
-					ctx
-				}: {
-					input: { increment: number };
-					ctx: TestContext;
-				}) => {
+				const resolver: ProcedureResolver<
+					{ increment: number },
+					{ newValue: number; context: TestContext },
+					{ newValue: number; context: TestContext },
+					TestContext
+				> = async ({ input, ctx }: { input: { increment: number }; ctx: TestContext }) => {
 					// Simulate context being used and modified during execution
 					const modifiedContext = {
 						...ctx,

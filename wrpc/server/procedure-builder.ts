@@ -34,12 +34,15 @@ export interface ProcedureResolverOptions<TInput, TContext, TServerRouter extend
 /**
  * A procedure resolver
  */
-export type ProcedureResolver<TInput, TOutput, TContext, TServerRouter extends AnyRouter = AnyRouter> = (
+export type ProcedureResolver<TInput, TOutput, $Output, TContext, TServerRouter extends AnyRouter = AnyRouter> = (
 	opts: ProcedureResolverOptions<TInput, TContext, TServerRouter>
-) => MaybePromise<TOutput>;
+) => MaybePromise<
+	// If an output parser is defined, we need to return what the parser expects, otherwise we return the inferred type
+	DefaultValue<TOutput, $Output>
+>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyResolver = ProcedureResolver<any, any, any, any>;
+type AnyResolver = ProcedureResolver<any, any, any, any, any>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyProcedureBuilder = ProcedureBuilder<any, any, any, any, any>;
@@ -57,13 +60,13 @@ export interface ProcedureBuilder<TMeta, TInput, TOutput, TContext, TServerRoute
 
 	meta(meta: TMeta): ProcedureBuilder<TMeta, TInput, TOutput, TContext, TServerRouter>;
 
-	query<$Output>(resolver: ProcedureResolver<TInput, $Output, TContext, TServerRouter>): QueryProcedure<{
+	query<$Output>(resolver: ProcedureResolver<TInput, TOutput, $Output, TContext, TServerRouter>): QueryProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;
 	}>;
 
-	mutation<$Output>(resolver: ProcedureResolver<TInput, $Output, TContext, TServerRouter>): MutationProcedure<{
+	mutation<$Output>(resolver: ProcedureResolver<TInput, TOutput, $Output, TContext, TServerRouter>): MutationProcedure<{
 		input: DefaultValue<TInput, void>;
 		output: DefaultValue<TOutput, $Output>;
 		meta: TMeta;

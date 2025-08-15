@@ -93,7 +93,7 @@ function getProcedureAtPath(router: AnyRouter, path: string): AnyProcedure | nul
 async function callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>, ctx: object): Promise<unknown> {
 	// The procedure is a function that validates input and calls the resolver
 	// Cast to function since we know it's callable from the procedure definition
-	const procedureFn = procedure as unknown as ProcedureResolver<unknown, never, object, AnyRouter>;
+	const procedureFn = procedure as unknown as ProcedureResolver<unknown, unknown, unknown, object, AnyRouter>;
 	return await procedureFn({ input, session, ctx });
 }
 
