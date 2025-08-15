@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { createBuilder } from './procedure-builder';
+import { createBuilder, type ProcedureResolver } from './procedure-builder';
 import type { Session } from './session';
 import type { AnyRouter } from './router';
 
@@ -282,6 +282,301 @@ describe('Procedure Builder', () => {
 
 				const result = await (procedure as any)({ input: 'test', session: mockSession });
 				expect(result).toBe('async result: test');
+			});
+		});
+	});
+
+	describe('Context integration', () => {
+		interface TestContext {
+			userId: string;
+			role: string;
+			permissions: string[];
+		}
+
+		let contextBuilder: ReturnType<typeof createBuilder<never, TestContext>>;
+
+		beforeEach(() => {
+			contextBuilder = createBuilder<never, TestContext>();
+		});
+
+		describe('query procedures with context', () => {
+			it('should pass context to query resolver', async () => {
+				const resolver: ProcedureResolver<string, string, TestContext> = async ({ input, ctx }: { input: string; ctx: TestContext }) => {
+					return `Hello ${input}, user: ${ctx.userId}, role: ${ctx.role}`;
+				};
+
+				const procedure = contextBuilder.input(z.string()).query(resolver);
+
+				const testContext: TestContext = {
+					userId: 'user123',
+					role: 'admin',
+					permissions: ['read', 'write']
+				};
+
+				const result = await (procedure as any)({
+					input: 'World',
+					session: mockSession,
+					ctx: testContext
+				});
+
+				expect(result).toBe('Hello World, user: user123, role: admin');
+			});
+
+			it('should use context for authorization in queries', async () => {
+				const resolver: ProcedureResolver<void, string, TestContext> = async ({ ctx }: { ctx: TestContext }) => {
+					if (!ctx.permissions.includes('admin')) {
+						throw new Error('Admin permission required');
+					}
+					return 'Admin data accessed';
+				};
+
+				const procedure = contextBuilder.query(resolver);
+
+				// Test with admin permissions
+				const adminContext: TestContext = {
+					userId: 'admin123',
+					role: 'admin',
+					permissions: ['read', 'write', 'admin']
+				};
+
+				const adminResult = await (procedure as any)({
+					input: undefined,
+					session: mockSession,
+					ctx: adminContext
+				});
+				expect(adminResult).toBe('Admin data accessed');
+
+				// Test without admin permissions
+				const userContext: TestContext = {
+					userId: 'user123',
+					role: 'user',
+					permissions: ['read']
+				};
+
+				await expect(
+					(procedure as any)({
+						input: undefined,
+						session: mockSession,
+						ctx: userContext
+					})
+				).rejects.toThrow('Admin permission required');
+			});
+		});
+
+		describe('mutation procedures with context', () => {
+			it('should pass context to mutation resolver', async () => {
+				const resolver: ProcedureResolver<{ action: string }, { success: boolean; performedBy: string }, TestContext> = async ({
+					input,
+					ctx
+				}: {
+					input: { action: string };
+					ctx: TestContext;
+				}) => {
+					return {
+						success: true,
+						performedBy: ctx.userId
+					};
+				};
+
+				const procedure = contextBuilder.input(z.object({ action: z.string() })).mutation(resolver);
+
+				const testContext: TestContext = {
+					userId: 'user456',
+					role: 'editor',
+					permissions: ['read', 'write']
+				};
+
+				const result = await (procedure as any)({
+					input: { action: 'update' },
+					session: mockSession,
+					ctx: testContext
+				});
+
+				expect(result).toEqual({
+					success: true,
+					performedBy: 'user456'
+				});
+			});
+
+			it('should use context for role-based mutations', async () => {
+				const resolver: ProcedureResolver<{ data: string }, { result: string; audit: string }, TestContext> = async ({
+					input,
+					ctx
+				}: {
+					input: { data: string };
+					ctx: TestContext;
+				}) => {
+					const auditInfo = `Action performed by ${ctx.userId} with role ${ctx.role}`;
+
+					if (ctx.role === 'admin') {
+						return { result: `Admin processed: ${input.data}`, audit: auditInfo };
+					} else if (ctx.role === 'editor') {
+						return { result: `Editor processed: ${input.data}`, audit: auditInfo };
+					} else {
+						throw new Error('Insufficient role for this operation');
+					}
+				};
+
+				const procedure = contextBuilder.input(z.object({ data: z.string() })).mutation(resolver);
+
+				// Test admin role
+				const adminContext: TestContext = {
+					userId: 'admin789',
+					role: 'admin',
+					permissions: ['read', 'write', 'delete']
+				};
+
+				const adminResult = await (procedure as any)({
+					input: { data: 'test-data' },
+					session: mockSession,
+					ctx: adminContext
+				});
+
+				expect(adminResult).toEqual({
+					result: 'Admin processed: test-data',
+					audit: 'Action performed by admin789 with role admin'
+				});
+
+				// Test editor role
+				const editorContext: TestContext = {
+					userId: 'editor456',
+					role: 'editor',
+					permissions: ['read', 'write']
+				};
+
+				const editorResult = await (procedure as any)({
+					input: { data: 'test-data' },
+					session: mockSession,
+					ctx: editorContext
+				});
+
+				expect(editorResult).toEqual({
+					result: 'Editor processed: test-data',
+					audit: 'Action performed by editor456 with role editor'
+				});
+
+				// Test insufficient role
+				const userContext: TestContext = {
+					userId: 'user123',
+					role: 'viewer',
+					permissions: ['read']
+				};
+
+				await expect(
+					(procedure as any)({
+						input: { data: 'test-data' },
+						session: mockSession,
+						ctx: userContext
+					})
+				).rejects.toThrow('Insufficient role for this operation');
+			});
+		});
+
+		describe('complex context scenarios', () => {
+			it('should handle context with complex permission logic', async () => {
+				const resolver: ProcedureResolver<
+					{ resourceId: string; action: string },
+					{ allowed: boolean; reason?: string },
+					TestContext
+				> = async ({ input, ctx }: { input: { resourceId: string; action: string }; ctx: TestContext }) => {
+					// Complex permission logic
+					const hasPermission = (action: string): boolean => {
+						switch (action) {
+							case 'read':
+								return ctx.permissions.includes('read');
+							case 'write':
+								return ctx.permissions.includes('write') && ctx.role !== 'viewer';
+							case 'delete':
+								return ctx.permissions.includes('delete') && ctx.role === 'admin';
+							default:
+								return false;
+						}
+					};
+
+					if (hasPermission(input.action)) {
+						return { allowed: true };
+					} else {
+						return {
+							allowed: false,
+							reason: `User ${ctx.userId} with role ${ctx.role} cannot perform ${input.action}`
+						};
+					}
+				};
+
+				const procedure = contextBuilder.input(z.object({ resourceId: z.string(), action: z.string() })).query(resolver);
+
+				// Test various permission scenarios
+				const testCases = [
+					{
+						context: { userId: 'admin1', role: 'admin', permissions: ['read', 'write', 'delete'] },
+						input: { resourceId: 'res1', action: 'delete' },
+						expected: { allowed: true }
+					},
+					{
+						context: { userId: 'editor1', role: 'editor', permissions: ['read', 'write'] },
+						input: { resourceId: 'res1', action: 'write' },
+						expected: { allowed: true }
+					},
+					{
+						context: { userId: 'viewer1', role: 'viewer', permissions: ['read', 'write'] },
+						input: { resourceId: 'res1', action: 'write' },
+						expected: { allowed: false, reason: 'User viewer1 with role viewer cannot perform write' }
+					},
+					{
+						context: { userId: 'user1', role: 'user', permissions: ['read'] },
+						input: { resourceId: 'res1', action: 'delete' },
+						expected: { allowed: false, reason: 'User user1 with role user cannot perform delete' }
+					}
+				];
+
+				for (const testCase of testCases) {
+					const result = await (procedure as any)({
+						input: testCase.input,
+						session: mockSession,
+						ctx: testCase.context
+					});
+					expect(result).toEqual(testCase.expected);
+				}
+			});
+
+			it('should handle context modifications during procedure execution', async () => {
+				const resolver: ProcedureResolver<{ increment: number }, { newValue: number; context: TestContext }, TestContext> = async ({
+					input,
+					ctx
+				}: {
+					input: { increment: number };
+					ctx: TestContext;
+				}) => {
+					// Simulate context being used and modified during execution
+					const modifiedContext = {
+						...ctx,
+						permissions: [...ctx.permissions, 'temp_permission']
+					};
+
+					return {
+						newValue: input.increment + 1,
+						context: modifiedContext
+					};
+				};
+
+				const procedure = contextBuilder.input(z.object({ increment: z.number() })).mutation(resolver);
+
+				const originalContext: TestContext = {
+					userId: 'test-user',
+					role: 'user',
+					permissions: ['read']
+				};
+
+				const result = await (procedure as any)({
+					input: { increment: 5 },
+					session: mockSession,
+					ctx: originalContext
+				});
+
+				expect(result.newValue).toBe(6);
+				expect(result.context.permissions).toEqual(['read', 'temp_permission']);
+				// Original context should remain unchanged
+				expect(originalContext.permissions).toEqual(['read']);
 			});
 		});
 	});

@@ -566,4 +566,331 @@ describe('WebsocketClient', () => {
 			wsClient.disconnect();
 		});
 	});
+
+	describe('Context handling', () => {
+		interface TestContext {
+			userId: string;
+			sessionToken: string;
+			permissions: string[];
+		}
+
+		let contextOptions: ClientOptions<AnyRouter>;
+		let contextRouter: AnyRouter;
+		let contextWsClient: WebsocketClient<AnyRouter>;
+
+		beforeEach(() => {
+			// Create context-aware client options
+			contextOptions = {
+				wsUrl: 'ws://localhost:8080/ws',
+				sessionId: 'context-session',
+				clientId: 'context-client',
+				deviceName: 'Context Test Device',
+				onContext: async (request) => {
+					// Simulate context generation based on request
+					const context: TestContext = {
+						userId: 'test-user-123',
+						sessionToken: 'token-' + request.id,
+						permissions: request.path === 'getClientInfo' ? ['admin'] : ['user']
+					};
+					return context;
+				}
+			};
+
+			// Create a context-aware client router using existing procedures
+			const w = initWRPC.createClient<any, TestContext>();
+			contextRouter = w.router({
+				onNotification: w.procedure.input(z.string()).mutation(async ({ input, ctx }) => {
+					console.log('Notification received:', input);
+					return {
+						received: true,
+						processedBy: ctx.userId,
+						token: ctx.sessionToken,
+						permissions: ctx.permissions
+					};
+				}),
+
+				getClientInfo: w.procedure.query(async ({ ctx }) => {
+					if (ctx.permissions && !ctx.permissions.includes('admin')) {
+						throw new Error('Admin access required');
+					}
+					return {
+						clientId: 'test-client',
+						status: 'online',
+						userId: ctx.userId,
+						token: ctx.sessionToken,
+						permissions: ctx.permissions
+					};
+				}),
+
+				throwError: w.procedure.mutation(async ({ ctx }) => {
+					return {
+						error: 'Client error',
+						context: ctx
+					};
+				})
+			});
+
+			contextWsClient = new WebsocketClient(contextOptions, contextRouter);
+		});
+
+		afterEach(() => {
+			contextWsClient.disconnect();
+		});
+
+		it('should call onContext when receiving server requests', async () => {
+			const onContextSpy = vi.spyOn(contextOptions, 'onContext');
+
+			// Trigger connection by making a query
+			const queryPromise = contextWsClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance that was just created
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request
+			const serverRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'server-req-123',
+				type: 'mutation',
+				path: 'onNotification',
+				input: 'test-action'
+			};
+
+			mockWs.simulateMessage(JSON.stringify(serverRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			expect(onContextSpy).toHaveBeenCalledWith(serverRequest);
+			contextWsClient.disconnect();
+		});
+
+		it('should pass context to client procedure handlers', async () => {
+			// Trigger connection by making a query
+			const queryPromise = contextWsClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request
+			const serverRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'context-test-456',
+				type: 'mutation',
+				path: 'onNotification',
+				input: 'context-test'
+			};
+
+			mockWs.simulateMessage(JSON.stringify(serverRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Check that response includes context data
+			expect(mockWs.send).toHaveBeenCalledTimes(2); // Initial query + response to server request
+			const response = JSON.parse(mockWs.send.mock.calls[1][0]); // Second call is the response to server request
+			expect(response.result.data).toEqual({
+				received: true,
+				processedBy: 'test-user-123',
+				token: 'token-context-test-456',
+				permissions: ['user']
+			});
+		});
+
+		it('should generate admin permissions for admin paths', async () => {
+			// Trigger connection by making a query
+			const queryPromise = contextWsClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request with admin path
+			const adminRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'admin-req-789',
+				type: 'query',
+				path: 'getClientInfo',
+				input: undefined
+			};
+
+			mockWs.simulateMessage(JSON.stringify(adminRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Check that response includes admin context
+			expect(mockWs.send).toHaveBeenCalledTimes(2); // Initial query + response to server request
+			const response = JSON.parse(mockWs.send.mock.calls[1][0]); // Second call is the response to server request
+			expect(response.result.data).toEqual({
+				clientId: 'test-client',
+				status: 'online',
+				userId: 'test-user-123',
+				token: 'token-admin-req-789',
+				permissions: ['admin']
+			});
+		});
+
+		it('should handle context-based authorization failures', async () => {
+			// Create a client with restricted context
+			const restrictedOptions = {
+				...contextOptions,
+				onContext: async () => ({
+					userId: 'restricted-user',
+					sessionToken: 'restricted-token',
+					permissions: ['user'] // No admin permission
+				})
+			};
+
+			const restrictedClient = new WebsocketClient(restrictedOptions, contextRouter);
+
+			// Trigger connection by making a query
+			const queryPromise = restrictedClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance for the restricted client
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate admin request
+			const adminRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'restricted-admin-req',
+				type: 'query',
+				path: 'getClientInfo',
+				input: undefined
+			};
+
+			mockWs.simulateMessage(JSON.stringify(adminRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Check that response contains error
+			expect(mockWs.send).toHaveBeenCalledTimes(2); // Initial query + response to server request
+			const response = JSON.parse(mockWs.send.mock.calls[1][0]); // Second call is the response to server request
+			expect(response.result.type).toBe('error');
+			expect(response.result.error.message).toBe('Admin access required');
+
+			restrictedClient.disconnect();
+		});
+
+		it('should return full context when requested', async () => {
+			// Trigger connection by making a query
+			const queryPromise = contextWsClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request for context info
+			const contextRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'context-info-req',
+				type: 'mutation',
+				path: 'throwError',
+				input: undefined
+			};
+
+			mockWs.simulateMessage(JSON.stringify(contextRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Check that response contains full context
+			expect(mockWs.send).toHaveBeenCalledTimes(2); // Initial query + response to server request
+			const response = JSON.parse(mockWs.send.mock.calls[1][0]); // Second call is the response to server request
+			expect(response.result.data).toEqual({
+				error: 'Client error',
+				context: {
+					userId: 'test-user-123',
+					sessionToken: 'token-context-info-req',
+					permissions: ['user']
+				}
+			});
+		});
+
+		it('should handle async context generation', async () => {
+			// Create client with async context generation
+			const asyncContextOptions = {
+				...contextOptions,
+				onContext: async (request: WRPCRequest) => {
+					// Simulate async operation (e.g., database lookup)
+					await new Promise((resolve) => setTimeout(resolve, 5));
+
+					return {
+						userId: 'async-user',
+						sessionToken: 'async-token-' + request.id,
+						permissions: ['async-permission']
+					};
+				}
+			};
+
+			const asyncClient = new WebsocketClient(asyncContextOptions, contextRouter);
+
+			// Trigger connection by making a query
+			const queryPromise = asyncClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance for the async client
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request
+			const asyncRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'async-req',
+				type: 'mutation',
+				path: 'onNotification',
+				input: 'async-test'
+			};
+
+			mockWs.simulateMessage(JSON.stringify(asyncRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 20));
+
+			// Check that response includes async context data
+			expect(mockWs.send).toHaveBeenCalledTimes(2); // Initial query + response to server request
+			const response = JSON.parse(mockWs.send.mock.calls[1][0]); // Second call is the response to server request
+			expect(response.result.data.received).toBe(true);
+			expect(response.result.data.processedBy).toBe('async-user');
+			expect(response.result.data.token).toBe('async-token-async-req');
+			expect(response.result.data.permissions).toEqual(['async-permission']);
+
+			asyncClient.disconnect();
+		});
+
+		it('should handle context generation errors gracefully', async () => {
+			// Create client with failing context generation
+			const failingContextOptions = {
+				...contextOptions,
+				onContext: async () => {
+					throw new Error('Context generation failed');
+				}
+			};
+
+			const failingClient = new WebsocketClient(failingContextOptions, contextRouter);
+			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+			// Trigger connection by making a query
+			const queryPromise = failingClient.query('test', null);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Get the mock WebSocket instance for the failing client
+			const mockWs = vi.mocked(MockWebSocket).mock.results[vi.mocked(MockWebSocket).mock.results.length - 1]?.value as any;
+
+			// Simulate server request
+			const failingRequest: WRPCRequest = {
+				kind: 'request',
+				id: 'failing-req',
+				type: 'query',
+				path: 'getClientInfo',
+				input: undefined
+			};
+
+			mockWs.simulateMessage(JSON.stringify(failingRequest));
+
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			// Check that error was logged
+			expect(consoleSpy).toHaveBeenCalledWith('Error parsing or validating WebSocket message:', expect.any(Error));
+
+			failingClient.disconnect();
+			consoleSpy.mockRestore();
+		});
+	});
 });

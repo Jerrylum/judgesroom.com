@@ -395,4 +395,251 @@ describe('WebSocket Handler', () => {
 			expect(getClientDataSpy).toHaveBeenCalledWith('test-client');
 		});
 	});
+
+	describe('Context handling', () => {
+		interface TestContext {
+			userId: string;
+			permissions: string[];
+			timestamp: number;
+		}
+
+		let contextRouter: AnyRouter;
+		let contextWsHandler: ReturnType<typeof createWebSocketHandler>;
+
+		beforeEach(async () => {
+			// Create a router that uses Context
+			const w = initWRPC.createServer<TestContext>();
+			contextRouter = w.router({
+				getUserInfo: w.procedure.input(z.string()).query(async ({ input, ctx }) => {
+					return {
+						message: `Hello ${input}`,
+						userId: ctx.userId,
+						permissions: ctx.permissions,
+						timestamp: ctx.timestamp
+					};
+				}),
+
+				updateUserPermission: w.procedure.input(z.object({ permission: z.string() })).mutation(async ({ input, ctx }) => {
+					if (!ctx.permissions.includes('admin')) {
+						throw new Error('Insufficient permissions');
+					}
+					return {
+						success: true,
+						permission: input.permission,
+						updatedBy: ctx.userId
+					};
+				}),
+
+				getContextValue: w.procedure.query(async ({ ctx }) => {
+					return ctx;
+				})
+			});
+
+			const contextOptions = {
+				...mockOptions,
+				router: contextRouter
+			};
+
+			contextWsHandler = createWebSocketHandler(contextOptions);
+			await contextWsHandler.initialize();
+		});
+
+		it('should pass context to query procedures', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('test-client', mockWs);
+
+			await contextWsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'test-client',
+				deviceName: 'Test Device'
+			});
+
+			const testContext: TestContext = {
+				userId: 'user-123',
+				permissions: ['read', 'write'],
+				timestamp: Date.now()
+			};
+
+			const request: WRPCRequest = {
+				kind: 'request',
+				id: 'context-test',
+				type: 'query',
+				path: 'getUserInfo',
+				input: 'TestUser'
+			};
+
+			await contextWsHandler.handleMessage(mockWs as any, JSON.stringify(request), testContext);
+
+			expect(mockWs.send).toHaveBeenCalledWith(
+				JSON.stringify({
+					kind: 'response',
+					id: 'context-test',
+					result: {
+						type: 'data',
+						data: {
+							message: 'Hello TestUser',
+							userId: 'user-123',
+							permissions: ['read', 'write'],
+							timestamp: testContext.timestamp
+						}
+					}
+				})
+			);
+		});
+
+		it('should pass context to mutation procedures', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('admin-client', mockWs);
+
+			await contextWsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'admin-client',
+				deviceName: 'Admin Device'
+			});
+
+			const adminContext: TestContext = {
+				userId: 'admin-456',
+				permissions: ['read', 'write', 'admin'],
+				timestamp: Date.now()
+			};
+
+			const request: WRPCRequest = {
+				kind: 'request',
+				id: 'mutation-context-test',
+				type: 'mutation',
+				path: 'updateUserPermission',
+				input: { permission: 'delete' }
+			};
+
+			await contextWsHandler.handleMessage(mockWs as any, JSON.stringify(request), adminContext);
+
+			expect(mockWs.send).toHaveBeenCalledWith(
+				JSON.stringify({
+					kind: 'response',
+					id: 'mutation-context-test',
+					result: {
+						type: 'data',
+						data: {
+							success: true,
+							permission: 'delete',
+							updatedBy: 'admin-456'
+						}
+					}
+				})
+			);
+		});
+
+		it('should handle context-based authorization failures', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('user-client', mockWs);
+
+			await contextWsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'user-client',
+				deviceName: 'User Device'
+			});
+
+			const userContext: TestContext = {
+				userId: 'user-789',
+				permissions: ['read'], // No admin permission
+				timestamp: Date.now()
+			};
+
+			const request: WRPCRequest = {
+				kind: 'request',
+				id: 'auth-fail-test',
+				type: 'mutation',
+				path: 'updateUserPermission',
+				input: { permission: 'delete' }
+			};
+
+			await contextWsHandler.handleMessage(mockWs as any, JSON.stringify(request), userContext);
+
+			expect(mockWs.send).toHaveBeenCalledWith(
+				JSON.stringify({
+					kind: 'response',
+					id: 'auth-fail-test',
+					result: {
+						type: 'error',
+						error: {
+							message: 'Internal server error',
+							code: 'INTERNAL_ERROR'
+						}
+					}
+				})
+			);
+		});
+
+		it('should return full context when requested', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('context-client', mockWs);
+
+			await contextWsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'context-client',
+				deviceName: 'Context Device'
+			});
+
+			const fullContext: TestContext = {
+				userId: 'context-user',
+				permissions: ['read', 'write', 'admin'],
+				timestamp: 1234567890
+			};
+
+			const request: WRPCRequest = {
+				kind: 'request',
+				id: 'full-context-test',
+				type: 'query',
+				path: 'getContextValue',
+				input: undefined
+			};
+
+			await contextWsHandler.handleMessage(mockWs as any, JSON.stringify(request), fullContext);
+
+			expect(mockWs.send).toHaveBeenCalledWith(
+				JSON.stringify({
+					kind: 'response',
+					id: 'full-context-test',
+					result: {
+						type: 'data',
+						data: fullContext
+					}
+				})
+			);
+		});
+
+		it('should handle empty context gracefully', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('empty-context-client', mockWs);
+
+			await contextWsHandler.handleConnection(mockWs as any, {
+				sessionId: 'test-session',
+				clientId: 'empty-context-client',
+				deviceName: 'Empty Context Device'
+			});
+
+			const emptyContext = {} as TestContext;
+
+			const request: WRPCRequest = {
+				kind: 'request',
+				id: 'empty-context-test',
+				type: 'query',
+				path: 'getContextValue',
+				input: undefined
+			};
+
+			await contextWsHandler.handleMessage(mockWs as any, JSON.stringify(request), emptyContext);
+
+			expect(mockWs.send).toHaveBeenCalledWith(
+				JSON.stringify({
+					kind: 'response',
+					id: 'empty-context-test',
+					result: {
+						type: 'data',
+						data: {}
+					}
+				})
+			);
+		});
+	});
 });

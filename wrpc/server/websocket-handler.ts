@@ -177,6 +177,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 
 					ws.send(JSON.stringify(response));
 				} catch (procedureError) {
+					// TODO: Add a way to get the error message from the procedure in debug mode
 					const error =
 						procedureError instanceof WRPCError ? procedureError : new WRPCError('Internal server error', 'INTERNAL_ERROR', procedureError);
 
