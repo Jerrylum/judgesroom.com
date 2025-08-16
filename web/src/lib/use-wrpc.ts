@@ -1,4 +1,4 @@
-import { createClientManager } from '@judging.jerryio/wrpc/client';
+import { createClientManager, type ConnectionState } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import type { ClientRouter } from './client-router';
 import { clientRouter } from './client-router';
@@ -28,7 +28,8 @@ const clientManager = createClientManager<ServerRouter, ClientRouter>(
 			wsUrl,
 			clientId,
 			sessionId,
-			deviceName
+			deviceName,
+			onContext: async () => ({})
 		};
 	},
 	clientRouter // Client-side procedure definitions
@@ -64,4 +65,8 @@ export function resetWRPCClient(): void {
  */
 export function isWRPCConnected(): boolean {
 	return clientManager.isConnected();
+}
+
+export function getWRPCConnectionState(): ConnectionState {
+	return clientManager.getConnectionState();
 }

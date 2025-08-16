@@ -1,77 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { EventGradeLevelSchema, EventNameSchema, EventSetupSchema, getEventGradeLevelOptions, type EventSetup } from './event.svelte';
 import { type CompetitionType } from '@judging.jerryio/protocol/src/award';
+import { EventGradeLevelSchema, EventNameSchema, EssentialDataSchema, type EssentialData } from '@judging.jerryio/protocol/src/event';
+import { uuidv4 } from '@judging.jerryio/protocol/src/utils';
+import { getEventGradeLevelOptions } from './event.svelte';
 
-describe('Event Schema Validation', () => {
-	describe('EventGradeLevelSchema', () => {
-		it('should validate valid event grade levels', () => {
-			const validGradeLevels = ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'];
-			validGradeLevels.forEach((gradeLevel) => {
-				expect(() => EventGradeLevelSchema.parse(gradeLevel)).not.toThrow();
-			});
-		});
-
-		it('should reject invalid event grade levels', () => {
-			const invalidGradeLevels = [
-				'',
-				'Elementary Only',
-				'Middle Only',
-				'High Only',
-				'es only',
-				'ES_Only',
-				'Mixed',
-				'All Grades',
-				'Elementary School',
-				'Middle School',
-				'High School',
-				'College'
-			];
-			invalidGradeLevels.forEach((gradeLevel) => {
-				expect(() => EventGradeLevelSchema.parse(gradeLevel)).toThrow();
-			});
-		});
-	});
-
-	describe('EventNameSchema', () => {
-		it('should validate valid event names', () => {
-			const validNames = [
-				'My Event',
-				'VEX Robotics Competition',
-				'A',
-				'State Championship 2024',
-				'Regional Tournament - Winter',
-				'Event #123',
-				'Competition_Name',
-				'Event.Name',
-				'Event/Name',
-				'Event-Name',
-				'Event Name with Many Words and Numbers 123'
-			];
-			validNames.forEach((name) => {
-				expect(() => EventNameSchema.parse(name)).not.toThrow();
-			});
-		});
-
-		it('should reject invalid event names', () => {
-			const invalidNames = [
-				'', // empty
-				' My Event', // leading space
-				'My Event ', // trailing space
-				' My Event ', // leading and trailing spaces
-				'A'.repeat(101), // too long (>100 chars)
-				'\tEvent', // leading tab
-				'Event\n', // trailing newline
-				'  ', // only spaces
-				'\t\n', // only whitespace
-				'Event\t', // trailing tab
-				'\nEvent' // leading newline
-			];
-			invalidNames.forEach((name) => {
-				expect(() => EventNameSchema.parse(name)).toThrow();
-			});
-		});
-	});
-
+describe('Event Grade Level Options', () => {
 	describe('V5RC Competition', () => {
 		it('should return correct grade level options for V5RC', () => {
 			const options = getEventGradeLevelOptions('V5RC');
@@ -235,7 +168,7 @@ describe('Integration Tests', () => {
 		expect(selectedGradeLevel?.grades).toEqual(['High School']);
 
 		// Create a complete event setup using the selected grade level
-		const eventSetup: EventSetup = {
+		const eventSetup: EssentialData = {
 			eventName: 'Regional Championship',
 			competitionType: 'V5RC',
 			eventGradeLevel: selectedGradeLevel!.value,
@@ -283,7 +216,7 @@ describe('Integration Tests', () => {
 		};
 
 		// Validate the complete event setup
-		expect(() => EventSetupSchema.parse(eventSetup)).not.toThrow();
+		expect(() => EssentialDataSchema.parse(eventSetup)).not.toThrow();
 
 		// Verify the event name validation
 		expect(() => EventNameSchema.parse(eventSetup.eventName)).not.toThrow();
@@ -300,7 +233,7 @@ describe('Integration Tests', () => {
 		expect(blendedOption).toBeDefined();
 		expect(blendedOption?.grades).toEqual(['Elementary School', 'Middle School']);
 
-		const eventSetup: EventSetup = {
+		const eventSetup: EssentialData = {
 			eventName: 'A',
 			competitionType: 'VIQRC',
 			eventGradeLevel: blendedOption!.value,
@@ -318,6 +251,6 @@ describe('Integration Tests', () => {
 			]
 		};
 
-		expect(() => EventSetupSchema.parse(eventSetup)).not.toThrow();
+		expect(() => EssentialDataSchema.parse(eventSetup)).not.toThrow();
 	});
 });

@@ -1,5 +1,5 @@
 import z from 'zod/v4';
-import { JudgeSchema } from './judging.svelte';
+import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 
 export const RoleSchema = z.enum(['judge', 'judge_advisor']);
 export type Role = z.infer<typeof RoleSchema>;
