@@ -76,7 +76,7 @@ class WRPCBuilder<TMeta extends object> {
 			/**
 			 * Builder object for creating procedures
 			 */
-			procedure: createBuilder<TMeta, never>({}),
+			procedure: createBuilder<TMeta, TContext, never>({}),
 			/**
 			 * Create a router
 			 */
