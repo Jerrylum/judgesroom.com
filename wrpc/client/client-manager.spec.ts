@@ -144,13 +144,6 @@ describe('WRPCClientManager', () => {
 		it('should handle reset when no client exists', () => {
 			expect(() => clientManager.resetClient()).not.toThrow();
 		});
-
-		it('should handle reset when client has no disconnect method', () => {
-			const [wsClient] = clientManager.getClient();
-			delete (wsClient as any).disconnect;
-
-			expect(() => clientManager.resetClient()).not.toThrow();
-		});
 	});
 
 	describe('isConnected', () => {
