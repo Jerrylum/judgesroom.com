@@ -1,6 +1,6 @@
 import type z from 'zod';
 import type { AnyProcedure, Procedure, ProcedureType } from './procedure';
-import type { AnyRouter } from './router';
+import type { AnyRouter, RouterRecord } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
 
 /**
@@ -39,23 +39,6 @@ export type TypeError<TMessage extends string> = TMessage & {
 	_: typeof _errorSymbol;
 };
 
-// Type inference helpers
-export type InferRouterInputs<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends Procedure<ProcedureType, infer TDef>
-		? TDef['input']
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? InferRouterInputs<TRouter['_def']['record'][K]>
-			: never;
-};
-
-export type InferRouterOutputs<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends Procedure<ProcedureType, infer TDef>
-		? TDef['output']
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? InferRouterOutputs<TRouter['_def']['record'][K]>
-			: never;
-};
-
 export type InferRouterContext<TRouter extends AnyRouter> = TRouter['_def']['_config']['context'];
 
 // Client types
@@ -90,16 +73,18 @@ export type InferClientType<TProcedure> = TProcedure extends {
 			: never
 	: never;
 
+export type InferRouterType<TRecord extends RouterRecord> = {
+	[K in keyof TRecord]: TRecord[K] extends AnyProcedure
+		? InferClientType<TRecord[K]>
+		: TRecord[K] extends RouterRecord
+			? InferRouterType<TRecord[K]>
+			: never;
+};
+
 /**
  * Client proxy type that mirrors the client router structure
  */
-export type RouterProxy<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
-		? InferClientType<TRouter['_def']['record'][K]>
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? RouterProxy<TRouter['_def']['record'][K]>
-			: never;
-};
+export type RouterProxy<TRouter extends AnyRouter> = InferRouterType<TRouter['_def']['record']>;
 
 export type InputOutputBroadcastFunction<TInput, TOutput> = (input: TInput) => Promise<TOutput[]>;
 
@@ -113,16 +98,18 @@ export type InferBroadcastClientType<TProcedure> = TProcedure extends {
 			: never
 	: never;
 
+export type InferRouterBroadcastType<TRecord extends RouterRecord> = {
+	[K in keyof TRecord]: TRecord[K] extends AnyProcedure
+		? InferBroadcastClientType<TRecord[K]>
+		: TRecord[K] extends RouterRecord
+			? InferRouterBroadcastType<TRecord[K]>
+			: never;
+};
+
 /**
  * Client proxy type that mirrors the client router structure
  */
-export type RouterBroadcastProxy<TRouter extends AnyRouter> = {
-	[K in keyof TRouter['_def']['record']]: TRouter['_def']['record'][K] extends AnyProcedure
-		? InferBroadcastClientType<TRouter['_def']['record'][K]>
-		: TRouter['_def']['record'][K] extends AnyRouter
-			? RouterBroadcastProxy<TRouter['_def']['record'][K]>
-			: never;
-};
+export type RouterBroadcastProxy<TRouter extends AnyRouter> = InferRouterBroadcastType<TRouter['_def']['record']>;
 
 /**
  * Network interface
