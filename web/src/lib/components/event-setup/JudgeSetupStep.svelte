@@ -1,18 +1,12 @@
 <script lang="ts">
-	import { Team, TeamList } from '$lib/teams.svelte';
-	import {
-		type Judge,
-		type JudgingMethod,
-		JudgeGroupClass,
-		randomlyAssignTeamsToGroups,
-		createJudgeFromString,
-		getJudgesInGroup
-	} from '$lib/judging.svelte';
 	import JudgeGroupComponent from './JudgeGroup.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
+	import { JudgeGroupClass, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
+	import { TeamList, type Team } from '$lib/team.svelte';
+	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
 		teams: Team[];
@@ -38,9 +32,7 @@
 	let selectedItems = $state(new TeamList());
 	let activeZoneId = $state('');
 
-	const allTeamsHaveSameGrade = $derived(
-		teamsProp.every((team) => team.grade === teamsProp[0].grade)
-	);
+	const allTeamsHaveSameGrade = $derived(teamsProp.every((team) => team.grade === teamsProp[0].grade));
 
 	const unassignedZoneId = 'unassigned-teams';
 
@@ -101,10 +93,7 @@
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
 				unassignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
-			} else if (
-				trigger === TRIGGERS.DROPPED_INTO_ZONE ||
-				trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY
-			) {
+			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
 					const idx = newItems.findIndex((item: Team) => item.id === id);
 					// to support arrow up when keyboard dragging
@@ -180,10 +169,7 @@
 			return judgeGroups.length > 0;
 		} else {
 			// For assigned method, all non-excluded teams must be assigned
-			const totalAssignedTeams = judgeGroups.reduce(
-				(sum, group) => sum + group.assignedTeams.length,
-				0
-			);
+			const totalAssignedTeams = judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0);
 			const totalActiveTeams = teamsProp.filter((team) => !team.excluded).length;
 			return totalAssignedTeams === totalActiveTeams;
 		}
@@ -209,9 +195,7 @@
 				/>
 				<div>
 					<div class="font-medium">Walk-in Judging</div>
-					<div class="text-sm text-gray-600">
-						Teams queue up and are assigned to judge groups randomly.
-					</div>
+					<div class="text-sm text-gray-600">Teams queue up and are assigned to judge groups randomly.</div>
 				</div>
 			</label>
 
@@ -227,8 +211,7 @@
 				<div>
 					<div class="font-medium">Pre-assigned Judging</div>
 					<div class="text-sm text-gray-600">
-						Teams are pre-assigned to specific judge groups. Judges find their assigned teams in
-						their team pits for interviews.
+						Teams are pre-assigned to specific judge groups. Judges find their assigned teams in their team pits for interviews.
 					</div>
 				</div>
 			</label>
@@ -242,9 +225,7 @@
 			<div class="flex items-center gap-2">
 				<button onclick={() => addJudgeGroup()} class="primary tiny">Add Group</button>
 				{#if judgingMethod === 'assigned'}
-					<button onclick={randomlyAssignTeams} class="primary tiny">
-						Randomly Assign Teams
-					</button>
+					<button onclick={randomlyAssignTeams} class="primary tiny"> Randomly Assign Teams </button>
 				{/if}
 			</div>
 		</div>
@@ -274,13 +255,9 @@
 			</h3>
 
 			{#if unassignedTeams.length > 0}
-				<div class="text-sm text-gray-600">
-					Drag and drop teams from here to judge groups. Right-click to select multiple teams.
-				</div>
+				<div class="text-sm text-gray-600">Drag and drop teams from here to judge groups. Right-click to select multiple teams.</div>
 			{:else}
-				<div class="rounded-lg bg-green-50 p-4 text-green-700">
-					✓ All active teams are assigned to judge groups
-				</div>
+				<div class="rounded-lg bg-green-50 p-4 text-green-700">✓ All active teams are assigned to judge groups</div>
 			{/if}
 
 			<div

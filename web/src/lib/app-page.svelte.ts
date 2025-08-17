@@ -175,14 +175,7 @@ class DialogController {
 // App State
 // ============================================================================
 
-export type AppPhase =
-	| 'loading'
-	| 'choose_action'
-	| 'event_setup'
-	| 'session_setup'
-	| 'joining_session'
-	| 'role_selection'
-	| 'workspace';
+export type AppPhase = 'loading' | 'choose_action' | 'event_setup' | 'session_setup' | 'joining_session' | 'role_selection' | 'workspace';
 
 export const AppUI = $state({
 	appPhase: 'loading'

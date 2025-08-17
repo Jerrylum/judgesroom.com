@@ -1,15 +1,8 @@
 <script lang="ts">
-	import {
-		Team,
-		parseTournamentManagerCSV,
-		parseNotebookData,
-		mergeTeamData,
-		groupTeamsByGroup,
-		TeamList
-	} from '$lib/teams.svelte';
 	import TeamGroup from './TeamGroup.svelte';
 	import EditTeamDialog from './EditTeamDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
+	import { Team, TeamList, groupTeamsByGroup, parseTournamentManagerCSV, parseNotebookData, mergeTeamData } from '$lib/team.svelte';
 
 	interface Props {
 		teams: Team[];
@@ -51,9 +44,7 @@
 		const groupedWithIds: Record<string, Team[]> = {};
 
 		Object.entries(grouped).forEach(([groupName, teamList]) => {
-			groupedWithIds[groupName] = teamList.map((team, index) =>
-				Object.assign(team, { id: `${team.number}-${index}` })
-			);
+			groupedWithIds[groupName] = teamList.map((team, index) => Object.assign(team, { id: `${team.number}-${index}` }));
 		});
 
 		return groupedWithIds;
@@ -129,15 +120,9 @@
 
 	function createNewGroup() {
 		const trimmedName = newGroupName.trim();
-		const hasLeadingTrailingWhitespace =
-			newGroupName.length > 0 && newGroupName !== newGroupName.trim();
+		const hasLeadingTrailingWhitespace = newGroupName.length > 0 && newGroupName !== newGroupName.trim();
 
-		if (
-			trimmedName &&
-			!hasLeadingTrailingWhitespace &&
-			trimmedName.length <= 100 &&
-			!teamGroups[trimmedName]
-		) {
+		if (trimmedName && !hasLeadingTrailingWhitespace && trimmedName.length <= 100 && !teamGroups[trimmedName]) {
 			teamGroups[trimmedName] = [];
 			newGroupName = '';
 		}
@@ -178,8 +163,7 @@
 		<div class="space-y-4">
 			<h3 class="text-lg font-medium text-gray-800">1. Tournament Manager Data</h3>
 			<p class="h-14 text-sm text-gray-600">
-				Download CSV from RobotEvents → Event Admin → "Downloads & Links" → "Download Tournament
-				Manager Import Data"
+				Download CSV from RobotEvents → Event Admin → "Downloads & Links" → "Download Tournament Manager Import Data"
 			</p>
 
 			<div
@@ -194,12 +178,7 @@
 				tabindex="-1"
 			>
 				<div class="">
-					<svg
-						class="mx-auto h-12 w-12 text-gray-400"
-						stroke="currentColor"
-						fill="none"
-						viewBox="0 0 48 48"
-					>
+					<svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
 						<path
 							d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
 							stroke-width="2"
@@ -222,13 +201,7 @@
 				</div>
 			</div>
 
-			<input
-				bind:this={fileInput}
-				type="file"
-				accept=".csv"
-				onchange={handleFileSelect}
-				class="hidden"
-			/>
+			<input bind:this={fileInput} type="file" accept=".csv" onchange={handleFileSelect} class="hidden" />
 
 			{#if csvContent}
 				<div class="rounded bg-green-50 p-2 text-sm text-green-600">✓ CSV file loaded</div>
@@ -239,9 +212,8 @@
 		<div class="space-y-4">
 			<h3 class="text-lg font-medium text-gray-800">2. Digital Engineering Notebooks (Optional)</h3>
 			<p class="h-14 text-sm text-gray-600">
-				Download the Excel file from RobotEvents → Event Admin → "Downloads & Links" → "Download
-				Digital Engineering Notebook Links report". Select all data in the Excel file (Ctrl+A) and
-				paste it here
+				Download the Excel file from RobotEvents → Event Admin → "Downloads & Links" → "Download Digital Engineering Notebook Links report".
+				Select all data in the Excel file (Ctrl+A) and paste it here
 			</p>
 
 			<div class="mb-4 h-40 w-full">
@@ -260,9 +232,7 @@
 
 	<!-- Process Button -->
 	<div class="flex justify-center">
-		<button onclick={processTeamData} disabled={!csvContent.trim()} class="primary">
-			Import Teams
-		</button>
+		<button onclick={processTeamData} disabled={!csvContent.trim()} class="primary"> Import Teams </button>
 	</div>
 
 	<!-- Status Messages -->
@@ -284,22 +254,14 @@
 			<div class="flex items-center justify-between">
 				<h3 class="text-lg font-medium text-gray-800">Team Groups</h3>
 				<div class="flex items-center gap-2">
-					<input
-						type="text"
-						bind:value={newGroupName}
-						placeholder="New group name"
-						maxlength="100"
-						class="classic"
-					/>
-					<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny">
-						Create Group
-					</button>
+					<input type="text" bind:value={newGroupName} placeholder="New group name" maxlength="100" class="classic" />
+					<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny"> Create Group </button>
 				</div>
 			</div>
 
 			<p class="h-7 text-sm text-gray-600">
-				Drag and drop teams between groups to organize them. Right click to select multiple teams.
-				Team groups are useful when determining the final ranking of award winners.
+				Drag and drop teams between groups to organize them. Right click to select multiple teams. Team groups are useful when determining
+				the final ranking of award winners.
 			</p>
 
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">

@@ -202,7 +202,11 @@ describe('Integration Tests', () => {
 					shortName: 'TT',
 					school: 'Test School',
 					grade: 'High School',
-					group: '123'
+					group: '123',
+					data: {
+						notebookLink: '',
+						excluded: false
+					}
 				}
 			],
 			judgingMethod: 'assigned',

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AwardOptions } from '$lib/awards.svelte';
+	import type { AwardOptions } from '$lib/award.svelte';
 
 	type AwardOptionsWithId = AwardOptions & { id: string };
 
@@ -50,11 +50,7 @@
 		<div class="flex flex-1 items-center justify-between gap-4">
 			<!-- Left side: Large checkbox -->
 			<label class="flex cursor-pointer items-center">
-				<input
-					type="checkbox"
-					bind:checked={award.isSelected}
-					class="h-5 w-5 rounded border-gray-300 {colors.checkbox}"
-				/>
+				<input type="checkbox" bind:checked={award.isSelected} class="h-5 w-5 rounded border-gray-300 {colors.checkbox}" />
 				<span class="sr-only">Select {award.name} award</span>
 			</label>
 

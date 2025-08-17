@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Team, TeamList } from '$lib/teams.svelte';
 	import { dndzone, TRIGGERS, SOURCES } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
@@ -7,6 +6,7 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import { TeamList, type Team } from '$lib/team.svelte';
 
 	interface Props {
 		groupName: string;
@@ -85,10 +85,7 @@
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
 				teamList = newItems.filter((item: Team) => !selectedItems.includes(item.id));
-			} else if (
-				trigger === TRIGGERS.DROPPED_INTO_ZONE ||
-				trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY
-			) {
+			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
 					const idx = newItems.findIndex((item: Team) => item.id === id);
 					// to support arrow up when keyboard dragging
@@ -140,15 +137,9 @@
 
 	function saveGroupName() {
 		const newName = editedGroupName.trim();
-		const hasLeadingTrailingWhitespace =
-			editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
+		const hasLeadingTrailingWhitespace = editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
 
-		if (
-			newName &&
-			newName !== groupName &&
-			!hasLeadingTrailingWhitespace &&
-			newName.length <= 100
-		) {
+		if (newName && newName !== groupName && !hasLeadingTrailingWhitespace && newName.length <= 100) {
 			const success = onRenameGroup(groupName, newName);
 			if (success) {
 				isEditingName = false;
@@ -177,26 +168,11 @@
 	<div class="mb-3 flex items-center justify-between">
 		{#if isEditingName}
 			<div class="flex items-center gap-2">
-				<input
-					type="text"
-					bind:value={editedGroupName}
-					bind:this={nameInput}
-					onkeydown={handleKeydown}
-					maxlength="100"
-					class="classic"
-				/>
-				<button
-					onclick={saveGroupName}
-					class="text-sm text-green-600 hover:text-green-800"
-					title="Save"
-				>
+				<input type="text" bind:value={editedGroupName} bind:this={nameInput} onkeydown={handleKeydown} maxlength="100" class="classic" />
+				<button onclick={saveGroupName} class="text-sm text-green-600 hover:text-green-800" title="Save">
 					<CheckIcon size={24} />
 				</button>
-				<button
-					onclick={cancelEditingName}
-					class="text-sm text-red-600 hover:text-red-800"
-					title="Cancel"
-				>
+				<button onclick={cancelEditingName} class="text-sm text-red-600 hover:text-red-800" title="Cancel">
 					<CloseIcon size={24} />
 				</button>
 			</div>
@@ -215,9 +191,7 @@
 		{/if}
 
 		{#if teamList.length === 0}
-			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800">
-				Delete
-			</button>
+			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800"> Delete </button>
 		{/if}
 	</div>
 

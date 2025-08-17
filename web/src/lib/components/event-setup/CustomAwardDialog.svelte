@@ -1,14 +1,8 @@
 <script lang="ts">
-	import {
-		type AwardType,
-		type CompetitionType,
-		type Grade,
-		AwardOptions,
-		AwardTypeSchema,
-		createCustomAwardOptions
-	} from '$lib/awards.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
+	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import { type CompetitionType, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
 
 	type AwardOptionsWithId = AwardOptions & { id: string };
 
@@ -53,15 +47,12 @@
 	// Validate custom award form (pure function, no state mutation)
 	function canSubmitCustomAward() {
 		const hasName = customAwardName.trim().length > 0;
-		const hasLeadingTrailingWhitespace =
-			customAwardName.length > 0 && customAwardName !== customAwardName.trim();
+		const hasLeadingTrailingWhitespace = customAwardName.length > 0 && customAwardName !== customAwardName.trim();
 		const hasGrades = customAwardGrades.length > 0;
 		const hasValidWinners = customAwardWinners > 0 && customAwardWinners <= 10000;
 		const isNameTooLong = customAwardName.trim().length > 100;
 
-		return (
-			hasName && !hasLeadingTrailingWhitespace && !isNameTooLong && hasGrades && hasValidWinners
-		);
+		return hasName && !hasLeadingTrailingWhitespace && !isNameTooLong && hasGrades && hasValidWinners;
 	}
 
 	// Update error message reactively (only after user interaction)
@@ -72,8 +63,7 @@
 		}
 
 		const hasName = customAwardName.trim().length > 0;
-		const hasLeadingTrailingWhitespace =
-			customAwardName.length > 0 && customAwardName !== customAwardName.trim();
+		const hasLeadingTrailingWhitespace = customAwardName.length > 0 && customAwardName !== customAwardName.trim();
 		const hasGrades = customAwardGrades.length > 0;
 
 		if (!hasName) {
@@ -135,9 +125,7 @@
 
 	<div class="space-y-4">
 		<div>
-			<label for="custom-award-name" class="mb-2 block text-sm font-medium text-gray-700"
-				>Award Name</label
-			>
+			<label for="custom-award-name" class="mb-2 block text-sm font-medium text-gray-700">Award Name</label>
 			<input
 				id="custom-award-name"
 				type="text"
@@ -151,15 +139,8 @@
 		</div>
 
 		<div>
-			<label for="custom-award-type" class="mb-2 block text-sm font-medium text-gray-700"
-				>Award Type</label
-			>
-			<select
-				id="custom-award-type"
-				bind:value={customAwardType}
-				onchange={() => (hasUserInteracted = true)}
-				class="classic block w-full"
-			>
+			<label for="custom-award-type" class="mb-2 block text-sm font-medium text-gray-700">Award Type</label>
+			<select id="custom-award-type" bind:value={customAwardType} onchange={() => (hasUserInteracted = true)} class="classic block w-full">
 				{#each AwardTypeSchema.options as type (type)}
 					<option value={type}>{type.replace('_', ' ')}</option>
 				{/each}
@@ -176,9 +157,7 @@
 				/>
 				<span class="text-sm font-medium text-gray-700">Require Notebook</span>
 			</label>
-			<p class="mt-1 text-xs text-gray-500">
-				Check if this award requires teams to have a notebook
-			</p>
+			<p class="mt-1 text-xs text-gray-500">Check if this award requires teams to have a notebook</p>
 		</div>
 
 		<fieldset>
@@ -199,9 +178,7 @@
 		</fieldset>
 
 		<div>
-			<label for="custom-award-winners" class="mb-2 block text-sm font-medium text-gray-700"
-				>Number of Winners</label
-			>
+			<label for="custom-award-winners" class="mb-2 block text-sm font-medium text-gray-700">Number of Winners</label>
 			<input
 				id="custom-award-winners"
 				type="number"

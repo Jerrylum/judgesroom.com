@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Team } from '$lib/teams.svelte';
-	import { GradeSchema } from '$lib/awards.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import type { Team } from '$lib/team.svelte';
+	import { GradeSchema } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
 		team: Team;
@@ -76,16 +76,8 @@
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<div>
-			<label for="team-number" class="mb-1 block text-sm font-medium text-gray-700"
-				>Team Number</label
-			>
-			<input
-				id="team-number"
-				type="text"
-				value={editedTeam.number}
-				disabled
-				class="classic block w-full"
-			/>
+			<label for="team-number" class="mb-1 block text-sm font-medium text-gray-700">Team Number</label>
+			<input id="team-number" type="text" value={editedTeam.number} disabled class="classic block w-full" />
 		</div>
 
 		<div>
@@ -95,12 +87,7 @@
 
 		<div>
 			<label for="team-school" class="mb-1 block text-sm font-medium text-gray-700">School</label>
-			<input
-				id="team-school"
-				type="text"
-				bind:value={editedTeam.school}
-				class="classic block w-full"
-			/>
+			<input id="team-school" type="text" bind:value={editedTeam.school} class="classic block w-full" />
 		</div>
 
 		<div>
@@ -113,9 +100,7 @@
 		</div>
 
 		<div class="md:col-span-2">
-			<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700"
-				>Notebook Link</label
-			>
+			<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700">Notebook Link</label>
 			<input
 				id="team-notebook-link"
 				type="url"
@@ -127,11 +112,7 @@
 
 		<div class="md:col-span-2">
 			<label class="flex items-center">
-				<input
-					type="checkbox"
-					bind:checked={editedTeam.excluded}
-					class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500"
-				/>
+				<input type="checkbox" bind:checked={editedTeam.excluded} class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" />
 				<span class="text-sm text-gray-700">Exclude this team from judging</span>
 			</label>
 		</div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Team, TeamList } from '$lib/teams.svelte';
 	import { JudgeGroupClass, parseJudgeNamesFromInput } from '$lib/judging.svelte';
 	import { dndzone, TRIGGERS, SOURCES } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
@@ -8,6 +7,7 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import { TeamList, type Team } from '$lib/team.svelte';
 
 	interface Props {
 		judgeGroup: JudgeGroupClass;
@@ -72,9 +72,7 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						judgeGroup.assignedTeams = newItems.filter(
-							(item: Team) => !selectedItems.includes(item.id)
-						);
+						judgeGroup.assignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
 					});
 				} else {
 					selectedItems = new TeamList();
@@ -94,13 +92,8 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				judgeGroup.assignedTeams = newItems.filter(
-					(item: Team) => !selectedItems.includes(item.id)
-				);
-			} else if (
-				trigger === TRIGGERS.DROPPED_INTO_ZONE ||
-				trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY
-			) {
+				judgeGroup.assignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
 					const idx = newItems.findIndex((item: Team) => item.id === id);
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
@@ -143,8 +136,7 @@
 
 	function saveGroupName() {
 		const newName = editedGroupName.trim();
-		const hasLeadingTrailingWhitespace =
-			editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
+		const hasLeadingTrailingWhitespace = editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
 
 		if (newName && !hasLeadingTrailingWhitespace && newName.length <= 100) {
 			judgeGroup.name = newName;
@@ -242,40 +234,24 @@
 					maxlength="100"
 					class="classic"
 				/>
-				<button
-					onclick={saveGroupName}
-					class="text-sm text-green-600 hover:text-green-800"
-					title="Save"
-				>
+				<button onclick={saveGroupName} class="text-sm text-green-600 hover:text-green-800" title="Save">
 					<CheckIcon size={20} />
 				</button>
-				<button
-					onclick={cancelEditingName}
-					class="text-sm text-red-600 hover:text-red-800"
-					title="Cancel"
-				>
+				<button onclick={cancelEditingName} class="text-sm text-red-600 hover:text-red-800" title="Cancel">
 					<CloseIcon size={20} />
 				</button>
 			</div>
 		{:else}
 			<div class="flex items-center gap-2">
 				<h4 class="font-medium text-gray-900">{judgeGroup.name}</h4>
-				<button
-					onclick={startEditingName}
-					class="text-sm text-gray-500 hover:text-gray-700"
-					title="Rename group"
-				>
+				<button onclick={startEditingName} class="text-sm text-gray-500 hover:text-gray-700" title="Rename group">
 					<EditIcon size={16} />
 				</button>
 			</div>
 		{/if}
 
 		{#if !isEditingName}
-			<button
-				onclick={deleteGroup}
-				class="text-sm text-red-600 hover:text-red-800"
-				title="Delete group (only if empty)"
-			>
+			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800" title="Delete group (only if empty)">
 				<CloseIcon size={20} />
 			</button>
 		{/if}
@@ -293,12 +269,7 @@
 					aria-label={`Add judge to ${judgeGroup.name}`}
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 4v16m8-8H4"
-						/>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
 					</svg>
 				</button>
 			{/if}
@@ -308,11 +279,7 @@
 			{#each judges as judge (judge.id)}
 				<div class="flex items-center justify-between rounded bg-white px-2 py-1 text-sm">
 					<span>{judge.name}</span>
-					<button
-						onclick={() => removeJudge(judge.id)}
-						class="text-red-600 hover:text-red-800"
-						title="Remove judge"
-					>
+					<button onclick={() => removeJudge(judge.id)} class="text-red-600 hover:text-red-800" title="Remove judge">
 						<CloseIcon size={16} />
 					</button>
 				</div>
@@ -330,18 +297,10 @@
 						maxlength="100"
 						class="flex-1 border-none bg-transparent text-sm focus:outline-none"
 					/>
-					<button
-						onclick={addJudges}
-						class="text-green-600 hover:text-green-800"
-						title="Add judges"
-					>
+					<button onclick={addJudges} class="text-green-600 hover:text-green-800" title="Add judges">
 						<CheckIcon size={16} />
 					</button>
-					<button
-						onclick={cancelAddingJudge}
-						class="text-red-600 hover:text-red-800"
-						title="Cancel"
-					>
+					<button onclick={cancelAddingJudge} class="text-red-600 hover:text-red-800" title="Cancel">
 						<CloseIcon size={16} />
 					</button>
 				</div>
@@ -382,9 +341,7 @@
 				</div>
 
 				{#if judgeGroup.assignedTeams.length === 0}
-					<div
-						class="absolute top-0 left-0 flex h-[120px] w-full items-center justify-center text-gray-500"
-					>
+					<div class="absolute top-0 left-0 flex h-[120px] w-full items-center justify-center text-gray-500">
 						<p class="text-sm">Drop teams here</p>
 					</div>
 				{/if}

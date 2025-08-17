@@ -124,11 +124,7 @@
 	<div class="flex flex-col overflow-auto p-2">
 		<div class="mb-4 flex items-center justify-between">
 			<h3 id="share-dialog-title" class="text-lg font-medium text-gray-900">Session Management</h3>
-			<button
-				onclick={handleClose}
-				class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-				aria-label="Close dialog"
-			>
+			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close dialog">
 				<CloseIcon size={24} />
 			</button>
 		</div>
@@ -154,17 +150,9 @@
 
 				<!-- URL Section -->
 				<div>
-					<label for="session-url" class="mb-2 block text-sm font-medium text-gray-700">
-						Session Link
-					</label>
+					<label for="session-url" class="mb-2 block text-sm font-medium text-gray-700"> Session Link </label>
 					<div class="flex items-center space-x-2">
-						<input
-							id="session-url"
-							type="text"
-							value={shareableUrl}
-							readonly
-							class="classic flex-1"
-						/>
+						<input id="session-url" type="text" value={shareableUrl} readonly class="classic flex-1" />
 						<button onclick={copyShareUrl} class="primary tiny">
 							{copyButtonText}
 						</button>
@@ -194,9 +182,7 @@
 							<DenialIcon />
 							<div>
 								<h5 class="font-medium">Connection Error</h5>
-								<p class="text-sm">
-									You are disconnected from the server. This may be due to a network issue.
-								</p>
+								<p class="text-sm">You are disconnected from the server. This may be due to a network issue.</p>
 							</div>
 						</div>
 					</div>

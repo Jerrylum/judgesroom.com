@@ -7,7 +7,20 @@
 	async function createSession() {
 		try {
 			isCreatingSession = true;
-			await app.createSession();
+
+			// Get event setup data from app's essential data
+			const essentialData = app.getEssentialData();
+			if (!essentialData) {
+				throw new Error('No event setup data available. Please complete event setup first.');
+			}
+
+			await app.createSession(
+				essentialData.eventName,
+				essentialData.competitionType,
+				essentialData.eventGradeLevel,
+				essentialData.judgingMethod
+			);
+
 			// For Judge Advisor who created the session, auto-select role and show share dialog
 			app.selectUser({ role: 'judge_advisor' });
 			AppUI.appPhase = 'workspace';
@@ -65,15 +78,8 @@
 				<!-- Online Collaboration Option -->
 				<div class="rounded-lg border-2 border-emerald-200 bg-emerald-50 p-6">
 					<div class="text-center">
-						<div
-							class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100"
-						>
-							<svg
-								class="h-6 w-6 text-emerald-600"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
+						<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+							<svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									stroke-linecap="round"
 									stroke-linejoin="round"
@@ -84,8 +90,7 @@
 						</div>
 						<h3 class="text-lg font-medium text-gray-900">Online Collaboration</h3>
 						<p class="mt-2 text-sm text-gray-600">
-							Create a secure session for multiple judges to collaborate in real-time. All data is
-							end-to-end encrypted.
+							Create a secure session for multiple judges to collaborate in real-time. All data is end-to-end encrypted.
 						</p>
 
 						<!-- Create session button -->

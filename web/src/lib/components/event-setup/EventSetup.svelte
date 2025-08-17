@@ -1,12 +1,4 @@
 <script lang="ts">
-	import {
-		type AwardOptions,
-		getOfficialAwardOptionsList,
-		type CompetitionType
-	} from '$lib/awards.svelte';
-	import { type EventGradeLevel, getEventGradeLevelOptions } from '$lib/event.svelte';
-	import { Team } from '$lib/teams.svelte';
-	import { type JudgingMethod, JudgeGroupClass, type Judge } from '$lib/judging.svelte';
 	import CompetitionSetupStep from './CompetitionSetupStep.svelte';
 	import AwardSelectionStep from './AwardSelectionStep.svelte';
 	import TeamImportStep from './TeamImportStep.svelte';
@@ -14,6 +6,13 @@
 	import ReviewStep from './ReviewStep.svelte';
 	import { untrack, onMount, onDestroy } from 'svelte';
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
+	import { AwardOptions, getOfficialAwardOptionsList } from '$lib/award.svelte';
+	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import { JudgeGroupClass } from '$lib/judging.svelte';
+	import { Team } from '$lib/team.svelte';
+	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	// Extended AwardOptions type for drag and drop
 	type AwardOptionsWithId = AwardOptions & { id: string };
@@ -43,9 +42,7 @@
 
 	// Get current grades based on selection - this is computed in CompetitionSetupStep now
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
-	const possibleGrades = $derived(
-		gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []
-	);
+	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 
 	// Hash comparison for conflict detection
 	let originalEventSetupHash: string | null = null;
@@ -90,9 +87,20 @@
 			selectedEventGradeLevel = eventSetup.eventGradeLevel;
 
 			// Load teams
-			const allTeamData = app.getAllTeamData();
-			teams = eventSetup.teams.map((teamInfo) => {
-				const teamData = allTeamData[teamInfo.number] || { notebookLink: '', excluded: false };
+			teams = eventSetup.teams.map((teamWithData) => {
+				const teamInfo = {
+					id: teamWithData.id,
+					number: teamWithData.number,
+					name: teamWithData.name,
+					city: teamWithData.city,
+					state: teamWithData.state,
+					country: teamWithData.country,
+					shortName: teamWithData.shortName,
+					school: teamWithData.school,
+					grade: teamWithData.grade,
+					group: teamWithData.group
+				};
+				const teamData = teamWithData.data;
 				return new Team(teamInfo, teamData);
 			});
 
@@ -102,9 +110,7 @@
 				const judgeGroup = new JudgeGroupClass(group.name);
 				// Copy the properties instead of setting id directly
 				Object.assign(judgeGroup, { id: group.id });
-				judgeGroup.assignedTeams = group.assignedTeams
-					.map((teamNumber) => teams.find((t) => t.number === teamNumber)!)
-					.filter(Boolean);
+				judgeGroup.assignedTeams = group.assignedTeams.map((teamNumber) => teams.find((t) => t.number === teamNumber)!).filter(Boolean);
 				return judgeGroup;
 			});
 
@@ -112,12 +118,8 @@
 			judges = [...allJudges];
 
 			// Update unassigned teams
-			const assignedTeamNumbers = new Set(
-				judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.number))
-			);
-			unassignedTeams = teams.filter(
-				(team) => !team.excluded && !assignedTeamNumbers.has(team.number)
-			);
+			const assignedTeamNumbers = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.number)));
+			unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeamNumbers.has(team.number));
 		}
 	}
 
@@ -182,7 +184,7 @@
 						...award.generateAward(),
 						type: 'volunteer_nominated' as const
 					})),
-				teams: teams.map((team) => team.info),
+				teams: teams.map((team) => ({ ...team.info, data: team.data })),
 				judgingMethod,
 				judgeGroups: judgeGroups.map((group) => ({
 					id: group.id,
@@ -249,9 +251,7 @@
 			(async () => {
 				const currentHash = await generateEventSetupHash(currentAppEventSetup);
 				if (currentHash && currentHash !== originalEventSetupHash) {
-					app.addErrorNotice(
-						'Event setup has been modified on another device. Your changes may conflict.'
-					);
+					app.addErrorNotice('Event setup has been modified on another device. Your changes may conflict.');
 				}
 			})();
 		}
@@ -272,10 +272,7 @@
 				.map((award, index) => Object.assign(award, { id: `judged-${index}` }));
 
 			volunteerNominatedAwards = officialAwards
-				.filter(
-					(award) =>
-						!award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
-				)
+				.filter((award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged'))
 				.map((award, index) => Object.assign(award, { id: `vol-${index}` }));
 		}
 	});
@@ -323,12 +320,7 @@
 	<!-- Step Content -->
 	<div class="rounded-lg bg-white p-6 shadow-lg">
 		{#if currentStep === 1}
-			<CompetitionSetupStep
-				bind:eventName
-				bind:selectedCompetitionType
-				bind:selectedEventGradeLevel
-				onNext={nextStep}
-			/>
+			<CompetitionSetupStep bind:eventName bind:selectedCompetitionType bind:selectedEventGradeLevel onNext={nextStep} />
 		{:else if currentStep === 2}
 			<AwardSelectionStep
 				{selectedCompetitionType}
@@ -342,15 +334,7 @@
 		{:else if currentStep === 3}
 			<TeamImportStep bind:teams onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 4}
-			<JudgeSetupStep
-				{teams}
-				bind:judgingMethod
-				bind:judgeGroups
-				bind:judges
-				bind:unassignedTeams
-				onNext={nextStep}
-				onPrev={prevStep}
-			/>
+			<JudgeSetupStep {teams} bind:judgingMethod bind:judgeGroups bind:judges bind:unassignedTeams onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 5}
 			<ReviewStep
 				{selectedCompetitionType}

@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { groupTeamsByGroup, type Team } from '$lib/teams.svelte';
-	import type { AwardOptions, CompetitionType } from '$lib/awards.svelte';
-	import type { EventGradeLevel } from '$lib/event.svelte';
-	import { type JudgingMethod, type JudgeGroupClass } from '$lib/judging.svelte';
+	import type { AwardOptions } from '$lib/award.svelte';
+	import type { JudgeGroupClass } from '$lib/judging.svelte';
+	import { Team, groupTeamsByGroup } from '$lib/team.svelte';
+	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
 
 	type AwardOptionsWithId = AwardOptions & { id: string };
 
@@ -62,9 +64,7 @@
 		<div class="rounded-lg bg-gray-50 p-4">
 			<h3 class="mb-2 font-medium text-gray-900">Selected Awards</h3>
 			<p class="text-sm text-gray-600">
-				Performance: <span class="font-medium"
-					>{performanceAwards.filter((a) => a.isSelected).length}</span
-				>
+				Performance: <span class="font-medium">{performanceAwards.filter((a) => a.isSelected).length}</span>
 				of {performanceAwards.length}
 			</p>
 			<p class="text-sm text-gray-600">
@@ -72,9 +72,7 @@
 				of {judgedAwards.length}
 			</p>
 			<p class="text-sm text-gray-600">
-				Volunteer Nominated: <span class="font-medium"
-					>{volunteerNominatedAwards.filter((a) => a.isSelected).length}</span
-				>
+				Volunteer Nominated: <span class="font-medium">{volunteerNominatedAwards.filter((a) => a.isSelected).length}</span>
 				of {volunteerNominatedAwards.length}
 			</p>
 		</div>
@@ -82,9 +80,7 @@
 		<div class="rounded-lg bg-gray-50 p-4">
 			<h3 class="mb-2 font-medium text-gray-900">Judging Setup</h3>
 			<p class="text-sm text-gray-600">
-				Method: <span class="font-medium"
-					>{judgingMethod === 'walk_in' ? 'Walk-in' : 'Pre-assigned'}</span
-				>
+				Method: <span class="font-medium">{judgingMethod === 'walk_in' ? 'Walk-in' : 'Pre-assigned'}</span>
 			</p>
 			<p class="text-sm text-gray-600">
 				Judge Groups: <span class="font-medium">{judgeGroups.length}</span>
@@ -94,9 +90,7 @@
 			</p>
 			{#if judgingMethod === 'assigned'}
 				<p class="text-sm text-gray-600">
-					Assigned Teams: <span class="font-medium"
-						>{judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0)}</span
-					>
+					Assigned Teams: <span class="font-medium">{judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0)}</span>
 				</p>
 			{/if}
 		</div>
@@ -106,10 +100,7 @@
 		<div class="flex space-x-3">
 			<button onclick={onPrev} class="secondary"> Back </button>
 			{#if isInSession}
-				<button
-					onclick={onCancel}
-					class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-				>
+				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
 					Cancel
 				</button>
 			{/if}

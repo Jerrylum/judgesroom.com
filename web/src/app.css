@@ -1,1 +1,40 @@
 @import 'tailwindcss';
+
+button {
+	@apply cursor-pointer;
+}
+
+button.primary {
+	@apply rounded-md bg-slate-900 px-6 py-3 font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-gray-400;
+}
+
+button.secondary {
+	@apply rounded-md bg-gray-500 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-600;
+}
+
+button.cancel {
+	@apply rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200;
+}
+
+button.success {
+	@apply rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700;
+}
+
+button.danger {
+	@apply rounded-md bg-red-600 px-6 py-3 font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400;
+}
+
+button.primary.tiny {
+	@apply rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-gray-400;
+}
+
+button.tiny {
+	@apply px-4 py-2 text-sm;
+}
+
+input.classic[type='text'],
+input.classic[type='number'],
+input.classic[type='url'],
+select.classic {
+	@apply min-h-10 rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900;
+}

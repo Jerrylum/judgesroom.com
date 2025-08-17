@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Team } from '$lib/teams.svelte';
+	import type { Team } from '$lib/team.svelte';
 
 	interface Props {
 		team: Team;

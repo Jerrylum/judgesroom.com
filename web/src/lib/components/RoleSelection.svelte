@@ -80,9 +80,7 @@
 		<div class="space-y-6">
 			<div class="text-center">
 				<h2 class="text-2xl font-semibold text-gray-900">Select Your Role</h2>
-				<p class="mt-2 text-gray-600">
-					Choose your identity to start participating in the judging session.
-				</p>
+				<p class="mt-2 text-gray-600">Choose your identity to start participating in the judging session.</p>
 
 				{#if connectionState !== 'offline'}
 					<div class="mt-2 text-sm">
@@ -90,8 +88,7 @@
 						<span
 							class="font-medium"
 							class:text-green-600={connectionState === 'connected'}
-							class:text-yellow-600={connectionState === 'connecting' ||
-								connectionState === 'reconnecting'}
+							class:text-yellow-600={connectionState === 'connecting' || connectionState === 'reconnecting'}
 							class:text-red-600={connectionState === 'error'}
 						>
 							{connectionState}
@@ -148,9 +145,7 @@
 								/>
 								<div>
 									<div class="font-medium text-gray-900">Judge Advisor</div>
-									<div class="text-sm text-gray-500">
-										Manage the judging session and oversee judges
-									</div>
+									<div class="text-sm text-gray-500">Manage the judging session and oversee judges</div>
 								</div>
 							</label>
 						</div>
@@ -235,9 +230,7 @@
 								<div class="space-y-4">
 									<div class="space-y-4">
 										<div>
-											<label for="judgeName" class="block text-sm font-medium text-gray-700">
-												Your Name
-											</label>
+											<label for="judgeName" class="block text-sm font-medium text-gray-700"> Your Name </label>
 											<input
 												id="judgeName"
 												type="text"
@@ -248,14 +241,8 @@
 										</div>
 
 										<div>
-											<label for="judgeGroup" class="block text-sm font-medium text-gray-700">
-												Judge Group
-											</label>
-											<select
-												id="judgeGroup"
-												bind:value={selectedJudgeGroupId}
-												class="classic mt-1 block w-full"
-											>
+											<label for="judgeGroup" class="block text-sm font-medium text-gray-700"> Judge Group </label>
+											<select id="judgeGroup" bind:value={selectedJudgeGroupId} class="classic mt-1 block w-full">
 												{#each judgeGroups as group (group.id)}
 													<option value={group.id}>{group.name}</option>
 												{/each}
@@ -281,8 +268,7 @@
 							<div class="rounded-lg border bg-indigo-50 p-4 text-center">
 								<h4 class="font-medium text-gray-900">Judge Advisor</h4>
 								<p class="mt-2 text-sm text-gray-600">
-									As a Judge Advisor, you can manage the judging session, oversee all judges, and
-									access all judging data.
+									As a Judge Advisor, you can manage the judging session, oversee all judges, and access all judging data.
 								</p>
 								<div class="mt-4">
 									<button

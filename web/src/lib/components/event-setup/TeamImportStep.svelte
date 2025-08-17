@@ -1,6 +1,6 @@
 <script lang="ts">
+	import type { Team } from '$lib/team.svelte';
 	import TeamImport from './TeamImport.svelte';
-	import { Team } from '$lib/teams.svelte';
 
 	interface Props {
 		teams: Team[];

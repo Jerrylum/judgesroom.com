@@ -32,10 +32,10 @@
 
 		try {
 			isDestroying = true;
-			
+
 			// Destroy all app data
 			app.destroySessionData();
-			
+
 			// Close dialog and go to choose action
 			dialogs.closeDialog(true);
 			AppUI.appPhase = 'choose_action';
@@ -57,8 +57,8 @@
 		<div>
 			<h3 class="text-lg font-semibold text-gray-900">Destroy Judging Data</h3>
 			<p class="mt-2 text-sm text-gray-600">
-				Prior to the award ceremony, the Judge Advisor should secure the Judges' Room and destroy 
-				all judging materials. These items are not to be given to the Event Partner for destruction.
+				Prior to the award ceremony, the Judge Advisor should secure the Judges' Room and destroy all judging materials. These items are not
+				to be given to the Event Partner for destruction.
 			</p>
 		</div>
 
@@ -78,9 +78,8 @@
 					<h3 class="text-sm font-medium text-red-800">Warning</h3>
 					<div class="mt-2 text-sm text-red-700">
 						<p>
-							This action will permanently destroy all judging data including team evaluations, 
-							rankings, and notes. Make sure all connected devices have completed judging and 
-							all data has been properly collected before proceeding.
+							This action will permanently destroy all judging data including team evaluations, rankings, and notes. Make sure all connected
+							devices have completed judging and all data has been properly collected before proceeding.
 						</p>
 					</div>
 				</div>
@@ -127,21 +126,17 @@
 			<h4 class="text-sm font-medium text-gray-900">
 				{isInSession ? 'Step 2: ' : ''}Destroy Data
 			</h4>
-			<p class="text-sm text-gray-600">
-				Type "delete" below to confirm the permanent destruction of all judging data.
-			</p>
-			
+			<p class="text-sm text-gray-600">Type "delete" below to confirm the permanent destruction of all judging data.</p>
+
 			<div>
-				<label for="deleteConfirm" class="block text-sm font-medium text-gray-700">
-					Confirmation
-				</label>
+				<label for="deleteConfirm" class="block text-sm font-medium text-gray-700"> Confirmation </label>
 				<input
 					id="deleteConfirm"
 					type="text"
 					bind:value={deleteConfirmText}
 					disabled={!canDestroy}
 					placeholder="Type 'delete' to confirm"
-					class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 disabled:bg-gray-50 disabled:opacity-50"
+					class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none disabled:bg-gray-50 disabled:opacity-50"
 				/>
 			</div>
 		</div>
@@ -167,4 +162,4 @@
 			</button>
 		</div>
 	</div>
-</Dialog> 
+</Dialog>

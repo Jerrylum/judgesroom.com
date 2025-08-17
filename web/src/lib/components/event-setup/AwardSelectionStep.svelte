@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { type AwardOptions, type Grade, type CompetitionType } from '$lib/awards.svelte';
 	import AwardOptionsComponent from './AwardOptions.svelte';
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
+	import type { AwardOptions } from '$lib/award.svelte';
+	import type { CompetitionType, Grade } from '@judging.jerryio/protocol/src/award';
 
 	// Extended AwardOptions type for drag and drop
 	type AwardOptionsWithId = AwardOptions & { id: string };
@@ -29,10 +30,7 @@
 		onPrev
 	}: Props = $props();
 
-	function handleDndConsiderCards(
-		e: CustomEvent<{ items: AwardOptionsWithId[] }>,
-		listType: 'performance' | 'judged' | 'volunteer'
-	) {
+	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptionsWithId[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
@@ -42,10 +40,7 @@
 		}
 	}
 
-	function handleDndFinalizeCards(
-		e: CustomEvent<{ items: AwardOptionsWithId[] }>,
-		listType: 'performance' | 'judged' | 'volunteer'
-	) {
+	function handleDndFinalizeCards(e: CustomEvent<{ items: AwardOptionsWithId[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
@@ -89,8 +84,8 @@
 			<div>
 				<h3 class="text-base font-semibold text-gray-800">Performance Awards</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Based on robot performance in matches and skills challenges. Default order follows
-					Qualifying Criteria precedence &lt;AW1&gt;. Drag to reorder if needed.
+					Based on robot performance in matches and skills challenges. Default order follows Qualifying Criteria precedence &lt;AW1&gt;.
+					Drag to reorder if needed.
 				</p>
 			</div>
 			<div
@@ -117,8 +112,8 @@
 			<div>
 				<h3 class="text-base font-semibold text-gray-800">Judged Awards</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Determined by judges based on award criteria. Default order follows Qualifying Criteria
-					precedence &lt;AW2&gt;. Drag to reorder if needed.
+					Determined by judges based on award criteria. Default order follows Qualifying Criteria precedence &lt;AW2&gt;. Drag to reorder if
+					needed.
 				</p>
 			</div>
 			<div
@@ -145,8 +140,7 @@
 			<div>
 				<h3 class="text-base font-semibold text-gray-800">Volunteer Nominated Awards</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Determined by volunteer staff and not by Judges. Sportsmapship Award and Energy Award can
-					be dragged to this section.
+					Determined by volunteer staff and not by Judges. Sportsmapship Award and Energy Award can be dragged to this section.
 				</p>
 			</div>
 			<div

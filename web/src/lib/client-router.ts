@@ -3,6 +3,8 @@ import { initWRPC } from '@judging.jerryio/wrpc/client';
 import { clientHandlers } from './client-state.svelte';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import type { Session } from '@judging.jerryio/wrpc/server';
+import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
+import { ClientInfoSchema } from '@judging.jerryio/protocol/src/client';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -13,39 +15,19 @@ const w = initWRPC.createClient<ServerRouter>();
  */
 const clientRouter = w.router({
 	/**
-	 * Server can call this to get a personalized greeting from the client
+	 * Server pushes essential data updates to client
 	 */
-	getPersonalGreeting: w.procedure.input(z.string()).query(async ({ input }: { input: string }) => {
-		return `Hello from client! You said: ${input}`;
+	onEssentialDataUpdate: w.procedure.input(EssentialDataSchema).mutation(async ({ input }) => {
+		clientHandlers.onEssentialDataUpdate(input);
+		return `Essential data updated`;
 	}),
 
 	/**
-	 * Server calls this when it wants to update the client's age display
+	 * Server pushes client list updates to client
 	 */
-	updateAge: w.procedure.input(z.number()).mutation(async ({ session, input }: { session: Session<ServerRouter>; input: number }) => {
-		// Demonstrate calling server procedure from client procedure
-		const serverResponse = await session.getServer().getServerTime.query();
-		console.log('🕰️ Server time:', serverResponse);
-
-		// Update local client state
-		clientHandlers.onUpdateAge(input);
-		return `Client: Age updated to ${input} at ${new Date().toLocaleTimeString()}`;
-	}),
-
-	/**
-	 * Server can send notifications to this client
-	 */
-	receiveNotification: w.procedure.input(z.string()).mutation(async ({ input }: { input: string }) => {
-		clientHandlers.onNotify(input);
-		return `Notification received: ${input}`;
-	}),
-
-	/**
-	 * Server notifies client about connected client count changes
-	 */
-	updateClientCount: w.procedure.input(z.number()).mutation(async ({ input }: { input: number }) => {
-		clientHandlers.onClientCountUpdate(input);
-		return `Client count updated: ${input}`;
+	onClientListUpdate: w.procedure.input(z.array(ClientInfoSchema)).mutation(async ({ input }) => {
+		clientHandlers.onClientListUpdate(input);
+		return `Client list updated`;
 	})
 });
 

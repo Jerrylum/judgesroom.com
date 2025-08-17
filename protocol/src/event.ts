@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AwardSchema } from './award';
 import { CompetitionTypeSchema } from './award';
-import { TeamInfoSchema } from './team';
+import { TeamInfoSchema, TeamDataSchema } from './team';
 import { JudgingMethodSchema } from './judging';
 import { JudgeGroupSchema } from './judging';
 
@@ -21,7 +21,7 @@ export const EssentialDataSchema = z.object({
 	performanceAwards: z.array(AwardSchema.extend({ type: z.literal('performance') })),
 	judgedAwards: z.array(AwardSchema.extend({ type: z.literal('judged') })),
 	volunteerNominatedAwards: z.array(AwardSchema.extend({ type: z.literal('volunteer_nominated') })),
-	teams: z.array(TeamInfoSchema),
+	teams: z.array(TeamInfoSchema.extend({ data: TeamDataSchema })),
 	judgingMethod: JudgingMethodSchema,
 	judgeGroups: z.array(JudgeGroupSchema).min(1)
 });

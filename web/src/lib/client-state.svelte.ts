@@ -1,49 +1,31 @@
 /**
- * Client-side state management for WRPC demo
+ * Client-side state management for WRPC
  * Provides reactive state updates when server calls client procedures
  */
+import type { EssentialData } from '@judging.jerryio/protocol/src/event';
+import type { ClientInfo } from '@judging.jerryio/protocol/src/client';
+import { app } from './app-page.svelte';
 
 interface ClientState {
-	serverName: string;
-	serverTime: string;
-	ageResult: string;
-	notificationResult: string;
-	clientGreetingResult: string;
-	serverCallCount: number;
-	lastUpdateAge: number;
-	lastNotification: string;
-	connectedClients: number;
+	// Placeholder for future client state if needed
+	// Currently all state is managed by the App class
+	placeholder?: never;
 }
 
 // Reactive state store for client-side data
 export const clientState: ClientState = $state({
-	serverName: '',
-	serverTime: '',
-	ageResult: '',
-	notificationResult: '',
-	clientGreetingResult: '',
-	serverCallCount: 0,
-	lastUpdateAge: 0,
-	lastNotification: '',
-	connectedClients: 0
+	// Currently empty - App class manages all state
 });
 
 // Handlers for server-to-client procedure calls
 export const clientHandlers = {
-	onUpdateAge: (age: number) => {
-		console.log(`🔄 Server called updateAge with: ${age}`);
-		clientState.serverCallCount++;
-		clientState.lastUpdateAge = age;
+	onEssentialDataUpdate: (data: EssentialData) => {
+		console.log(`📊 Essential data updated:`, data);
+		app.handleEssentialDataUpdate(data);
 	},
 
-	onNotify: (message: string) => {
-		console.log(`📢 Server notification: ${message}`);
-		clientState.serverCallCount++;
-		clientState.lastNotification = message;
-	},
-
-	onClientCountUpdate: (count: number) => {
-		console.log(`👥 Connected clients: ${count}`);
-		clientState.connectedClients = count;
+	onClientListUpdate: (clients: ClientInfo[]) => {
+		console.log(`👥 Client list updated:`, clients);
+		app.handleClientListUpdate(clients);
 	}
 };

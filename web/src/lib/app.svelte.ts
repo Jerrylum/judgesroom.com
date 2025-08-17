@@ -3,7 +3,11 @@ import type { User } from './user.svelte';
 import { getWRPCConnectionState, useWRPC } from './use-wrpc';
 import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 import type { ClientInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
-import type { EventGradeLevel } from './event.svelte';
+import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+import type { EssentialData } from '@judging.jerryio/protocol/src/event';
+import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
+import type { Award, CompetitionType } from '@judging.jerryio/protocol/src/award';
+import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
 
 export class AppStorage {
 	/**
@@ -11,10 +15,7 @@ export class AppStorage {
 	 * @param key - The storage key
 	 * @param data - The data to save (must be JSON serializable)
 	 */
-	save(
-		key: string,
-		data: Record<string, unknown> | unknown[] | string | number | boolean | null
-	): void {
+	save(key: string, data: Record<string, unknown> | unknown[] | string | number | boolean | null): void {
 		try {
 			localStorage.setItem(key, JSON.stringify(data));
 		} catch (error) {
@@ -69,8 +70,19 @@ export class App {
 	private readonly isDevelopment: boolean;
 	private currentUser: User | null = $state(null);
 
-  private allJudges: readonly Judge[] = $state([]);
-  private allJudgeGroups: readonly JudgeGroup[] = $state([]);
+	// EssentialData cache - entirely cached on client side
+	private essentialData: EssentialData | null = $state(null);
+
+	// Session management
+	private sessionInfo: SessionInfo | null = $state(null);
+	private clients: ClientInfo[] = $state([]);
+
+	// Error handling
+	private errorNotices: string[] = $state([]);
+	private userClearReason: 'role_deleted' | null = $state(null);
+
+	// Judges data (separate from EssentialData as it's not part of event setup)
+	private allJudges: readonly Judge[] = $state([]);
 
 	constructor(storage?: AppStorage, isDevelopment: boolean = false) {
 		this.storage = storage || new AppStorage();
@@ -89,18 +101,168 @@ export class App {
 		this.saveUserToStorage(user);
 	}
 
-  /**
+	/**
 	 * Update judge with transaction support
 	 */
 	async updateJudge(judge: Judge): Promise<void> {
 		return useWRPC().updateJudge.mutation(judge);
-  }
+	}
 
-  getJudgeGroups(): Readonly<JudgeGroup[]> {
-    return $state.snapshot(this.allJudgeGroups);
-  }
+	// ===== ESSENTIAL DATA METHODS =====
 
-  getExistingJudgesGroupedByGroup(): Readonly<Record<string, readonly Judge[]>> {
+	/**
+	 * Handle EssentialData update from server
+	 */
+	handleEssentialDataUpdate(data: EssentialData): void {
+		this.essentialData = data;
+		this.saveEssentialDataToStorage();
+	}
+
+	/**
+	 * Get cached EssentialData
+	 */
+	getEssentialData(): Readonly<EssentialData> | null {
+		return this.essentialData ? $state.snapshot(this.essentialData) : null;
+	}
+
+	/**
+	 * Check if essential data is available
+	 */
+	hasEssentialData(): boolean {
+		return this.essentialData !== null;
+	}
+
+	/**
+	 * Get event name from cached EssentialData
+	 */
+	getEventName(): string | null {
+		return this.essentialData?.eventName || null;
+	}
+
+	/**
+	 * Get event grade level from cached EssentialData
+	 */
+	getEventGradeLevel(): EventGradeLevel | null {
+		return this.essentialData?.eventGradeLevel || null;
+	}
+
+	/**
+	 * Get competition type from cached EssentialData
+	 */
+	getCompetitionType(): CompetitionType | null {
+		return this.essentialData?.competitionType || null;
+	}
+
+	/**
+	 * Get judging method from cached EssentialData
+	 */
+	getJudgingMethod(): JudgingMethod | null {
+		return this.essentialData?.judgingMethod || null;
+	}
+
+	/**
+	 * Get all teams from cached EssentialData
+	 */
+	getTeams(): readonly TeamInfo[] {
+		return this.essentialData?.teams || [];
+	}
+
+	/**
+	 * Get team count from cached EssentialData
+	 */
+	getTeamCount(): number {
+		return this.essentialData?.teams.length || 0;
+	}
+
+	/**
+	 * Get performance awards from cached EssentialData
+	 */
+	getPerformanceAwards(): readonly Award[] {
+		return this.essentialData?.performanceAwards || [];
+	}
+
+	/**
+	 * Get judged awards from cached EssentialData
+	 */
+	getJudgedAwards(): readonly Award[] {
+		return this.essentialData?.judgedAwards || [];
+	}
+
+	/**
+	 * Get volunteer nominated awards from cached EssentialData
+	 */
+	getVolunteerNominatedAwards(): readonly Award[] {
+		return this.essentialData?.volunteerNominatedAwards || [];
+	}
+
+	/**
+	 * Get all awards from cached EssentialData
+	 */
+	getAllAwards(): readonly Award[] {
+		if (!this.essentialData) return [];
+		return [...this.essentialData.performanceAwards, ...this.essentialData.judgedAwards, ...this.essentialData.volunteerNominatedAwards];
+	}
+
+	/**
+	 * Get event setup data (alias for EssentialData for compatibility)
+	 */
+	getEventSetup(): Readonly<EssentialData> | null {
+		return this.essentialData ? $state.snapshot(this.essentialData) : null;
+	}
+
+	/**
+	 * Get all team data as a lookup object (for compatibility)
+	 */
+	getAllTeamData(): Record<string, { notebookLink: string; excluded: boolean }> {
+		if (!this.essentialData) return {};
+
+		const teamData: Record<string, { notebookLink: string; excluded: boolean }> = {};
+		this.essentialData.teams.forEach((team) => {
+			teamData[team.number] = {
+				notebookLink: team.data.notebookLink || '',
+				excluded: team.data.excluded || false
+			};
+		});
+		return teamData;
+	}
+
+	/**
+	 * Update event setup (sends to server via updateEssentialData)
+	 */
+	async updateEventSetup(eventSetup: EssentialData): Promise<void> {
+		try {
+			await useWRPC().updateEssentialData.mutation(eventSetup);
+			// The server will broadcast the update back to us via onEssentialDataUpdate
+		} catch (error) {
+			this.addErrorNotice(`Failed to update event setup: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
+
+	/**
+	 * Update team data (for compatibility - in new system this is part of EssentialData)
+	 */
+	async updateTeamData(teamNumber: string, teamData: { notebookLink: string; excluded: boolean }): Promise<void> {
+		// In the new system, team data is part of EssentialData and updated via updateEssentialData
+		// This method is kept for compatibility but doesn't need to do anything
+		// as the team data is already updated when updateEventSetup is called
+	}
+
+	/**
+	 * Get judge groups from cached EssentialData
+	 */
+	getJudgeGroups(): readonly JudgeGroup[] {
+		return this.essentialData?.judgeGroups || [];
+	}
+
+	/**
+	 * Get judge group count from cached EssentialData
+	 */
+	getJudgeGroupCount(): number {
+		return this.essentialData?.judgeGroups.length || 0;
+	}
+
+	getExistingJudgesGroupedByGroup(): Readonly<Record<string, readonly Judge[]>> {
 		const judgeGroups = this.getJudgeGroups();
 		const allJudges = this.allJudges;
 
@@ -112,92 +274,239 @@ export class App {
 		return $state.snapshot(groups);
 	}
 
-  getConnectionState(): ConnectionState {
-    return getWRPCConnectionState();
-  }
+	getConnectionState(): ConnectionState {
+		return getWRPCConnectionState();
+	}
 
-  findJudgeById(judgeId: string): Readonly<Judge> | null {
-    const allJudges = this.getAllJudges();
+	findJudgeById(judgeId: string): Readonly<Judge> | null {
+		const allJudges = this.getAllJudges();
 		const judge = allJudges.find((j) => j.id === judgeId);
 		return judge ? $state.snapshot(judge) : null;
-  }
+	}
 
-  getAllJudges(): readonly Judge[] {
-    return $state.snapshot(this.allJudges);
-  }
+	getAllJudges(): readonly Judge[] {
+		return $state.snapshot(this.allJudges);
+	}
 
-  getClients(): readonly ClientInfo[] {
-    throw new Error('Not implemented');
-  }
+	// ===== SESSION MANAGEMENT METHODS =====
 
-  getSessionInfo(): Readonly<SessionInfo> | null {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Handle client list update from server
+	 */
+	handleClientListUpdate(clients: ClientInfo[]): void {
+		this.clients = clients;
+	}
 
-  getSessionUrl(): string {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Get connected clients
+	 */
+	getClients(): readonly ClientInfo[] {
+		return $state.snapshot(this.clients);
+	}
 
-  createSession(): Promise<void> {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Get session info
+	 */
+	getSessionInfo(): Readonly<SessionInfo> | null {
+		return this.sessionInfo ? $state.snapshot(this.sessionInfo) : null;
+	}
 
-  getTeamCount(): number {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Get session URL for sharing
+	 */
+	getSessionUrl(): string {
+		if (!this.sessionInfo?.sessionId) {
+			throw new Error('No active session');
+		}
+		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.sessionId}`;
+	}
 
-  getJudgeGroupCount(): number {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Create a new session
+	 */
+	async createSession(
+		eventName: string,
+		competitionType: CompetitionType,
+		eventGradeLevel: EventGradeLevel,
+		judgingMethod: JudgingMethod
+	): Promise<void> {
+		try {
+			const response = await useWRPC().createSession.mutation({
+				eventName,
+				competitionType,
+				eventGradeLevel,
+				judgingMethod
+			});
 
-  getJudgeCount(): number {
-    throw new Error('Not implemented');
-  }
+			// Fetch session info after creation
+			this.sessionInfo = await useWRPC().getSessionInfo.query();
 
-  isInSession(): boolean {
-    throw new Error('Not implemented');
-  }
+			// Fetch initial essential data
+			const essentialData = await useWRPC().getEssentialData.query();
+			this.handleEssentialDataUpdate(essentialData);
 
-  leaveSession(): Promise<void> {
-    throw new Error('Not implemented');
-  }
+			// Save session to storage
+			this.saveSessionToStorage();
+		} catch (error) {
+			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
 
-  destroySessionData(): void {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Join a session from URL
+	 */
+	async joinSessionFromUrl(url: string): Promise<void> {
+		try {
+			// Extract session ID from URL hash
+			const hashIndex = url.indexOf('#');
+			if (hashIndex === -1) {
+				throw new Error('Invalid session URL: No session ID found');
+			}
 
-  loadUserFromStorage(): void {
-    throw new Error('Not implemented');
-  }
+			const sessionId = url.substring(hashIndex + 1);
+			if (!sessionId) {
+				throw new Error('Invalid session URL: Empty session ID');
+			}
 
-  hasStoredSession(): boolean {
-    throw new Error('Not implemented');
-  }
+			// Join the session
+			await useWRPC().joinSession.mutation({ sessionId });
 
+			// Fetch session info
+			this.sessionInfo = await useWRPC().getSessionInfo.query();
 
-  reconnectStoredSession(): Promise<void> {
-    throw new Error('Not implemented');
-  }
+			// Fetch essential data
+			const essentialData = await useWRPC().getEssentialData.query();
+			this.handleEssentialDataUpdate(essentialData);
 
-  clearErrorNotice(index: number): void {
-    throw new Error('Not implemented');
-  }
+			// Save session to storage
+			this.saveSessionToStorage();
+		} catch (error) {
+			this.addErrorNotice(`Failed to join session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
 
-  getErrorNotices(): readonly string[] {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Check if currently in a session
+	 */
+	isInSession(): boolean {
+		return this.sessionInfo !== null && this.essentialData !== null;
+	}
 
-  getEventName(): string | null {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Leave current session
+	 */
+	async leaveSession(): Promise<void> {
+		// Clear session data
+		this.sessionInfo = null;
+		this.essentialData = null;
+		this.clients = [];
+		this.allJudges = [];
+		this.currentUser = null;
+		this.userClearReason = null;
 
-  getEventGradeLevel(): EventGradeLevel | null {
-    throw new Error('Not implemented');
-  }
+		// Clear storage
+		this.clearSessionFromStorage();
+		this.clearEssentialDataFromStorage();
+		this.clearUserFromStorage();
+	}
 
-  getCurrentUserJudgeGroup(judgeId: string): Readonly<JudgeGroup> | null {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Destroy all session data (for admin)
+	 */
+	destroySessionData(): void {
+		// This would typically call a server endpoint to destroy the session
+		// For now, just leave the session locally
+		this.leaveSession();
+	}
+
+	/**
+	 * Kick a client from session
+	 */
+	async kickClient(clientId: string): Promise<void> {
+		try {
+			await useWRPC().kickClient.mutation({ clientId });
+		} catch (error) {
+			this.addErrorNotice(`Failed to kick client: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
+
+	// ===== UTILITY METHODS =====
+
+	/**
+	 * Get judge count
+	 */
+	getJudgeCount(): number {
+		return this.allJudges.length;
+	}
+
+	/**
+	 * Get current user's judge group
+	 */
+	getCurrentUserJudgeGroup(judgeId: string): Readonly<JudgeGroup> | null {
+		const judge = this.findJudgeById(judgeId);
+		if (!judge) return null;
+
+		const judgeGroup = this.getJudgeGroups().find((g) => g.id === judge.groupId);
+		return judgeGroup ? $state.snapshot(judgeGroup) : null;
+	}
+
+	/**
+	 * Get user clear reason
+	 */
+	getUserClearReason(): 'role_deleted' | null {
+		return this.userClearReason;
+	}
+
+	/**
+	 * Load user from storage
+	 */
+	loadUserFromStorage(): void {
+		const storedUser = this.storage.load<User>('currentUser');
+		if (storedUser) {
+			this.currentUser = storedUser;
+		}
+	}
+
+	/**
+	 * Check if there's a stored session
+	 */
+	hasStoredSession(): boolean {
+		const storedSession = this.storage.load<SessionInfo>('sessionInfo');
+		return storedSession !== null;
+	}
+
+	/**
+	 * Reconnect to stored session
+	 */
+	async reconnectStoredSession(): Promise<void> {
+		try {
+			const storedSession = this.storage.load<SessionInfo>('sessionInfo');
+			if (!storedSession?.sessionId) {
+				throw new Error('No stored session found');
+			}
+
+			// Try to rejoin the session
+			await useWRPC().joinSession.mutation({ sessionId: storedSession.sessionId });
+
+			// Fetch current session info
+			this.sessionInfo = await useWRPC().getSessionInfo.query();
+
+			// Fetch essential data
+			const essentialData = await useWRPC().getEssentialData.query();
+			this.handleEssentialDataUpdate(essentialData);
+
+			// Load user from storage
+			this.loadUserFromStorage();
+		} catch (error) {
+			// Clear invalid stored session
+			this.clearSessionFromStorage();
+			this.addErrorNotice(`Failed to reconnect to session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
 
 	/**
 	 * Get current user
@@ -206,14 +515,6 @@ export class App {
 		return this.currentUser ? $state.snapshot(this.currentUser) : null;
 	}
 
-  getUserClearReason(): 'role_deleted' | null {
-    throw new Error('Not implemented');
-  }
-
-  kickClient(clientId: string): Promise<void> {
-    throw new Error('Not implemented');
-  }
-
 	/**
 	 * Check if a user is selected
 	 */
@@ -221,22 +522,85 @@ export class App {
 		return this.currentUser !== null;
 	}
 
-  hasEssentialData(): boolean {
-    throw new Error('Not implemented');
-  }
+	// ===== ERROR HANDLING METHODS =====
 
-  joinSessionFromUrl(url: string): Promise<void> {
-    throw new Error('Not implemented');
-  }
+	/**
+	 * Add error notice
+	 */
+	addErrorNotice(message: string): void {
+		this.errorNotices = [...this.errorNotices, message];
+	}
 
+	/**
+	 * Get all error notices
+	 */
+	getErrorNotices(): readonly string[] {
+		return $state.snapshot(this.errorNotices);
+	}
+
+	/**
+	 * Clear a specific error notice by index
+	 */
+	clearErrorNotice(index: number): void {
+		if (index >= 0 && index < this.errorNotices.length) {
+			this.errorNotices = this.errorNotices.filter((_, i) => i !== index);
+		}
+	}
+
+	/**
+	 * Clear all error notices
+	 */
+	clearAllErrorNotices(): void {
+		this.errorNotices = [];
+	}
+
+	// ===== PRIVATE STORAGE METHODS =====
+
+	/**
+	 * Save user to storage
+	 */
 	private saveUserToStorage(user: User): void {
 		if (user) {
 			this.storage.save('currentUser', user);
 		}
 	}
 
+	/**
+	 * Clear user from storage
+	 */
 	private clearUserFromStorage(): void {
 		this.storage.remove('currentUser');
 	}
 
+	/**
+	 * Save essential data to storage
+	 */
+	private saveEssentialDataToStorage(): void {
+		if (this.essentialData) {
+			this.storage.save('essentialData', this.essentialData);
+		}
+	}
+
+	/**
+	 * Clear essential data from storage
+	 */
+	private clearEssentialDataFromStorage(): void {
+		this.storage.remove('essentialData');
+	}
+
+	/**
+	 * Save session info to storage
+	 */
+	private saveSessionToStorage(): void {
+		if (this.sessionInfo) {
+			this.storage.save('sessionInfo', this.sessionInfo);
+		}
+	}
+
+	/**
+	 * Clear session info from storage
+	 */
+	private clearSessionFromStorage(): void {
+		this.storage.remove('sessionInfo');
+	}
 }

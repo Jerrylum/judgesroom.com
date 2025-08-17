@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Team } from '$lib/teams.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import type { Team } from '$lib/team.svelte';
 
 	interface Props {
 		team: Team;
