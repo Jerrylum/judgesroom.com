@@ -76,9 +76,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
-		const [_, ws] = Object.values(webSocketPair);
+		const [client, server] = Object.values(webSocketPair);
 
-		if (!_ || !ws) {
+		if (!client || !server) {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
 		}
 
@@ -91,16 +91,12 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// from memory, but the WebSocket connection will remain open. If at some later point the
 		// WebSocket receives a message, the runtime will recreate the Durable Object
 		// (run the `constructor`) and deliver the message to the appropriate handler.
-		this.ctx.acceptWebSocket(ws, [clientId]);
+		this.ctx.acceptWebSocket(server, [clientId]);
 
 		// Set up connection with the WebSocket handler (now async for storage)
-		await this.wsHandler.handleConnection(ws, {
-			sessionId,
-			clientId,
-			deviceName
-		});
+		await this.wsHandler.handleConnection(server, { sessionId, clientId, deviceName });
 
-		return new Response(null, { status: 101, webSocket: _ });
+		return new Response(null, { status: 101, webSocket: client });
 	}
 
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
@@ -108,7 +104,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 
 		// The connection manager will handle finding the right client based on the WebSocket
-		await this.wsHandler.handleMessage(ws, messageStr, { db: this.db, destroySession: () => this.ctx.storage.deleteAll() });
+		const messageCtx = { db: this.db, network: this.wsHandler.connectionManager };
+		await this.wsHandler.handleMessage(ws, messageStr, messageCtx);
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {

@@ -1,4 +1,4 @@
-export { type ClientData, WebSocketConnectionManager } from './connection-manager';
+export { WebSocketConnectionManager } from './connection-manager';
 export { type WRPCRootObject, initWRPC } from './initWRPC';
 export {
 	type ProcedureType,
@@ -21,10 +21,10 @@ export {
 	type DecorateCreateRouterOptions
 } from './router';
 export { type Session } from './session';
-export { type RouterProxy, type Network } from './types';
+export { type RouterProxy, type Network, type ClientData } from './types';
 export {
 	type WebSocketHandlerOptions,
-	type WebSocketConnectionOptions,
+	type WebSocketConnectionMetadata as WebSocketConnectionOptions,
 	type WebSocketHandler,
 	createWebSocketHandler
 } from './websocket-handler';

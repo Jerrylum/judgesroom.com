@@ -88,10 +88,10 @@ export const handshake = {
 			});
 		}),
 
-	destroySession: w.procedure.mutation(async ({ ctx, session }) => {
+	destroySession: w.procedure.mutation(async ({ ctx }) => {
 		// TODO: Broadcast to all clients
 
-		await ctx.destroySession();
+		await ctx.network.destroy();
 
 		return { success: true, message: 'Session destroyed' };
 	})

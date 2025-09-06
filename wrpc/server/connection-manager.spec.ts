@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { WebSocketConnectionManager, type ClientData } from './connection-manager';
+import { WebSocketConnectionManager } from './connection-manager';
 import type { WebSocketHandlerOptions } from './websocket-handler';
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
@@ -22,7 +22,7 @@ describe('WebSocketConnectionManager', () => {
 
 		mockOptions = {
 			router: {} as AnyRouter,
-			loadData: vi.fn().mockResolvedValue({ clients: [] }),
+			loadData: vi.fn().mockResolvedValue({ sessionId: null, clients: [] }),
 			saveData: vi.fn().mockResolvedValue(undefined),
 			destroy: vi.fn().mockResolvedValue(undefined),
 			getWebSocket: vi.fn().mockImplementation((clientId: string) => {
@@ -53,9 +53,9 @@ describe('WebSocketConnectionManager', () => {
 
 		it('should load existing data on initialization', async () => {
 			const existingData = {
+				sessionId: null,
 				clients: [
 					{
-						sessionId: 'session1',
 						clientId: 'client1',
 						deviceName: 'Device1',
 						connectedAt: Date.now()
@@ -82,13 +82,51 @@ describe('WebSocketConnectionManager', () => {
 
 			const clientData = connectionManager.getClientData('client1');
 			expect(clientData).toEqual({
-				sessionId: 'session1',
 				clientId: 'client1',
 				deviceName: 'Test Device',
 				connectedAt: expect.any(Number)
 			});
 
 			expect(mockOptions.saveData).toHaveBeenCalled();
+		});
+
+		describe('session id handling', () => {
+			it('should throw on session id mismatch', async () => {
+				const mockWs = new MockWebSocket();
+				mockWebSockets.set('client1', mockWs);
+
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Device1');
+
+				await expect(
+					connectionManager.addConnection(mockWs as unknown as WebSocket, 'session2', 'client2', 'Device2')
+				).rejects.toThrow('Session ID mismatch');
+			});
+
+			it('getSessionId should throw before first connection and return after', async () => {
+				const newManager = new WebSocketConnectionManager(mockOptions);
+				await newManager.initialize();
+
+				expect(() => newManager.getSessionId()).toThrow('Session ID not set');
+
+				const mockWs = new MockWebSocket();
+				mockWebSockets.set('clientA', mockWs);
+				await newManager.addConnection(mockWs as unknown as WebSocket, 'abc-session', 'clientA', 'A');
+
+				expect(newManager.getSessionId()).toBe('abc-session');
+			});
+		});
+
+		describe('kickClient', () => {
+			it('should close socket and remove client', async () => {
+				const mockWs = new MockWebSocket();
+				mockWebSockets.set('clientZ', mockWs);
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'clientZ', 'Z');
+
+				await connectionManager.kickClient('clientZ');
+
+				expect(mockWs.close).toHaveBeenCalled();
+				expect(connectionManager.getClientData('clientZ')).toBeNull();
+			});
 		});
 
 		it('should remove existing client when reconnecting', async () => {
@@ -138,7 +176,6 @@ describe('WebSocketConnectionManager', () => {
 		it('should get client data by ID', () => {
 			const clientData = connectionManager.getClientData('client1');
 			expect(clientData).toEqual({
-				sessionId: 'session1',
 				clientId: 'client1',
 				deviceName: 'Test Device',
 				connectedAt: expect.any(Number)
@@ -169,7 +206,7 @@ describe('WebSocketConnectionManager', () => {
 		it('should filter out clients without active WebSocket connections', async () => {
 			// Add another client but don't add WebSocket
 			const mockWs2 = new MockWebSocket();
-			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session2', 'client2', 'Device2');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'Device2');
 
 			// Remove WebSocket for client2 (simulating disconnection)
 			mockWebSockets.delete('client2');

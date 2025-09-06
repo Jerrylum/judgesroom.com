@@ -112,9 +112,17 @@ export type InferRouterBroadcastType<TRecord extends RouterRecord> = {
 export type RouterBroadcastProxy<TRouter extends AnyRouter> = InferRouterBroadcastType<TRouter['_def']['record']>;
 
 /**
+ * Client data stored in Durable Object storage
+ */
+export interface ClientData {
+	clientId: string;
+	deviceName?: string;
+	connectedAt: number;
+}
+
+/**
  * Network interface
  */
-
 export interface Network {
 	/**
 	 * Send a request to a specific client
@@ -129,10 +137,30 @@ export interface Network {
 	/**
 	 * Get all connected client IDs
 	 */
-	getConnectedClients(): string[];
+	getConnectedClients(): Readonly<string[]>;
 
 	/**
 	 * Check if a client is connected
 	 */
 	isClientConnected(clientId: string): boolean;
+
+	/**
+	 * Get all client data
+	 */
+	getAllClientData(): Readonly<Readonly<ClientData>[]>;
+
+	/**
+	 * Get client data by clientId
+	 */
+	getClientData(clientId: string): Readonly<ClientData> | null;
+
+	/**
+	 * Kick a client
+	 */
+	kickClient(clientId: string): Promise<void>;
+
+	/**
+	 * Destroy the network
+	 */
+	destroy(): Promise<void>;
 }

@@ -47,17 +47,17 @@ export interface WebSocketHandlerOptions<TRouter extends AnyRouter> {
 	onError?: (opts: { error: WRPCError; req: WRPCRequest; ws: WebSocket }) => void;
 }
 
-export interface WebSocketConnectionOptions {
-	sessionId?: string;
-	clientId?: string;
-	deviceName?: string;
+export interface WebSocketConnectionMetadata {
+	sessionId: string;
+	clientId: string;
+	deviceName: string;
 }
 
 export interface WebSocketHandler<TRouter extends AnyRouter> {
 	connectionManager: WebSocketConnectionManager;
 	initialize: () => Promise<void>;
 	handleMessage: (ws: WebSocket, message: string, ctx: InferRouterContext<TRouter>) => Promise<void>;
-	handleConnection: (ws: WebSocket, connectionOpts?: WebSocketConnectionOptions) => Promise<void>;
+	handleConnection: (ws: WebSocket, metadata: WebSocketConnectionMetadata) => Promise<void>;
 	handleClose: (ws: WebSocket, code: number, reason: string) => Promise<void>;
 	handleError: (ws: WebSocket, error: Error) => void;
 }
@@ -158,7 +158,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 					// Create session for this request
 					const session = createServerSideSession(
 						connectionManager,
-						clientData?.sessionId || 'unknown',
+						connectionManager.getSessionId(),
 						clientId || 'unknown',
 						clientData?.deviceName || 'unknown'
 					);
@@ -234,14 +234,10 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 		 * Note: Event listeners won't work with Cloudflare WebSocket Hibernation Server
 		 * Instead, call handleMessage, handleClose, and handleError directly from the server
 		 */
-		async handleConnection(ws: WebSocket, connectionOpts?: WebSocketConnectionOptions) {
-			if (connectionOpts?.clientId && connectionOpts?.sessionId) {
-				// Add connection to manager (async with storage)
-				await connectionManager.addConnection(ws, connectionOpts.sessionId, connectionOpts.clientId, connectionOpts.deviceName);
-				console.log('WebSocket connection established', connectionOpts);
-			} else {
-				console.warn('WebSocket connection missing clientId or sessionId', connectionOpts);
-			}
+		async handleConnection(ws: WebSocket, metadata: WebSocketConnectionMetadata) {
+			// Add connection to manager (async with storage)
+			await connectionManager.addConnection(ws, metadata.sessionId, metadata.clientId, metadata.deviceName);
+			console.log('WebSocket connection established', metadata);
 		},
 
 		/**

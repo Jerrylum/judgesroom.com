@@ -39,7 +39,7 @@ describe('WebSocket Handler', () => {
 
 		mockOptions = {
 			router: testRouter,
-			loadData: vi.fn().mockResolvedValue({ clients: [] }),
+			loadData: vi.fn().mockResolvedValue({ sessionId: null, clients: [] }),
 			saveData: vi.fn().mockResolvedValue(undefined),
 			destroy: vi.fn().mockResolvedValue(undefined),
 			getWebSocket: vi.fn().mockImplementation((clientId: string) => {
@@ -84,17 +84,6 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleConnection(mockWs as any, connectionOpts);
 
 			expect(mockOptions.saveData).toHaveBeenCalled();
-		});
-
-		it('should warn for connection without clientId or sessionId', async () => {
-			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-			const mockWs = new MockWebSocket();
-
-			await wsHandler.handleConnection(mockWs as any, {});
-
-			expect(consoleSpy).toHaveBeenCalledWith('WebSocket connection missing clientId or sessionId', {});
-
-			consoleSpy.mockRestore();
 		});
 	});
 

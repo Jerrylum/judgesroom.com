@@ -1,4 +1,4 @@
-import { initWRPC } from '@judging.jerryio/wrpc/server';
+import { initWRPC, Network } from '@judging.jerryio/wrpc/server';
 import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { handshake } from './routes/handshake';
 import { team } from './routes/team';
@@ -9,9 +9,7 @@ import { client } from './routes/client';
 
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
-	destroySession: () => Promise<void>;
-	// Note: Network access might be added here in a full implementation
-	// network: Network;
+	network: Network;
 }
 
 export type Transaction = Parameters<Parameters<DrizzleSqliteDODatabase['transaction']>[0]>[0];
@@ -19,12 +17,6 @@ export type DatabaseOrTransaction = DrizzleSqliteDODatabase | Transaction;
 
 // Initialize WRPC server
 export const w = initWRPC.createServer<ServerContext>();
-
-/*
-TODO, for human:
-
-- destroySession
-*/
 
 /**
  * Server router defines procedures that clients can call

@@ -13,7 +13,11 @@ describe('Server-side Session', () => {
 			sendToClient: vi.fn(),
 			broadcast: vi.fn(),
 			getConnectedClients: vi.fn(),
-			isClientConnected: vi.fn()
+			isClientConnected: vi.fn(),
+			getAllClientData: vi.fn(),
+			getClientData: vi.fn(),
+			kickClient: vi.fn(),
+			destroy: vi.fn()
 		};
 
 		session = createServerSideSession(mockNetwork, 'test-session-id', 'test-client-id', 'Test Device');

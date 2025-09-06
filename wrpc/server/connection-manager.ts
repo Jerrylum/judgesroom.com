@@ -1,22 +1,17 @@
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
 import type { WebSocketHandlerOptions } from './websocket-handler';
-import type { Network } from './types';
-
-/**
- * Client data stored in Durable Object storage
- */
-export interface ClientData {
-	sessionId: string;
-	clientId: string;
-	deviceName?: string;
-	connectedAt: number;
-}
+import type { ClientData, Network } from './types';
 
 /**
  * Server data stored in Durable Object storage
  */
 interface ServerData {
+	sessionId: string | null;
+	// This is the list of clients that are "likely"connected to the server
+	// However, it is not guaranteed that the client is actually connected to the server
+	// because the client may have disconnected and the server may not have removed the client from the list
+	// isClientConnected is used to check if the client is actually connected to the server
 	clients: ClientData[];
 }
 
@@ -25,7 +20,7 @@ interface ServerData {
  */
 export class WebSocketConnectionManager implements Network {
 	private opts: WebSocketHandlerOptions<AnyRouter>;
-	private serverData: ServerData | null = null;
+	private serverData: ServerData = { sessionId: null, clients: [] };
 	private isLoaded = false;
 	private pendingRequests = new Map<
 		string,
@@ -47,6 +42,18 @@ export class WebSocketConnectionManager implements Network {
 		await this.load();
 	}
 
+	getSessionId(): string {
+		if (!this.isRunning()) {
+			throw new Error('Connection manager not initialized');
+		}
+
+		if (this.serverData.sessionId === null) {
+			throw new Error('Session ID not set');
+		}
+
+		return this.serverData.sessionId;
+	}
+
 	/**
 	 * Add a WebSocket connection with hibernation support
 	 */
@@ -54,13 +61,16 @@ export class WebSocketConnectionManager implements Network {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
+		if (this.serverData.sessionId !== null && this.serverData.sessionId !== sessionId) {
+			throw new Error('Session ID mismatch');
+		}
+		this.serverData.sessionId = sessionId;
 
 		// Remove existing client data if reconnecting
-		this.serverData!.clients = this.serverData!.clients.filter((c) => c.clientId !== clientId);
+		this.serverData.clients = this.serverData.clients.filter((c) => c.clientId !== clientId);
 
 		// Add new client data
-		this.serverData!.clients.push({
-			sessionId,
+		this.serverData.clients.push({
 			clientId,
 			deviceName,
 			connectedAt: Date.now()
@@ -77,7 +87,7 @@ export class WebSocketConnectionManager implements Network {
 			return; // Don't throw error during cleanup
 		}
 
-		this.serverData!.clients = this.serverData!.clients.filter((c) => c.clientId !== clientId);
+		this.serverData.clients = this.serverData.clients.filter((c) => c.clientId !== clientId);
 		await this.save();
 
 		// Reject any pending requests for this client
@@ -88,16 +98,6 @@ export class WebSocketConnectionManager implements Network {
 				this.pendingRequests.delete(requestId);
 			}
 		}
-	}
-
-	/**
-	 * Get client data by clientId
-	 */
-	getClientData(clientId: string): ClientData | null {
-		if (!this.isRunning()) {
-			throw new Error('Connection manager not initialized');
-		}
-		return this.serverData!.clients.find((c) => c.clientId === clientId) || null;
 	}
 
 	/**
@@ -198,12 +198,14 @@ export class WebSocketConnectionManager implements Network {
 	/**
 	 * Get all connected client IDs (hibernation-compatible)
 	 */
-	getConnectedClients(): string[] {
+	getConnectedClients(): Readonly<string[]> {
 		if (!this.isRunning()) {
 			return [];
 		}
 		// Filter clients that actually have active WebSocket connections
-		return this.serverData!.clients.filter((client) => this.opts.getWebSocket(client.clientId) !== null).map((client) => client.clientId);
+		return [
+			...this.serverData.clients.filter((client) => this.opts.getWebSocket(client.clientId) !== null).map((client) => client.clientId)
+		];
 	}
 
 	/**
@@ -216,18 +218,39 @@ export class WebSocketConnectionManager implements Network {
 	/**
 	 * Get all client data
 	 */
-	getAllClientData(): ClientData[] {
+	getAllClientData(): Readonly<Readonly<ClientData>[]> {
 		if (!this.isRunning()) {
 			return [];
 		}
-		return [...this.serverData!.clients];
+		return [...this.serverData.clients];
+	}
+
+	/**
+	 * Get client data by clientId
+	 */
+	getClientData(clientId: string): Readonly<ClientData> | null {
+		if (!this.isRunning()) {
+			throw new Error('Connection manager not initialized');
+		}
+		return this.serverData.clients.find((c) => c.clientId === clientId) || null;
+	}
+
+	async kickClient(clientId: string) {
+		if (!this.isRunning()) {
+			return; // Don't throw error during cleanup
+		}
+		const ws = this.opts.getWebSocket(clientId);
+		if (ws) {
+			ws.close();
+		}
+		this.removeConnection(clientId);
 	}
 
 	/**
 	 * Check if server is running
 	 */
 	private isRunning(): boolean {
-		return this.isLoaded && this.serverData !== null;
+		return this.isLoaded;
 	}
 
 	/**
@@ -245,14 +268,15 @@ export class WebSocketConnectionManager implements Network {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
-		await this.opts.saveData(this.serverData!);
+		await this.opts.saveData(this.serverData);
 	}
 
 	/**
 	 * Destroy all data (for cleanup)
 	 */
 	async destroy() {
-		this.serverData = null;
+		this.serverData = { sessionId: null, clients: [] };
+		this.isLoaded = false;
 		await this.opts.destroy();
 	}
 }
