@@ -130,9 +130,9 @@
 
 	<!-- Error Notices -->
 	{#if errorNotices.length > 0}
-		<div class="fixed bottom-4 right-4 z-50 space-y-2">
+		<div class="fixed right-4 bottom-4 z-50 space-y-2">
 			{#each errorNotices as notice, index (index)}
-				<div class="min-w-xs flex max-w-sm items-center justify-between rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
+				<div class="flex max-w-sm min-w-xs items-center justify-between rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
 					<div class="flex items-center">
 						<svg class="mr-2 h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"

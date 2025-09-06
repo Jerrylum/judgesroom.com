@@ -112,7 +112,7 @@ describe('ServerRouter', () => {
 			const input = {
 				...current,
 				eventName: 'Updated Event Name',
-				awards: [],
+				awards: []
 			};
 			const resolver = serverRouter.essential.updateEssentialData._def._resolver!;
 			await resolver({ input, session, ctx: context });

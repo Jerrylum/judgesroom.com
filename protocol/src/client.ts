@@ -1,10 +1,10 @@
 import z from 'zod';
 
 export const ClientInfoSchema = z.object({
-  clientId: z.string(),
-  deviceName: z.string(),
-  connectedAt: z.number().int().positive(),
-  isOnline: z.boolean()
+	clientId: z.string(),
+	deviceName: z.string(),
+	connectedAt: z.number().int().positive(),
+	isOnline: z.boolean()
 });
 export type ClientInfo = z.infer<typeof ClientInfoSchema>;
 
@@ -16,4 +16,3 @@ export const SessionInfoSchema = z.object({
 });
 
 export type SessionInfo = z.infer<typeof SessionInfoSchema>;
-

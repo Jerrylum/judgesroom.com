@@ -8,7 +8,7 @@ export const offlineClients = sqliteTable('OfflineClients', {
 	connectedAt: integer('connectedAt', { mode: 'timestamp' }).notNull(),
 	// nullable because we don't want to delete the client if the judge is deleted
 	// client might not be assigned to a judge yet
-	judgeId: text('judgeId').references(() => judges.id, { onDelete: 'set null' }),
+	judgeId: text('judgeId').references(() => judges.id, { onDelete: 'set null' })
 });
 
 export const metadata = sqliteTable('Metadata', {
@@ -46,9 +46,7 @@ export const teams = sqliteTable(
 		notebookLink: text('notebookLink').notNull().default(''),
 		excluded: integer('excluded', { mode: 'boolean' }).notNull().default(false)
 	},
-	(table) => [
-		uniqueIndex('teams_number').on(table.number),
-		index('teams_group').on(table.group)]
+	(table) => [uniqueIndex('teams_number').on(table.number), index('teams_group').on(table.group)]
 );
 
 export const judgeGroups = sqliteTable('JudgeGroups', {

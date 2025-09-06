@@ -9,18 +9,11 @@ import type { ClientOptions, PendingRequest } from './types';
 import type { InferRouterContext } from '../server/types';
 import type { Session } from '../server/session';
 
-
 // ============================================================================
 // Connection State
 // ============================================================================
 
-export const ConnectionStateSchema = z.enum([
-	'offline',
-	'connecting',
-	'connected',
-	'reconnecting',
-	'error'
-]);
+export const ConnectionStateSchema = z.enum(['offline', 'connecting', 'connected', 'reconnecting', 'error']);
 export type ConnectionState = z.infer<typeof ConnectionStateSchema>;
 
 /**

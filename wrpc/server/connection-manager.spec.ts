@@ -97,9 +97,9 @@ describe('WebSocketConnectionManager', () => {
 
 				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Device1');
 
-				await expect(
-					connectionManager.addConnection(mockWs as unknown as WebSocket, 'session2', 'client2', 'Device2')
-				).rejects.toThrow('Session ID mismatch');
+				await expect(connectionManager.addConnection(mockWs as unknown as WebSocket, 'session2', 'client2', 'Device2')).rejects.toThrow(
+					'Session ID mismatch'
+				);
 			});
 
 			it('getSessionId should throw before first connection and return after', async () => {

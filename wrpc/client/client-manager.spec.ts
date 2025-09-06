@@ -204,7 +204,7 @@ describe('WRPCClientManager', () => {
 			const [wsClient] = clientManager.getClient();
 			const states: ConnectionState[] = ['offline', 'connecting', 'connected', 'reconnecting', 'error'];
 
-			states.forEach(state => {
+			states.forEach((state) => {
 				vi.mocked(wsClient.getConnectionState).mockReturnValue(state);
 				expect(clientManager.getConnectionState()).toBe(state);
 			});
