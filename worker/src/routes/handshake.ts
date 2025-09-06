@@ -8,7 +8,7 @@ import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import { type ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
-import { eq } from 'drizzle-orm';
+import { getClients } from './client';
 
 export const StarterKitSchema = z.object({
 	essentialData: EssentialDataSchema,
@@ -37,7 +37,9 @@ export const handshake = {
 
 		// TODO :broadcast to all listening clients
 		// Do not wait for the broadcast to complete
-		session.broadcast<ClientRouter>().onClientListUpdate.mutation([]);
+		getClients(ctx.db, ctx.network).then((clients) => {
+			session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
+		});
 
 		return ctx.db.transaction(async (tx) => {
 			return {
@@ -75,7 +77,9 @@ export const handshake = {
 
 			// TODO :broadcast to all listening clients
 			// Do not wait for the broadcast to complete
-			session.broadcast<ClientRouter>().onClientListUpdate.mutation([]);
+			getClients(ctx.db, ctx.network).then((clients) => {
+				session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
+			});
 
 			return ctx.db.transaction(async (tx) => {
 				await updateEssentialData(tx, input.essentialData);
