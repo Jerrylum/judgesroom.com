@@ -204,7 +204,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 	private async callProcedure(procedure: AnyProcedure, input: unknown, session: Session<AnyRouter>, ctx: object): Promise<unknown> {
 		const procedureFn = procedure as unknown as ProcedureResolver<unknown, unknown, unknown, object, AnyRouter>;
-		return await procedureFn({ input, session, ctx });
+		return procedureFn({ input, session, ctx });
 	}
 
 	private async handleClose(event: CloseEvent): Promise<void> {

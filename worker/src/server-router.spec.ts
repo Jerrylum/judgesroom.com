@@ -23,7 +23,9 @@ describe('ServerRouter', () => {
 			broadcast: () =>
 				({
 					onClientListUpdate: { mutation: async () => [] },
-					onEssentialDataUpdate: { mutation: async () => [] }
+					onEssentialDataUpdate: { mutation: async () => [] },
+					onTeamDataUpdate: { mutation: async () => [] },
+					onJudgesUpdate: { mutation: async () => [] }
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				}) as any,
 			getServer: () => {

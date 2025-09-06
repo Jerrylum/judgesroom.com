@@ -108,7 +108,10 @@ export class App {
 		this.clientManager.resetClient();
 
 		// Join the session, this will call createWRPCClient
-		await this.wrpcClient.handshake.joinSession.mutation();
+		const starterKit = await this.wrpcClient.handshake.joinSession.mutation();
+		this.handleEssentialDataUpdate(starterKit.essentialData);
+		// this.allTeamData = starterKit.teamData;
+		// this.allJudges = starterKit.judges;
 	}
 
 	/**
@@ -155,20 +158,25 @@ export class App {
 	/**
 	 * Create a new session
 	 */
-	async createSession(essentialData: EssentialData, teamData: TeamData[], judges: Judge[]): Promise<void> {
+	async createSession(): Promise<void> {
 		try {
+			if (this.hasSessionInfo()) {
+				throw new Error('CRITICAL: already in a session');
+			}
+
 			const sessionId = generateUUID();
 			this.sessionInfo = this.createNewSessionInfo(sessionId);
 
+			if (!this.essentialData) {
+				throw new Error('CRITICAL: No essential data');
+			}
+
 			const response = await this.wrpcClient.handshake.createSession.mutation({
-				essentialData,
-				teamData,
-				judges
+				essentialData: this.essentialData,
+				teamData: [...this.allTeamData],
+				judges: [...this.allJudges]
 			});
 			if (response.success) {
-				this.handleEssentialDataUpdate(essentialData);
-				this.allTeamData = teamData;
-				this.allJudges = judges;
 				this.saveSessionToStorage();
 			} else {
 				this.sessionInfo = null;
@@ -176,6 +184,8 @@ export class App {
 				throw new Error(response.message);
 			}
 		} catch (error) {
+			this.sessionInfo = null;
+			this.clearSessionFromStorage();
 			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
@@ -211,9 +221,7 @@ export class App {
 	 * Destroy all session data (for admin)
 	 */
 	async destroySessionData(): Promise<void> {
-		// TODO
-		// This would typically call a server endpoint to destroy the session
-		// For now, just leave the session locally
+		await this.wrpcClient.handshake.destroySession.mutation();
 		this.leaveSession();
 	}
 
@@ -249,8 +257,8 @@ export class App {
 				}
 			}
 		} catch (error) {
-			// Clear invalid stored session
-			this.clearSessionFromStorage();
+			// Do not clear session from storage, the user might be able to connect to the session again
+			// this.clearSessionFromStorage();
 			this.addErrorNotice(`Failed to reconnect to session: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
@@ -263,14 +271,14 @@ export class App {
 	/**
 	 * Handle EssentialData update from server
 	 */
-	handleEssentialDataUpdate(data: EssentialData): void {
-		this.essentialData = data;
+	handleEssentialDataUpdate(data: Readonly<EssentialData>): void {
+		this.essentialData = $state.snapshot(data);
 	}
 
 	/**
 	 * Update event setup (sends to server via updateEssentialData)
 	 */
-	async updateEssentialData(eventSetup: EssentialData): Promise<void> {
+	async updateEssentialData(eventSetup: Readonly<EssentialData>): Promise<void> {
 		try {
 			await this.wrpcClient.essential.updateEssentialData.mutation(eventSetup);
 			// The server will broadcast the update back to us via onEssentialDataUpdate
@@ -292,6 +300,10 @@ export class App {
 		return this.essentialData?.eventName || null;
 	}
 
+	getAllTeams(): Readonly<Readonly<TeamInfo>[]> {
+		return $state.snapshot(this.essentialData?.teamInfos || []);
+	}
+
 	getTeamCount(): number {
 		return this.essentialData?.teamInfos.length || 0;
 	}
@@ -299,8 +311,8 @@ export class App {
 	/**
 	 * Get judge groups from cached EssentialData
 	 */
-	getJudgeGroups(): readonly JudgeGroup[] {
-		return this.essentialData?.judgeGroups || [];
+	getJudgeGroups(): Readonly<Readonly<JudgeGroup>[]> {
+		return $state.snapshot(this.essentialData?.judgeGroups || []);
 	}
 
 	/**
@@ -310,11 +322,11 @@ export class App {
 		return this.essentialData?.judgeGroups.length || 0;
 	}
 
-	getExistingJudgesGroupedByGroup(): Readonly<Record<string, readonly Judge[]>> {
+	getExistingJudgesGroupedByGroup(): Readonly<Record<string, Readonly<Judge>[]>> {
 		const judgeGroups = this.getJudgeGroups();
 		const allJudges = this.allJudges;
 
-		const groups: Record<string, Judge[]> = {};
+		const groups: Record<string, Readonly<Judge>[]> = {};
 		judgeGroups.forEach((group) => {
 			groups[group.id] = allJudges.filter((judge) => judge.groupId === group.id);
 		});
@@ -322,12 +334,16 @@ export class App {
 		return $state.snapshot(groups);
 	}
 
-	getAllAwards(): readonly Award[] {
+	getAllAwards(): Readonly<Readonly<Award>[]> {
 		if (!this.essentialData) return [];
 		return this.essentialData.awards;
 	}
 
-	getAllTeamData(): readonly TeamData[] {
+	handleTeamDataUpdate(data: Readonly<Readonly<TeamData>[]>): void {
+		this.allTeamData = $state.snapshot(data);
+	}
+
+	getAllTeamData(): Readonly<Readonly<TeamData>[]> {
 		return $state.snapshot(this.allTeamData);
 	}
 
@@ -341,7 +357,11 @@ export class App {
 		return judge ? $state.snapshot(judge) : null;
 	}
 
-	getAllJudges(): readonly Judge[] {
+	handleJudgesUpdate(data: Readonly<Readonly<Judge>[]>): void {
+		this.allJudges = $state.snapshot(data);
+	}
+
+	getAllJudges(): Readonly<Readonly<Judge>[]> {
 		return $state.snapshot(this.allJudges);
 	}
 
@@ -357,14 +377,14 @@ export class App {
 	/**
 	 * Handle client list update from server
 	 */
-	handleClientListUpdate(clients: ClientInfo[]): void {
-		this.allClients = clients;
+	handleClientListUpdate(clients: Readonly<Readonly<ClientInfo>[]>): void {
+		this.allClients = $state.snapshot(clients);
 	}
 
 	/**
 	 * Get connected clients
 	 */
-	getClients(): Readonly<readonly ClientInfo[]> {
+	getClients(): Readonly<Readonly<ClientInfo>[]> {
 		return $state.snapshot(this.allClients);
 	}
 
@@ -464,13 +484,13 @@ export class App {
 		this.errorNotices = [];
 	}
 
+	get wrpcClient() {
+		return this.clientManager.getClient()[1];
+	}
+
 	// ============================================================================
 	// Private Methods
 	// ============================================================================
-
-	private get wrpcClient() {
-		return this.clientManager.getClient()[1];
-	}
 
 	private createClientOptions(): ClientOptions<ClientRouter> {
 		const isDevelopment = import.meta.env.DEV;

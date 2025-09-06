@@ -10,6 +10,7 @@ import { getJudges, upsertJudge } from './judge';
 import { getClients } from './client';
 import type { ServerContext } from '../server-router';
 import { offlineClients } from '../db/schema';
+import { transaction } from '../utils';
 
 export const StarterKitSchema = z.object({
 	essentialData: EssentialDataSchema,
@@ -43,7 +44,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
 			});
 
-			return ctx.db.transaction(async (tx) => {
+			return transaction(ctx.db, async (tx) => {
 				return {
 					essentialData: await getEssentialData(tx),
 					teamData: await getTeamData(tx),
@@ -83,7 +84,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 					session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
 				});
 
-				return ctx.db.transaction(async (tx) => {
+				return transaction(ctx.db, async (tx) => {
 					await updateEssentialData(tx, input.essentialData);
 
 					await Promise.all(input.teamData.map((team) => updateTeamData(tx, team)));

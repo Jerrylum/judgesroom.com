@@ -7,9 +7,9 @@
 	let isDestroying = $state(false);
 	// let hasEndedSession = $state(false);
 
-	const isInSession = $derived(app.isInSession());
-	const connectionState = $derived(app.getConnectionState());
-	const isConnected = $derived(connectionState === 'connected');
+	const isJudgingReady = $derived(app.isJudgingReady());
+	// const connectionState = $derived(app.getConnectionState());
+	// const isConnected = $derived(connectionState === 'connected');
 	// const canEndSession = $derived(isInSession && isConnected && !hasEndedSession);
 	// const canDestroy = $derived(!isInSession || hasEndedSession);
 	const canDestroy = $derived(true);
@@ -124,7 +124,7 @@
 		<!-- Data Destruction Section -->
 		<div class="space-y-3">
 			<h4 class="text-sm font-medium text-gray-900">
-				{isInSession ? 'Step 2: ' : ''}Destroy Data
+				{isJudgingReady ? 'Step 2: ' : ''}Destroy Data
 			</h4>
 			<p class="text-sm text-gray-600">Type "delete" below to confirm the permanent destruction of all judging data.</p>
 

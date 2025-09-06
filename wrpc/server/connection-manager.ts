@@ -61,6 +61,8 @@ export class WebSocketConnectionManager implements Network {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
+		console.log('Adding connection', this.serverData, sessionId);
+		
 		if (this.serverData.sessionId !== null && this.serverData.sessionId !== sessionId) {
 			throw new Error('Session ID mismatch');
 		}
@@ -175,7 +177,7 @@ export class WebSocketConnectionManager implements Network {
 			};
 
 			try {
-				return await this.sendToClient(clientId, clientRequest);
+				return this.sendToClient(clientId, clientRequest);
 			} catch (error) {
 				// Return error response for failed broadcasts
 				return {
@@ -257,7 +259,7 @@ export class WebSocketConnectionManager implements Network {
 	 * Load data from Durable Object storage
 	 */
 	private async load() {
-		this.serverData = ((await this.opts.loadData()) || { clients: [] }) as ServerData;
+		this.serverData = ((await this.opts.loadData()) || { sessionId: null, clients: [] }) as ServerData;
 		this.isLoaded = true;
 	}
 

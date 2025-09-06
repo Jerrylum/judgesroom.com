@@ -111,6 +111,31 @@ describe('Server-side Session', () => {
 			);
 			expect(result).toBe('nested result');
 		});
+
+		it('should support multi-segment nested paths for client query', async () => {
+			const mockResponse: WRPCResponse = {
+				kind: 'response',
+				id: 'test-id',
+				result: { type: 'data', data: 'multi nested result' }
+			};
+
+			vi.mocked(mockNetwork.sendToClient).mockResolvedValue(mockResponse);
+
+			const clientProxy = session.getClient('target-client-id');
+			const result = await (clientProxy as any).handshake.createSession.query({ ok: true });
+
+			expect(mockNetwork.sendToClient).toHaveBeenCalledWith(
+				'target-client-id',
+				expect.objectContaining({
+					kind: 'request',
+					type: 'query',
+					path: 'handshake.createSession',
+					input: { ok: true },
+					id: expect.any(String)
+				})
+			);
+			expect(result).toBe('multi nested result');
+		});
 	});
 
 	describe('broadcast', () => {
@@ -143,6 +168,29 @@ describe('Server-side Session', () => {
 				})
 			);
 			expect(results).toBe(mockResponses);
+		});
+
+		it('should support multi-segment nested paths for broadcast mutation', async () => {
+			const mockResponses: WRPCResponse[] = [
+				{ kind: 'response', id: 'id-1', result: { type: 'data', data: 1 } },
+				{ kind: 'response', id: 'id-2', result: { type: 'data', data: 2 } }
+			];
+
+			vi.mocked(mockNetwork.broadcast).mockResolvedValue(mockResponses);
+
+			const broadcastProxy = session.broadcast();
+			const results = await (broadcastProxy as any).handshake.createSession.mutation({ a: 1 });
+
+			expect(mockNetwork.broadcast).toHaveBeenCalledWith(
+				expect.objectContaining({
+					kind: 'request',
+					type: 'mutation',
+					path: 'handshake.createSession',
+					input: { a: 1 },
+					id: expect.any(String)
+				})
+			);
+			expect(results).toEqual(mockResponses);
 		});
 	});
 

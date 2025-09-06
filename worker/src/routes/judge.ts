@@ -4,6 +4,7 @@ import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { judges } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
+import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
 export async function getJudges(db: DatabaseOrTransaction): Promise<Judge[]> {
 	return db.select().from(judges) as Promise<Judge[]>;
@@ -28,11 +29,30 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 		getJudges: w.procedure.output(z.array(JudgeSchema)).query(async ({ ctx }) => {
 			return getJudges(ctx.db);
 		}),
-		updateJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input }) => {
-			return upsertJudge(ctx.db, input);
+		updateJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input, session }) => {
+			await upsertJudge(ctx.db, input);
+			// Do not wait for the broadcast to complete
+			getJudges(ctx.db).then((judges) => {
+				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+			});
 		}),
-		removeJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input }) => {
-			return removeJudge(ctx.db, input);
+		removeJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input, session }) => {
+			await removeJudge(ctx.db, input);
+			// Do not wait for the broadcast to complete
+			getJudges(ctx.db).then((judges) => {
+				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+			});
+		}),
+		updateAllJudges: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ ctx, input, session }) => {
+			await ctx.db.transaction(async (tx) => {
+				input.forEach(async (judge) => {
+					await tx.update(judges).set(judge).where(eq(judges.id, judge.id));
+				});
+			});
+			// Do not wait for the broadcast to complete
+			getJudges(ctx.db).then((judges) => {
+				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+			});
 		})
 	};
 }

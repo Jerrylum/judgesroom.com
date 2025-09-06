@@ -13,22 +13,16 @@ export function createClientSideSession<TServerRouter extends AnyRouter, TClient
 	/**
 	 * Create a client proxy that can call procedures on the client
 	 */
-	function createServerProxy() {
+	function createServerProxy(pathParts: string[] = []) {
 		return new Proxy({} as RouterProxy<TServerRouter>, {
-			get(target, prop: string) {
-				return new Proxy(
-					{},
-					{
-						get(target, method: string) {
-							if (method === 'query') {
-								return (input: unknown) => wsClient.query(prop, input);
-							} else if (method === 'mutation') {
-								return (input: unknown) => wsClient.mutation(prop, input);
-							}
-							throw new Error(`Unknown method: ${method}`);
-						}
-					}
-				);
+			get(_target, prop: string) {
+				if (prop === 'query') {
+					return (input: unknown) => wsClient.query(pathParts.join('.'), input);
+				}
+				if (prop === 'mutation') {
+					return (input: unknown) => wsClient.mutation(pathParts.join('.'), input);
+				}
+				return createServerProxy([...pathParts, prop]);
 			}
 		});
 	}

@@ -114,12 +114,13 @@ describe('createWRPCClient', () => {
 			const [, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
 
 			expect(() => {
+				// With chained proxies, unknown methods aren't recognized and invoking them throws a TypeError
 				(wrpcProxy as any).getStatus.unknownMethod();
-			}).toThrow('Unknown method: unknownMethod');
+			}).toThrow(/is not a function/);
 
 			expect(() => {
 				(wrpcProxy as any).onNotification.invalidMethod();
-			}).toThrow('Unknown method: invalidMethod');
+			}).toThrow(/is not a function/);
 		});
 
 		it('should handle nested procedure paths', async () => {

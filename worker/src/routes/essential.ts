@@ -8,6 +8,7 @@ import { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 import { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import { transaction } from '../utils';
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -64,7 +65,7 @@ export async function hasEssentialData(db: DatabaseOrTransaction): Promise<boole
 }
 
 export async function getEssentialData(db: DatabaseOrTransaction): Promise<EssentialData> {
-	return db.transaction(async (tx) => {
+	return transaction(db, async (tx) => {
 		const metadataRows = await tx.select().from(metadata).limit(1);
 		if (metadataRows.length === 0) {
 			throw new Error('No metadata found');
@@ -162,7 +163,7 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 		}
 	}
 
-	return db.transaction(async (tx) => {
+	return transaction(db, async (tx) => {
 		await tx.update(metadata).set(essentialData); // only for event name, competition type, event grade level, judging method
 		await updateInsertAndDeleteAwards(tx, essentialData.awards);
 		await updateInsertAndDeleteTeams(tx, essentialData.teamInfos);

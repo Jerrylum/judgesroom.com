@@ -14,12 +14,7 @@
 				throw new Error('No event setup data available. Please complete event setup first.');
 			}
 
-			await app.createSession(
-				essentialData.eventName,
-				essentialData.competitionType,
-				essentialData.eventGradeLevel,
-				essentialData.judgingMethod
-			);
+			await app.createSession();
 
 			// For Judge Advisor who created the session, auto-select role and show share dialog
 			app.selectUser({ role: 'judge_advisor' });

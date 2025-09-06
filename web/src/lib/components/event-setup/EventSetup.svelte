@@ -11,8 +11,9 @@
 	import { JudgeGroupClass } from '$lib/judging.svelte';
 	import { Team } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
-	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
+	import type { TeamData } from '@judging.jerryio/protocol/src/team';
 
 	// Extended AwardOptions type for drag and drop
 	type AwardOptionsWithId = AwardOptions & { id: string };
@@ -48,7 +49,7 @@
 	let originalEventSetupHash: string | null = null;
 
 	// Current app data for comparison
-	const currentAppEventSetup = $derived(app.getEventSetup());
+	// const currentEssentialData = $derived(app.getEssentialData());
 
 	/**
 	 * Generate SHA-256 hash of event setup data
@@ -68,8 +69,8 @@
 	 * Check if current event setup conflicts with original
 	 */
 	async function hasEventSetupConflict(): Promise<boolean> {
-		if (!originalEventSetupHash || !currentAppEventSetup) return false;
-		const currentHash = await generateEventSetupHash(currentAppEventSetup);
+		if (!originalEventSetupHash || !app.isJudgingReady()) return false;
+		const currentHash = await generateEventSetupHash(app.getEssentialData());
 		return currentHash !== originalEventSetupHash;
 	}
 
@@ -77,7 +78,14 @@
 	 * Load current data from app
 	 */
 	function loadCurrentData() {
-		const eventSetup = currentAppEventSetup;
+		const eventSetup = app.getEssentialData();
+		const allTeamData: Record<string, TeamData> = app.getAllTeamData().reduce(
+			(acc, team) => {
+				acc[team.id] = team;
+				return acc;
+			},
+			{} as Record<string, TeamData>
+		);
 		const allJudges = app.getAllJudges();
 
 		if (eventSetup) {
@@ -87,7 +95,7 @@
 			selectedEventGradeLevel = eventSetup.eventGradeLevel;
 
 			// Load teams
-			teams = eventSetup.teams.map((teamWithData) => {
+			teams = eventSetup.teamInfos.map((teamWithData) => {
 				const teamInfo = {
 					id: teamWithData.id,
 					number: teamWithData.number,
@@ -100,7 +108,11 @@
 					grade: teamWithData.grade,
 					group: teamWithData.group
 				};
-				const teamData = teamWithData.data;
+				const teamData = allTeamData[teamWithData.id] || {
+					id: teamWithData.id,
+					notebookLink: '',
+					excluded: false
+				};
 				return new Team(teamInfo, teamData);
 			});
 
@@ -137,7 +149,7 @@
 
 	function cancelSetup() {
 		// Only allow cancel if user is in session
-		if (app.isInSession()) {
+		if (app.isJudgingReady()) {
 			AppUI.appPhase = 'workspace';
 		}
 	}
@@ -162,56 +174,34 @@
 			}
 
 			// Create the event setup object
-			const eventSetup = {
+			const essentialData = {
 				eventName,
 				competitionType: selectedCompetitionType,
 				eventGradeLevel: selectedEventGradeLevel,
-				performanceAwards: performanceAwards
-					.filter((award) => award.isSelected)
-					.map((award) => ({
-						...award.generateAward(),
-						type: 'performance' as const
-					})),
-				judgedAwards: judgedAwards
-					.filter((award) => award.isSelected)
-					.map((award) => ({
-						...award.generateAward(),
-						type: 'judged' as const
-					})),
-				volunteerNominatedAwards: volunteerNominatedAwards
-					.filter((award) => award.isSelected)
-					.map((award) => ({
-						...award.generateAward(),
-						type: 'volunteer_nominated' as const
-					})),
-				teams: teams.map((team) => ({ ...team.info, data: team.data })),
 				judgingMethod,
+				teamInfos: teams.map((team) => ({ ...team.info, data: team.data })),
 				judgeGroups: judgeGroups.map((group) => ({
 					id: group.id,
 					name: group.name,
 					assignedTeams: group.assignedTeams.map((team) => team.number)
+				})),
+				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards].map((award) => ({
+					...award.generateAward()
 				}))
-			};
+			} satisfies EssentialData;
 
-			// Save to app if available
-			await app.updateEventSetup(eventSetup);
-
-			// Also save team data (notebookLink, excluded status, etc.)
-			for (const team of teams) {
-				await app.updateTeamData(team.number, team.data);
-			}
-
-			// Also save judges
-			for (const judge of judges) {
-				await app.updateJudge(judge);
-			}
-
-			// Redirect based on whether user is in session
-			if (app.isInSession()) {
-				// User is already in session, go back to workspace
+			// Redirect based on whether user is judging ready
+			if (app.isJudgingReady()) {
+				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
+				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
+				await app.wrpcClient.judge.updateAllJudges.mutation(judges);
+				// User is already ready, go back to workspace
 				AppUI.appPhase = 'workspace';
 			} else {
-				// User is not in session, continue to session setup
+				app.handleEssentialDataUpdate(essentialData);
+				app.handleTeamDataUpdate(teams.map((team) => team.data));
+				app.handleJudgesUpdate(judges);
+				// User is not ready, continue to session setup
 				AppUI.appPhase = 'session_setup';
 			}
 		} catch (error) {
@@ -234,7 +224,7 @@
 		loadCurrentData();
 
 		// Store original hash for conflict detection
-		const eventSetup = currentAppEventSetup;
+		const eventSetup = app.getEssentialData();
 		if (eventSetup) {
 			originalEventSetupHash = await generateEventSetupHash(eventSetup);
 		}
@@ -247,14 +237,11 @@
 
 	// Monitor app data changes and warn about conflicts
 	$effect(() => {
-		if (originalEventSetupHash && currentAppEventSetup) {
-			(async () => {
-				const currentHash = await generateEventSetupHash(currentAppEventSetup);
-				if (currentHash && currentHash !== originalEventSetupHash) {
-					app.addErrorNotice('Event setup has been modified on another device. Your changes may conflict.');
-				}
-			})();
-		}
+		hasEventSetupConflict().then((hasConflict) => {
+			if (hasConflict) {
+				app.addErrorNotice('Event setup has been modified on another device. Your changes may conflict.');
+			}
+		});
 	});
 
 	// Load official awards when competition type or grade changes
@@ -277,6 +264,7 @@
 		}
 	});
 
+	// If teams are updated, reset all teams to unassigned
 	$effect(() => {
 		if (teams.length > 0) {
 			unassignedTeams = teams.filter((team) => !team.excluded);
@@ -349,7 +337,7 @@
 				onPrev={prevStep}
 				onComplete={completeSetup}
 				onCancel={cancelSetup}
-				isInSession={app.isInSession()}
+				isJudgingReady={app.isJudgingReady()}
 			/>
 		{/if}
 	</div>

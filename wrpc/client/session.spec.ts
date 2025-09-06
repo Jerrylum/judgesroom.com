@@ -53,12 +53,24 @@ describe('Client-side Session', () => {
 			expect(result).toBe('mutation result');
 		});
 
-		it('should throw error for unknown methods', async () => {
-			const serverProxy = session.getServer();
+		it('should support multi-segment nested paths for query', async () => {
+			vi.mocked(mockWsClient.query).mockResolvedValue('multi result');
 
-			expect(() => {
-				(serverProxy as any).testProcedure.unknownMethod('input');
-			}).toThrow('Unknown method: unknownMethod');
+			const serverProxy = session.getServer();
+			const result = await (serverProxy as any).handshake.createSession.query({ foo: 'bar' });
+
+			expect(mockWsClient.query).toHaveBeenCalledWith('handshake.createSession', { foo: 'bar' });
+			expect(result).toBe('multi result');
+		});
+
+		it('should support multi-segment nested paths for mutation', async () => {
+			vi.mocked(mockWsClient.mutation).mockResolvedValue('multi mutation');
+
+			const serverProxy = session.getServer();
+			const result = await (serverProxy as any).handshake.createSession.mutation({ a: 1 });
+
+			expect(mockWsClient.mutation).toHaveBeenCalledWith('handshake.createSession', { a: 1 });
+			expect(result).toBe('multi mutation');
 		});
 	});
 

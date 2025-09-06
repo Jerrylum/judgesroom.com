@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { initWRPC } from '@judging.jerryio/wrpc/client';
-import { clientHandlers } from './client-state.svelte';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
-import type { Session } from '@judging.jerryio/wrpc/server';
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { ClientInfoSchema } from '@judging.jerryio/protocol/src/client';
+import { app } from './app-page.svelte';
+import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
+import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -18,7 +19,8 @@ const clientRouter = w.router({
 	 * Server pushes essential data updates to client
 	 */
 	onEssentialDataUpdate: w.procedure.input(EssentialDataSchema).mutation(async ({ input }) => {
-		clientHandlers.onEssentialDataUpdate(input);
+		console.log(`📊 Essential data updated:`, input);
+		app.handleEssentialDataUpdate(input);
 		return `Essential data updated`;
 	}),
 
@@ -26,8 +28,27 @@ const clientRouter = w.router({
 	 * Server pushes client list updates to client
 	 */
 	onClientListUpdate: w.procedure.input(z.array(ClientInfoSchema)).mutation(async ({ input }) => {
-		clientHandlers.onClientListUpdate(input);
+		console.log(`📊 Client list updated:`, input);
+		app.handleClientListUpdate(input);
 		return `Client list updated`;
+	}),
+
+	/**
+	 * Server pushes team data updates to client
+	 */
+	onTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
+		console.log(`📊 Team data updated:`, input);
+		app.handleTeamDataUpdate(input);
+		return `Team data updated`;
+	}),
+
+	/**
+	 * Server pushes judges updates to client
+	 */
+	onJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
+		console.log(`📊 Judges updated:`, input);
+		app.handleJudgesUpdate(input);
+		return `Judges updated`;
 	})
 });
 

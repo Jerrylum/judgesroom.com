@@ -9,7 +9,7 @@
 
 	const currentUser = $derived(app.getCurrentUser());
 	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
-	const isInSession = $derived(app.isInSession());
+	const isJudgingReady = $derived(app.isJudgingReady());
 	const connectionState = $derived(app.getConnectionState());
 	const isConnected = $derived(connectionState === 'connected');
 
@@ -29,7 +29,7 @@
 	async function handleLeaveSession() {
 		closeMenu();
 
-		if (!isInSession) return;
+		if (!isJudgingReady) return;
 
 		const confirmed = await dialogs.showConfirmation({
 			title: 'Leave Session',
@@ -158,7 +158,7 @@
 			</button>
 
 			<!-- Leave Session -->
-			{#if isInSession}
+			{#if isJudgingReady}
 				<button
 					onclick={handleLeaveSession}
 					disabled={!isConnected}

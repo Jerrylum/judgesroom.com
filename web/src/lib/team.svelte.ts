@@ -32,8 +32,9 @@ export function createTeamInfo(
 	};
 }
 
-export function createTeamData(notebookLink: string, excluded: boolean): TeamData {
+export function createTeamData(id: string, notebookLink: string, excluded: boolean): TeamData {
 	return {
+		id: uuidv4(),
 		notebookLink,
 		excluded
 	};
@@ -315,11 +316,12 @@ export function mapGradeToGradeLevel(gradeString: string): Grade {
 
 export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebookLinks: Record<string, string>): Team[] {
 	return csvTeams.map((team) => {
+		const id = uuidv4();
 		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
 		const notebookLink = notebookLinks[teamNumber] || '';
 
 		const teamInfo = createTeamInfo(
-			uuidv4(),
+			id,
 			teamNumber,
 			team.name || '',
 			team.city || '',
@@ -331,7 +333,7 @@ export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebook
 			team.group || ''
 		);
 
-		const teamData = createTeamData(notebookLink, team.excluded || false);
+		const teamData = createTeamData(id, notebookLink, team.excluded || false);
 
 		return new Team(teamInfo, teamData);
 	});

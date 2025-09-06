@@ -4,6 +4,7 @@ import { teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
 export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]> {
 	return db
@@ -24,10 +25,23 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 		getTeamData: w.procedure.output(z.array(TeamDataSchema)).query(async ({ ctx }) => {
 			return getTeamData(ctx.db);
 		}),
-		updateTeamData: w.procedure.input(TeamDataSchema).mutation(async ({ ctx, input }) => {
+		updateTeamData: w.procedure.input(TeamDataSchema).mutation(async ({ ctx, input, session }) => {
 			await updateTeamData(ctx.db, input);
 			// Do not wait for the broadcast to complete
-			// TODO: Broadcast to all clients: onTeamDataUpdate
+			getTeamData(ctx.db).then((teamData) => {
+				session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(teamData);
+			});
+		}),
+		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
+			await ctx.db.transaction(async (tx) => {
+				input.forEach(async (teamData) => {
+					await tx.update(teams).set(teamData).where(eq(teams.id, teamData.id));
+				});
+			});
+			// Do not wait for the broadcast to complete
+			getTeamData(ctx.db).then((teamData) => {
+				session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(teamData);
+			});
 		})
 	};
 }

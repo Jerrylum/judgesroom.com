@@ -12,26 +12,29 @@ export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter 
 	const client = new WebsocketClient<TClientRouter>(options, clientRouter);
 
 	const wrpc = new Proxy({} as WRPCClient<TServerRouter>, {
-		get(target, prop: string) {
-			return new Proxy(
-				{},
-				{
-					get(target, method: string | symbol) {
-						if (typeof method === 'symbol') {
-							return undefined;
+		get(_target, prop: string | symbol) {
+			const pathParts: string[] = [];
+			function createPathProxy(currentParts: string[]): unknown {
+				return new Proxy(
+					{},
+					{
+						get(_t, key: string | symbol) {
+							if (typeof key === 'symbol') return undefined;
+							if (key === 'constructor') return undefined;
+							if (key === 'query') {
+								return (input: unknown) => client.query(currentParts.join('.'), input);
+							}
+							if (key === 'mutation') {
+								return (input: unknown) => client.mutation(currentParts.join('.'), input);
+							}
+							return createPathProxy([...currentParts, key]);
 						}
-						if (method === 'constructor') {
-							return undefined;
-						}
-						if (method === 'query') {
-							return (input: unknown) => client.query(prop, input);
-						} else if (method === 'mutation') {
-							return (input: unknown) => client.mutation(prop, input);
-						}
-						throw new Error(`Unknown method: ${method}`);
 					}
-				}
-			);
+				);
+			}
+
+			if (typeof prop === 'symbol') return undefined;
+			return createPathProxy([prop]);
 		}
 	});
 

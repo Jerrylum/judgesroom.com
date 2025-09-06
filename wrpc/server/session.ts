@@ -64,44 +64,34 @@ export function createServerSideSession(
 	/**
 	 * Create a client proxy that can call procedures on the client
 	 */
-	function createClientProxy<TClientRouter extends AnyRouter>(targetClientId?: string): RouterProxy<TClientRouter> {
+	function createClientProxy<TClientRouter extends AnyRouter>(targetClientId?: string, pathParts: string[] = []): RouterProxy<TClientRouter> {
 		return new Proxy({} as RouterProxy<TClientRouter>, {
-			get(target, prop: string) {
-				return new Proxy(
-					{},
-					{
-						get(target, method: string) {
-							if (method === 'query' || method === 'mutation') {
-								return async (input: unknown) => {
-									const request: WRPCRequest = {
-										kind: 'request',
-										id: crypto.randomUUID(),
-										type: method as 'query' | 'mutation',
-										path: prop,
-										input
-									};
+			get(_target, prop: string) {
+				if (prop === 'query' || prop === 'mutation') {
+					return async (input: unknown) => {
+						const request: WRPCRequest = {
+							kind: 'request',
+							id: crypto.randomUUID(),
+							type: prop as 'query' | 'mutation',
+							path: pathParts.join('.'),
+							input
+						};
 
-									if (targetClientId) {
-										// Send to specific client
-										const response = await connectionManager.sendToClient(targetClientId, request);
-										if (response.result.type === 'data') {
-											return response.result.data;
-										} else {
-											throw new Error(response.result.error.message);
-										}
-									} else {
-										// Broadcast to all clients
-										const responses = await connectionManager.broadcast(request);
-										return responses; // Return array of responses for broadcast
-									}
-								};
+						if (targetClientId) {
+							const response = await connectionManager.sendToClient(targetClientId, request);
+							if (response.result.type === 'data') {
+								return response.result.data;
+							} else {
+								throw new Error(response.result.error.message);
 							}
-
-							// Handle nested router properties
-							return createClientProxy(targetClientId);
+						} else {
+							const responses = await connectionManager.broadcast(request);
+							return responses;
 						}
-					}
-				);
+					};
+				}
+
+				return createClientProxy(targetClientId, [...pathParts, prop]);
 			}
 		});
 	}

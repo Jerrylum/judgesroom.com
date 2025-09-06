@@ -9,7 +9,7 @@
 	let { showDetails = false }: Props = $props();
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
-	let isInSession = $derived(app.isInSession());
+	let isJudgingReady = $derived(app.isJudgingReady());
 
 	function getStatusColor(state: ConnectionState): string {
 		switch (state) {
@@ -28,7 +28,7 @@
 	}
 
 	function getStatusText(state: ConnectionState): string {
-		if (!isInSession) {
+		if (!isJudgingReady) {
 			return 'Offline Mode';
 		}
 
@@ -59,9 +59,9 @@
 		{/if}
 	</div>
 
-	{#if showDetails && isInSession}
+	{#if showDetails && isJudgingReady}
 		<!-- Offline mode indicator -->
-		{#if !isInSession}
+		{#if !isJudgingReady}
 			<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"> Offline Mode </span>
 		{/if}
 
@@ -71,7 +71,7 @@
 		{/if}
 
 		<!-- Submission disabled indicator -->
-		{#if connectionState !== 'connected' && isInSession}
+		{#if connectionState !== 'connected' && isJudgingReady}
 			<span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-700"> Submissions Disabled </span>
 		{/if}
 	{/if}
