@@ -160,9 +160,13 @@ export class App {
 	 */
 	async createSession(): Promise<void> {
 		try {
-			if (this.hasSessionInfo()) {
-				throw new Error('CRITICAL: already in a session');
-			}
+			this.currentUser = null;
+			this.userClearReason = null;
+			this.clientManager.resetClient();
+
+			// Clear storage
+			this.clearSessionFromStorage();
+			this.clearUserFromStorage();
 
 			const sessionId = generateUUID();
 			this.sessionInfo = this.createNewSessionInfo(sessionId);

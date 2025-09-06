@@ -34,7 +34,7 @@ export function createTeamInfo(
 
 export function createTeamData(id: string, notebookLink: string, excluded: boolean): TeamData {
 	return {
-		id: uuidv4(),
+		id,
 		notebookLink,
 		excluded
 	};
@@ -46,12 +46,14 @@ export class Team {
 	public data: TeamData;
 
 	constructor(info: TeamInfo, data: TeamData) {
+		if (info.id !== data.id) {
+			throw new Error('Team info and data IDs do not match');
+		}
 		this.id = info.id;
 		this.info = $state(info);
 		this.data = $state(data);
 	}
 
-	// Convenience getters for backward compatibility
 	get number() {
 		return this.info.number;
 	}

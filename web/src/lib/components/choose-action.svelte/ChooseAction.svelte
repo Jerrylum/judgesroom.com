@@ -27,6 +27,7 @@
 			// Stay in joining state - App will request sync automatically when connected
 			// UI will update via reactive app.hasAppData() when sync completes
 			AppUI.appPhase = 'joining_session';
+			await app.leaveSession();
 			await app.joinSessionFromUrl(sessionUrl);
 		} catch (error) {
 			console.error('Error joining session:', error);

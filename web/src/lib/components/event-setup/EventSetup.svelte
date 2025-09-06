@@ -183,7 +183,7 @@
 				judgeGroups: judgeGroups.map((group) => ({
 					id: group.id,
 					name: group.name,
-					assignedTeams: group.assignedTeams.map((team) => team.number)
+					assignedTeams: group.assignedTeams.map((team) => team.id)
 				})),
 				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards].map((award) => ({
 					...award.generateAward()

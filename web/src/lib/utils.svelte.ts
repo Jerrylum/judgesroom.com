@@ -1,3 +1,4 @@
+import { SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
 
 /**
@@ -64,24 +65,10 @@ export function debounce<T extends (...args: Parameters<T>) => void>(func: T, wa
 	};
 }
 
-export function parseSessionUrl(urlOrFragment: string | URL): string | null {
+export function parseSessionUrl(url: string): string | null {
 	try {
-		let fragment: string;
-		if (typeof urlOrFragment === 'string') {
-			if (urlOrFragment.startsWith('#')) {
-				fragment = urlOrFragment.substring(1);
-			} else {
-				fragment = urlOrFragment;
-			}
-		} else {
-			fragment = urlOrFragment.hash.substring(1);
-		}
-
-		if (!fragment) {
-			return null;
-		}
-
-		return z.uuidv4().parse(fragment);
+		const hash = new SvelteURL(url).hash.substring(1);
+		return z.uuidv4().parse(hash);
 	} catch (error) {
 		console.error('Failed to parse session URL:', error);
 		return null;

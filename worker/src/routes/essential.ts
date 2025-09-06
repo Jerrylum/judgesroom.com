@@ -105,13 +105,16 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 				)
 			)
 		);
-		if (values.length > 0) {
+
+		// Use for loop instead of bulk insert to avoid SQLite error
+		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+		for (const v of values) {
 			await tx
 				.insert(awards)
-				.values(values)
+				.values(v)
 				.onConflictDoUpdate({
 					target: [awards.name],
-					set: buildConflictUpdateColumns(awards, Object.keys(values[0]) as (keyof Award)[])
+					set: buildConflictUpdateColumns(awards, Object.keys(v) as (keyof Award)[])
 				});
 		}
 	}
@@ -125,13 +128,16 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 				)
 			)
 		);
-		if (values.length > 0) {
+
+		// Use for loop instead of bulk insert to avoid SQLite error
+		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+		for (const v of values) {
 			await tx
 				.insert(teams)
-				.values(values)
+				.values(v)
 				.onConflictDoUpdate({
 					target: [teams.id],
-					set: buildConflictUpdateColumns(teams, Object.keys(values[0]) as (keyof TeamInfo)[])
+					set: buildConflictUpdateColumns(teams, Object.keys(v) as (keyof TeamInfo)[])
 				});
 		}
 	}
@@ -146,10 +152,11 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 				)
 			)
 		);
-		if (values.length > 0) {
+
+		for (const v of values) {
 			await tx
 				.insert(judgeGroups)
-				.values(values satisfies DBJudgeGroup[])
+				.values(v)
 				.onConflictDoUpdate({
 					target: [judgeGroups.id],
 					set: buildConflictUpdateColumns(judgeGroups, ['id', 'name'])
@@ -158,13 +165,15 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 
 		const assignedTeams = values.flatMap((v) => v.assignedTeams.map((t) => ({ judgeGroupId: v.id, teamId: t })));
 		await tx.delete(judgeGroupsAssignedTeams);
-		if (assignedTeams.length > 0) {
-			await tx.insert(judgeGroupsAssignedTeams).values(assignedTeams);
+
+		for (const v of assignedTeams) {
+			await tx.insert(judgeGroupsAssignedTeams).values(v);
 		}
 	}
 
 	return transaction(db, async (tx) => {
-		await tx.update(metadata).set(essentialData); // only for event name, competition type, event grade level, judging method
+		await tx.delete(metadata);
+		await tx.insert(metadata).values(essentialData); // only for event name, competition type, event grade level, judging method
 		await updateInsertAndDeleteAwards(tx, essentialData.awards);
 		await updateInsertAndDeleteTeams(tx, essentialData.teamInfos);
 		await updateInsertAndDeleteJudgeGroups(tx, essentialData.judgeGroups);

@@ -29,6 +29,6 @@ export type Judge = z.infer<typeof JudgeSchema>;
 export const JudgeGroupSchema = z.object({
 	id: z.uuidv4(),
 	name: JudgeGroupNameSchema,
-	assignedTeams: z.array(TeamNumberSchema)
+	assignedTeams: z.array(z.string()) // Team IDs
 });
 export type JudgeGroup = z.infer<typeof JudgeGroupSchema>;

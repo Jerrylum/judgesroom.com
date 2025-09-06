@@ -38,10 +38,12 @@
 		}
 	});
 
+	$inspect(AppUI.appPhase);
+
 	onMount(async () => {
 		const hash = window.location.hash;
 		if (hash) {
-			const result = parseSessionUrl(hash);
+			const result = parseSessionUrl(window.location.href);
 			const existingSessionInfo = app.getSessionInfo();
 			if (existingSessionInfo?.sessionId !== result) {
 				await app.leaveSession();
@@ -74,8 +76,7 @@
 
 	async function handleSessionFromUrl() {
 		try {
-			const fullUrl = window.location.href;
-			await app.joinSessionFromUrl(fullUrl);
+			await app.joinSessionFromUrl(window.location.href);
 
 			// Clear URL hash for security using SvelteKit navigation
 			replaceState('/app', {});

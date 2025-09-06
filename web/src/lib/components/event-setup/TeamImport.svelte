@@ -18,7 +18,7 @@
 	let uploadSuccess = $state('');
 
 	// Team management states
-	let teamGroups = $state<Record<string, Team[]>>(getTeamGroupsFromTeams(teams));
+	let teamGroups = $state<Record<string, Team[]>>(groupTeamsByGroup(teams));
 	let newGroupName = $state('');
 
 	// Multi-select drag and drop states
@@ -38,17 +38,6 @@
 			});
 		});
 	});
-
-	function getTeamGroupsFromTeams(teams: Team[]) {
-		const grouped = groupTeamsByGroup(teams);
-		const groupedWithIds: Record<string, Team[]> = {};
-
-		Object.entries(grouped).forEach(([groupName, teamList]) => {
-			groupedWithIds[groupName] = teamList.map((team, index) => Object.assign(team, { id: `${team.number}-${index}` }));
-		});
-
-		return groupedWithIds;
-	}
 
 	function handleFileSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -98,11 +87,12 @@
 
 			const mergedTeams = mergeTeamData(csvTeams, notebookLinks);
 			teams = mergedTeams;
-			teamGroups = getTeamGroupsFromTeams(mergedTeams);
+			teamGroups = groupTeamsByGroup(mergedTeams);
 
 			uploadSuccess = `Successfully imported ${mergedTeams.length} teams`;
 			uploadError = '';
 		} catch (error) {
+			console.error('Error processing data', error);
 			uploadError = `Error processing data: ${error}`;
 			uploadSuccess = '';
 		}
