@@ -11,6 +11,7 @@
 	import JoiningSession from '$lib/components/joining-session/JoiningSession.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/PromptDialog.svelte';
+	import { parseSessionUrl } from '$lib/utils.svelte';
 
 	// App state management
 
@@ -38,35 +39,37 @@
 	});
 
 	onMount(async () => {
-		// Load any existing app data
-		// app.loadAppData(); // Do we need this?
-		app.loadUserFromStorage();
-
-		// Check if URL contains session info (fragment)
 		const hash = window.location.hash;
 		if (hash) {
-			await handleSessionFromUrl();
-			return;
+			const result = parseSessionUrl(hash);
+			const existingSessionInfo = app.getSessionInfo();
+			if (existingSessionInfo?.sessionId !== result) {
+				await app.leaveSession();
+				handleSessionFromUrl();
+			}
 		}
 
 		// Check if we can rejoin a stored session
-		if (app.hasStoredSession()) {
+		const existingSessionInfo = app.getSessionInfo();
+		if (existingSessionInfo) {
 			await rejoinStoredSession();
 			return;
 		}
 
 		// Check if we have app data (offline mode)
-		if (app.hasEssentialData()) {
-			// We have data, check if we have a stored role
-			if (app.hasCurrentUser()) {
-				AppUI.appPhase = 'workspace';
-			} else {
-				AppUI.appPhase = 'role_selection';
-			}
-		} else {
-			// No data, show initial choice
-			AppUI.appPhase = 'choose_action';
-		}
+		// We do not support offline at the moment
+		AppUI.appPhase = 'choose_action';
+		// if (app.hasEssentialData()) {
+		// 	// We have data, check if we have a stored role
+		// 	if (app.hasCurrentUser()) {
+		// 		AppUI.appPhase = 'workspace';
+		// 	} else {
+		// 		AppUI.appPhase = 'role_selection';
+		// 	}
+		// } else {
+		// 	// No data, show initial choice
+		// 	AppUI.appPhase = 'choose_action';
+		// }
 	});
 
 	async function handleSessionFromUrl() {
@@ -127,9 +130,9 @@
 
 	<!-- Error Notices -->
 	{#if errorNotices.length > 0}
-		<div class="fixed right-4 bottom-4 z-50 space-y-2">
+		<div class="fixed bottom-4 right-4 z-50 space-y-2">
 			{#each errorNotices as notice, index (index)}
-				<div class="flex max-w-sm min-w-xs items-center justify-between rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
+				<div class="min-w-xs flex max-w-sm items-center justify-between rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
 					<div class="flex items-center">
 						<svg class="mr-2 h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"

@@ -1,13 +1,15 @@
+import { createClientManager, type ClientOptions, type ConnectionState, type WRPCClientManager } from '@judging.jerryio/wrpc/client';
 import type { Judge, JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import type { User } from './user.svelte';
-import { getWRPCConnectionState, useWRPC } from './use-wrpc';
-import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 import type { ClientInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
 import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 import type { EssentialData } from '@judging.jerryio/protocol/src/event';
-import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
+import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
 import type { Award, CompetitionType } from '@judging.jerryio/protocol/src/award';
 import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
+import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
+import { clientRouter, type ClientRouter } from './client-router';
+import type { User } from './user.svelte';
+import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl } from './utils.svelte';
 
 export class AppStorage {
 	/**
@@ -68,170 +70,209 @@ export class AppStorage {
 export class App {
 	private readonly storage: AppStorage;
 	private readonly isDevelopment: boolean;
-	private currentUser: User | null = $state(null);
-
-	// EssentialData cache - entirely cached on client side
-	private essentialData: EssentialData | null = $state(null);
-
-	// Session management
+	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
 	private sessionInfo: SessionInfo | null = $state(null);
-	private clients: ClientInfo[] = $state([]);
+	private currentUser: User | null = $state(null);
+	private essentialData: EssentialData | null = $state(null);
+	private allClients: readonly ClientInfo[] = $state([]);
+	private allTeamData: readonly TeamData[] = $state([]);
+	private allJudges: readonly Judge[] = $state([]);
 
 	// Error handling
 	private errorNotices: string[] = $state([]);
-	private userClearReason: 'role_deleted' | null = $state(null);
+	private userClearReason: string | null = $state(null);
 
-	// Judges data (separate from EssentialData as it's not part of event setup)
-	private allJudges: readonly Judge[] = $state([]);
-
-	constructor(storage?: AppStorage, isDevelopment: boolean = false) {
-		this.storage = storage || new AppStorage();
+	constructor(storage: AppStorage, isDevelopment: boolean = false) {
+		this.storage = storage;
 		this.isDevelopment = isDevelopment;
+		this.clientManager = createClientManager(this.createClientOptions.bind(this), clientRouter);
+
+		this.loadSessionFromStorage();
+		this.loadUserFromStorage();
 	}
 
-	/**
-	 * Select current user (User)
-	 */
-	async selectUser(user: User): Promise<void> {
-		if (user.role === 'judge') {
-			await this.updateJudge(user.judge);
+	// ============================================================================
+	// Session Management
+	// ============================================================================
+
+	async joinSession(): Promise<void> {
+		if (!this.hasSessionInfo()) {
+			throw new Error('CRITICAL: No session info');
 		}
 
-		this.currentUser = user;
-		this.saveUserToStorage(user);
+		if (this.getConnectionState() === 'connected') {
+			throw new Error('CRITICAL: already connected to a session');
+		}
+
+		// Just to be safe, reset the client manager
+		this.clientManager.resetClient();
+
+		// Join the session, this will call createWRPCClient
+		await this.wrpcClient.handshake.joinSession.mutation();
 	}
 
 	/**
-	 * Update judge with transaction support
+	 * Join a session from URL
 	 */
-	async updateJudge(judge: Judge): Promise<void> {
-		return useWRPC().updateJudge.mutation(judge);
+	async joinSessionFromUrl(url: string): Promise<void> {
+		try {
+			if (this.hasSessionInfo()) {
+				throw new Error('CRITICAL: already in a session');
+			}
+
+			const sessionId = parseSessionUrl(url);
+			if (!sessionId) {
+				throw new Error('Invalid session URL');
+			}
+
+			this.sessionInfo = this.createNewSessionInfo(sessionId);
+			this.saveSessionToStorage();
+
+			await this.joinSession();
+		} catch (error) {
+			this.addErrorNotice(`Failed to join session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
 	}
 
-	// ===== ESSENTIAL DATA METHODS =====
+	/**
+	 * Get session info
+	 */
+	getSessionInfo(): Readonly<SessionInfo> | null {
+		return this.sessionInfo ? $state.snapshot(this.sessionInfo) : null;
+	}
+
+	/**
+	 * Get session URL for sharing
+	 */
+	getSessionUrl(): string {
+		if (!this.sessionInfo?.sessionId) {
+			throw new Error('No active session');
+		}
+		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.sessionId}`;
+	}
+
+	/**
+	 * Create a new session
+	 */
+	async createSession(essentialData: EssentialData, teamData: TeamData[], judges: Judge[]): Promise<void> {
+		try {
+			const sessionId = generateUUID();
+			this.sessionInfo = this.createNewSessionInfo(sessionId);
+
+			const response = await this.wrpcClient.handshake.createSession.mutation({
+				essentialData,
+				teamData,
+				judges
+			});
+			if (response.success) {
+				this.handleEssentialDataUpdate(essentialData);
+				this.allTeamData = teamData;
+				this.allJudges = judges;
+				this.saveSessionToStorage();
+			} else {
+				this.sessionInfo = null;
+				this.clearSessionFromStorage();
+				throw new Error(response.message);
+			}
+		} catch (error) {
+			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
+
+	isJudgingReady(): boolean {
+		return this.sessionInfo !== null && this.essentialData !== null;
+	}
+
+	hasSessionInfo(): boolean {
+		return this.sessionInfo !== null;
+	}
+
+	/**
+	 * Leave current session
+	 */
+	async leaveSession(): Promise<void> {
+		// Clear session data
+		this.sessionInfo = null;
+		this.essentialData = null;
+		this.allJudges = [];
+		this.currentUser = null;
+		this.userClearReason = null;
+		// no client-held session id field to clear
+		this.clientManager.resetClient();
+
+		// Clear storage
+		this.clearSessionFromStorage();
+		this.clearUserFromStorage();
+	}
+
+	/**
+	 * Destroy all session data (for admin)
+	 */
+	async destroySessionData(): Promise<void> {
+		// TODO
+		// This would typically call a server endpoint to destroy the session
+		// For now, just leave the session locally
+		this.leaveSession();
+	}
+
+	/**
+	 * Reconnect to stored session
+	 */
+	async reconnectStoredSession(): Promise<void> {
+		try {
+			if (!this.hasSessionInfo()) {
+				throw new Error('No stored session found');
+			}
+
+			this.clientManager.resetClient();
+
+			// Try to rejoin the session
+			const { essentialData, teamData, judges } = await this.wrpcClient.handshake.joinSession.mutation();
+			this.handleEssentialDataUpdate(essentialData);
+			this.allTeamData = teamData;
+			this.allJudges = judges;
+
+			// Load user from storage
+			const user = this.loadUserFromStorage();
+			if (user) {
+				this.currentUser = user;
+
+				if (user.role === 'judge') {
+					const find = this.allJudges.find((judge) => judge.id === user.judge.id);
+					if (find) {
+						this.currentUser = user;
+					} else {
+						this.clearCurrentUser('judge_deleted');
+					}
+				}
+			}
+		} catch (error) {
+			// Clear invalid stored session
+			this.clearSessionFromStorage();
+			this.addErrorNotice(`Failed to reconnect to session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			throw error;
+		}
+	}
+
+	// ============================================================================
+	// Data Update Methods
+	// ============================================================================
 
 	/**
 	 * Handle EssentialData update from server
 	 */
 	handleEssentialDataUpdate(data: EssentialData): void {
 		this.essentialData = data;
-		this.saveEssentialDataToStorage();
-	}
-
-	/**
-	 * Get cached EssentialData
-	 */
-	getEssentialData(): Readonly<EssentialData> | null {
-		return this.essentialData ? $state.snapshot(this.essentialData) : null;
-	}
-
-	/**
-	 * Check if essential data is available
-	 */
-	hasEssentialData(): boolean {
-		return this.essentialData !== null;
-	}
-
-	/**
-	 * Get event name from cached EssentialData
-	 */
-	getEventName(): string | null {
-		return this.essentialData?.eventName || null;
-	}
-
-	/**
-	 * Get event grade level from cached EssentialData
-	 */
-	getEventGradeLevel(): EventGradeLevel | null {
-		return this.essentialData?.eventGradeLevel || null;
-	}
-
-	/**
-	 * Get competition type from cached EssentialData
-	 */
-	getCompetitionType(): CompetitionType | null {
-		return this.essentialData?.competitionType || null;
-	}
-
-	/**
-	 * Get judging method from cached EssentialData
-	 */
-	getJudgingMethod(): JudgingMethod | null {
-		return this.essentialData?.judgingMethod || null;
-	}
-
-	/**
-	 * Get all teams from cached EssentialData
-	 */
-	getTeams(): readonly TeamInfo[] {
-		return this.essentialData?.teams || [];
-	}
-
-	/**
-	 * Get team count from cached EssentialData
-	 */
-	getTeamCount(): number {
-		return this.essentialData?.teams.length || 0;
-	}
-
-	/**
-	 * Get performance awards from cached EssentialData
-	 */
-	getPerformanceAwards(): readonly Award[] {
-		return this.essentialData?.performanceAwards || [];
-	}
-
-	/**
-	 * Get judged awards from cached EssentialData
-	 */
-	getJudgedAwards(): readonly Award[] {
-		return this.essentialData?.judgedAwards || [];
-	}
-
-	/**
-	 * Get volunteer nominated awards from cached EssentialData
-	 */
-	getVolunteerNominatedAwards(): readonly Award[] {
-		return this.essentialData?.volunteerNominatedAwards || [];
-	}
-
-	/**
-	 * Get all awards from cached EssentialData
-	 */
-	getAllAwards(): readonly Award[] {
-		if (!this.essentialData) return [];
-		return [...this.essentialData.performanceAwards, ...this.essentialData.judgedAwards, ...this.essentialData.volunteerNominatedAwards];
-	}
-
-	/**
-	 * Get event setup data (alias for EssentialData for compatibility)
-	 */
-	getEventSetup(): Readonly<EssentialData> | null {
-		return this.essentialData ? $state.snapshot(this.essentialData) : null;
-	}
-
-	/**
-	 * Get all team data as a lookup object (for compatibility)
-	 */
-	getAllTeamData(): Record<string, { notebookLink: string; excluded: boolean }> {
-		if (!this.essentialData) return {};
-
-		const teamData: Record<string, { notebookLink: string; excluded: boolean }> = {};
-		this.essentialData.teams.forEach((team) => {
-			teamData[team.number] = {
-				notebookLink: team.data.notebookLink || '',
-				excluded: team.data.excluded || false
-			};
-		});
-		return teamData;
 	}
 
 	/**
 	 * Update event setup (sends to server via updateEssentialData)
 	 */
-	async updateEventSetup(eventSetup: EssentialData): Promise<void> {
+	async updateEssentialData(eventSetup: EssentialData): Promise<void> {
 		try {
-			await useWRPC().updateEssentialData.mutation(eventSetup);
+			await this.wrpcClient.essential.updateEssentialData.mutation(eventSetup);
 			// The server will broadcast the update back to us via onEssentialDataUpdate
 		} catch (error) {
 			this.addErrorNotice(`Failed to update event setup: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -239,13 +280,20 @@ export class App {
 		}
 	}
 
-	/**
-	 * Update team data (for compatibility - in new system this is part of EssentialData)
-	 */
-	async updateTeamData(teamNumber: string, teamData: { notebookLink: string; excluded: boolean }): Promise<void> {
-		// In the new system, team data is part of EssentialData and updated via updateEssentialData
-		// This method is kept for compatibility but doesn't need to do anything
-		// as the team data is already updated when updateEventSetup is called
+	getEssentialData(): Readonly<EssentialData> | null {
+		return this.essentialData ? $state.snapshot(this.essentialData) : null;
+	}
+
+	hasEssentialData(): boolean {
+		return this.essentialData !== null;
+	}
+
+	getEventName(): string | null {
+		return this.essentialData?.eventName || null;
+	}
+
+	getTeamCount(): number {
+		return this.essentialData?.teamInfos.length || 0;
 	}
 
 	/**
@@ -274,8 +322,17 @@ export class App {
 		return $state.snapshot(groups);
 	}
 
+	getAllAwards(): readonly Award[] {
+		if (!this.essentialData) return [];
+		return this.essentialData.awards;
+	}
+
+	getAllTeamData(): readonly TeamData[] {
+		return $state.snapshot(this.allTeamData);
+	}
+
 	getConnectionState(): ConnectionState {
-		return getWRPCConnectionState();
+		return this.clientManager.getConnectionState();
 	}
 
 	findJudgeById(judgeId: string): Readonly<Judge> | null {
@@ -288,137 +345,27 @@ export class App {
 		return $state.snapshot(this.allJudges);
 	}
 
+	/**
+	 * Get judge count
+	 */
+	getJudgeCount(): number {
+		return this.allJudges.length;
+	}
+
 	// ===== SESSION MANAGEMENT METHODS =====
 
 	/**
 	 * Handle client list update from server
 	 */
 	handleClientListUpdate(clients: ClientInfo[]): void {
-		this.clients = clients;
+		this.allClients = clients;
 	}
 
 	/**
 	 * Get connected clients
 	 */
-	getClients(): readonly ClientInfo[] {
-		return $state.snapshot(this.clients);
-	}
-
-	/**
-	 * Get session info
-	 */
-	getSessionInfo(): Readonly<SessionInfo> | null {
-		return this.sessionInfo ? $state.snapshot(this.sessionInfo) : null;
-	}
-
-	/**
-	 * Get session URL for sharing
-	 */
-	getSessionUrl(): string {
-		if (!this.sessionInfo?.sessionId) {
-			throw new Error('No active session');
-		}
-		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.sessionId}`;
-	}
-
-	/**
-	 * Create a new session
-	 */
-	async createSession(
-		eventName: string,
-		competitionType: CompetitionType,
-		eventGradeLevel: EventGradeLevel,
-		judgingMethod: JudgingMethod
-	): Promise<void> {
-		try {
-			const response = await useWRPC().createSession.mutation({
-				eventName,
-				competitionType,
-				eventGradeLevel,
-				judgingMethod
-			});
-
-			// Fetch session info after creation
-			this.sessionInfo = await useWRPC().getSessionInfo.query();
-
-			// Fetch initial essential data
-			const essentialData = await useWRPC().getEssentialData.query();
-			this.handleEssentialDataUpdate(essentialData);
-
-			// Save session to storage
-			this.saveSessionToStorage();
-		} catch (error) {
-			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
-			throw error;
-		}
-	}
-
-	/**
-	 * Join a session from URL
-	 */
-	async joinSessionFromUrl(url: string): Promise<void> {
-		try {
-			// Extract session ID from URL hash
-			const hashIndex = url.indexOf('#');
-			if (hashIndex === -1) {
-				throw new Error('Invalid session URL: No session ID found');
-			}
-
-			const sessionId = url.substring(hashIndex + 1);
-			if (!sessionId) {
-				throw new Error('Invalid session URL: Empty session ID');
-			}
-
-			// Join the session
-			await useWRPC().joinSession.mutation({ sessionId });
-
-			// Fetch session info
-			this.sessionInfo = await useWRPC().getSessionInfo.query();
-
-			// Fetch essential data
-			const essentialData = await useWRPC().getEssentialData.query();
-			this.handleEssentialDataUpdate(essentialData);
-
-			// Save session to storage
-			this.saveSessionToStorage();
-		} catch (error) {
-			this.addErrorNotice(`Failed to join session: ${error instanceof Error ? error.message : 'Unknown error'}`);
-			throw error;
-		}
-	}
-
-	/**
-	 * Check if currently in a session
-	 */
-	isInSession(): boolean {
-		return this.sessionInfo !== null && this.essentialData !== null;
-	}
-
-	/**
-	 * Leave current session
-	 */
-	async leaveSession(): Promise<void> {
-		// Clear session data
-		this.sessionInfo = null;
-		this.essentialData = null;
-		this.clients = [];
-		this.allJudges = [];
-		this.currentUser = null;
-		this.userClearReason = null;
-
-		// Clear storage
-		this.clearSessionFromStorage();
-		this.clearEssentialDataFromStorage();
-		this.clearUserFromStorage();
-	}
-
-	/**
-	 * Destroy all session data (for admin)
-	 */
-	destroySessionData(): void {
-		// This would typically call a server endpoint to destroy the session
-		// For now, just leave the session locally
-		this.leaveSession();
+	getClients(): Readonly<readonly ClientInfo[]> {
+		return $state.snapshot(this.allClients);
 	}
 
 	/**
@@ -426,7 +373,7 @@ export class App {
 	 */
 	async kickClient(clientId: string): Promise<void> {
 		try {
-			await useWRPC().kickClient.mutation({ clientId });
+			await this.wrpcClient.client.kickClient.mutation({ clientId });
 		} catch (error) {
 			this.addErrorNotice(`Failed to kick client: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
@@ -434,13 +381,6 @@ export class App {
 	}
 
 	// ===== UTILITY METHODS =====
-
-	/**
-	 * Get judge count
-	 */
-	getJudgeCount(): number {
-		return this.allJudges.length;
-	}
 
 	/**
 	 * Get current user's judge group
@@ -453,64 +393,20 @@ export class App {
 		return judgeGroup ? $state.snapshot(judgeGroup) : null;
 	}
 
-	/**
-	 * Get user clear reason
-	 */
-	getUserClearReason(): 'role_deleted' | null {
-		return this.userClearReason;
-	}
+	// ============================================================================
+	// User Management
+	// ============================================================================
 
-	/**
-	 * Load user from storage
-	 */
-	loadUserFromStorage(): void {
-		const storedUser = this.storage.load<User>('currentUser');
-		if (storedUser) {
-			this.currentUser = storedUser;
+	async selectUser(user: User): Promise<void> {
+		if (user.role === 'judge') {
+			await this.wrpcClient.judge.updateJudge.mutation(user.judge);
 		}
+
+		this.currentUser = user;
+		this.userClearReason = null;
+		this.saveUserToStorage();
 	}
 
-	/**
-	 * Check if there's a stored session
-	 */
-	hasStoredSession(): boolean {
-		const storedSession = this.storage.load<SessionInfo>('sessionInfo');
-		return storedSession !== null;
-	}
-
-	/**
-	 * Reconnect to stored session
-	 */
-	async reconnectStoredSession(): Promise<void> {
-		try {
-			const storedSession = this.storage.load<SessionInfo>('sessionInfo');
-			if (!storedSession?.sessionId) {
-				throw new Error('No stored session found');
-			}
-
-			// Try to rejoin the session
-			await useWRPC().joinSession.mutation({ sessionId: storedSession.sessionId });
-
-			// Fetch current session info
-			this.sessionInfo = await useWRPC().getSessionInfo.query();
-
-			// Fetch essential data
-			const essentialData = await useWRPC().getEssentialData.query();
-			this.handleEssentialDataUpdate(essentialData);
-
-			// Load user from storage
-			this.loadUserFromStorage();
-		} catch (error) {
-			// Clear invalid stored session
-			this.clearSessionFromStorage();
-			this.addErrorNotice(`Failed to reconnect to session: ${error instanceof Error ? error.message : 'Unknown error'}`);
-			throw error;
-		}
-	}
-
-	/**
-	 * Get current user
-	 */
 	getCurrentUser(): Readonly<User> | null {
 		return this.currentUser ? $state.snapshot(this.currentUser) : null;
 	}
@@ -522,13 +418,27 @@ export class App {
 		return this.currentUser !== null;
 	}
 
-	// ===== ERROR HANDLING METHODS =====
+	getUserClearReason(): string | null {
+		return this.userClearReason;
+	}
+
+	// ============================================================================
+	// Error Management
+	// ============================================================================
 
 	/**
 	 * Add error notice
 	 */
 	addErrorNotice(message: string): void {
-		this.errorNotices = [...this.errorNotices, message];
+		this.errorNotices.push(message);
+
+		// Auto-remove error notices after 10 seconds
+		setTimeout(() => {
+			const index = this.errorNotices.indexOf(message);
+			if (index > -1) {
+				this.errorNotices.splice(index, 1);
+			}
+		}, 10000);
 	}
 
 	/**
@@ -554,53 +464,83 @@ export class App {
 		this.errorNotices = [];
 	}
 
-	// ===== PRIVATE STORAGE METHODS =====
+	// ============================================================================
+	// Private Methods
+	// ============================================================================
 
-	/**
-	 * Save user to storage
-	 */
-	private saveUserToStorage(user: User): void {
-		if (user) {
-			this.storage.save('currentUser', user);
+	private get wrpcClient() {
+		return this.clientManager.getClient()[1];
+	}
+
+	private createClientOptions(): ClientOptions<ClientRouter> {
+		const isDevelopment = import.meta.env.DEV;
+		const wsUrl = isDevelopment
+			? 'ws://localhost:8787/ws' // Local development server
+			: 'wss://judging.jerryio.workers.dev/ws'; // Production Cloudflare Worker
+
+		if (this.sessionInfo === null) {
+			throw new Error('CRITICAL: No session info');
 		}
+
+		return {
+			wsUrl,
+			clientId: this.sessionInfo.clientId,
+			sessionId: this.sessionInfo.sessionId,
+			deviceName: this.sessionInfo.deviceName,
+			onContext: async () => ({})
+		};
 	}
 
 	/**
-	 * Clear user from storage
+	 * Clear current user with reason
 	 */
-	private clearUserFromStorage(): void {
-		this.storage.remove('currentUser');
+	private clearCurrentUser(reason: string): void {
+		this.currentUser = null;
+		this.userClearReason = reason;
+		this.clearUserFromStorage();
 	}
 
-	/**
-	 * Save essential data to storage
-	 */
-	private saveEssentialDataToStorage(): void {
-		if (this.essentialData) {
-			this.storage.save('essentialData', this.essentialData);
+	private createNewSessionInfo(sessionId: string): SessionInfo {
+		const clientId = generateUUID();
+		const deviceName = getDeviceNameFromUserAgent();
+		return { sessionId, clientId, deviceName, createdAt: Date.now() };
+	}
+
+	private loadSessionFromStorage(): SessionInfo | null {
+		const stored = this.storage.load<SessionInfo>('sessionInfo');
+		if (stored) {
+			this.sessionInfo = stored;
+			return stored;
 		}
+		return null;
 	}
 
-	/**
-	 * Clear essential data from storage
-	 */
-	private clearEssentialDataFromStorage(): void {
-		this.storage.remove('essentialData');
-	}
-
-	/**
-	 * Save session info to storage
-	 */
 	private saveSessionToStorage(): void {
 		if (this.sessionInfo) {
 			this.storage.save('sessionInfo', this.sessionInfo);
 		}
 	}
 
-	/**
-	 * Clear session info from storage
-	 */
 	private clearSessionFromStorage(): void {
 		this.storage.remove('sessionInfo');
+	}
+
+	private loadUserFromStorage(): User | null {
+		const stored = this.storage.load<User>('currentUser');
+		if (stored) {
+			this.currentUser = stored;
+			return stored;
+		}
+		return null;
+	}
+
+	private saveUserToStorage(): void {
+		if (this.currentUser) {
+			this.storage.save('currentUser', this.currentUser);
+		}
+	}
+
+	private clearUserFromStorage(): void {
+		this.storage.remove('currentUser');
 	}
 }

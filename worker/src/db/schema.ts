@@ -3,7 +3,16 @@ import { sqliteTable, integer, text, primaryKey, unique, index } from 'drizzle-o
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
-export const essential = sqliteTable('Essential', {
+export const offlineClients = sqliteTable('OfflineClients', {
+	clientId: text('clientId').primaryKey(),
+	deviceName: text('deviceName').notNull(),
+	connectedAt: integer('connectedAt', { mode: 'timestamp' }).notNull(),
+	// nullable because we don't want to delete the client if the judge is deleted
+	// client might not be assigned to a judge yet
+	judgeId: text('judgeId').references(() => judges.id, { onDelete: 'set null' }),
+});
+
+export const metadata = sqliteTable('Metadata', {
 	eventName: text('eventName').notNull(),
 	competitionType: text('competitionType', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),
@@ -35,8 +44,8 @@ export const teams = sqliteTable(
 		school: text('school').notNull(),
 		grade: text('grade', { enum: ['Elementary School', 'Middle School', 'High School', 'College'] }).notNull(),
 		group: text('group').notNull(),
-		notebookLink: text('notebookLink').notNull(),
-		excluded: integer('excluded', { mode: 'boolean' }).notNull()
+		notebookLink: text('notebookLink').notNull().default(''),
+		excluded: integer('excluded', { mode: 'boolean' }).notNull().default(false)
 	},
 	(table) => [index('number').on(table.number), index('group').on(table.group)]
 );
@@ -77,7 +86,7 @@ export const finalAwardRankings = sqliteTable(
 		awardName: text('awardName').notNull(),
 		ranking: integer('ranking').notNull()
 	},
-	(table) => [index('teamId').on(table.teamId), index('awardName').on(table.awardName)]
+	(table) => [index('final_award_rankings_teamId').on(table.teamId), index('final_award_rankings_awardName').on(table.awardName)]
 );
 
 export const engineeringNotebookRubrics = sqliteTable(
@@ -94,7 +103,10 @@ export const engineeringNotebookRubrics = sqliteTable(
 		notes: text('notes').notNull(),
 		innovateAwardNotes: text('innovateAwardNotes').notNull()
 	},
-	(table) => [index('teamId').on(table.teamId), index('judgeId').on(table.judgeId)]
+	(table) => [
+		index('engineering_notebook_rubrics_teamId').on(table.teamId),
+		index('engineering_notebook_rubrics_judgeId').on(table.judgeId)
+	]
 );
 
 export const teamInterviewRubrics = sqliteTable(
@@ -109,7 +121,7 @@ export const teamInterviewRubrics = sqliteTable(
 			.notNull(),
 		rubric: text('rubric', { mode: 'json' }).notNull()
 	},
-	(table) => [index('teamId').on(table.teamId), index('judgeId').on(table.judgeId)]
+	(table) => [index('team_interview_rubrics_teamId').on(table.teamId), index('team_interview_rubrics_judgeId').on(table.judgeId)]
 );
 
 export const teamInterviewNotes = sqliteTable(
@@ -124,7 +136,7 @@ export const teamInterviewNotes = sqliteTable(
 			.notNull(),
 		rows: text('rows', { mode: 'json' }).notNull()
 	},
-	(table) => [index('teamId').on(table.teamId), index('judgeId').on(table.judgeId)]
+	(table) => [index('team_interview_notes_teamId').on(table.teamId), index('team_interview_notes_judgeId').on(table.judgeId)]
 );
 
 export const awardRankings = sqliteTable(
@@ -141,7 +153,10 @@ export const awardRankings = sqliteTable(
 			.notNull(),
 		ranking: integer('ranking').notNull()
 	},
-	(table) => [primaryKey({ columns: [table.judgeGroupId, table.awardName, table.teamId] }), index('judgeGroupId').on(table.judgeGroupId)]
+	(table) => [
+		primaryKey({ columns: [table.judgeGroupId, table.awardName, table.teamId] }),
+		index('award_rankings_judgeGroupId').on(table.judgeGroupId)
+	]
 );
 
 export const judgeGroupAwardNominations = sqliteTable(
@@ -157,7 +172,10 @@ export const judgeGroupAwardNominations = sqliteTable(
 			.references(() => teams.id, { onDelete: 'cascade' })
 			.notNull()
 	},
-	(table) => [primaryKey({ columns: [table.judgeGroupId, table.awardName, table.teamId] }), index('judgeGroupId').on(table.judgeGroupId)]
+	(table) => [
+		primaryKey({ columns: [table.judgeGroupId, table.awardName, table.teamId] }),
+		index('judge_group_award_nominations_judgeGroupId').on(table.judgeGroupId)
+	]
 );
 
 export const finalAwardNominations = sqliteTable(

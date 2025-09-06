@@ -18,12 +18,10 @@ export const EssentialDataSchema = z.object({
 	eventName: EventNameSchema,
 	competitionType: CompetitionTypeSchema,
 	eventGradeLevel: EventGradeLevelSchema,
-	performanceAwards: z.array(AwardSchema.extend({ type: z.literal('performance') })),
-	judgedAwards: z.array(AwardSchema.extend({ type: z.literal('judged') })),
-	volunteerNominatedAwards: z.array(AwardSchema.extend({ type: z.literal('volunteer_nominated') })),
-	teams: z.array(TeamInfoSchema.extend({ data: TeamDataSchema })),
 	judgingMethod: JudgingMethodSchema,
-	judgeGroups: z.array(JudgeGroupSchema).min(1)
+	teamInfos: z.array(TeamInfoSchema),
+	judgeGroups: z.array(JudgeGroupSchema).min(1),
+	awards: z.array(AwardSchema)
 });
 
 export type EssentialData = z.infer<typeof EssentialDataSchema>;

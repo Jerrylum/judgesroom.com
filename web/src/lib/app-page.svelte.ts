@@ -1,5 +1,10 @@
-import { App } from '$lib/app.svelte';
+import { App, AppStorage } from '$lib/app.svelte';
+import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
+import { createClientManager } from '@judging.jerryio/wrpc/client';
 import type { Component } from 'svelte';
+import { SvelteMap } from 'svelte/reactivity';
+import { type ClientRouter, clientRouter } from './client-router';
+import { generateUUID, getDeviceNameFromUserAgent } from './utils.svelte';
 
 // ============================================================================
 // Dialog System
@@ -44,9 +49,9 @@ export interface CustomDialog extends BaseDialog {
 
 export type Dialog = ConfirmationDialog | PromptDialog | CustomDialog;
 
-class DialogController {
+export class DialogController {
 	private dialogs: Dialog[] = $state([]);
-	private resolvers = new Map<string, (result: unknown) => void>();
+	private resolvers = new SvelteMap<string, (result: unknown) => void>();
 
 	get currentDialog() {
 		return this.dialogs[this.dialogs.length - 1] || null;
@@ -181,5 +186,5 @@ export const AppUI = $state({
 	appPhase: 'loading'
 });
 
-export const app = new App(undefined, import.meta.env.DEV);
+export const app = new App(new AppStorage(), import.meta.env.DEV);
 export const dialogs = new DialogController();

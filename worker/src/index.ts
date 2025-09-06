@@ -108,7 +108,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 
 		// The connection manager will handle finding the right client based on the WebSocket
-		await this.wsHandler.handleMessage(ws, messageStr, { db: this.db });
+		await this.wsHandler.handleMessage(ws, messageStr, { db: this.db, destroySession: () => this.ctx.storage.deleteAll() });
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {

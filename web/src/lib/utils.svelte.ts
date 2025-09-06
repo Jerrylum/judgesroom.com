@@ -1,3 +1,5 @@
+import z from 'zod';
+
 /**
  * Get device name from user agent
  */
@@ -60,4 +62,28 @@ export function debounce<T extends (...args: Parameters<T>) => void>(func: T, wa
 		clearTimeout(timeout);
 		timeout = setTimeout(later, wait);
 	};
+}
+
+export function parseSessionUrl(urlOrFragment: string | URL): string | null {
+	try {
+		let fragment: string;
+		if (typeof urlOrFragment === 'string') {
+			if (urlOrFragment.startsWith('#')) {
+				fragment = urlOrFragment.substring(1);
+			} else {
+				fragment = urlOrFragment;
+			}
+		} else {
+			fragment = urlOrFragment.hash.substring(1);
+		}
+
+		if (!fragment) {
+			return null;
+		}
+
+		return z.uuidv4().parse(fragment);
+	} catch (error) {
+		console.error('Failed to parse session URL:', error);
+		return null;
+	}
 }
