@@ -27,16 +27,14 @@ import { DatabaseOrTransaction, Transaction } from './server-router';
 export function transaction<T>(tx: DatabaseOrTransaction, fn: (tx: Transaction) => Promise<T>) {
 	const { promise, resolve, reject } = Promise.withResolvers<T>();
 
-	(async function () {
+	tx.transaction(async (tx) => {
 		try {
-			await tx.transaction(async (tx) => {
-				resolve(await fn(tx));
-			});
-			// Do not put resolve here, it will be called before the transaction is committed
+			resolve(await fn(tx));
 		} catch (error) {
 			reject(error);
+			throw error;
 		}
-	})();
+	});
 
 	return promise;
 }
