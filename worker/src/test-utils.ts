@@ -1,8 +1,9 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { awards, teams } from './db/schema';
+import { awards, teams, metadata, judgeGroups } from './db/schema';
 import type { ServerContext } from './server-router';
+import type { Network, ClientData } from '@judging.jerryio/wrpc/server/types';
 import type { Award } from '@judging.jerryio/protocol/src/award';
 import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
 import path from 'path';
@@ -15,6 +16,20 @@ export function createTestDatabase() {
 	// Create an in-memory SQLite database
 	const sqlite = new Database(':memory:');
 	const db = drizzle(sqlite);
+
+	// Make transaction callback accept async functions in tests by bypassing real transactions
+	// We don't test atomicity at unit level; this avoids better-sqlite3's sync-only transaction limitation
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const anyDb = db as any;
+	const originalTransaction = anyDb.transaction?.bind(anyDb);
+	anyDb.transaction = (cb: (tx: unknown) => unknown) => {
+		try {
+			return cb(anyDb);
+		} catch (e) {
+			// Fallback to original if needed
+			return originalTransaction ? originalTransaction(cb) : cb(anyDb);
+		}
+	};
 
 	// Apply Drizzle migrations to create the tables
 	const migrationsFolder = path.join(__dirname, '../drizzle/migrations');
@@ -37,8 +52,42 @@ export function createTestDatabase() {
  */
 export function createTestServerContext(): ServerContext & { cleanup: () => void } {
 	const { db, cleanup } = createTestDatabase();
+
+	// Minimal in-memory mock network implementation
+	const connectedClientIds = new Set<string>();
+	const clientData = new Map<string, ClientData>();
+
+	const network: Network = {
+		async sendToClient() {
+			return { kind: 'response', id: 'test', result: { type: 'data', data: null } };
+		},
+		async broadcast() {
+			return [];
+		},
+		getConnectedClients() {
+			return Array.from(connectedClientIds);
+		},
+		isClientConnected(clientId: string) {
+			return connectedClientIds.has(clientId);
+		},
+		getAllClientData() {
+			return Array.from(clientData.values());
+		},
+		getClientData(clientId: string) {
+			return clientData.get(clientId) ?? null;
+		},
+		async kickClient(clientId: string) {
+			connectedClientIds.delete(clientId);
+		},
+		async destroy() {
+			connectedClientIds.clear();
+			clientData.clear();
+		}
+	};
+
 	return {
 		db,
+		network,
 		cleanup
 	};
 }
@@ -143,6 +192,17 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
  * Seeds the test database with sample data
  */
 export async function seedTestDatabase(context: ServerContext) {
+	// Insert one metadata row so essential data queries work
+	await context.db.insert(metadata).values({
+		eventName: 'Test Event',
+		competitionType: 'VIQRC',
+		eventGradeLevel: 'MS Only',
+		judgingMethod: 'assigned'
+	});
+
+	// Insert a judge group so EssentialDataSchema (min 1) is satisfied
+	await context.db.insert(judgeGroups).values({ id: 'group-1', name: 'Group 1' });
+
 	// Insert sample awards
 	// With { mode: 'json' }, Drizzle automatically handles JSON serialization
 	await context.db.insert(awards).values(sampleAwards);

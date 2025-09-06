@@ -1,14 +1,13 @@
 import { EssentialData, EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { awards, judgeGroups, judgeGroupsAssignedTeams, metadata, teams } from '../db/schema';
-import { DatabaseOrTransaction, ServerContext, w } from '../server-router';
+import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { Award, AwardType } from '@judging.jerryio/protocol/src/award';
-import { eq, ExtractTablesWithRelations, getTableColumns, inArray, not, sql, SQL, TableConfig } from 'drizzle-orm';
+import { eq, getTableColumns, inArray, not, sql, SQL } from 'drizzle-orm';
 import { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
-import { SQLiteInsertValue, SQLiteTable, SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core';
-import { IndexColumn } from 'drizzle-orm/sqlite-core';
+import { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -60,10 +59,8 @@ export async function getJudgeGroups(db: DatabaseOrTransaction): Promise<JudgeGr
 }
 
 export async function hasEssentialData(db: DatabaseOrTransaction): Promise<boolean> {
-	return db.transaction(async (tx) => {
-		const metadataRows = await tx.select().from(metadata).limit(1);
-		return metadataRows.length > 0;
-	});
+	const metadataRows = await db.select().from(metadata).limit(1);
+	return metadataRows.length > 0;
 }
 
 export async function getEssentialData(db: DatabaseOrTransaction): Promise<EssentialData> {
@@ -99,13 +96,6 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	};
 
 	async function updateInsertAndDeleteAwards(tx: DatabaseOrTransaction, values: Award[]) {
-		await tx
-			.insert(awards)
-			.values(values)
-			.onConflictDoUpdate({
-				target: [awards.name],
-				set: buildConflictUpdateColumns(awards, Object.keys(values[0]) as (keyof Award)[])
-			});
 		await tx.delete(awards).where(
 			not(
 				inArray(
@@ -114,35 +104,39 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 				)
 			)
 		);
+		if (values.length > 0) {
+			await tx
+				.insert(awards)
+				.values(values)
+				.onConflictDoUpdate({
+					target: [awards.name],
+					set: buildConflictUpdateColumns(awards, Object.keys(values[0]) as (keyof Award)[])
+				});
+		}
 	}
 
 	async function updateInsertAndDeleteTeams(tx: DatabaseOrTransaction, values: TeamInfo[]) {
-		await tx
-			.insert(teams)
-			.values(values)
-			.onConflictDoUpdate({
-				target: [teams.number],
-				set: buildConflictUpdateColumns(teams, Object.keys(values[0]) as (keyof TeamInfo)[])
-			});
 		await tx.delete(teams).where(
 			not(
 				inArray(
-					teams.number,
-					values.map((v) => v.number)
+					teams.id,
+					values.map((v) => v.id)
 				)
 			)
 		);
+		if (values.length > 0) {
+			await tx
+				.insert(teams)
+				.values(values)
+				.onConflictDoUpdate({
+					target: [teams.id],
+					set: buildConflictUpdateColumns(teams, Object.keys(values[0]) as (keyof TeamInfo)[])
+				});
+		}
 	}
 
 	async function updateInsertAndDeleteJudgeGroups(tx: DatabaseOrTransaction, values: JudgeGroup[]) {
 		type DBJudgeGroup = SQLiteInsertValue<typeof judgeGroups>;
-		await tx
-			.insert(judgeGroups)
-			.values(values satisfies DBJudgeGroup[])
-			.onConflictDoUpdate({
-				target: [judgeGroups.id],
-				set: buildConflictUpdateColumns(judgeGroups, Object.keys(values[0]) as (keyof DBJudgeGroup)[])
-			});
 		await tx.delete(judgeGroups).where(
 			not(
 				inArray(
@@ -151,10 +145,21 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 				)
 			)
 		);
+		if (values.length > 0) {
+			await tx
+				.insert(judgeGroups)
+				.values(values satisfies DBJudgeGroup[])
+				.onConflictDoUpdate({
+					target: [judgeGroups.id],
+					set: buildConflictUpdateColumns(judgeGroups, ['id', 'name'])
+				});
+		}
 
 		const assignedTeams = values.flatMap((v) => v.assignedTeams.map((t) => ({ judgeGroupId: v.id, teamId: t })));
 		await tx.delete(judgeGroupsAssignedTeams);
-		await tx.insert(judgeGroupsAssignedTeams).values(assignedTeams);
+		if (assignedTeams.length > 0) {
+			await tx.insert(judgeGroupsAssignedTeams).values(assignedTeams);
+		}
 	}
 
 	return db.transaction(async (tx) => {
@@ -165,11 +170,13 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	});
 }
 
-export const essential = {
-	updateEssentialData: w.procedure.input(EssentialDataSchema).mutation(async ({ ctx, input, session }) => {
-		await updateEssentialData(ctx.db, input);
+export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
+	return {
+		updateEssentialData: w.procedure.input(EssentialDataSchema).mutation(async ({ ctx, input, session }) => {
+			await updateEssentialData(ctx.db, input);
 
-		// Do not wait for the broadcast to complete
-		session.broadcast<ClientRouter>().onEssentialDataUpdate.mutation(input);
-	})
-};
+			// Do not wait for the broadcast to complete
+			session.broadcast<ClientRouter>().onEssentialDataUpdate.mutation(input);
+		})
+	};
+}

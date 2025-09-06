@@ -1,4 +1,4 @@
-import { w } from '../server-router';
+import type { ServerContext } from '../server-router';
 import z from 'zod';
 import { EngineeringNotebookRubricSchema, TeamInterviewNoteSchema, TeamInterviewRubricSchema } from '@judging.jerryio/protocol/src/rubric';
 import { EngineeringNotebookRubric, TeamInterviewNote, TeamInterviewRubric } from '@judging.jerryio/protocol/src/rubric';
@@ -14,8 +14,10 @@ import {
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
 import { and } from 'drizzle-orm';
+import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 
-export const judging = {
+export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
+return {
 	getRubricAndNoteByJudgeGroup: w.procedure
 		.input(z.object({ judgeGroupId: z.uuidv4() }))
 		.output(
@@ -189,3 +191,4 @@ export const judging = {
 		return Object.fromEntries(rtn.entries());
 	})
 };
+}

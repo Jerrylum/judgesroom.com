@@ -1,8 +1,9 @@
 import { ClientInfoSchema } from '@judging.jerryio/protocol/src/client';
-import { DatabaseOrTransaction, w } from '../server-router';
+import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineClients } from '../db/schema';
 import { Network } from '@judging.jerryio/wrpc/server';
+import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 
 export async function getClients(tx: DatabaseOrTransaction, network: Network) {
 	const listOfOfflineClients = await tx.select().from(offlineClients);
@@ -23,12 +24,14 @@ export async function kickClient(network: Network, clientId: string) {
 	return { success: false };
 }
 
-export const client = {
-	getClients: w.procedure.output(z.array(ClientInfoSchema)).query(async ({ ctx }) => {
-		return getClients(ctx.db, ctx.network);
-	}),
+export function buildClientRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
+	return {
+		getClients: w.procedure.output(z.array(ClientInfoSchema)).query(async ({ ctx }) => {
+			return getClients(ctx.db, ctx.network);
+		}),
 
-	kickClient: w.procedure.input(z.object({ clientId: z.string() })).mutation(async ({ ctx, input }) => {
-		return kickClient(ctx.network, input.clientId);
-	})
-};
+		kickClient: w.procedure.input(z.object({ clientId: z.string() })).mutation(async ({ ctx, input }) => {
+			return kickClient(ctx.network, input.clientId);
+		})
+	};
+}

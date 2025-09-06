@@ -1,14 +1,15 @@
-import { metadata, offlineClients } from '../db/schema';
-import { w } from '../server-router';
 import z from 'zod';
 import { getEssentialData, hasEssentialData, updateEssentialData } from './essential';
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import { type ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
 import { getClients } from './client';
+import type { ServerContext } from '../server-router';
+import { offlineClients } from '../db/schema';
 
 export const StarterKitSchema = z.object({
 	essentialData: EssentialDataSchema,
@@ -18,7 +19,8 @@ export const StarterKitSchema = z.object({
 
 export type StarterKit = z.infer<typeof StarterKitSchema>;
 
-export const handshake = {
+export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
+	return {
 	joinSession: w.procedure.output(StarterKitSchema).mutation(async ({ ctx, session }) => {
 		const offlineClient = {
 			clientId: session.currentClient.clientId,
@@ -99,4 +101,5 @@ export const handshake = {
 
 		return { success: true, message: 'Session destroyed' };
 	})
-};
+	};
+}

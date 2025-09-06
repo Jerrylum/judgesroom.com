@@ -1,5 +1,4 @@
-import { sql } from 'drizzle-orm';
-import { sqliteTable, integer, text, primaryKey, unique, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, primaryKey, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
@@ -43,11 +42,13 @@ export const teams = sqliteTable(
 		shortName: text('shortName').notNull(),
 		school: text('school').notNull(),
 		grade: text('grade', { enum: ['Elementary School', 'Middle School', 'High School', 'College'] }).notNull(),
-		group: text('group').notNull(),
+		group: text('group_').notNull(),
 		notebookLink: text('notebookLink').notNull().default(''),
 		excluded: integer('excluded', { mode: 'boolean' }).notNull().default(false)
 	},
-	(table) => [index('number').on(table.number), index('group').on(table.group)]
+	(table) => [
+		uniqueIndex('teams_number').on(table.number),
+		index('teams_group').on(table.group)]
 );
 
 export const judgeGroups = sqliteTable('JudgeGroups', {

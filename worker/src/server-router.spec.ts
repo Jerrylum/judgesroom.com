@@ -1,35 +1,31 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { serverRouter } from './server-router';
-import { createTestServerContext, seedTestDatabase, sampleAwards, sampleTeamInfoAndData } from './test-utils';
+import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from './test-utils';
+import { getAwards, getTeamInfos, getEssentialData } from './routes/essential';
+import { getTeamData } from './routes/team';
+import { getJudges } from './routes/judge';
 import type { ServerContext } from './server-router';
 import type { Session } from '@judging.jerryio/wrpc/server/session';
 import type { AnyRouter } from '@judging.jerryio/wrpc/server/router';
-import type { Network } from '@judging.jerryio/wrpc/server/types';
 
 describe('ServerRouter', () => {
 	let context: ServerContext & { cleanup: () => void };
-	let mockNetwork: Network;
 	let session: Session<AnyRouter>;
 
 	beforeEach(async () => {
-		// Create a fresh test database for each test
 		context = createTestServerContext();
 		await seedTestDatabase(context);
 
-		// Create mock network and session for procedure calls
-		mockNetwork = {
-			sendToClient: async () => ({ kind: 'response', id: 'test', result: { type: 'data', data: null } }),
-			broadcast: async () => [],
-			getConnectedClients: () => [],
-			isClientConnected: () => false
-		};
-
-		// Create a mock session that matches the Session<AnyRouter> interface
+		// Minimal session with broadcast handlers used by routes
 		session = {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			getClient: () => ({}) as any,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			broadcast: () => ({}) as any,
+			broadcast: () =>
+				({
+					onClientListUpdate: { mutation: async () => [] },
+					onEssentialDataUpdate: { mutation: async () => [] }
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				}) as any,
 			getServer: () => {
 				throw new Error('getServer() cannot be called from server-side session');
 			},
@@ -42,289 +38,151 @@ describe('ServerRouter', () => {
 	});
 
 	afterEach(() => {
-		// Clean up the database connection
 		context.cleanup();
 	});
 
-	describe('getAwards', () => {
-		it('should return all awards when no type filter is provided', async () => {
-			// Call the procedure resolver directly
-			const resolver = serverRouter.getAwards._def._resolver!;
-			const result = await resolver({ input: {}, session, ctx: context });
-
-			expect(result).toHaveLength(4);
-			expect(result).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						name: 'Excellence Award',
-						type: 'performance',
-						winnersCount: 1,
-						requireNotebook: true
-					}),
-					expect.objectContaining({
-						name: 'Design Award',
-						type: 'judged',
-						winnersCount: 3,
-						requireNotebook: true
-					}),
-					expect.objectContaining({
-						name: 'Teamwork Award',
-						type: 'judged',
-						winnersCount: 2,
-						requireNotebook: false
-					}),
-					expect.objectContaining({
-						name: 'Volunteer Award',
-						type: 'volunteer_nominated',
-						winnersCount: 1,
-						requireNotebook: false
-					})
-				])
-			);
-
-			// Verify acceptedGrades are returned as an array (automatically deserialized from JSON)
-			const excellenceAward = result.find((award) => award.name === 'Excellence Award');
-			expect(excellenceAward?.acceptedGrades).toEqual(['High School', 'Middle School']);
+	describe('essential helpers', () => {
+		it('getAwards: all and by type', async () => {
+			const all = await getAwards(context.db);
+			expect(all).toHaveLength(4);
+			const perf = await getAwards(context.db, 'performance');
+			expect(perf).toHaveLength(1);
 		});
 
-		it('should return only performance awards when type filter is "performance"', async () => {
-			const resolver = serverRouter.getAwards._def._resolver!;
-			const result = await resolver({ input: { type: 'performance' }, session, ctx: context });
-
-			expect(result).toHaveLength(1);
-			expect(result[0]).toEqual(
-				expect.objectContaining({
-					name: 'Excellence Award',
-					type: 'performance',
-					winnersCount: 1,
-					requireNotebook: true
-				})
-			);
+		it('getTeamInfos: all and by group', async () => {
+			const all = await getTeamInfos(context.db);
+			expect(all).toHaveLength(4);
+			const groupA = await getTeamInfos(context.db, 'Group A');
+			expect(groupA).toHaveLength(2);
 		});
 
-		it('should return only judged awards when type filter is "judged"', async () => {
-			const resolver = serverRouter.getAwards._def._resolver!;
-			const result = await resolver({ input: { type: 'judged' }, session, ctx: context });
-
-			expect(result).toHaveLength(2);
-			expect(result).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						name: 'Design Award',
-						type: 'judged'
-					}),
-					expect.objectContaining({
-						name: 'Teamwork Award',
-						type: 'judged'
-					})
-				])
-			);
-		});
-
-		it('should return only volunteer nominated awards when type filter is "volunteer_nominated"', async () => {
-			const resolver = serverRouter.getAwards._def._resolver!;
-			const result = await resolver({ input: { type: 'volunteer_nominated' }, session, ctx: context });
-
-			expect(result).toHaveLength(1);
-			expect(result[0]).toEqual(
-				expect.objectContaining({
-					name: 'Volunteer Award',
-					type: 'volunteer_nominated',
-					winnersCount: 1,
-					requireNotebook: false
-				})
-			);
-		});
-
-		it('should return empty array when no awards match the filter', async () => {
-			// Create a context with no data
-			const emptyContext = createTestServerContext();
-			const resolver = serverRouter.getAwards._def._resolver!;
-
-			const result = await resolver({ input: { type: 'performance' }, session, ctx: emptyContext });
-
-			expect(result).toHaveLength(0);
-			emptyContext.cleanup();
-		});
-
-		it('should handle empty input object', async () => {
-			const resolver = serverRouter.getAwards._def._resolver!;
-			const result = await resolver({ input: {}, session, ctx: context });
-
-			expect(result).toHaveLength(4);
-		});
-
-		it('should validate input type correctly', async () => {
-			const resolver = serverRouter.getAwards._def._resolver!;
-
-			// This should work with valid enum values
-			await expect(resolver({ input: { type: 'performance' }, session, ctx: context })).resolves.toBeDefined();
-			await expect(resolver({ input: { type: 'judged' }, session, ctx: context })).resolves.toBeDefined();
-			await expect(resolver({ input: { type: 'volunteer_nominated' }, session, ctx: context })).resolves.toBeDefined();
+		it('getEssentialData returns full dataset', async () => {
+			const data = await getEssentialData(context.db);
+			expect(data.eventName).toBe('Test Event');
+			expect(data.awards.length).toBeGreaterThan(0);
+			expect(data.teamInfos.length).toBeGreaterThan(0);
+			expect(data.judgeGroups.length).toBeGreaterThan(0);
 		});
 	});
 
-	describe('getTeamInfo', () => {
-		it('should return all team info when no group filter is provided', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: {}, session, ctx: context });
-
-			expect(result).toHaveLength(4);
-			expect(result).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						id: '550e8400-e29b-41d4-a716-446655440001',
-						number: '123A',
-						name: 'Robotics Team Alpha',
-						group: 'Group A'
-					}),
-					expect.objectContaining({
-						id: '550e8400-e29b-41d4-a716-446655440002',
-						number: '456B',
-						name: 'Engineering Eagles',
-						group: 'Group B'
-					}),
-					expect.objectContaining({
-						id: '550e8400-e29b-41d4-a716-446655440003',
-						number: '789C',
-						name: 'Code Crushers',
-						group: 'Group A'
-					}),
-					expect.objectContaining({
-						id: '550e8400-e29b-41d4-a716-446655440004',
-						number: '101D',
-						name: 'Binary Builders',
-						group: 'Group C'
-					})
-				])
-			);
+	describe('handshake router', () => {
+		it('joinSession returns starter kit', async () => {
+			const resolver = serverRouter.handshake.joinSession._def._resolver!;
+			const result = await resolver({ input: undefined, session, ctx: context });
+			expect(result.essentialData.eventName).toBe('Test Event');
+			expect(Array.isArray(result.teamData)).toBe(true);
+			expect(Array.isArray(result.judges)).toBe(true);
 		});
 
-		it('should return only teams from Group A when group filter is "Group A"', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: { group: 'Group A' }, session, ctx: context });
-
-			expect(result).toHaveLength(2);
-			expect(result).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						number: '123A',
-						name: 'Robotics Team Alpha',
-						group: 'Group A'
-					}),
-					expect.objectContaining({
-						number: '789C',
-						name: 'Code Crushers',
-						group: 'Group A'
-					})
-				])
-			);
+		it('createSession returns already exists when metadata present', async () => {
+			const resolver = serverRouter.handshake.createSession._def._resolver!;
+			const starter = await serverRouter.handshake.joinSession._def._resolver!({ input: undefined, session, ctx: context });
+			const result = await resolver({ input: starter, session, ctx: context });
+			expect(result.success).toBe(false);
 		});
 
-		it('should return only teams from Group B when group filter is "Group B"', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: { group: 'Group B' }, session, ctx: context });
-
-			expect(result).toHaveLength(1);
-			expect(result[0]).toEqual(
-				expect.objectContaining({
-					number: '456B',
-					name: 'Engineering Eagles',
-					group: 'Group B',
-					grade: 'Middle School'
-				})
-			);
-		});
-
-		it('should return only teams from Group C when group filter is "Group C"', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: { group: 'Group C' }, session, ctx: context });
-
-			expect(result).toHaveLength(1);
-			expect(result[0]).toEqual(
-				expect.objectContaining({
-					number: '101D',
-					name: 'Binary Builders',
-					group: 'Group C',
-					grade: 'Middle School'
-				})
-			);
-		});
-
-		it('should return empty array when no teams match the group filter', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: { group: 'Nonexistent Group' }, session, ctx: context });
-
-			expect(result).toHaveLength(0);
-		});
-
-		it('should return empty array when database has no teams', async () => {
-			// Create a context with no data
-			const emptyContext = createTestServerContext();
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-
-			const result = await resolver({ input: { group: 'Group A' }, session, ctx: emptyContext });
-
-			expect(result).toHaveLength(0);
-			emptyContext.cleanup();
-		});
-
-		it('should handle empty input object', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: {}, session, ctx: context });
-
-			expect(result).toHaveLength(4);
-		});
-
-		it('should return complete team information with all fields', async () => {
-			const resolver = serverRouter.getTeamInfo._def._resolver!;
-			const result = await resolver({ input: { group: 'Group A' }, session, ctx: context });
-
-			const team = result.find((t: { number: string }) => t.number === '123A');
-			expect(team).toEqual({
-				id: '550e8400-e29b-41d4-a716-446655440001',
-				number: '123A',
-				name: 'Robotics Team Alpha',
-				city: 'San Francisco',
-				state: 'CA',
-				country: 'USA',
-				shortName: 'Alpha',
-				school: 'Tech High School',
-				grade: 'High School',
-				group: 'Group A'
-			});
+		it('destroySession returns success', async () => {
+			const resolver = serverRouter.handshake.destroySession._def._resolver!;
+			const result = await resolver({ input: undefined, session, ctx: context });
+			expect(result.success).toBe(true);
 		});
 	});
 
-	describe('Database Integration', () => {
-		it('should handle database operations correctly', async () => {
-			const awardsResolver = serverRouter.getAwards._def._resolver!;
-			const teamsResolver = serverRouter.getTeamInfo._def._resolver!;
-
-			// Test that both procedures can be called on the same context
-			const awards = await awardsResolver({ input: {}, session, ctx: context });
-			const teams = await teamsResolver({ input: {}, session, ctx: context });
-
-			expect(awards).toHaveLength(4);
-			expect(teams).toHaveLength(4);
+	describe('essential.updateEssentialData', () => {
+		it('updates metadata and collections', async () => {
+			const current = await getEssentialData(context.db);
+			const input = {
+				...current,
+				eventName: 'Updated Event Name',
+				awards: current.awards.slice(0, 2),
+				teamInfos: current.teamInfos.slice(0, 2),
+				judgeGroups: current.judgeGroups.slice(0, 1)
+			};
+			const resolver = serverRouter.essential.updateEssentialData._def._resolver!;
+			await resolver({ input, session, ctx: context });
+			const updated = await getEssentialData(context.db);
+			expect(updated.eventName).toBe('Updated Event Name');
+			expect(updated.awards).toHaveLength(2);
+			expect(updated.teamInfos).toHaveLength(2);
+			expect(updated.judgeGroups).toHaveLength(1);
 		});
 
-		it('should handle concurrent queries', async () => {
-			const awardsResolver = serverRouter.getAwards._def._resolver!;
-			const teamsResolver = serverRouter.getTeamInfo._def._resolver!;
+		it('updates metadata and collections with empty arrays', async () => {
+			const current = await getEssentialData(context.db);
+			const input = {
+				...current,
+				eventName: 'Updated Event Name',
+				awards: [],
+			};
+			const resolver = serverRouter.essential.updateEssentialData._def._resolver!;
+			await resolver({ input, session, ctx: context });
+			const updated = await getEssentialData(context.db);
+			expect(updated.eventName).toBe('Updated Event Name');
+			expect(updated.awards).toHaveLength(0);
+			expect(updated.teamInfos).toHaveLength(4);
+			expect(updated.judgeGroups).toHaveLength(1);
+		});
+	});
 
-			// Execute multiple queries concurrently
-			const [allAwards, performanceAwards, allTeams, groupATeams] = await Promise.all([
-				awardsResolver({ input: {}, session, ctx: context }),
-				awardsResolver({ input: { type: 'performance' }, session, ctx: context }),
-				teamsResolver({ input: {}, session, ctx: context }),
-				teamsResolver({ input: { group: 'Group A' }, session, ctx: context })
-			]);
+	describe('team router', () => {
+		it('getTeamData and updateTeamData', async () => {
+			const getResolver = serverRouter.team.getTeamData._def._resolver!;
+			const updateResolver = serverRouter.team.updateTeamData._def._resolver!;
+			const before = await getResolver({ input: undefined, session, ctx: context });
+			expect(before).toHaveLength(4);
+			const team = before[0];
+			await updateResolver({ input: { ...team, excluded: true }, session, ctx: context });
+			const after = await getTeamData(context.db);
+			expect(after.find((t) => t.id === team.id)?.excluded).toBe(true);
+		});
+	});
 
-			expect(allAwards).toHaveLength(4);
-			expect(performanceAwards).toHaveLength(1);
-			expect(allTeams).toHaveLength(4);
-			expect(groupATeams).toHaveLength(2);
+	describe('judge router', () => {
+		it('get, upsert, remove judge', async () => {
+			const getResolver = serverRouter.judge.getJudges._def._resolver!;
+			const updateResolver = serverRouter.judge.updateJudge._def._resolver!;
+			const removeResolver = serverRouter.judge.removeJudge._def._resolver!;
+			const initial = await getResolver({ input: undefined, session, ctx: context });
+			const newJudge = { id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', name: 'New Judge', groupId: 'group-1' };
+			await updateResolver({ input: newJudge, session, ctx: context });
+			const withNew = await getJudges(context.db);
+			expect(withNew.some((j) => j.id === newJudge.id)).toBe(true);
+			await removeResolver({ input: newJudge, session, ctx: context });
+			const afterRemove = await getJudges(context.db);
+			expect(afterRemove.length).toBe(initial.length);
+		});
+	});
+
+	describe('client router', () => {
+		it('getClients and kickClient (offline)', async () => {
+			// Ensure there is at least one offline client by joining session
+			await serverRouter.handshake.joinSession._def._resolver!({ input: undefined, session, ctx: context });
+			const getResolver = serverRouter.client.getClients._def._resolver!;
+			const clients = await getResolver({ input: undefined, session, ctx: context });
+			expect(clients.length).toBeGreaterThan(0);
+			const kickResolver = serverRouter.client.kickClient._def._resolver!;
+			const result = await kickResolver({ input: { clientId: clients[0].clientId }, session, ctx: context });
+			expect(result.success).toBe(false);
+		});
+	});
+
+	describe('judging router', () => {
+		it('update and get judge group award nominations', async () => {
+			const teamIds = sampleTeamInfoAndData.slice(0, 2).map((t) => t.id);
+			const updateResolver = serverRouter.judging.updateJudgeGroupAwardNomination._def._resolver!;
+			await updateResolver({ input: { judgeGroupId: 'group-1', awardName: 'Design Award', teamIds }, session, ctx: context });
+			const getResolver = serverRouter.judging.getJudgeGroupAwardNominations._def._resolver!;
+			const result = await getResolver({ input: { judgeGroupId: 'group-1' }, session, ctx: context });
+			expect(result['Design Award']).toEqual(teamIds);
+		});
+
+		it('update and get final award rankings', async () => {
+			const teamIds = sampleTeamInfoAndData.slice(0, 3).map((t) => t.id);
+			const updateResolver = serverRouter.judging.updateFinalAwardRankings._def._resolver!;
+			await updateResolver({ input: { awardName: 'Excellence Award', teamIds }, session, ctx: context });
+			const getResolver = serverRouter.judging.getFinalAwardRankings._def._resolver!;
+			const result = await getResolver({ input: undefined, session, ctx: context });
+			expect(result['Excellence Award']).toEqual(teamIds);
 		});
 	});
 });

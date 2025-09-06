@@ -1,11 +1,11 @@
 import { initWRPC, Network } from '@judging.jerryio/wrpc/server';
 import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
-import { handshake } from './routes/handshake';
-import { team } from './routes/team';
-import { judge } from './routes/judge';
-import { judging } from './routes/judging';
-import { essential } from './routes/essential';
-import { client } from './routes/client';
+import { buildHandshakeRoute } from './routes/handshake';
+import { buildTeamRoute } from './routes/team';
+import { buildJudgeRoute } from './routes/judge';
+import { buildJudgingRoute } from './routes/judging';
+import { buildEssentialRoute } from './routes/essential';
+import { buildClientRoute } from './routes/client';
 
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
@@ -23,12 +23,12 @@ export const w = initWRPC.createServer<ServerContext>();
  * These are the API endpoints available to connected clients
  */
 const serverRouter = w.router({
-	handshake,
-	essential,
-	team,
-	judge,
-	judging,
-	client,
+	handshake: buildHandshakeRoute(w),
+	essential: buildEssentialRoute(w),
+	team: buildTeamRoute(w),
+	judge: buildJudgeRoute(w),
+	judging: buildJudgingRoute(w),
+	client: buildClientRoute(w)
 });
 
 export { serverRouter };
