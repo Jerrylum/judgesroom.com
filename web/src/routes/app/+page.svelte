@@ -13,7 +13,7 @@
 	import PromptDialog from '$lib/components/PromptDialog.svelte';
 	import { parseSessionUrl } from '$lib/utils.svelte';
 
-	// App state management
+	// App state persistence error message
 
 	let errorMessage = $state('');
 
@@ -42,46 +42,39 @@
 
 	onMount(async () => {
 		const hash = window.location.hash;
+		// If there is a hash, it means we are trying to join a session from a URL
 		if (hash) {
+			// Parse the session URL from the hash
 			const result = parseSessionUrl(window.location.href);
 			const existingSessionInfo = app.getSessionInfo();
+			// If the session URL is different from the existing session,
+			// leave the current session and join the new one
 			if (existingSessionInfo?.sessionId !== result) {
-				await app.leaveSession();
-				handleSessionFromUrl();
+				await handleSessionFromUrl();
 			}
 		}
 
-		// Check if we can rejoin a stored session
+		// In other cases, check if we can rejoin a stored session
+		// The stored session should be the loaded when the app is loaded
 		const existingSessionInfo = app.getSessionInfo();
 		if (existingSessionInfo) {
 			await rejoinStoredSession();
 			return;
 		}
 
-		// Check if we have app data (offline mode)
-		// We do not support offline at the moment
+		// If we have no session, show the choose action page
 		AppUI.appPhase = 'choose_action';
-		// if (app.hasEssentialData()) {
-		// 	// We have data, check if we have a stored role
-		// 	if (app.hasCurrentUser()) {
-		// 		AppUI.appPhase = 'workspace';
-		// 	} else {
-		// 		AppUI.appPhase = 'role_selection';
-		// 	}
-		// } else {
-		// 	// No data, show initial choice
-		// 	AppUI.appPhase = 'choose_action';
-		// }
 	});
 
 	async function handleSessionFromUrl() {
 		try {
+			await app.leaveSession();
 			await app.joinSessionFromUrl(window.location.href);
 
 			// Clear URL hash for security using SvelteKit navigation
 			replaceState('/app', {});
 
-			// wait for sync to complete
+			// Wait for sync to complete
 			AppUI.appPhase = 'joining_session';
 		} catch (error) {
 			console.error('Error joining session from URL:', error);

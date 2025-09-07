@@ -73,7 +73,8 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			ws.onerror = (error) => {
 				this.connectionState = 'error';
 				this.connectingPromise = null;
-				reject(new Error(`WebSocket connection failed: ${error}`));
+				console.error('WebSocket connection failed', error);
+				reject(new Error(`WebSocket connection failed`));
 			};
 
 			ws.onmessage = (event) => {

@@ -31,7 +31,6 @@
 			await app.joinSessionFromUrl(sessionUrl);
 		} catch (error) {
 			console.error('Error joining session:', error);
-			errorMessage = `Failed to join session: ${error}`;
 			AppUI.appPhase = 'choose_action';
 		}
 	}

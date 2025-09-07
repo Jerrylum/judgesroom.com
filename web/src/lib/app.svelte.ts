@@ -110,8 +110,8 @@ export class App {
 		// Join the session, this will call createWRPCClient
 		const starterKit = await this.wrpcClient.handshake.joinSession.mutation();
 		this.handleEssentialDataUpdate(starterKit.essentialData);
-		// this.allTeamData = starterKit.teamData;
-		// this.allJudges = starterKit.judges;
+		this.handleTeamDataUpdate(starterKit.teamData);
+		this.handleJudgesUpdate(starterKit.judges);
 	}
 
 	/**
