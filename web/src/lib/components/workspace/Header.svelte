@@ -2,7 +2,7 @@
 	import { app } from '$lib/app-page.svelte';
 	import ConnectionStatusIndicator from '$lib/components/ConnectionStatusIndicator.svelte';
 	import ShareIcon from '$lib/icon/ShareIcon.svelte';
-	import UserMenu from '$lib/components/UserMenu.svelte';
+	import UserMenu from '$lib/components/workspace/UserMenu.svelte';
 
 	interface Props {
 		// onClickShareSession: () => void;
