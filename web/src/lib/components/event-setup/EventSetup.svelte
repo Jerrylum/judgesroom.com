@@ -201,8 +201,12 @@
 				app.handleEssentialDataUpdate(essentialData);
 				app.handleTeamDataUpdate(teams.map((team) => team.data));
 				app.handleJudgesUpdate(judges);
-				// User is not ready, continue to session setup
-				AppUI.appPhase = 'session_setup';
+
+				await app.createSession();
+				// For Judge Advisor who created the session, auto-select role and show share dialog
+				await app.selectUser({ role: 'judge_advisor' });
+
+				AppUI.appPhase = 'workspace';
 			}
 		} catch (error) {
 			console.error('Failed to complete setup:', error);

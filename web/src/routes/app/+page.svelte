@@ -4,7 +4,6 @@
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
 	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
 	import Workspace from '$lib/components/workspace/Workspace.svelte';
-	import SessionSetup from '$lib/components/SessionSetup.svelte';
 	import RoleSelection from '$lib/components/RoleSelection.svelte';
 	import Loading from '$lib/components/loading/Loading.svelte';
 	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
@@ -114,8 +113,6 @@
 		<JoiningSession />
 	{:else if AppUI.appPhase === 'event_setup'}
 		<EventSetup />
-	{:else if AppUI.appPhase === 'session_setup'}
-		<SessionSetup />
 	{:else if AppUI.appPhase === 'role_selection'}
 		<RoleSelection />
 	{:else if AppUI.appPhase === 'workspace'}
