@@ -7,7 +7,7 @@
 	import SessionSetup from '$lib/components/SessionSetup.svelte';
 	import RoleSelection from '$lib/components/RoleSelection.svelte';
 	import Loading from '$lib/components/loading/Loading.svelte';
-	import ChooseAction from '$lib/components/choose-action.svelte/ChooseAction.svelte';
+	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
 	import JoiningSession from '$lib/components/joining-session/JoiningSession.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/PromptDialog.svelte';
