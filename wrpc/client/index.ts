@@ -1,6 +1,6 @@
 // WRPC Client exports
 export { createWRPCClient } from './client-factory';
-export { WebsocketClient, type ConnectionState } from './websocket-client';
+export { WebsocketClient, type ConnectionState, ConnectionCloseCode } from './websocket-client';
 export { WRPCClientManager, createClientManager } from './client-manager';
 export type { WRPCClient, ClientOptions, PendingRequest } from './types';
 

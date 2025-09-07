@@ -29,7 +29,9 @@ describe('createWRPCClient', () => {
 			sessionId: 'test-session',
 			clientId: 'test-client',
 			deviceName: 'Test Device',
-			onContext: async () => ({})
+			onContext: async () => ({}),
+			onOpen: () => {},
+			onClosed: () => {}
 		};
 
 		// Create a test client router

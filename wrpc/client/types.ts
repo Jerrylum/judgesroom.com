@@ -14,6 +14,8 @@ export interface ClientOptions<TRouter extends AnyRouter> {
 	clientId: string;
 	deviceName?: string;
 	onContext: (request: WRPCRequest) => Promise<InferRouterContext<TRouter>>;
+	onOpen: () => void;
+	onClosed: (code: number, reason: string) => void;
 }
 
 export interface PendingRequest {

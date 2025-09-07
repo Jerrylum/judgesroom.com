@@ -3,10 +3,10 @@
  */
 import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
-import { WRPCError, type InferRouterContext } from './types';
+import { WRPCError, type InferRouterContext, type RouterProxy, type RouterBroadcastProxy } from './types';
 import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';
-import { createServerSideSession, type Session } from './session';
+import { createClientProxy, createServerSideSession, type Session } from './session';
 import { parseWRPCMessage } from './utils';
 import type { ProcedureResolver } from './procedure-builder';
 
@@ -60,6 +60,8 @@ export interface WebSocketHandler<TRouter extends AnyRouter> {
 	handleConnection: (ws: WebSocket, metadata: WebSocketConnectionMetadata) => Promise<void>;
 	handleClose: (ws: WebSocket, code: number, reason: string) => Promise<void>;
 	handleError: (ws: WebSocket, error: Error) => void;
+	getClient<TClientRouter extends AnyRouter>(clientId: string): RouterProxy<TClientRouter>;
+	broadcast<TClientRouter extends AnyRouter>(): RouterBroadcastProxy<TClientRouter>;
 }
 
 /**
@@ -258,6 +260,20 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 		 */
 		handleError(ws: WebSocket, error: Error) {
 			console.error('WebSocket error:', error);
+		},
+
+		/**
+		 * Get a client proxy that can call procedures on the client
+		 */
+		getClient<TClientRouter extends AnyRouter>(clientId: string): RouterProxy<TClientRouter> {
+			return createClientProxy(connectionManager, clientId);
+		},
+
+		/**
+		 * Get a broadcast proxy that can call procedures on all clients
+		 */
+		broadcast<TClientRouter extends AnyRouter>(): RouterBroadcastProxy<TClientRouter> {
+			return createClientProxy(connectionManager);
 		}
 	};
 }

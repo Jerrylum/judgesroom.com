@@ -53,6 +53,45 @@ export type SessionFactory<TServerRouter extends AnyRouter> = (
 ) => Session<TServerRouter>;
 
 /**
+ * Create a client proxy that can call procedures on the client
+ */
+export function createClientProxy<TClientRouter extends AnyRouter>(
+	connectionManager: Network,
+	targetClientId?: string,
+	pathParts: string[] = []
+): RouterProxy<TClientRouter> {
+	return new Proxy({} as RouterProxy<TClientRouter>, {
+		get(_target, prop: string) {
+			if (prop === 'query' || prop === 'mutation') {
+				return async (input: unknown) => {
+					const request: WRPCRequest = {
+						kind: 'request',
+						id: crypto.randomUUID(),
+						type: prop as 'query' | 'mutation',
+						path: pathParts.join('.'),
+						input
+					};
+
+					if (targetClientId) {
+						const response = await connectionManager.sendToClient(targetClientId, request);
+						if (response.result.type === 'data') {
+							return response.result.data;
+						} else {
+							throw new Error(response.result.error.message);
+						}
+					} else {
+						const responses = await connectionManager.broadcast(request);
+						return responses;
+					}
+				};
+			}
+
+			return createClientProxy(connectionManager, targetClientId, [...pathParts, prop]);
+		}
+	});
+}
+
+/**
  * Create a session instance
  */
 export function createServerSideSession(
@@ -61,44 +100,9 @@ export function createServerSideSession(
 	clientId: string,
 	deviceName: string
 ): Session<never> {
-	/**
-	 * Create a client proxy that can call procedures on the client
-	 */
-	function createClientProxy<TClientRouter extends AnyRouter>(targetClientId?: string, pathParts: string[] = []): RouterProxy<TClientRouter> {
-		return new Proxy({} as RouterProxy<TClientRouter>, {
-			get(_target, prop: string) {
-				if (prop === 'query' || prop === 'mutation') {
-					return async (input: unknown) => {
-						const request: WRPCRequest = {
-							kind: 'request',
-							id: crypto.randomUUID(),
-							type: prop as 'query' | 'mutation',
-							path: pathParts.join('.'),
-							input
-						};
-
-						if (targetClientId) {
-							const response = await connectionManager.sendToClient(targetClientId, request);
-							if (response.result.type === 'data') {
-								return response.result.data;
-							} else {
-								throw new Error(response.result.error.message);
-							}
-						} else {
-							const responses = await connectionManager.broadcast(request);
-							return responses;
-						}
-					};
-				}
-
-				return createClientProxy(targetClientId, [...pathParts, prop]);
-			}
-		});
-	}
-
 	return {
-		getClient: (clientId: string) => createClientProxy(clientId),
-		broadcast: () => createClientProxy(), // No specific client ID = broadcast
+		getClient: (clientId: string) => createClientProxy(connectionManager, clientId),
+		broadcast: () => createClientProxy(connectionManager), // No specific client ID = broadcast
 		getServer: () => {
 			throw new Error('getServer() cannot be called from server-side session. Server procedures should be called directly.');
 		},

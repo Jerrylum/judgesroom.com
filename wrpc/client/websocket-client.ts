@@ -16,6 +16,12 @@ import type { Session } from '../server/session';
 export const ConnectionStateSchema = z.enum(['offline', 'connecting', 'connected', 'reconnecting', 'error']);
 export type ConnectionState = z.infer<typeof ConnectionStateSchema>;
 
+export enum ConnectionCloseCode {
+	NORMAL = 1000,
+	KICKED = 3000,
+	SESSION_DESTROYED = 3001
+}
+
 /**
  * WRPC WebSocket client implementation
  */
@@ -64,9 +70,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 			ws.onopen = () => {
 				this.ws = ws;
-				this.reconnectAttempts = 0;
-				this.connectionState = 'connected';
-				this.connectingPromise = null;
+				this.handleOpen();
 				resolve(ws);
 			};
 
@@ -87,6 +91,13 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		});
 
 		return this.connectingPromise;
+	}
+
+	private async handleOpen(): Promise<void> {
+		this.reconnectAttempts = 0;
+		this.connectionState = 'connected';
+		this.connectingPromise = null;
+		this.options.onOpen();
 	}
 
 	private async handleMessage(data: string): Promise<void> {
@@ -217,8 +228,14 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		}
 		this.pendingRequests.clear();
 
-		// Attempt to reconnect if not intentionally closed
-		if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+		this.options.onClosed(event.code, event.reason);
+		if (event.code === ConnectionCloseCode.NORMAL) {
+			this.connectionState = 'offline';
+		} else if (event.code === ConnectionCloseCode.KICKED) {
+			this.connectionState = 'offline';
+		} else if (event.code === ConnectionCloseCode.SESSION_DESTROYED) {
+			this.connectionState = 'offline';
+		} else if (this.reconnectAttempts < this.maxReconnectAttempts) {
 			this.connectionState = 'reconnecting';
 			setTimeout(
 				() => {
@@ -227,8 +244,6 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				},
 				this.reconnectDelay * Math.pow(2, this.reconnectAttempts)
 			);
-		} else {
-			this.connectionState = 'offline';
 		}
 	}
 
@@ -285,7 +300,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	 */
 	disconnect(): void {
 		if (this.ws) {
-			this.ws.close(1000, 'Client disconnect');
+			this.ws.close(ConnectionCloseCode.NORMAL, 'Client disconnected peacefully');
 			this.ws = null;
 		}
 		this.connectionState = 'offline';

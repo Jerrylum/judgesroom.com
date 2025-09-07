@@ -102,7 +102,9 @@ describe('WRPCClientManager', () => {
 				sessionId: 'test-session',
 				clientId: 'test-client',
 				deviceName: 'Test Device',
-				onContext: async () => ({})
+				onContext: async () => ({}),
+				onOpen: () => {},
+				onClosed: () => {}
 			};
 
 			vi.mocked(mockCreateOptions).mockReturnValue(expectedOptions);
@@ -243,7 +245,9 @@ describe('WRPCClientManager', () => {
 				sessionId,
 				clientId: 'test-client',
 				deviceName: 'Test Device',
-				onContext: async () => ({})
+				onContext: async () => ({}),
+				onOpen: () => {},
+				onClosed: () => {}
 			}));
 
 			const [wsClient1] = clientManager.getClient();
@@ -264,7 +268,9 @@ describe('WRPCClientManager', () => {
 					sessionId: 'test-session',
 					clientId: 'test-client',
 					deviceName: 'Test Device',
-					onContext: async () => ({})
+					onContext: async () => ({}),
+					onOpen: () => {},
+					onClosed: () => {}
 				}),
 				clientRouter
 			);
@@ -295,7 +301,9 @@ describe('createClientManager', () => {
 			sessionId: 'test-session',
 			clientId: 'test-client',
 			deviceName: 'Test Device',
-			onContext: async () => ({})
+			onContext: async () => ({}),
+			onOpen: () => {},
+			onClosed: () => {}
 		});
 
 		const w = initWRPC.createClient();

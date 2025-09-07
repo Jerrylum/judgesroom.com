@@ -78,7 +78,9 @@ describe('WebsocketClient', () => {
 			sessionId: 'test-session',
 			clientId: 'test-client',
 			deviceName: 'Test Device',
-			onContext: async () => ({})
+			onContext: async () => ({}),
+			onOpen: () => {},
+			onClosed: () => {}
 		};
 
 		// Create a test client router
@@ -130,7 +132,9 @@ describe('WebsocketClient', () => {
 				sessionId: 'test-session',
 				clientId: 'test-client',
 				deviceName: 'Test Device',
-				onContext: async () => ({})
+				onContext: async () => ({}),
+				onOpen: () => {},
+				onClosed: () => {}
 			};
 
 			const minimalClient = new WebsocketClient(minimalOptions, clientRouter);
@@ -712,7 +716,9 @@ describe('WebsocketClient', () => {
 						permissions: request.path === 'getClientInfo' ? ['admin'] : ['user']
 					};
 					return context;
-				}
+				},
+				onOpen: () => {},
+				onClosed: () => {}
 			};
 
 			// Create a context-aware client router using existing procedures

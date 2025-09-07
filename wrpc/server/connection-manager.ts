@@ -2,6 +2,7 @@ import type { AnyRouter } from './router';
 import type { WRPCRequest, WRPCResponse } from './messages';
 import type { WebSocketHandlerOptions } from './websocket-handler';
 import type { ClientData, Network } from './types';
+import { ConnectionCloseCode } from '../client';
 
 /**
  * Server data stored in Durable Object storage
@@ -61,8 +62,7 @@ export class WebSocketConnectionManager implements Network {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
-		console.log('Adding connection', this.serverData, sessionId);
-		
+
 		if (this.serverData.sessionId !== null && this.serverData.sessionId !== sessionId) {
 			throw new Error('Session ID mismatch');
 		}
@@ -243,7 +243,7 @@ export class WebSocketConnectionManager implements Network {
 		}
 		const ws = this.opts.getWebSocket(clientId);
 		if (ws) {
-			ws.close();
+			ws.close(ConnectionCloseCode.KICKED, 'Client kicked');
 		}
 		this.removeConnection(clientId);
 	}
@@ -277,6 +277,10 @@ export class WebSocketConnectionManager implements Network {
 	 * Destroy all data (for cleanup)
 	 */
 	async destroy() {
+		for (const client of this.serverData.clients) {
+			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.SESSION_DESTROYED, 'Session destroyed');
+		}
+
 		this.serverData = { sessionId: null, clients: [] };
 		this.isLoaded = false;
 		await this.opts.destroy();

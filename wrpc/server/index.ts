@@ -21,7 +21,7 @@ export {
 	type DecorateCreateRouterOptions
 } from './router';
 export { type Session } from './session';
-export { type RouterProxy, type Network, type ClientData } from './types';
+export { type RouterProxy, type RouterBroadcastProxy, type Network, type ClientData } from './types';
 export {
 	type WebSocketHandlerOptions,
 	type WebSocketConnectionMetadata as WebSocketConnectionOptions,
