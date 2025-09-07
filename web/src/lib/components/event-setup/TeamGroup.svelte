@@ -191,7 +191,7 @@
 		{/if}
 
 		{#if teamList.length === 0}
-			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800"> Delete </button>
+			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800">Delete</button>
 		{/if}
 	</div>
 

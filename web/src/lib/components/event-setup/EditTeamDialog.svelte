@@ -119,7 +119,7 @@
 	</div>
 
 	<div class="mt-6 flex justify-end space-x-3">
-		<button onclick={handleCancel} class="cancel"> Cancel </button>
-		<button onclick={handleSave} class="primary"> Save Changes </button>
+		<button onclick={handleCancel} class="cancel">Cancel</button>
+		<button onclick={handleSave} class="primary">Save Changes</button>
 	</div>
 </Dialog>

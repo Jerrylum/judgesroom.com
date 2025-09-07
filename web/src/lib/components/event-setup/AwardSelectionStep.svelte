@@ -75,7 +75,7 @@
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
 		<h2 class="text-xl font-semibold text-gray-900">Award Selection</h2>
-		<button onclick={openCustomAwardDialog} class="success">+ Add Custom Award</button>
+		<button onclick={openCustomAwardDialog} class="success tiny">+ Add Custom Award</button>
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

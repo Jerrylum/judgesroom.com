@@ -225,7 +225,7 @@
 			<div class="flex items-center gap-2">
 				<button onclick={() => addJudgeGroup()} class="primary tiny">Add Group</button>
 				{#if judgingMethod === 'assigned'}
-					<button onclick={randomlyAssignTeams} class="primary tiny"> Randomly Assign Teams </button>
+					<button onclick={randomlyAssignTeams} class="primary tiny">Randomly Assign Teams</button>
 				{/if}
 			</div>
 		</div>

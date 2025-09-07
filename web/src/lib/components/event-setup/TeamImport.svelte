@@ -185,7 +185,7 @@
 						>
 							Click to upload
 						</button>
-						<span class="text-gray-500"> or drag and drop</span>
+						<span class="text-gray-500">or drag and drop</span>
 					</div>
 					<p class="text-xs text-gray-500">CSV files only</p>
 				</div>
@@ -222,7 +222,7 @@
 
 	<!-- Process Button -->
 	<div class="flex justify-center">
-		<button onclick={processTeamData} disabled={!csvContent.trim()} class="primary"> Import Teams </button>
+		<button onclick={processTeamData} disabled={!csvContent.trim()} class="primary">Import Teams</button>
 	</div>
 
 	<!-- Status Messages -->
@@ -245,7 +245,7 @@
 				<h3 class="text-lg font-medium text-gray-800">Team Groups</h3>
 				<div class="flex items-center gap-2">
 					<input type="text" bind:value={newGroupName} placeholder="New group name" maxlength="100" class="classic" />
-					<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny"> Create Group </button>
+					<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny">Create Group</button>
 				</div>
 			</div>
 

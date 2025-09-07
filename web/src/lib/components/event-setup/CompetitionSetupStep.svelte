@@ -33,7 +33,7 @@
 	<h2 class="text-xl font-semibold text-gray-900">Competition Information</h2>
 
 	<div>
-		<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700"> Event Name </label>
+		<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700">Event Name </label>
 		<input
 			type="text"
 			id="event-name"
@@ -54,7 +54,7 @@
 	</div>
 
 	<div>
-		<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700"> Competition Type </label>
+		<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Competition Type </label>
 		<select id="competition-type" bind:value={selectedCompetitionType} class="classic block w-full">
 			{#each CompetitionTypeSchema.options as type (type)}
 				<option value={type}>{type}</option>
@@ -63,7 +63,7 @@
 	</div>
 
 	<div>
-		<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700"> Grade Level </label>
+		<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700">Grade Level </label>
 		<select id="grade-level" bind:value={selectedEventGradeLevel} class="classic block w-full">
 			{#each gradeOptions as option (option.value)}
 				<option value={option.value}>{option.label}</option>

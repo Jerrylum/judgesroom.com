@@ -62,17 +62,17 @@
 	{#if showDetails && isJudgingReady}
 		<!-- Offline mode indicator -->
 		{#if !isJudgingReady}
-			<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"> Offline Mode </span>
+			<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">Offline Mode</span>
 		{/if}
 
 		<!-- Connection issues indicator -->
 		{#if connectionState === 'error'}
-			<span class="rounded-full bg-red-100 px-2 py-1 text-xs text-red-700"> Connection Issues </span>
+			<span class="rounded-full bg-red-100 px-2 py-1 text-xs text-red-700">Connection Issues</span>
 		{/if}
 
 		<!-- Submission disabled indicator -->
 		{#if connectionState !== 'connected' && isJudgingReady}
-			<span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-700"> Submissions Disabled </span>
+			<span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-700">Submissions Disabled</span>
 		{/if}
 	{/if}
 </div>

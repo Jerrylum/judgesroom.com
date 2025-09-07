@@ -5,27 +5,23 @@ button {
 }
 
 button.primary {
-	@apply rounded-md bg-slate-900 px-6 py-3 font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-gray-400;
+	@apply rounded-md bg-slate-800 px-6 py-3 font-medium text-white transition-colors hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-gray-400;
 }
 
 button.secondary {
-	@apply rounded-md bg-gray-500 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-600;
+	@apply rounded-md bg-gray-500 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:bg-gray-300;
 }
 
 button.cancel {
-	@apply rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200;
+	@apply rounded-md bg-gray-100 px-6 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:bg-gray-50;
 }
 
 button.success {
-	@apply rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700;
+	@apply rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300;
 }
 
 button.danger {
-	@apply rounded-md bg-red-600 px-6 py-3 font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400;
-}
-
-button.primary.tiny {
-	@apply rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-gray-400;
+	@apply rounded-md bg-red-600 px-6 py-3 font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300;
 }
 
 button.tiny {

@@ -1,22 +1,10 @@
 <script lang="ts">
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
 	import Header from './Header.svelte';
-	import ShareDialog from '$lib/components/ShareDialog.svelte';
 
 	// Tab system
 	let activeTab = $state('overview');
 	let tabs = $state([{ id: 'overview', title: 'Overview', closable: false }]);
-
-	// async function handleClickShareSession() {
-	// 	if (!app.isInSession()) {
-	// 		AppUI.appPhase = 'session_setup';
-	// 	} else {
-	// 		await dialogs.showCustom(ShareDialog, {
-	// 			props: {},
-	// 			maxWidth: 'max-w-4xl'
-	// 		});
-	// 	}
-	// }
 
 	function addTab(title: string, id?: string) {
 		const tabId = id || `tab-${Date.now()}`;

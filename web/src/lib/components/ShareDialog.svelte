@@ -47,27 +47,6 @@
 		}
 	}
 
-	// // Handle end session
-	// async function handleEndSession() {
-	// 	const confirmed = await dialogs.showConfirmation({
-	// 		title: 'End Session',
-	// 		message:
-	// 			'Are you sure you want to end the session? All participants will be disconnected immediately. Only this device will retain the complete judging data - all other connected devices will lose their local copies.',
-	// 		confirmText: 'End Session',
-	// 		cancelText: 'Cancel',
-	// 		confirmButtonClass: 'danger'
-	// 	});
-
-	// 	if (confirmed) {
-	// 		try {
-	// 			await app.endSession();
-	// 			dialogs.closeDialog();
-	// 		} catch (error) {
-	// 			console.error('Failed to end session:', error);
-	// 		}
-	// 	}
-	// }
-
 	// Generate QR code when URL changes
 	$effect(() => {
 		if (shareableUrl) {
@@ -150,7 +129,7 @@
 
 				<!-- URL Section -->
 				<div>
-					<label for="session-url" class="mb-2 block text-sm font-medium text-gray-700"> Session Link </label>
+					<label for="session-url" class="mb-2 block text-sm font-medium text-gray-700">Session Link </label>
 					<div class="flex items-center space-x-2">
 						<input id="session-url" type="text" value={shareableUrl} readonly class="classic flex-1" />
 						<button onclick={copyShareUrl} class="primary tiny">

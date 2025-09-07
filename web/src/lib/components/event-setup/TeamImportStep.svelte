@@ -15,7 +15,7 @@
 	<TeamImport bind:teams />
 
 	<div class="flex justify-between pt-6">
-		<button onclick={onPrev} class="secondary"> Back </button>
+		<button onclick={onPrev} class="secondary">Back</button>
 		<button onclick={onNext} class="primary">Next: Judge Setup</button>
 	</div>
 </div>

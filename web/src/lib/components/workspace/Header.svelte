@@ -32,7 +32,7 @@
 				</h1>
 				<div class="flex items-center space-x-2 text-sm text-gray-500">
 					{#if currentUser?.role === 'judge_advisor'}
-						<span> Judge Advisor </span>
+						<span> Judge Advisor</span>
 					{:else if currentUser && currentUser.role === 'judge'}
 						<span>{currentUser.judge.name || 'Unknown'}</span>
 						<span>•</span>

@@ -8,7 +8,7 @@
 		children?: Snippet;
 	}
 
-	let { open, onClose, innerContainerClass: innerContainerClass = 'max-w-md', children }: Props = $props();
+	let { open, onClose, innerContainerClass = 'max-w-md', children }: Props = $props();
 
 	// Handle keyboard events
 	function handleKeydown(event: KeyboardEvent) {

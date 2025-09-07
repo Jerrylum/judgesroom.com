@@ -2,33 +2,15 @@
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 
-	let deleteConfirmText = $state('');
-	// let isSessionEnded = $state(false);
+	let destroyConfirmText = $state('');
 	let isDestroying = $state(false);
-	// let hasEndedSession = $state(false);
 
 	const isJudgingReady = $derived(app.isJudgingReady());
-	// const connectionState = $derived(app.getConnectionState());
-	// const isConnected = $derived(connectionState === 'connected');
-	// const canEndSession = $derived(isInSession && isConnected && !hasEndedSession);
-	// const canDestroy = $derived(!isInSession || hasEndedSession);
 	const canDestroy = $derived(true);
-	const isDeleteConfirmValid = $derived(deleteConfirmText.trim().toLowerCase() === 'delete');
-
-	// async function handleEndSession() {
-	// 	if (!canEndSession) return;
-
-	// 	try {
-	// 		await app.leaveSession();
-	// 		hasEndedSession = true;
-	// 	} catch (error) {
-	// 		console.error('Failed to end session:', error);
-	// 		// TODO: Show error message
-	// 	}
-	// }
+	const isDestroyConfirmValid = $derived(destroyConfirmText.trim().toLowerCase() === 'destroy');
 
 	async function handleDestroy() {
-		if (!canDestroy || !isDeleteConfirmValid) return;
+		if (!canDestroy || !isDestroyConfirmValid) return;
 
 		try {
 			isDestroying = true;
@@ -86,56 +68,18 @@
 			</div>
 		</div>
 
-		<!-- Session Management Section -->
-		<!-- {#if isInSession}
-			<div class="space-y-3">
-				<h4 class="text-sm font-medium text-gray-900">Step 1: End Session</h4>
-				<p class="text-sm text-gray-600">
-					End the judging session to disconnect all participants. This must be done before destroying data.
-				</p>
-				
-				{#if hasEndedSession}
-					<div class="flex items-center rounded-md bg-green-50 p-3">
-						<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span class="ml-2 text-sm text-green-800">Session ended successfully</span>
-					</div>
-				{:else}
-					<button
-						onclick={handleEndSession}
-						disabled={!canEndSession}
-						class="w-full rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-					>
-						{#if !isConnected}
-							Already Offline
-						{:else}
-							End Session
-						{/if}
-					</button>
-				{/if}
-			</div>
-		{/if} -->
-
 		<!-- Data Destruction Section -->
 		<div class="space-y-3">
-			<h4 class="text-sm font-medium text-gray-900">
-				{isJudgingReady ? 'Step 2: ' : ''}Destroy Data
-			</h4>
-			<p class="text-sm text-gray-600">Type "delete" below to confirm the permanent destruction of all judging data.</p>
+			<p class="text-sm text-gray-600">Type "destroy" below to confirm the permanent destruction of all judging data.</p>
 
 			<div>
-				<label for="deleteConfirm" class="block text-sm font-medium text-gray-700"> Confirmation </label>
+				<label for="destroyConfirm" class="block text-sm font-medium text-gray-700">Confirmation </label>
 				<input
-					id="deleteConfirm"
+					id="destroyConfirm"
 					type="text"
-					bind:value={deleteConfirmText}
+					bind:value={destroyConfirmText}
 					disabled={!canDestroy}
-					placeholder="Type 'delete' to confirm"
+					placeholder="Type 'destroy' to confirm"
 					class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none disabled:bg-gray-50 disabled:opacity-50"
 				/>
 			</div>
@@ -151,7 +95,7 @@
 			</button>
 			<button
 				onclick={handleDestroy}
-				disabled={!canDestroy || !isDeleteConfirmValid || isDestroying}
+				disabled={!canDestroy || !isDestroyConfirmValid || isDestroying}
 				class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if isDestroying}

@@ -230,7 +230,7 @@
 								<div class="space-y-4">
 									<div class="space-y-4">
 										<div>
-											<label for="judgeName" class="block text-sm font-medium text-gray-700"> Your Name </label>
+											<label for="judgeName" class="block text-sm font-medium text-gray-700">Your Name </label>
 											<input
 												id="judgeName"
 												type="text"
@@ -241,7 +241,7 @@
 										</div>
 
 										<div>
-											<label for="judgeGroup" class="block text-sm font-medium text-gray-700"> Judge Group </label>
+											<label for="judgeGroup" class="block text-sm font-medium text-gray-700">Judge Group </label>
 											<select id="judgeGroup" bind:value={selectedJudgeGroupId} class="classic mt-1 block w-full">
 												{#each judgeGroups as group (group.id)}
 													<option value={group.id}>{group.name}</option>

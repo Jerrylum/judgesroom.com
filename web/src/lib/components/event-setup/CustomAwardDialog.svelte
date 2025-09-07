@@ -192,11 +192,11 @@
 	</div>
 
 	<div class="mt-6 flex justify-end space-x-3">
-		<button onclick={handleCancel} class="cancel"> Cancel </button>
+		<button onclick={handleCancel} class="cancel tiny">Cancel</button>
 		<button
 			onclick={addCustomAward}
 			disabled={!canSubmitCustomAward()}
-			class="rounded-md px-4 py-2 text-sm font-medium text-white transition-colors"
+			class="primary tiny"
 			class:bg-slate-900={canSubmitCustomAward()}
 			class:hover:bg-slate-800={canSubmitCustomAward()}
 			class:bg-gray-400={!canSubmitCustomAward()}
