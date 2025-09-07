@@ -1,4 +1,10 @@
-import { createClientManager, type ClientOptions, type ConnectionState, type WRPCClientManager } from '@judging.jerryio/wrpc/client';
+import {
+	ConnectionCloseCode,
+	createClientManager,
+	type ClientOptions,
+	type ConnectionState,
+	type WRPCClientManager
+} from '@judging.jerryio/wrpc/client';
 import type { Judge, JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 import type { ClientInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
 import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
@@ -10,6 +16,7 @@ import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl } from './utils.svelte';
+import { AppUI } from './app-page.svelte';
 
 export class AppStorage {
 	/**
@@ -95,7 +102,7 @@ export class App {
 	// Session Management
 	// ============================================================================
 
-	async joinSession(): Promise<void> {
+	private async joinSession(): Promise<void> {
 		if (!this.hasSessionInfo()) {
 			throw new Error('CRITICAL: No session info');
 		}
@@ -112,6 +119,21 @@ export class App {
 		this.handleEssentialDataUpdate(starterKit.essentialData);
 		this.handleTeamDataUpdate(starterKit.teamData);
 		this.handleJudgesUpdate(starterKit.judges);
+
+		// Load user from storage
+		const user = this.loadUserFromStorage();
+		if (user) {
+			this.currentUser = user;
+
+			if (user.role === 'judge') {
+				const find = this.allJudges.find((judge) => judge.id === user.judge.id);
+				if (find) {
+					this.currentUser = user;
+				} else {
+					this.clearCurrentUser('judge_deleted');
+				}
+			}
+		}
 	}
 
 	/**
@@ -234,32 +256,7 @@ export class App {
 	 */
 	async reconnectStoredSession(): Promise<void> {
 		try {
-			if (!this.hasSessionInfo()) {
-				throw new Error('No stored session found');
-			}
-
-			this.clientManager.resetClient();
-
-			// Try to rejoin the session
-			const { essentialData, teamData, judges } = await this.wrpcClient.handshake.joinSession.mutation();
-			this.handleEssentialDataUpdate(essentialData);
-			this.allTeamData = teamData;
-			this.allJudges = judges;
-
-			// Load user from storage
-			const user = this.loadUserFromStorage();
-			if (user) {
-				this.currentUser = user;
-
-				if (user.role === 'judge') {
-					const find = this.allJudges.find((judge) => judge.id === user.judge.id);
-					if (find) {
-						this.currentUser = user;
-					} else {
-						this.clearCurrentUser('judge_deleted');
-					}
-				}
-			}
+			await this.joinSession();
 		} catch (error) {
 			// Do not clear session from storage, the user might be able to connect to the session again
 			// this.clearSessionFromStorage();
@@ -511,7 +508,21 @@ export class App {
 			clientId: this.sessionInfo.clientId,
 			sessionId: this.sessionInfo.sessionId,
 			deviceName: this.sessionInfo.deviceName,
-			onContext: async () => ({})
+			onContext: async () => ({}),
+			onOpen: () => {},
+			onClosed: (code, reason) => {
+				if (code === ConnectionCloseCode.KICKED) {
+					this.leaveSession();
+					this.addErrorNotice('You have been kicked from the session');
+
+					AppUI.appPhase = 'choose_action';
+				} else if (code === ConnectionCloseCode.SESSION_DESTROYED) {
+					this.leaveSession();
+					this.addErrorNotice('The session has been destroyed');
+
+					AppUI.appPhase = 'choose_action';
+				}
+			}
 		};
 	}
 

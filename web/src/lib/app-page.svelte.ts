@@ -1,10 +1,6 @@
 import { App, AppStorage } from '$lib/app.svelte';
-import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
-import { createClientManager } from '@judging.jerryio/wrpc/client';
 import type { Component } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
-import { type ClientRouter, clientRouter } from './client-router';
-import { generateUUID, getDeviceNameFromUserAgent } from './utils.svelte';
 
 // ============================================================================
 // Dialog System

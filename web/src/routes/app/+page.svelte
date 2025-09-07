@@ -50,6 +50,7 @@
 			// leave the current session and join the new one
 			if (existingSessionInfo?.sessionId !== result) {
 				await handleSessionFromUrl();
+				return;
 			}
 		}
 

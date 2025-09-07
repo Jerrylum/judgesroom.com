@@ -108,9 +108,10 @@
 			</button>
 		</div>
 
-		<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+		<!-- <div class="grid grid-cols-1 gap-6 lg:grid-cols-2"> -->
+		<div class="flex shrink-0 flex-col gap-6 overflow-hidden lg:flex-row">
 			<!-- Left Column: Share Session -->
-			<div class="max-h-173 space-y-6">
+			<div class="max-h-140 flex-1 space-y-6">
 				<h4 class="text-lg font-medium text-gray-900">Share Session</h4>
 
 				<!-- QR Code Section -->
@@ -152,7 +153,7 @@
 			</div>
 
 			<!-- Right Column: Connected Clients -->
-			<div class="max-h-173 space-y-4 overflow-y-auto">
+			<div class="flex max-h-140 flex-1 flex-col space-y-4 overflow-hidden">
 				<h4 class="text-lg font-medium text-gray-900">Connected Clients</h4>
 
 				{#if isDisconnectedFromServer()}
@@ -191,36 +192,39 @@
 
 					<!-- Other Clients Section -->
 					{#if getOtherClients().length > 0}
-						<div class="space-y-3">
+						<div class="flex min-h-0 flex-col space-y-3">
 							<h5 class="text-sm font-medium text-gray-700">Other Clients</h5>
-							{#each getOtherClients() as client (client.clientId)}
-								<div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-									<div class="flex items-center space-x-3">
-										<!-- <div class="h-2 w-2 rounded-full bg-green-500"></div> -->
-										{#if client.isOnline}
-											<div class="h-2 w-2 rounded-full bg-green-500"></div>
-										{:else}
-											<div class="h-2 w-2 rounded-full bg-red-500"></div>
-										{/if}
-										<div>
-											<div class="font-medium text-gray-900">{client.deviceName}</div>
-											<div class="text-xs text-gray-500">
-												Joined {getConnectionDuration(client.connectedAt)} ago
+
+							<div class="min-h-0 space-y-3 overflow-hidden pr-1 lg:overflow-auto">
+								{#each getOtherClients() as client (client.clientId)}
+									<div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+										<div class="flex items-center space-x-3">
+											<!-- <div class="h-2 w-2 rounded-full bg-green-500"></div> -->
+											{#if client.isOnline}
+												<div class="h-2 w-2 rounded-full bg-green-500"></div>
+											{:else}
+												<div class="h-2 w-2 rounded-full bg-red-500"></div>
+											{/if}
+											<div>
+												<div class="font-medium text-gray-900">{client.deviceName}</div>
+												<div class="text-xs text-gray-500">
+													Joined {getConnectionDuration(client.connectedAt)} ago
+												</div>
 											</div>
 										</div>
+										{#if isJudgeAdvisor()}
+											<button
+												onclick={() => handleKickClient(client.clientId)}
+												class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
+												title="Kick client"
+												aria-label="Kick client"
+											>
+												<CloseIcon size={16} />
+											</button>
+										{/if}
 									</div>
-									{#if isJudgeAdvisor()}
-										<button
-											onclick={() => handleKickClient(client.clientId)}
-											class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
-											title="Kick client"
-											aria-label="Kick client"
-										>
-											<CloseIcon size={16} />
-										</button>
-									{/if}
-								</div>
-							{/each}
+								{/each}
+							</div>
 						</div>
 					{/if}
 

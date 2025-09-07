@@ -7,10 +7,11 @@ import { type ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
-import { getClients } from './client';
+import { broadcastClientListUpdate, getClients } from './client';
 import type { ServerContext } from '../server-router';
 import { offlineClients } from '../db/schema';
 import { transaction } from '../utils';
+import { WRPCError } from '@judging.jerryio/wrpc/server/types';
 
 export const StarterKitSchema = z.object({
 	essentialData: EssentialDataSchema,
@@ -23,6 +24,11 @@ export type StarterKit = z.infer<typeof StarterKitSchema>;
 export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		joinSession: w.procedure.output(StarterKitSchema).mutation(async ({ ctx, session }) => {
+			const hasExistingEssentialData = await hasEssentialData(ctx.db);
+			if (!hasExistingEssentialData) {
+				throw new WRPCError('Session not found');
+			}
+
 			const offlineClient = {
 				clientId: session.currentClient.clientId,
 				deviceName: session.currentClient.deviceName,
@@ -38,11 +44,9 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 					set: offlineClient
 				});
 
-			// TODO :broadcast to all listening clients
+			// Broadcast client list update to all clients
 			// Do not wait for the broadcast to complete
-			getClients(ctx.db, ctx.network).then((clients) => {
-				session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
-			});
+			broadcastClientListUpdate(ctx.db, ctx.network, session.broadcast<ClientRouter>());
 
 			return transaction(ctx.db, async (tx) => {
 				return {

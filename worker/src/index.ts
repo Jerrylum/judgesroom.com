@@ -5,6 +5,7 @@ import { ServerRouter, serverRouter } from './server-router';
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
+import { broadcastClientListUpdate } from './routes/client';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
@@ -96,6 +97,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Set up connection with the WebSocket handler (now async for storage)
 		await this.wsHandler.handleConnection(server, { sessionId, clientId, deviceName });
 
+		// We do not broadcast client list update here, it will be done when the client sends a join request
+
 		return new Response(null, { status: 101, webSocket: client });
 	}
 
@@ -111,6 +114,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
 		// Delegate to the WebSocket handler
 		await this.wsHandler.handleClose(ws, code, reason);
+
+		// Broadcast client list update to all clients
+		// Do not wait for the broadcast to complete
+		broadcastClientListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler.broadcast());
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {
