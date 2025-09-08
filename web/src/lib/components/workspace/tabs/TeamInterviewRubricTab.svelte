@@ -88,26 +88,10 @@
 	<div class="h-full overflow-auto p-6">
 		<div class="mx-auto max-w-5xl space-y-6">
 			<!-- Header -->
-			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<h2 class="text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
-				<p class="mt-2 text-sm text-gray-600">Evaluate team performance during the interview process.</p>
-			</div>
-
-			<!-- Judge & Team Information -->
-			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<h3 class="mb-4 text-lg font-medium text-gray-900">Interview Setup</h3>
-
-				<!-- Current Judge Information (Read-only) -->
-				<div class="mb-6 rounded-lg bg-gray-50 p-4">
-					<h4 class="font-medium text-gray-900">Current Judge</h4>
-					<div class="mt-2 text-sm text-gray-700">
-						<p><strong>Judge:</strong> {currentJudge().name}</p>
-					</div>
-				</div>
-
-				<!-- Team Selection -->
-				<div>
-					<label for="team-select" class="block text-sm font-medium text-gray-700">Team to Interview</label>
+			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+				<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+				<div class="mb-4">
+					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
 					<select id="team-select" bind:value={selectedTeamId} class="classic mt-1 block w-full">
 						<option value="">Select a team...</option>
 						{#each allTeams as team (team.id)}
@@ -117,19 +101,95 @@
 				</div>
 
 				{#if selectedTeam}
-					<div class="mt-4 rounded-lg bg-blue-50 p-4">
-						<h4 class="font-medium text-blue-900">Team Information</h4>
-						<div class="mt-2 text-sm text-blue-800">
+					<div class="mb-4 rounded-lg bg-gray-50 p-4">
+						<div class=" text-sm text-gray-800">
 							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
 							<p><strong>School:</strong> {selectedTeam.school}</p>
 							<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
 						</div>
 					</div>
 				{/if}
+
+				<!-- Current Judge Information (Read-only) -->
+				<div class="mt-2 text-sm text-gray-700">
+					<p><strong>Judge Name:{' '}</strong>{currentJudge().name}</p>
+				</div>
+			</div>
+			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+				<p class="text-sm text-gray-600">
+					<strong>Directions:</strong> Determine a point value that best characterizes the content of the Team Interview for that criterion.
+				</p>
+
+				<rubric-table>
+					<rubric-header>
+						<aside class="border-r-3 min-w-42 max-w-42 text-base! bg-gray-400">CRITERIA</aside>
+						<scroll-container>
+							<content class="min-w-120 flex-col! items-stretch! flex gap-2 bg-gray-200 font-bold">
+								<div class="p-0! text-base! pt-1 text-center">PROFICIENCY LEVEL</div>
+								<div class="p-0! border-0! flex items-center justify-center text-center">
+									<div class="flex-1 border-r pb-1">
+										<p>EXPERT</p>
+										<p class="text-xs font-normal">(4-5 POINTS)</p>
+									</div>
+									<div class="flex-1 pb-1">
+										<p>PROFICIENT</p>
+										<p class="text-xs font-normal">(2-3 POINTS)</p>
+									</div>
+									<div class="flex-1 border-l pb-1">
+										<p>EMERGING</p>
+										<p class="text-xs font-normal">(0-1 POINTS)</p>
+									</div>
+								</div>
+							</content>
+						</scroll-container>
+						<aside class="flex-0! flex-col! items-stretch! min-w-14! bg-gray-200">
+							<div class="pt-1">&nbsp;</div>
+							<div class="flex flex-grow items-center justify-center p-1 text-xs font-bold">
+								<span>POINTS</span>
+							</div>
+						</aside>
+					</rubric-header>
+					<rubric-body>
+						<row>
+							<aside class="min-w-42 max-w-42">
+								<p class="text-sm font-bold">ENGINEERING DESIGN PROCESS</p>
+								<p class="text-xs italic text-gray-500">All Awards</p>
+							</aside>
+							<scroll-container>
+								<content class="min-w-120">
+									<div>
+										Team shows evidence of independent inquiry from the beginning stages of their design process. This includes
+										brainstorming, testing, and exploring alternative solutions
+									</div>
+									<div>Team shows evidence of independent inquiry for some elements of their design process.</div>
+									<div>Team shows little to no evidence of independent inquiry in their design process.</div>
+								</content>
+							</scroll-container>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
+						</row>
+						<row>
+							<aside class="min-w-42 max-w-42">
+								<p class="text-sm font-bold">GAME STRATEGY</p>
+								<p class="text-xs italic text-gray-500">Design, Innovate, Create, Amaze</p>
+							</aside>
+							<scroll-container>
+								<content class="min-w-120">
+									<div>
+										Team shows evidence of independent inquiry from the beginning stages of their design process. This includes
+										brainstorming, testing, and exploring alternative solutions
+									</div>
+									<div>Team shows evidence of independent inquiry for some elements of their design process.</div>
+									<div>Team shows little to no evidence of independent inquiry in their design process.</div>
+								</content>
+							</scroll-container>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
+						</row>
+					</rubric-body>
+				</rubric-table>
 			</div>
 
 			<!-- Rubric Scoring -->
-			{#if selectedTeamId}
+			{#if false}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-4 text-lg font-medium text-gray-900">Scoring Rubric</h3>
 					<div class="space-y-6">
@@ -204,3 +264,81 @@
 		</div>
 	</div>
 </Tab>
+
+<style lang="postcss">
+	@reference "tailwindcss";
+
+	rubric-table {
+		@apply flex flex-col;
+
+		> :first-child {
+			@apply border-t-3;
+		}
+
+		> * {
+			@apply border-b-3;
+		}
+
+		scroll-container {
+			@apply overflow-auto;
+
+			> content {
+				@apply flex flex-grow flex-row items-stretch justify-center text-left text-sm;
+
+				> * {
+					@apply flex-1 p-2;
+				}
+
+				> :not(:first-child) {
+					@apply border-l-1;
+				}
+			}
+		}
+
+		aside {
+			@apply flex flex-grow flex-col items-center justify-center p-2 text-center text-xs;
+		}
+
+		rubric-header {
+			@apply flex flex-row;
+
+			> :first-child {
+				@apply border-l-3;
+			}
+
+			> * {
+				@apply border-r-3 flex-grow;
+			}
+		}
+
+		rubric-body {
+			@apply flex flex-col;
+
+			> :not(:first-child) {
+				@apply border-t-1;
+			}
+
+			> row {
+				@apply flex flex-row;
+
+				> :first-child {
+					@apply border-l-3;
+				}
+
+				> * {
+					@apply border-r-3 flex-grow;
+				}
+
+				&:nth-child(even) {
+					@apply bg-gray-100;
+				}
+			}
+		}
+
+		:not(:last-child) {
+			> scroll-container {
+				scrollbar-width: none;
+			}
+		}
+	}
+</style>
