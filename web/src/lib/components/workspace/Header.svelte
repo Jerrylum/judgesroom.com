@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { app } from '$lib/app-page.svelte';
-	import ConnectionStatusIndicator from '$lib/components/ConnectionStatusIndicator.svelte';
-	import ShareIcon from '$lib/icon/ShareIcon.svelte';
-	import UserMenu from '$lib/components/workspace/UserMenu.svelte';
+	import ConnectionStatusIndicator from './ConnectionStatusIndicator.svelte';
+	import UserMenu from './UserMenu.svelte';
 
 	interface Props {
 		// onClickShareSession: () => void;

@@ -1,6 +1,7 @@
 import { App, AppStorage } from '$lib/app.svelte';
 import type { Component } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
+import { TabController } from '$lib/tab.svelte';
 
 // ============================================================================
 // Dialog System
@@ -184,3 +185,4 @@ export const AppUI = $state({
 
 export const app = new App(new AppStorage(), import.meta.env.DEV);
 export const dialogs = new DialogController();
+export const tabs = new TabController();
