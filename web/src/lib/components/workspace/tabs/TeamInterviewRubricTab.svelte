@@ -146,8 +146,8 @@
 					<p><strong>Judge Name:{' '}</strong>{currentJudge().name}</p>
 				</div>
 			</div>
-			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-				<p class="text-sm text-gray-600">
+			<div class="rounded-lg bg-white p-6 shadow-sm">
+				<p class="mb-6 text-sm text-gray-600">
 					<strong>Directions:</strong> Determine a point value that best characterizes the content of the Team Interview for that criterion.
 				</p>
 
@@ -189,14 +189,23 @@
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>
-										Team shows evidence of independent inquiry <u>from the beginning stages</u> of their design process. This includes
-										brainstorming, testing, and exploring alternative solutions.
+										Team shows evidence of independent inquiry <u>from the beginning stages</u> of their design process. This includes brainstorming,
+										testing, and exploring alternative solutions.
 									</div>
 									<div>Team shows evidence of independent inquiry for <u>some elements</u> of their design process.</div>
 									<div>Team <u>shows little to no evidence</u> of independent inquiry in their design process.</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14! p-0!">
+								<div class="flex flex-row flex-wrap items-center justify-center">
+									<button class="score-button">0</button>
+									<button class="score-button">1</button>
+									<button class="score-button">2</button>
+									<button class="score-button">3</button>
+									<button class="score-button">4</button>
+									<button class="score-button">5</button>
+								</div>
+							</aside>
 						</row>
 						<row>
 							<aside class="min-w-42 max-w-42">
@@ -210,7 +219,16 @@
 									<div>Team <u>did not explain</u> game strategy, or strategy is not student-directed.</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14! p-0!">
+								<div class="flex flex-row flex-wrap items-center justify-center">
+									<button class="score-button">0</button>
+									<button class="score-button">1</button>
+									<button class="score-button">2</button>
+									<button class="score-button">3</button>
+									<button class="score-button">4</button>
+									<button class="score-button">5</button>
+								</div>
+							</aside>
 						</row>
 						<row>
 							<aside class="min-w-42 max-w-42">
@@ -228,10 +246,15 @@
 									</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14! text-xs!">TOTAL</aside>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14! text-xs!">TOTAL<br />SCORE</aside>
 						</row>
 					</rubric-body>
 				</rubric-table>
+
+				<p class="mt-2 text-center text-xs italic">
+					All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at
+					the end of the event.
+				</p>
 			</div>
 
 			<!-- Rubric Scoring -->
@@ -339,6 +362,10 @@
 					@apply border-l-1;
 				}
 			}
+		}
+
+		button.score-button {
+			@apply flex h-6 w-6 flex-col items-center p-1 text-center hover:font-bold;
 		}
 
 		aside {
