@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "bc2e2836-bc62-44a3-b31a-029dfa2b8343",
+  "id": "37e0d42f-b6e5-4701-8181-8d18d181988d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -801,6 +801,13 @@
         },
         "rubric": {
           "name": "rubric",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

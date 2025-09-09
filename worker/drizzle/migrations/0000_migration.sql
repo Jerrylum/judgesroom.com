@@ -114,6 +114,7 @@ CREATE TABLE `TeamInterviewRubrics` (
 	`teamId` text NOT NULL,
 	`judgeId` text NOT NULL,
 	`rubric` text NOT NULL,
+	`notes` text NOT NULL,
 	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE cascade
 );
