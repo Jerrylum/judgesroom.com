@@ -153,39 +153,39 @@
 
 				<rubric-table>
 					<rubric-header>
-						<aside class="border-r-3 min-w-42 max-w-42 text-base! bg-gray-400">CRITERIA</aside>
+						<criteria class="min-w-42 max-w-42 bg-gray-400">CRITERIA</criteria>
 						<scroll-container use:registerScrollContainer>
-							<content class="min-w-120 flex-col! items-stretch! flex gap-2 bg-gray-200 font-bold">
-								<div class="p-0! text-base! pt-1 text-center">PROFICIENCY LEVEL</div>
-								<div class="p-0! border-0! flex items-center justify-center text-center">
+							<content class="min-w-120 flex-col! gap-2 bg-gray-200">
+								<div class="p-0! text-base! pt-1 text-center font-bold">PROFICIENCY LEVEL</div>
+								<div class="p-0! border-0! flex text-center">
 									<div class="flex-1 border-r pb-1">
-										<p>EXPERT</p>
-										<p class="text-xs font-normal">(4-5 POINTS)</p>
+										<p class="font-bold">EXPERT</p>
+										<p class="text-xs">(4-5 POINTS)</p>
 									</div>
 									<div class="flex-1 pb-1">
-										<p>PROFICIENT</p>
-										<p class="text-xs font-normal">(2-3 POINTS)</p>
+										<p class="font-bold">PROFICIENT</p>
+										<p class="text-xs">(2-3 POINTS)</p>
 									</div>
 									<div class="flex-1 border-l pb-1">
-										<p>EMERGING</p>
-										<p class="text-xs font-normal">(0-1 POINTS)</p>
+										<p class="font-bold">EMERGING</p>
+										<p class="text-xs">(0-1 POINTS)</p>
 									</div>
 								</div>
 							</content>
 						</scroll-container>
-						<aside class="flex-0! flex-col! items-stretch! min-w-14! bg-gray-200">
+						<scoring class="flex-col! min-w-14 bg-gray-200">
 							<div class="pt-1">&nbsp;</div>
-							<div class="flex flex-grow items-center justify-center p-1 text-xs font-bold">
+							<div class="flex items-center p-1 font-bold">
 								<span>POINTS</span>
 							</div>
-						</aside>
+						</scoring>
 					</rubric-header>
 					<rubric-body>
 						<row>
-							<aside class="min-w-42 max-w-42">
+							<criteria class="min-w-42 max-w-42">
 								<p class="text-sm font-bold">ENGINEERING DESIGN PROCESS</p>
 								<p class="text-xs italic text-gray-500">All Awards</p>
-							</aside>
+							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>
@@ -196,22 +196,20 @@
 									<div>Team <u>shows little to no evidence</u> of independent inquiry in their design process.</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14! p-0!">
-								<div class="flex flex-row flex-wrap items-center justify-center">
-									<button class="score-button">0</button>
-									<button class="score-button">1</button>
-									<button class="score-button">2</button>
-									<button class="score-button">3</button>
-									<button class="score-button">4</button>
-									<button class="score-button">5</button>
-								</div>
-							</aside>
+							<scoring class="min-w-14">
+								<button class="score-button">0</button>
+								<button class="score-button">1</button>
+								<button class="score-button">2</button>
+								<button class="score-button">3</button>
+								<button class="score-button">4</button>
+								<button class="score-button">5</button>
+							</scoring>
 						</row>
 						<row>
-							<aside class="min-w-42 max-w-42">
+							<criteria class="min-w-42 max-w-42">
 								<p class="text-sm font-bold">GAME STRATEGY</p>
 								<p class="text-xs italic text-gray-500">Design, Innovate, Create, Amaze</p>
-							</aside>
+							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>Team can fully explain their <u>entire</u> game strategy including game analysis.</div>
@@ -219,22 +217,20 @@
 									<div>Team <u>did not explain</u> game strategy, or strategy is not student-directed.</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14! p-0!">
-								<div class="flex flex-row flex-wrap items-center justify-center">
-									<button class="score-button">0</button>
-									<button class="score-button">1</button>
-									<button class="score-button">2</button>
-									<button class="score-button">3</button>
-									<button class="score-button">4</button>
-									<button class="score-button">5</button>
-								</div>
-							</aside>
+							<scoring class="min-w-14">
+								<button class="score-button">0</button>
+								<button class="score-button">1</button>
+								<button class="score-button">2</button>
+								<button class="score-button">3</button>
+								<button class="score-button">4</button>
+								<button class="score-button">5</button>
+							</scoring>
 						</row>
 						<row>
-							<aside class="min-w-42 max-w-42">
+							<criteria class="min-w-42 max-w-42">
 								<p class="text-sm font-bold">SPECIAL ATTRIBUTES & OVERALL IMPRESSIONS</p>
 								<p class="text-xs italic text-gray-500">Judges, Inspire</p>
-							</aside>
+							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>
@@ -246,7 +242,7 @@
 									</div>
 								</content>
 							</scroll-container>
-							<aside class="flex-0! flex-col! items-stretch! min-w-14! text-xs!">TOTAL<br />SCORE</aside>
+							<scoring class="min-w-14">TOTAL<br />SCORE</scoring>
 						</row>
 					</rubric-body>
 				</rubric-table>
@@ -349,7 +345,7 @@
 		}
 
 		scroll-container {
-			@apply overflow-x-auto;
+			@apply flex-grow overflow-x-auto;
 
 			> content {
 				@apply flex flex-grow flex-row items-stretch justify-center text-left text-sm;
@@ -368,8 +364,12 @@
 			@apply flex h-6 w-6 flex-col items-center p-1 text-center hover:font-bold;
 		}
 
-		aside {
-			@apply flex flex-grow flex-col items-center justify-center p-2 text-center text-xs;
+		criteria {
+			@apply flex flex-grow flex-col items-center justify-center p-2 text-center;
+		}
+
+		scoring {
+			@apply flex-0 flex flex-row flex-wrap content-center justify-center text-center text-xs;
 		}
 
 		rubric-header {
@@ -380,7 +380,7 @@
 			}
 
 			> * {
-				@apply border-r-3 flex-grow;
+				@apply border-r-3;
 			}
 		}
 
