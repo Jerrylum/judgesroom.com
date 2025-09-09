@@ -28,6 +28,10 @@
 	let interviewNotes = $state('');
 	let rubricScores = $state<Record<string, number>>({});
 
+	// Scroll container references for synchronization
+	let scrollContainers: HTMLElement[] = [];
+	let isSyncing = false;
+
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
 
@@ -61,6 +65,33 @@
 
 	function updateScore(criteriaId: string, score: number) {
 		rubricScores[criteriaId] = score;
+	}
+
+	// Synchronize scroll positions across all containers
+	function syncScrollPosition(sourceContainer: HTMLElement) {
+		if (isSyncing) return; // Prevent infinite loop
+
+		isSyncing = true;
+		const scrollLeft = sourceContainer.scrollLeft;
+
+		scrollContainers.forEach((container) => {
+			if (container !== sourceContainer) {
+				container.scrollLeft = scrollLeft;
+			}
+		});
+
+		// Use setTimeout to reset the flag after all scroll events have been processed
+		setTimeout(() => {
+			isSyncing = false;
+		}, 0);
+	}
+
+	// Register scroll container and add event listener
+	function registerScrollContainer(container: HTMLElement) {
+		if (!scrollContainers.includes(container)) {
+			scrollContainers.push(container);
+			container.addEventListener('scroll', () => syncScrollPosition(container));
+		}
 	}
 
 	async function saveRubric() {
@@ -123,7 +154,7 @@
 				<rubric-table>
 					<rubric-header>
 						<aside class="border-r-3 min-w-42 max-w-42 text-base! bg-gray-400">CRITERIA</aside>
-						<scroll-container>
+						<scroll-container use:registerScrollContainer>
 							<content class="min-w-120 flex-col! items-stretch! flex gap-2 bg-gray-200 font-bold">
 								<div class="p-0! text-base! pt-1 text-center">PROFICIENCY LEVEL</div>
 								<div class="p-0! border-0! flex items-center justify-center text-center">
@@ -155,14 +186,14 @@
 								<p class="text-sm font-bold">ENGINEERING DESIGN PROCESS</p>
 								<p class="text-xs italic text-gray-500">All Awards</p>
 							</aside>
-							<scroll-container>
+							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>
-										Team shows evidence of independent inquiry from the beginning stages of their design process. This includes
-										brainstorming, testing, and exploring alternative solutions
+										Team shows evidence of independent inquiry <u>from the beginning stages</u> of their design process. This includes
+										brainstorming, testing, and exploring alternative solutions.
 									</div>
-									<div>Team shows evidence of independent inquiry for some elements of their design process.</div>
-									<div>Team shows little to no evidence of independent inquiry in their design process.</div>
+									<div>Team shows evidence of independent inquiry for <u>some elements</u> of their design process.</div>
+									<div>Team <u>shows little to no evidence</u> of independent inquiry in their design process.</div>
 								</content>
 							</scroll-container>
 							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
@@ -172,17 +203,32 @@
 								<p class="text-sm font-bold">GAME STRATEGY</p>
 								<p class="text-xs italic text-gray-500">Design, Innovate, Create, Amaze</p>
 							</aside>
-							<scroll-container>
+							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
-									<div>
-										Team shows evidence of independent inquiry from the beginning stages of their design process. This includes
-										brainstorming, testing, and exploring alternative solutions
-									</div>
-									<div>Team shows evidence of independent inquiry for some elements of their design process.</div>
-									<div>Team shows little to no evidence of independent inquiry in their design process.</div>
+									<div>Team can fully explain their <u>entire</u> game strategy including game analysis.</div>
+									<div>Team can explain their current strategy with <u>limited evidence of game analysis</u>.</div>
+									<div>Team <u>did not explain</u> game strategy, or strategy is not student-directed.</div>
 								</content>
 							</scroll-container>
 							<aside class="flex-0! flex-col! items-stretch! min-w-14!">Score</aside>
+						</row>
+						<row>
+							<aside class="min-w-42 max-w-42">
+								<p class="text-sm font-bold">SPECIAL ATTRIBUTES & OVERALL IMPRESSIONS</p>
+								<p class="text-xs italic text-gray-500">Judges, Inspire</p>
+							</aside>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>
+										<p>
+											Does the team have any special attributes, accomplishments, or exemplary effort in overcoming challenges at this
+											event? Did anything stand out about this team in their interview? Please describe:
+										</p>
+										<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1"></textarea>
+									</div>
+								</content>
+							</scroll-container>
+							<aside class="flex-0! flex-col! items-stretch! min-w-14! text-xs!">TOTAL</aside>
 						</row>
 					</rubric-body>
 				</rubric-table>
@@ -280,7 +326,7 @@
 		}
 
 		scroll-container {
-			@apply overflow-auto;
+			@apply overflow-x-auto;
 
 			> content {
 				@apply flex flex-grow flex-row items-stretch justify-center text-left text-sm;
