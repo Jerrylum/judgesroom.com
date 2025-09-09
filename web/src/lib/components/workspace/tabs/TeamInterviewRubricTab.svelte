@@ -4,6 +4,7 @@
 	import Tab from './Tab.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import ScoreButtons from './ScoreButtons.svelte';
+	import { generateUUID } from '$lib/utils.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -12,8 +13,6 @@
 
 	let { tab, isActive }: Props = $props();
 
-	// Get essential data for teams and judge groups
-	const essentialData = $derived(app.getEssentialData());
 	const allTeams = $derived(app.getAllTeams());
 	const currentUser = $derived(app.getCurrentUser());
 
@@ -27,8 +26,8 @@
 
 	// Local state for the rubric form (no judge selection needed)
 	let selectedTeamId = $state(tab.teamId || '');
-	let interviewNotes = $state('');
-	let rubricScores = $state<Record<string, number>>({});
+	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let notes = $state('');
 
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
@@ -37,36 +36,31 @@
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
 
-	// Mock rubric criteria - in real implementation, this would come from the protocol
-	const rubricCriteria = [
-		{ id: 'presentation', name: 'Presentation Skills', maxScore: 10, description: 'How well the team presents their work' },
-		{ id: 'knowledge', name: 'Technical Knowledge', maxScore: 10, description: 'Understanding of technical concepts' },
-		{ id: 'teamwork', name: 'Teamwork & Collaboration', maxScore: 10, description: 'Evidence of effective teamwork' },
-		{ id: 'problem_solving', name: 'Problem Solving', maxScore: 10, description: 'Approach to problem solving' }
-	];
-
-	// Initialize scores
-	$effect(() => {
-		if (Object.keys(rubricScores).length === 0) {
-			const initialScores: Record<string, number> = {};
-			rubricCriteria.forEach((criteria) => {
-				initialScores[criteria.id] = 0;
-			});
-			rubricScores = initialScores;
+	// Calculate total score
+	const totalScore = $derived.by(() => {
+		if (rubricScores.find((score) => score === -1)) {
+			return 'N/A';
+		} else {
+			return rubricScores.reduce((sum, score) => sum + score, 0).toString();
 		}
 	});
 
-	// Calculate total score
-	const totalScore = $derived(() => {
-		return Object.values(rubricScores).reduce((sum, score) => sum + score, 0);
-	});
+	async function saveRubric() {
+		if (!selectedTeamId) {
+			alert('Please select a team');
+			return;
+		}
 
-	const maxTotalScore = $derived(() => {
-		return rubricCriteria.reduce((sum, criteria) => sum + criteria.maxScore, 0);
-	});
+		// TODO: Implement actual save functionality via WRPC
+		console.log('Saving rubric:', {
+			id: generateUUID(),
+			teamId: selectedTeamId,
+			judgeId: currentJudge().id,
+			rubric: rubricScores,
+			notes: notes
+		});
 
-	function updateScore(criteriaId: string, score: number) {
-		rubricScores[criteriaId] = score;
+		alert('Rubric saved successfully! (This is a placeholder)');
 	}
 
 	// Synchronize scroll positions across all containers
@@ -95,29 +89,6 @@
 			container.addEventListener('scroll', () => syncScrollPosition(container));
 		}
 	}
-
-	async function saveRubric() {
-		if (!selectedTeamId) {
-			alert('Please select a team');
-			return;
-		}
-
-		// TODO: Implement actual save functionality via WRPC
-		console.log('Saving rubric:', {
-			teamId: selectedTeamId,
-			judgeId: currentJudge().id,
-			judgeGroupId: currentJudge().groupId,
-			scores: rubricScores,
-			notes: interviewNotes,
-			totalScore: totalScore(),
-			maxScore: maxTotalScore()
-		});
-
-		alert('Rubric saved successfully! (This is a placeholder)');
-	}
-
-
-	let q1 = $state(-1);
 </script>
 
 <Tab {isActive} tabId={tab.id} tabType={tab.type}>
@@ -202,8 +173,8 @@
 								</content>
 							</scroll-container>
 							<scoring class="min-w-14">
-								<ScoreButtons variable={q1} />
-								 <!-- <p class="text-lg">{q1}</p> -->
+								<ScoreButtons bind:variable={rubricScores[0]} />
+								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
 						</row>
 						<row>
@@ -219,7 +190,7 @@
 								</content>
 							</scroll-container>
 							<scoring class="min-w-14">
-								<ScoreButtons variable={q1} />
+								<ScoreButtons bind:variable={rubricScores[1]} />
 							</scoring>
 						</row>
 						<row>
@@ -238,7 +209,10 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">TOTAL<br />SCORE</scoring>
+							<scoring class="min-w-14 gap-2">
+								<p>TOTAL<br />SCORE</p>
+								<p class="text-lg">{totalScore}</p>
+							</scoring>
 						</row>
 					</rubric-body>
 				</rubric-table>
@@ -248,88 +222,6 @@
 					the end of the event.
 				</p>
 			</div>
-
-			<!-- Rubric Scoring -->
-			{#if false}
-				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h3 class="mb-4 text-lg font-medium text-gray-900">Scoring Rubric</h3>
-					<div class="space-y-6">
-						{#each rubricCriteria as criteria (criteria.id)}
-							<div class="border-b border-gray-200 pb-6 last:border-b-0">
-								<div class="mb-2 flex items-center justify-between">
-									<h4 class="font-medium text-gray-900">{criteria.name}</h4>
-									<div class="text-sm text-gray-500">
-										{rubricScores[criteria.id] || 0} / {criteria.maxScore}
-									</div>
-								</div>
-								<p class="mb-3 text-sm text-gray-600">{criteria.description}</p>
-								<div class="flex items-center space-x-2">
-									<input
-										type="range"
-										min="0"
-										max={criteria.maxScore}
-										step="1"
-										value={rubricScores[criteria.id] || 0}
-										oninput={(e) => updateScore(criteria.id, parseInt((e.target as HTMLInputElement).value))}
-										class="flex-1"
-									/>
-									<input
-										type="number"
-										min="0"
-										max={criteria.maxScore}
-										step="1"
-										value={rubricScores[criteria.id] || 0}
-										oninput={(e) => updateScore(criteria.id, parseInt((e.target as HTMLInputElement).value) || 0)}
-										class="w-16 rounded-md border border-gray-300 px-2 py-1 text-center text-sm"
-									/>
-								</div>
-							</div>
-						{/each}
-
-						<!-- Total Score Display -->
-						<div class="rounded-lg bg-gray-50 p-4">
-							<div class="flex items-center justify-between">
-								<span class="text-lg font-medium text-gray-900">Total Score</span>
-								<span class="text-xl font-bold text-blue-600">
-									{totalScore()} / {maxTotalScore()}
-								</span>
-							</div>
-							<div class="mt-2">
-								<div class="h-2 w-full rounded-full bg-gray-200">
-									<div
-										class="h-2 rounded-full bg-blue-600 transition-all duration-300"
-										style="width: {(totalScore() / maxTotalScore()) * 100}%"
-									></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Interview Notes -->
-				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h3 class="mb-4 text-lg font-medium text-gray-900">Interview Notes</h3>
-					<textarea
-						bind:value={interviewNotes}
-						placeholder="Enter detailed notes about the team's interview performance..."
-						rows="6"
-						class="classic block w-full"
-					></textarea>
-				</div>
-
-				<!-- Actions -->
-				<div class="flex justify-end space-x-3">
-					<button onclick={saveRubric} class="primary"> Save Rubric </button>
-				</div>
-			{/if}
 		</div>
 	</div>
 </Tab>
-
-<style lang="postcss">
-	@reference "tailwindcss";
-
-	button.score-button {
-		@apply flex h-6 w-6 flex-col items-center p-1 text-center hover:font-bold;
-	}
-</style>

@@ -118,7 +118,8 @@ export const teamInterviewRubrics = sqliteTable(
 		judgeId: text('judgeId')
 			.references(() => judges.id, { onDelete: 'cascade' })
 			.notNull(),
-		rubric: text('rubric', { mode: 'json' }).notNull()
+		rubric: text('rubric', { mode: 'json' }).notNull(),
+		notes: text('notes').notNull()
 	},
 	(table) => [index('team_interview_rubrics_teamId').on(table.teamId), index('team_interview_rubrics_judgeId').on(table.judgeId)]
 );

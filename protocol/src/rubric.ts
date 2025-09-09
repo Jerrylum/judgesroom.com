@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { TeamNumberSchema } from './team';
 
 export const RankSchema = z.number().min(0).max(5);
 
@@ -18,7 +17,8 @@ export const TeamInterviewRubricSchema = z.object({
 	id: z.uuidv4(),
 	teamId: z.uuidv4(),
 	judgeId: z.uuidv4(),
-	rubric: z.array(RankSchema)
+	rubric: z.array(RankSchema),
+	notes: z.string()
 });
 
 export type TeamInterviewRubric = z.infer<typeof TeamInterviewRubricSchema>;
