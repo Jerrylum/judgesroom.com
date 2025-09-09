@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+rubric-table {
+	@apply flex flex-col;
+
+	> :first-child {
+		@apply border-t-3;
+	}
+
+	> * {
+		@apply border-b-3;
+	}
+
+	scroll-container {
+		@apply flex-grow overflow-x-auto;
+
+		> content {
+			@apply flex flex-grow flex-row items-stretch justify-center text-left text-sm;
+
+			> * {
+				@apply flex-1 p-2;
+			}
+
+			> :not(:first-child) {
+				@apply border-l-1;
+			}
+		}
+	}
+
+	criteria {
+		@apply flex flex-grow flex-col items-center justify-center p-2 text-center;
+	}
+
+	scoring {
+		@apply flex flex-0 flex-row flex-wrap content-center justify-center text-center text-xs;
+	}
+
+	rubric-header {
+		@apply flex flex-row;
+
+		> :first-child {
+			@apply border-l-3;
+		}
+
+		> * {
+			@apply border-r-3;
+		}
+	}
+
+	rubric-body {
+		@apply flex flex-col;
+
+		> :not(:first-child) {
+			@apply border-t-1;
+		}
+
+		> row {
+			@apply flex flex-row;
+
+			> :first-child {
+				@apply border-l-3;
+			}
+
+			> * {
+				@apply flex-grow border-r-3;
+			}
+
+			&:nth-child(even) {
+				@apply bg-gray-100;
+			}
+		}
+	}
+
+	:not(:last-child) {
+		> scroll-container {
+			scrollbar-width: none;
+		}
+	}
+}

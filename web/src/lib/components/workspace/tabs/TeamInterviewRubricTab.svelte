@@ -1,7 +1,9 @@
 <script lang="ts">
+	import './rubric.css';
 	import { app } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import ScoreButtons from './ScoreButtons.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -113,6 +115,9 @@
 
 		alert('Rubric saved successfully! (This is a placeholder)');
 	}
+
+
+	let q1 = $state(-1);
 </script>
 
 <Tab {isActive} tabId={tab.id} tabType={tab.type}>
@@ -197,12 +202,8 @@
 								</content>
 							</scroll-container>
 							<scoring class="min-w-14">
-								<button class="score-button">0</button>
-								<button class="score-button">1</button>
-								<button class="score-button">2</button>
-								<button class="score-button">3</button>
-								<button class="score-button">4</button>
-								<button class="score-button">5</button>
+								<ScoreButtons variable={q1} />
+								 <!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
 						</row>
 						<row>
@@ -218,12 +219,7 @@
 								</content>
 							</scroll-container>
 							<scoring class="min-w-14">
-								<button class="score-button">0</button>
-								<button class="score-button">1</button>
-								<button class="score-button">2</button>
-								<button class="score-button">3</button>
-								<button class="score-button">4</button>
-								<button class="score-button">5</button>
+								<ScoreButtons variable={q1} />
 							</scoring>
 						</row>
 						<row>
@@ -333,85 +329,7 @@
 <style lang="postcss">
 	@reference "tailwindcss";
 
-	rubric-table {
-		@apply flex flex-col;
-
-		> :first-child {
-			@apply border-t-3;
-		}
-
-		> * {
-			@apply border-b-3;
-		}
-
-		scroll-container {
-			@apply flex-grow overflow-x-auto;
-
-			> content {
-				@apply flex flex-grow flex-row items-stretch justify-center text-left text-sm;
-
-				> * {
-					@apply flex-1 p-2;
-				}
-
-				> :not(:first-child) {
-					@apply border-l-1;
-				}
-			}
-		}
-
-		button.score-button {
-			@apply flex h-6 w-6 flex-col items-center p-1 text-center hover:font-bold;
-		}
-
-		criteria {
-			@apply flex flex-grow flex-col items-center justify-center p-2 text-center;
-		}
-
-		scoring {
-			@apply flex-0 flex flex-row flex-wrap content-center justify-center text-center text-xs;
-		}
-
-		rubric-header {
-			@apply flex flex-row;
-
-			> :first-child {
-				@apply border-l-3;
-			}
-
-			> * {
-				@apply border-r-3;
-			}
-		}
-
-		rubric-body {
-			@apply flex flex-col;
-
-			> :not(:first-child) {
-				@apply border-t-1;
-			}
-
-			> row {
-				@apply flex flex-row;
-
-				> :first-child {
-					@apply border-l-3;
-				}
-
-				> * {
-					@apply border-r-3 flex-grow;
-				}
-
-				&:nth-child(even) {
-					@apply bg-gray-100;
-				}
-			}
-		}
-
-		:not(:last-child) {
-			> scroll-container {
-				scrollbar-width: none;
-			}
-		}
+	button.score-button {
+		@apply flex h-6 w-6 flex-col items-center p-1 text-center hover:font-bold;
 	}
 </style>
