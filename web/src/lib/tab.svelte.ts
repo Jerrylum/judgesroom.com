@@ -62,7 +62,7 @@ export class TabController {
 	}
 
 	get currentTab() {
-		return this.tabs.find(tab => tab.id === this.activeTabId) || null;
+		return this.tabs.find((tab) => tab.id === this.activeTabId) || null;
 	}
 
 	get activeTab() {
@@ -94,11 +94,13 @@ export class TabController {
 	/**
 	 * Add a team interview rubric tab
 	 */
-	addTeamInterviewRubricTab(options: {
-		title?: string;
-		teamId?: string;
-		judgeGroupId?: string;
-	} = {}): string {
+	addTeamInterviewRubricTab(
+		options: {
+			title?: string;
+			teamId?: string;
+			judgeGroupId?: string;
+		} = {}
+	): string {
 		const id = this.generateId();
 		const tab: TeamInterviewRubricTab = {
 			id,
@@ -117,11 +119,13 @@ export class TabController {
 	/**
 	 * Add a notebook rubric tab
 	 */
-	addNotebookRubricTab(options: {
-		title?: string;
-		teamId?: string;
-		judgeGroupId?: string;
-	} = {}): string {
+	addNotebookRubricTab(
+		options: {
+			title?: string;
+			teamId?: string;
+			judgeGroupId?: string;
+		} = {}
+	): string {
 		const id = this.generateId();
 		const tab: NotebookRubricTab = {
 			id,
@@ -140,10 +144,12 @@ export class TabController {
 	/**
 	 * Add an award rankings tab
 	 */
-	addAwardRankingsTab(options: {
-		title?: string;
-		awardId?: string;
-	} = {}): string {
+	addAwardRankingsTab(
+		options: {
+			title?: string;
+			awardId?: string;
+		} = {}
+	): string {
 		const id = this.generateId();
 		const tab: AwardRankingsTab = {
 			id,
@@ -187,7 +193,7 @@ export class TabController {
 	 * Switch to a specific tab
 	 */
 	switchToTab(tabId: string): void {
-		const tab = this.tabs.find(t => t.id === tabId);
+		const tab = this.tabs.find((t) => t.id === tabId);
 		if (tab) {
 			this.activeTabId = tabId;
 			this.notifyTabChange(tabId);
@@ -198,7 +204,7 @@ export class TabController {
 	 * Close a tab
 	 */
 	closeTab(tabId: string): void {
-		const tabIndex = this.tabs.findIndex(tab => tab.id === tabId);
+		const tabIndex = this.tabs.findIndex((tab) => tab.id === tabId);
 		if (tabIndex === -1) return;
 
 		const tab = this.tabs[tabIndex];
@@ -225,37 +231,37 @@ export class TabController {
 	 * Close all closable tabs
 	 */
 	closeAllTabs(): void {
-		const closableTabs = this.tabs.filter(tab => tab.closable);
-		closableTabs.forEach(tab => this.closeTab(tab.id));
+		const closableTabs = this.tabs.filter((tab) => tab.closable);
+		closableTabs.forEach((tab) => this.closeTab(tab.id));
 	}
 
 	/**
 	 * Find tab by type and optional properties
 	 */
 	findTab(type: string, props?: Record<string, unknown>): Tab | null {
-		return this.tabs.find(tab => {
-			if (tab.type !== type) return false;
-			if (!props) return true;
-			
-			// Check if all provided props match
-			return Object.entries(props).every(([key, value]) => 
-				(tab as unknown as Record<string, unknown>)[key] === value
-			);
-		}) || null;
+		return (
+			this.tabs.find((tab) => {
+				if (tab.type !== type) return false;
+				if (!props) return true;
+
+				// Check if all provided props match
+				return Object.entries(props).every(([key, value]) => (tab as unknown as Record<string, unknown>)[key] === value);
+			}) || null
+		);
 	}
 
 	/**
 	 * Check if a tab exists
 	 */
 	hasTab(tabId: string): boolean {
-		return this.tabs.some(tab => tab.id === tabId);
+		return this.tabs.some((tab) => tab.id === tabId);
 	}
 
 	/**
 	 * Get tab by ID
 	 */
 	getTab(tabId: string): Tab | null {
-		return this.tabs.find(tab => tab.id === tabId) || null;
+		return this.tabs.find((tab) => tab.id === tabId) || null;
 	}
 
 	/**
@@ -264,7 +270,7 @@ export class TabController {
 	onTabChange(handler: (tabId: string | null) => void): () => void {
 		const id = this.generateId();
 		this.tabChangeHandlers.set(id, handler);
-		
+
 		// Return unsubscribe function
 		return () => {
 			this.tabChangeHandlers.delete(id);
@@ -272,6 +278,6 @@ export class TabController {
 	}
 
 	private notifyTabChange(tabId: string | null): void {
-		this.tabChangeHandlers.forEach(handler => handler(tabId));
+		this.tabChangeHandlers.forEach((handler) => handler(tabId));
 	}
 }

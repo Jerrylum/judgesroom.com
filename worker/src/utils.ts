@@ -1,4 +1,4 @@
-import { DatabaseOrTransaction, Transaction } from './server-router';
+import type { DatabaseOrTransaction, Transaction } from './server-router';
 
 /**
  * Runs a Drizzle transaction and reliably returns the callback's value.

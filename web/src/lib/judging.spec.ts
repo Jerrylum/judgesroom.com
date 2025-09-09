@@ -49,18 +49,21 @@ describe('JudgeGroupClass', () => {
 		judgeGroup = new JudgeGroupClass('Technical Judges');
 
 		// Create mock teams
+		const teamId1 = uuidv4();
+		const teamId2 = uuidv4();
+		const teamId3 = uuidv4();
 		mockTeams = [
 			new Team(
-				createTeamInfo(uuidv4(), '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData('https://example.com/notebook-a', false)
+				createTeamInfo(teamId1, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
+				createTeamData(teamId1, 'https://example.com/notebook-a', false)
 			),
 			new Team(
-				createTeamInfo(uuidv4(), '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
-				createTeamData('https://example.com/notebook-b', false)
+				createTeamInfo(teamId2, '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
+				createTeamData(teamId2, 'https://example.com/notebook-b', false)
 			),
 			new Team(
-				createTeamInfo(uuidv4(), '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
-				createTeamData('https://example.com/notebook-c', false)
+				createTeamInfo(teamId3, '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
+				createTeamData(teamId3, 'https://example.com/notebook-c', false)
 			)
 		];
 	});
@@ -211,25 +214,24 @@ describe('randomlyAssignTeamsToGroups', () => {
 
 	beforeEach(() => {
 		// Create mock teams
-		mockTeams = Array.from(
-			{ length: 10 },
-			(_, i) =>
-				new Team(
-					createTeamInfo(
-						uuidv4(),
-						`${100 + i}A`,
-						`Team ${i + 1}`,
-						`City ${i + 1}`,
-						`State ${i + 1}`,
-						`Country ${i + 1}`,
-						`T${i + 1}`,
-						`School ${i + 1}`,
-						'High School',
-						`${100 + i}`
-					),
-					createTeamData(`https://example.com/notebook-${i + 1}`, false)
-				)
-		);
+		mockTeams = Array.from({ length: 10 }, (_, i) => {
+			const teamId = uuidv4();
+			return new Team(
+				createTeamInfo(
+					teamId,
+					`${100 + i}A`,
+					`Team ${i + 1}`,
+					`City ${i + 1}`,
+					`State ${i + 1}`,
+					`Country ${i + 1}`,
+					`T${i + 1}`,
+					`School ${i + 1}`,
+					'High School',
+					`${100 + i}`
+				),
+				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, false)
+			);
+		});
 
 		// Create judge groups
 		judgeGroups = [new JudgeGroupClass('Group A'), new JudgeGroupClass('Group B'), new JudgeGroupClass('Group C')];
@@ -378,25 +380,24 @@ describe('Integration Tests', () => {
 		const allJudges = [...judges1, ...judges2];
 
 		// Create teams
-		const teams = Array.from(
-			{ length: 6 },
-			(_, i) =>
-				new Team(
-					createTeamInfo(
-						uuidv4(),
-						`${100 + i}A`,
-						`Team ${i + 1}`,
-						`City ${i + 1}`,
-						`State ${i + 1}`,
-						`Country ${i + 1}`,
-						`T${i + 1}`,
-						`School ${i + 1}`,
-						'High School',
-						`${100 + i}`
-					),
-					createTeamData(`https://example.com/notebook-${i + 1}`, false)
-				)
-		);
+		const teams = Array.from({ length: 6 }, (_, i) => {
+			const teamId = uuidv4();
+			return new Team(
+				createTeamInfo(
+					teamId,
+					`${100 + i}A`,
+					`Team ${i + 1}`,
+					`City ${i + 1}`,
+					`State ${i + 1}`,
+					`Country ${i + 1}`,
+					`T${i + 1}`,
+					`School ${i + 1}`,
+					'High School',
+					`${100 + i}`
+				),
+				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, false)
+			);
+		});
 
 		// Assign teams to groups
 		randomlyAssignTeamsToGroups(teams, [group1, group2]);
@@ -429,9 +430,10 @@ describe('Integration Tests', () => {
 		// Single judge, single team
 		const singleGroup = new JudgeGroupClass('Single Group');
 		const singleJudge = createJudgeFromString('Solo Judge', singleGroup.id);
+		const soloTeamId = uuidv4();
 		const singleTeam = new Team(
-			createTeamInfo(uuidv4(), '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
-			createTeamData('https://example.com/notebook', false)
+			createTeamInfo(soloTeamId, '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
+			createTeamData(soloTeamId, 'https://example.com/notebook', false)
 		);
 
 		randomlyAssignTeamsToGroups([singleTeam], [singleGroup]);

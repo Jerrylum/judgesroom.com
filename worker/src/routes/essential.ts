@@ -1,12 +1,13 @@
-import { EssentialData, EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
+import type { EssentialData } from '@judging.jerryio/protocol/src/event';
+import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { awards, judgeGroups, judgeGroupsAssignedTeams, metadata, teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
-import { Award, AwardType } from '@judging.jerryio/protocol/src/award';
+import type { Award, AwardType } from '@judging.jerryio/protocol/src/award';
 import { eq, getTableColumns, inArray, not, sql, SQL } from 'drizzle-orm';
-import { TeamInfo } from '@judging.jerryio/protocol/src/team';
-import { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
-import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
+import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
+import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
+import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { transaction } from '../utils';
 

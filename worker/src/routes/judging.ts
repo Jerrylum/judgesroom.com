@@ -1,7 +1,7 @@
 import type { ServerContext } from '../server-router';
 import z from 'zod';
 import { EngineeringNotebookRubricSchema, TeamInterviewNoteSchema, TeamInterviewRubricSchema } from '@judging.jerryio/protocol/src/rubric';
-import { EngineeringNotebookRubric, TeamInterviewNote, TeamInterviewRubric } from '@judging.jerryio/protocol/src/rubric';
+import type { EngineeringNotebookRubric, TeamInterviewNote, TeamInterviewRubric } from '@judging.jerryio/protocol/src/rubric';
 import { eq, sql } from 'drizzle-orm';
 import {
 	awardRankings,

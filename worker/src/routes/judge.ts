@@ -1,10 +1,11 @@
-import { Judge, JudgeSchema } from '@judging.jerryio/protocol/src/judging';
+import type { Judge } from '@judging.jerryio/protocol/src/judging';
+import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { judges } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
-import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
 export async function getJudges(db: DatabaseOrTransaction): Promise<Judge[]> {
 	return db.select().from(judges) as Promise<Judge[]>;

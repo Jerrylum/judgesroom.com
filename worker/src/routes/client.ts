@@ -2,7 +2,7 @@ import { ClientInfoSchema } from '@judging.jerryio/protocol/src/client';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineClients } from '../db/schema';
-import { Network } from '@judging.jerryio/wrpc/server';
+import type { Network } from '@judging.jerryio/wrpc/server';
 import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import { eq } from 'drizzle-orm';

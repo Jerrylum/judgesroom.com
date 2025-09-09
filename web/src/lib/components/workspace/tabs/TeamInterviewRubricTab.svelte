@@ -129,11 +129,11 @@
 
 				<rubric-table>
 					<rubric-header>
-						<criteria class="min-w-42 max-w-42 bg-gray-400">CRITERIA</criteria>
+						<criteria class="max-w-42 min-w-42 bg-gray-400">CRITERIA</criteria>
 						<scroll-container use:registerScrollContainer>
 							<content class="min-w-120 flex-col! gap-2 bg-gray-200">
-								<div class="p-0! text-base! pt-1 text-center font-bold">PROFICIENCY LEVEL</div>
-								<div class="p-0! border-0! flex text-center">
+								<div class="p-0! pt-1 text-center text-base font-bold">PROFICIENCY LEVEL</div>
+								<div class="border-0! p-0! flex text-center">
 									<div class="flex-1 border-r pb-1">
 										<p class="font-bold">EXPERT</p>
 										<p class="text-xs">(4-5 POINTS)</p>
@@ -158,9 +158,9 @@
 					</rubric-header>
 					<rubric-body>
 						<row>
-							<criteria class="min-w-42 max-w-42">
+							<criteria class="max-w-42 min-w-42">
 								<p class="text-sm font-bold">ENGINEERING DESIGN PROCESS</p>
-								<p class="text-xs italic text-gray-500">All Awards</p>
+								<i class="text-xs text-gray-500">All Awards</i>
 							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
@@ -178,9 +178,9 @@
 							</scoring>
 						</row>
 						<row>
-							<criteria class="min-w-42 max-w-42">
+							<criteria class="max-w-42 min-w-42">
 								<p class="text-sm font-bold">GAME STRATEGY</p>
-								<p class="text-xs italic text-gray-500">Design, Innovate, Create, Amaze</p>
+								<i class="text-xs text-gray-500">Design, Innovate, Create, Amaze</i>
 							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
@@ -194,9 +194,9 @@
 							</scoring>
 						</row>
 						<row>
-							<criteria class="min-w-42 max-w-42">
+							<criteria class="max-w-42 min-w-42">
 								<p class="text-sm font-bold">SPECIAL ATTRIBUTES & OVERALL IMPRESSIONS</p>
-								<p class="text-xs italic text-gray-500">Judges, Inspire</p>
+								<i class="text-xs text-gray-500">Judges, Inspire</i>
 							</criteria>
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">

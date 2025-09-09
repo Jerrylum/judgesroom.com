@@ -28,12 +28,7 @@
 	<div class="border-b bg-white">
 		<div class="flex space-x-1 px-6">
 			{#each allTabs as tab (tab.id)}
-				<TabButton
-					{tab}
-					isActive={activeTabId === tab.id}
-					onSwitch={() => switchTab(tab.id)}
-					onClose={() => closeTab(tab.id)}
-				/>
+				<TabButton {tab} isActive={activeTabId === tab.id} onSwitch={() => switchTab(tab.id)} onClose={() => closeTab(tab.id)} />
 			{/each}
 		</div>
 	</div>

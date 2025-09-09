@@ -172,16 +172,15 @@ describe('Integration Tests', () => {
 			eventName: 'Regional Championship',
 			competitionType: 'V5RC',
 			eventGradeLevel: selectedGradeLevel!.value,
-			performanceAwards: [
+			judgingMethod: 'walk_in',
+			awards: [
 				{
 					name: 'Tournament Champions',
 					type: 'performance',
 					acceptedGrades: selectedGradeLevel!.grades,
 					winnersCount: 2,
 					requireNotebook: false
-				}
-			],
-			judgedAwards: [
+				},
 				{
 					name: 'Excellence Award',
 					type: 'judged',
@@ -190,8 +189,7 @@ describe('Integration Tests', () => {
 					requireNotebook: true
 				}
 			],
-			volunteerNominatedAwards: [],
-			teams: [
+			teamInfos: [
 				{
 					id: uuidv4(),
 					number: '123A',
@@ -202,14 +200,9 @@ describe('Integration Tests', () => {
 					shortName: 'TT',
 					school: 'Test School',
 					grade: 'High School',
-					group: '123',
-					data: {
-						notebookLink: '',
-						excluded: false
-					}
+					group: '123'
 				}
 			],
-			judgingMethod: 'assigned',
 			judgeGroups: [
 				{
 					id: uuidv4(),
@@ -241,11 +234,9 @@ describe('Integration Tests', () => {
 			eventName: 'A',
 			competitionType: 'VIQRC',
 			eventGradeLevel: blendedOption!.value,
-			performanceAwards: [],
-			judgedAwards: [],
-			volunteerNominatedAwards: [],
-			teams: [],
 			judgingMethod: 'walk_in',
+			teamInfos: [],
+			awards: [],
 			judgeGroups: [
 				{
 					id: uuidv4(),
