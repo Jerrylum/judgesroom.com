@@ -65,6 +65,12 @@ rubric-table {
 				@apply flex-grow border-r-3;
 			}
 
+			scroll-container {
+				content {
+					@apply min-h-23;
+				}
+			}
+
 			&:nth-child(even) {
 				@apply bg-gray-100;
 			}
