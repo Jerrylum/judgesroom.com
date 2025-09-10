@@ -26,7 +26,7 @@
 
 	// Local state for the rubric form (no judge selection needed)
 	let selectedTeamId = $state(tab.teamId || '');
-	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
 
 	// Scroll container references for synchronization
@@ -191,6 +191,136 @@
 							</scroll-container>
 							<scoring class="min-w-14">
 								<ScoreButtons bind:variable={rubricScores[1]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">ROBOT DESIGN</p>
+								<i class="text-xs text-gray-500">Design, Innovate, Build Create, Amaze</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>Team can <u>fully explain</u> the evolution of their robot design to the current design.</div>
+									<div>
+										Team can provide a <u>limited description</u> of why the current robot design was chosen, but shows limited evolution.
+									</div>
+									<div>Team <u>did not explain</u> robot design, or design is not student-directed.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[2]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">ROBOT BUILD</p>
+								<i class="text-xs text-gray-500">Innovate, Build, Create, Amaze</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>Team can <u>fully explain</u> their robot construction. Ownership of the robot build is evident.</div>
+									<div>Team can describe why the current robot design was chosen, but with <u>limited explanation</u>.</div>
+									<div>Team <u>did not explain</u> robot build, or build is not student-directed.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[3]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">ROBOT PROGRAMMING</p>
+								<i class="text-xs text-gray-500">Design, Innovate, Think, Amaze</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>Team can <u>fully explain</u> the evolution of their programming.</div>
+									<div>
+										Team can describe how the current programs work, but with
+										<u>limited evolution</u>.
+									</div>
+									<div>Team <u>did not explain</u> programming, or programming is not student-directed.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[4]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">CREATIVITY / ORIGINALITY</p>
+								<i class="text-xs text-gray-500">Innovate, Create</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>Team can describe creative aspect(s) of their robot with clarity and detail.</div>
+									<div>Team can describe a creative solution but the answer lacks detail.</div>
+									<div>Team has difficulty describing a creative solution or gives minimal response.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[5]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">TEAM AND PROJECT MANAGEMENT</p>
+								<i class="text-xs text-gray-500">All Awards</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>
+										Team can explain <u>how team progress was tracked against an overall project timeline</u>. Team can explain management
+										of material and personnel resources.
+									</div>
+									<div>
+										Team can explain <u>how team progress was monitored</u>, and some degree of management of material and personnel
+										resources.
+									</div>
+									<div>Team <u>cannot explain how team progress was monitored</u> or how resources were managed.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[6]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">TEAMWORK, COMMUNICATION, PROFESSIONALISM</p>
+								<i class="text-xs text-gray-500">All Awards</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>
+										<u>Most or all team members contribute to explanations</u> of the design process, game strategy, and other work done by the
+										team.
+									</div>
+									<div>
+										<u>Some team members contribute to explanations</u> of the design process, game strategy, and other work done by the team.
+									</div>
+									<div>
+										<u>Few team members contribute to explanations</u> of the design process, game strategy, and other work done by the team.
+									</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[7]} />
+							</scoring>
+						</row>
+						<row>
+							<criteria class="max-w-42 min-w-42">
+								<p class="text-sm font-bold">RESPECT, COURTESY, POSITIVITY</p>
+								<i class="text-xs text-gray-500">All Awards</i>
+							</criteria>
+							<scroll-container use:registerScrollContainer>
+								<content class="min-w-120">
+									<div>Team consistently interacts respectfully, courteously, and positively in their interview.</div>
+									<div>Team interactions show signs of respect and courtesy, but there is room for improvement.</div>
+									<div>Team interactions lack respectful and courteous behavior.</div>
+								</content>
+							</scroll-container>
+							<scoring class="min-w-14">
+								<ScoreButtons bind:variable={rubricScores[8]} />
 							</scoring>
 						</row>
 						<row>
