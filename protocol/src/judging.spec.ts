@@ -117,7 +117,7 @@ describe('Judging Schema Validation', () => {
 			const validGroup = {
 				id: uuidv4(),
 				name: 'Technical Judges',
-				assignedTeams: ['123A', '456B', '789C']
+				assignedTeams: ['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-41d1-80b4-00c04fd430c8', '123e4567-e89b-42d3-a456-426614174000']
 			};
 
 			expect(() => JudgeGroupSchema.parse(validGroup)).not.toThrow();
@@ -138,22 +138,17 @@ describe('Judging Schema Validation', () => {
 				{
 					id: 'not-a-uuid',
 					name: 'Technical Judges',
-					assignedTeams: ['123A']
+					assignedTeams: ['550e8400-e29b-41d4-a716-446655440000']
 				},
 				{
 					id: uuidv4(),
 					name: '', // empty name
-					assignedTeams: ['123A']
-				},
-				{
-					id: uuidv4(),
-					name: 'Technical Judges',
-					assignedTeams: ['123a'] // invalid team number
+					assignedTeams: ['550e8400-e29b-41d4-a716-446655440000']
 				},
 				{
 					id: uuidv4(),
 					name: ' Technical Judges ', // invalid name with spaces
-					assignedTeams: ['123A']
+					assignedTeams: ['550e8400-e29b-41d4-a716-446655440000']
 				}
 			];
 
