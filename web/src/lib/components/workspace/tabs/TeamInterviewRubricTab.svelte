@@ -335,7 +335,7 @@
 											Does the team have any special attributes, accomplishments, or exemplary effort in overcoming challenges at this
 											event? Did anything stand out about this team in their interview? Please describe:
 										</p>
-										<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1"></textarea>
+										<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes}></textarea>
 									</div>
 								</content>
 							</scroll-container>
