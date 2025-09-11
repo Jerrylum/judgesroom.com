@@ -505,7 +505,7 @@ describe('WebsocketClient', () => {
 			wsClient.disconnect();
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			expect(mockWs.close).toHaveBeenCalledWith(1000, 'Client disconnect');
+			expect(mockWs.close).toHaveBeenCalledWith(1000, 'Client disconnected peacefully');
 		});
 
 		it('should check connection status correctly', async () => {
