@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
+	import { AwardRankingsTab, NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import Tab from './Tab.svelte';
 
 	interface Props {
@@ -17,7 +18,7 @@
 			console.error('CRITICAL: Only judges can create team interview tabs');
 			return;
 		}
-		tabs.addTeamInterviewRubricTab();
+		tabs.addTab(new TeamInterviewRubricTab(null));
 	}
 
 	function addNotebookReviewTab() {
@@ -25,11 +26,11 @@
 			console.error('CRITICAL: Only judges can create notebook review tabs');
 			return;
 		}
-		tabs.addNotebookRubricTab();
+		tabs.addTab(new NotebookRubricTab(null));
 	}
 
 	function addAwardRankingsTab() {
-		tabs.addAwardRankingsTab();
+		tabs.addTab(new AwardRankingsTab());
 	}
 </script>
 

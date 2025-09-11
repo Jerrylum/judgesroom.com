@@ -25,7 +25,6 @@
 	});
 
 	// Local state for the rubric form (no judge selection needed)
-	let selectedTeamId = $state(tab.teamId || '');
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
 
@@ -34,7 +33,7 @@
 	let isSyncing = false;
 
 	// Get the selected team details
-	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
+	const selectedTeam = $derived(allTeams.find((team) => team.id === tab.teamId));
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -46,7 +45,7 @@
 	});
 
 	async function saveRubric() {
-		if (!selectedTeamId) {
+		if (!tab.teamId) {
 			alert('Please select a team');
 			return;
 		}
@@ -54,7 +53,7 @@
 		// TODO: Implement actual save functionality via WRPC
 		console.log('Saving rubric:', {
 			id: generateUUID(),
-			teamId: selectedTeamId,
+			teamId: tab.teamId,
 			judgeId: currentJudge().id,
 			rubric: rubricScores,
 			notes: notes
@@ -99,7 +98,7 @@
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-					<select id="team-select" bind:value={selectedTeamId} class="classic mt-1 block w-full">
+					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full">
 						<option value="">Select a team...</option>
 						{#each allTeams as team (team.id)}
 							<option value={team.id}>{team.number} - {team.name}</option>

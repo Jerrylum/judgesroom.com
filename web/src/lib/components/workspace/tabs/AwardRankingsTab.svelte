@@ -17,7 +17,7 @@
 	const currentUser = $derived(app.getCurrentUser());
 
 	// Local state
-	let selectedAwardId = $state(tab.awardId || '');
+	let selectedAwardId = $state('');
 	let teamRankings = $state<string[]>([]);
 	let rankingNotes = $state('');
 

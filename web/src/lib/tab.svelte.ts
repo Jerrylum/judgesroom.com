@@ -1,5 +1,7 @@
 import type { Component } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
+import { generateUUID } from './utils.svelte';
+import { app } from './app-page.svelte';
 
 // ============================================================================
 // Tab System
@@ -13,29 +15,63 @@ interface BaseTab {
 	closable: boolean;
 }
 
-// Overview tab (non-closable home tab)
-export interface OverviewTab extends BaseTab {
-	type: 'overview';
+export class OverviewTab implements BaseTab {
+	id: string;
+	readonly closable = false;
+	readonly type = 'overview';
+	readonly title = 'Overview';
+
+	constructor() {
+		this.id = generateUUID();
+		this.type = 'overview';
+	}
 }
 
-// Team Interview Rubric tab
-export interface TeamInterviewRubricTab extends BaseTab {
-	type: 'team_interview_rubric';
-	teamId?: string;
-	judgeGroupId?: string;
+export class TeamInterviewRubricTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'team_interview_rubric';
+	// teamNumber: string | null = null;
+	teamId: string | null = $state(null);
+
+	get title() {
+		const team = app.getAllTeams().find((team) => team.id === this.teamId);
+		return team ? `${team.number} Team Interview` : 'Team Interview';
+	}
+
+	constructor(teamId: string | null) {
+		this.id = generateUUID();
+		this.teamId = teamId;
+		this.type = 'team_interview_rubric';
+	}
 }
 
-// Notebook Rubric tab
-export interface NotebookRubricTab extends BaseTab {
-	type: 'notebook_rubric';
-	teamId?: string;
-	judgeGroupId?: string;
+export class NotebookRubricTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'notebook_rubric';
+	teamId: string | null = $state(null);
+
+	get title() {
+		const team = app.getAllTeams().find((team) => team.id === this.teamId);
+		return team ? `${team.number} Notebook Review` : 'Notebook Review';
+	}
+
+	constructor(teamId: string | null) {
+		this.id = generateUUID();
+		this.teamId = teamId;
+	}
 }
 
-// Award Rankings tab
-export interface AwardRankingsTab extends BaseTab {
-	type: 'award_rankings';
-	awardId?: string;
+export class AwardRankingsTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'award_rankings';
+	readonly title = 'Award Rankings';
+
+	constructor() {
+		this.id = generateUUID();
+	}
 }
 
 // Custom tab for extensibility
@@ -54,7 +90,7 @@ export class TabController {
 
 	constructor() {
 		// Initialize with overview tab
-		this.addOverviewTab();
+		this.addTab(new OverviewTab());
 	}
 
 	get allTabs() {
@@ -78,90 +114,12 @@ export class TabController {
 	}
 
 	/**
-	 * Add the default overview tab
+	 * Add a tab
 	 */
-	private addOverviewTab(): void {
-		const overviewTab: OverviewTab = {
-			id: 'overview',
-			type: 'overview',
-			title: 'Overview',
-			closable: false
-		};
-		this.tabs.push(overviewTab);
-		this.activeTabId = 'overview';
-	}
-
-	/**
-	 * Add a team interview rubric tab
-	 */
-	addTeamInterviewRubricTab(
-		options: {
-			title?: string;
-			teamId?: string;
-			judgeGroupId?: string;
-		} = {}
-	): string {
-		const id = this.generateId();
-		const tab: TeamInterviewRubricTab = {
-			id,
-			type: 'team_interview_rubric',
-			title: options.title || 'Team Interview',
-			closable: true,
-			teamId: options.teamId,
-			judgeGroupId: options.judgeGroupId
-		};
-
+	addTab(tab: Tab): string {
 		this.tabs.push(tab);
-		this.switchToTab(id);
-		return id;
-	}
-
-	/**
-	 * Add a notebook rubric tab
-	 */
-	addNotebookRubricTab(
-		options: {
-			title?: string;
-			teamId?: string;
-			judgeGroupId?: string;
-		} = {}
-	): string {
-		const id = this.generateId();
-		const tab: NotebookRubricTab = {
-			id,
-			type: 'notebook_rubric',
-			title: options.title || 'Notebook Review',
-			closable: true,
-			teamId: options.teamId,
-			judgeGroupId: options.judgeGroupId
-		};
-
-		this.tabs.push(tab);
-		this.switchToTab(id);
-		return id;
-	}
-
-	/**
-	 * Add an award rankings tab
-	 */
-	addAwardRankingsTab(
-		options: {
-			title?: string;
-			awardId?: string;
-		} = {}
-	): string {
-		const id = this.generateId();
-		const tab: AwardRankingsTab = {
-			id,
-			type: 'award_rankings',
-			title: options.title || 'Award Rankings',
-			closable: true,
-			awardId: options.awardId
-		};
-
-		this.tabs.push(tab);
-		this.switchToTab(id);
-		return id;
+		this.switchToTab(tab.id);
+		return tab.id;
 	}
 
 	/**
