@@ -37,7 +37,7 @@
 
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
-	const selectedTeamData = $derived(allTeamsData.find((team) => team.id === selectedTeamId));
+	const selectedTeamData = $derived(allTeamsData[selectedTeamId]);
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -145,14 +145,14 @@
 				<!--  hidden for test only -->
 				<rubric-table>
 					<rubric-header>
-						<div class="max-w-42 min-w-42 flex flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
-							<div class="border-b-3 flex-1 flex-grow bg-gray-200">CRITERIA</div>
-							<div class="pb-1 pt-1 leading-none">ENGINEERING DESIGN PROCESS</div>
+						<div class="flex max-w-42 min-w-42 flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
+							<div class="flex-1 flex-grow border-b-3 bg-gray-200">CRITERIA</div>
+							<div class="pt-1 pb-1 leading-none">ENGINEERING DESIGN PROCESS</div>
 						</div>
 						<scroll-container use:registerScrollContainer>
 							<content class="min-w-120 flex-col! gap-2 bg-gray-200">
 								<div class="p-0! pt-1 text-center text-base font-bold">PROFICIENCY LEVEL</div>
-								<div class="border-0! p-0! flex text-center">
+								<div class="flex border-0! p-0! text-center">
 									<div class="flex-1 border-r pb-1">
 										<p class="font-bold">EXPERT</p>
 										<p class="text-xs">(4-5 POINTS)</p>
@@ -168,7 +168,7 @@
 								</div>
 							</content>
 						</scroll-container>
-						<scoring class="flex-col! min-w-14 bg-gray-200">
+						<scoring class="min-w-14 flex-col! bg-gray-200">
 							<div class="pt-1">&nbsp;</div>
 							<div class="flex items-center p-1 font-bold">
 								<span>POINTS</span>
@@ -194,7 +194,7 @@
 									<div><u>Does not identify the problem / design goal(s)</u> at the start of each design cycle.</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[0]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -213,7 +213,7 @@
 									<div><u>Does not explore different solutions</u> or solutions are recorded with <u>little explanation</u>.</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[1]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -234,7 +234,7 @@
 									<div><u>Minimally explains the “why” behind design decisions.</u></div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[2]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -258,7 +258,7 @@
 									<div><u>Does not record the key steps</u> to build and program the solution.</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[3]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -280,7 +280,7 @@
 									<div><u>Does not record steps</u> to test the solution. Testing or results are borrowed from another team’s work.</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[4]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -306,7 +306,7 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14 max-w-14">
+							<scoring class="max-w-14 min-w-14">
 								<ScoreButtons bind:variable={rubricScores[5]} />
 								<!-- <p class="text-lg">{q1}</p> -->
 							</scoring>
@@ -316,14 +316,14 @@
 								<p class="text-sm font-bold">NOTES:</p>
 								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes}></textarea>
 							</div>
-							<scoring class="min-w-14 max-w-14"></scoring>
+							<scoring class="max-w-14 min-w-14"></scoring>
 						</row>
 					</rubric-body>
 				</rubric-table>
 				<!--  -->
 				<rubric-table class="mt-6">
 					<rubric-header>
-						<div class="max-h-42 flex min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
+						<div class="flex max-h-42 min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
 							Engineering Notebook Rubric (Page 2 of 2)
 						</div>
 					</rubric-header>
@@ -333,7 +333,7 @@
 						</criteria>
 						<scroll-container use:registerScrollContainer class="flex items-stretch bg-gray-200">
 							<content class="min-w-120 flex-col! gap-2">
-								<div class="border-0! p-0! flex text-center">
+								<div class="flex border-0! p-0! text-center">
 									<div class="flex flex-1 flex-col justify-center border-r">
 										<p class="font-bold">EXPERT</p>
 										<p class="text-xs">(4-5 POINTS)</p>
@@ -498,7 +498,7 @@
 								<p class="text-sm font-bold">INNOVATE AWARD NOTES (optional):</p>
 								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={innovateAwardNotes}></textarea>
 							</div>
-							<scoring class="flex-col! min-w-14 max-w-14 gap-2">
+							<scoring class="max-w-14 min-w-14 flex-col! gap-2">
 								<p>TOTAL<br />SCORE</p>
 								<p class="text-lg">{totalScore}</p>
 								<!-- TODO -->

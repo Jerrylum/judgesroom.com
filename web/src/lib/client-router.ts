@@ -36,7 +36,13 @@ const clientRouter = w.router({
 	/**
 	 * Server pushes team data updates to client
 	 */
-	onTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
+	onAllTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
+		console.log(`📊 Team data updated:`, input);
+		app.handleAllTeamDataUpdate(input);
+		return `All team data updated`;
+	}),
+
+	onTeamDataUpdate: w.procedure.input(TeamDataSchema).mutation(async ({ input }) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleTeamDataUpdate(input);
 		return `Team data updated`;
@@ -45,10 +51,10 @@ const clientRouter = w.router({
 	/**
 	 * Server pushes judges updates to client
 	 */
-	onJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
+	onAllJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
 		console.log(`📊 Judges updated:`, input);
-		app.handleJudgesUpdate(input);
-		return `Judges updated`;
+		app.handleAllJudgesUpdate(input);
+		return `All judges updated`;
 	})
 });
 

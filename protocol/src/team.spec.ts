@@ -97,6 +97,7 @@ describe('Teams Schema Validation', () => {
 			const validData = {
 				id: '550e8400-e29b-41d4-a716-446655440000',
 				notebookLink: 'https://example.com/notebook',
+				isDevelopedNotebook: null,
 				excluded: false
 			};
 
@@ -107,6 +108,7 @@ describe('Teams Schema Validation', () => {
 			const validData = {
 				id: '6ba7b810-9dad-41d1-80b4-00c04fd430c8',
 				notebookLink: '',
+				isDevelopedNotebook: null,
 				excluded: true
 			};
 

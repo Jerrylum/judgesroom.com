@@ -117,7 +117,11 @@ describe('Judging Schema Validation', () => {
 			const validGroup = {
 				id: uuidv4(),
 				name: 'Technical Judges',
-				assignedTeams: ['550e8400-e29b-41d4-a716-446655440000', '6ba7b810-9dad-41d1-80b4-00c04fd430c8', '123e4567-e89b-42d3-a456-426614174000']
+				assignedTeams: [
+					'550e8400-e29b-41d4-a716-446655440000',
+					'6ba7b810-9dad-41d1-80b4-00c04fd430c8',
+					'123e4567-e89b-42d3-a456-426614174000'
+				]
 			};
 
 			expect(() => JudgeGroupSchema.parse(validGroup)).not.toThrow();

@@ -32,10 +32,11 @@ export function createTeamInfo(
 	};
 }
 
-export function createTeamData(id: string, notebookLink: string, excluded: boolean): TeamData {
+export function createTeamData(id: string, notebookLink: string, isDevelopedNotebook: boolean | null, excluded: boolean): TeamData {
 	return {
 		id,
 		notebookLink,
+		isDevelopedNotebook,
 		excluded
 	};
 }
@@ -335,7 +336,7 @@ export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebook
 			team.group || ''
 		);
 
-		const teamData = createTeamData(id, notebookLink, team.excluded || false);
+		const teamData = createTeamData(id, notebookLink, team.isDevelopedNotebook || null, team.excluded || false);
 
 		return new Team(teamInfo, teamData);
 	});

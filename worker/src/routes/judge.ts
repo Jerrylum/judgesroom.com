@@ -34,14 +34,14 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 			await upsertJudge(ctx.db, input);
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judges) => {
-				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judges);
 			});
 		}),
 		removeJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input, session }) => {
 			await removeJudge(ctx.db, input);
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judges) => {
-				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judges);
 			});
 		}),
 		updateAllJudges: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ ctx, input, session }) => {
@@ -52,7 +52,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 			});
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judges) => {
-				session.broadcast<ClientRouter>().onJudgesUpdate.mutation(judges);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judges);
 			});
 		})
 	};

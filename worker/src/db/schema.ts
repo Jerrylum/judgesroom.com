@@ -41,6 +41,7 @@ export const teams = sqliteTable(
 		grade: text('grade', { enum: ['Elementary School', 'Middle School', 'High School', 'College'] }).notNull(),
 		group: text('group_').notNull(),
 		notebookLink: text('notebookLink').notNull().default(''),
+		isDevelopedNotebook: integer('isDevelopedNotebook', { mode: 'boolean' }), // nullable,
 		excluded: integer('excluded', { mode: 'boolean' }).notNull().default(false)
 	},
 	(table) => [uniqueIndex('teams_number').on(table.number), index('teams_group').on(table.group)]

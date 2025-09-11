@@ -12,6 +12,7 @@ export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]
 		.select({
 			id: teams.id,
 			notebookLink: teams.notebookLink,
+			isDevelopedNotebook: teams.isDevelopedNotebook,
 			excluded: teams.excluded
 		})
 		.from(teams) as Promise<TeamData[]>;
@@ -30,7 +31,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 			await updateTeamData(ctx.db, input);
 			// Do not wait for the broadcast to complete
 			getTeamData(ctx.db).then((teamData) => {
-				session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(teamData);
+				session.broadcast<ClientRouter>().onAllTeamDataUpdate.mutation(teamData);
 			});
 		}),
 		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
@@ -41,7 +42,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 			});
 			// Do not wait for the broadcast to complete
 			getTeamData(ctx.db).then((teamData) => {
-				session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(teamData);
+				session.broadcast<ClientRouter>().onAllTeamDataUpdate.mutation(teamData);
 			});
 		})
 	};

@@ -131,6 +131,7 @@ CREATE TABLE `Teams` (
 	`grade` text NOT NULL,
 	`group_` text NOT NULL,
 	`notebookLink` text DEFAULT '' NOT NULL,
+	`isDevelopedNotebook` integer,
 	`excluded` integer DEFAULT false NOT NULL
 );
 --> statement-breakpoint

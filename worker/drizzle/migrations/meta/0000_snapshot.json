@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "83e294f4-d558-4d7b-bc5f-9a9ba1e33002",
+  "id": "b35fff55-7a4e-4f34-93d9-a11b8a02bfa9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -921,6 +921,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "''"
+        },
+        "isDevelopedNotebook": {
+          "name": "isDevelopedNotebook",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "excluded": {
           "name": "excluded",

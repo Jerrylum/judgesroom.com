@@ -73,7 +73,7 @@ describe('TeamData Class', () => {
 	let teamData: TeamData;
 
 	beforeEach(() => {
-		teamData = createTeamData(uuidv4(), 'https://example.com/notebook', false);
+		teamData = createTeamData(uuidv4(), 'https://example.com/notebook', null, false);
 	});
 
 	it('should create a TeamData instance with correct properties', () => {
@@ -108,7 +108,7 @@ describe('Team Class', () => {
 			'High School',
 			'123'
 		);
-		teamData = createTeamData(teamInfo.id, 'https://example.com/notebook', false);
+		teamData = createTeamData(teamInfo.id, 'https://example.com/notebook', null, false);
 		team = new Team(teamInfo, teamData);
 	});
 
@@ -169,11 +169,11 @@ describe('TeamList Class', () => {
 		teams = [
 			new Team(
 				createTeamInfo(teamId1, '123A', 'Team A', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamId1, 'https://example.com/notebook-a', false)
+				createTeamData(teamId1, 'https://example.com/notebook-a', null, false)
 			),
 			new Team(
 				createTeamInfo(teamId2, '456B', 'Team B', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
-				createTeamData(teamId2, 'https://example.com/notebook-b', false)
+				createTeamData(teamId2, 'https://example.com/notebook-b', null, false)
 			)
 		];
 		teamList = new TeamList(teams);
@@ -194,7 +194,7 @@ describe('TeamList Class', () => {
 		const teamId3 = uuidv4();
 		const newTeam = new Team(
 			createTeamInfo(teamId3, '789C', 'Team C', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
-			createTeamData(teamId3, 'https://example.com/notebook-c', false)
+			createTeamData(teamId3, 'https://example.com/notebook-c', null, false)
 		);
 
 		teamList.push(newTeam);
@@ -587,19 +587,19 @@ describe('groupTeamsByGroup', () => {
 		teams = [
 			new Team(
 				createTeamInfo(teamIdA, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamIdA, 'https://example.com/notebook-a', false)
+				createTeamData(teamIdA, 'https://example.com/notebook-a', null, false)
 			),
 			new Team(
 				createTeamInfo(teamIdB, '123B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'High School', '123'),
-				createTeamData(teamIdB, 'https://example.com/notebook-b', false)
+				createTeamData(teamIdB, 'https://example.com/notebook-b', null, false)
 			),
 			new Team(
 				createTeamInfo(teamIdC, '456C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'Middle School', '456'),
-				createTeamData(teamIdC, 'https://example.com/notebook-c', false)
+				createTeamData(teamIdC, 'https://example.com/notebook-c', null, false)
 			),
 			new Team(
 				createTeamInfo(teamIdD, '789D', 'Team Delta', 'City D', 'State D', 'Country D', 'TD', 'School D', 'College', ''),
-				createTeamData(teamIdD, 'https://example.com/notebook-d', false)
+				createTeamData(teamIdD, 'https://example.com/notebook-d', null, false)
 			)
 		];
 	});
@@ -644,15 +644,15 @@ describe('groupTeamsByGroup', () => {
 		const letterTeams = [
 			new Team(
 				createTeamInfo(appleId, 'APPLE', 'Team Apple', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', 'APPLE'),
-				createTeamData(appleId, 'https://example.com/notebook-apple', false)
+				createTeamData(appleId, 'https://example.com/notebook-apple', null, false)
 			),
 			new Team(
 				createTeamInfo(banana1Id, 'BANANA1', 'Team Banana 1', 'City B', 'State B', 'Country B', 'TB1', 'School B', 'High School', 'BANANA'),
-				createTeamData(banana1Id, 'https://example.com/notebook-banana1', false)
+				createTeamData(banana1Id, 'https://example.com/notebook-banana1', null, false)
 			),
 			new Team(
 				createTeamInfo(banana2Id, 'BANANA2', 'Team Banana 2', 'City C', 'State C', 'Country C', 'TB2', 'School C', 'High School', 'BANANA'),
-				createTeamData(banana2Id, 'https://example.com/notebook-banana2', false)
+				createTeamData(banana2Id, 'https://example.com/notebook-banana2', null, false)
 			),
 			new Team(
 				createTeamInfo(
@@ -667,7 +667,7 @@ describe('groupTeamsByGroup', () => {
 					'Middle School',
 					'CHERRY'
 				),
-				createTeamData(cherry3Id, 'https://example.com/notebook-cherry3', false)
+				createTeamData(cherry3Id, 'https://example.com/notebook-cherry3', null, false)
 			)
 		];
 
@@ -693,23 +693,23 @@ describe('groupTeamsByGroup', () => {
 		const mixedTeams = [
 			new Team(
 				createTeamInfo(blrs1Id, 'BLRS1', 'BLRS Team 1', 'City A', 'State A', 'Country A', 'B1', 'School A', 'High School', 'BLRS'),
-				createTeamData(blrs1Id, 'https://example.com/notebook-blrs1', false)
+				createTeamData(blrs1Id, 'https://example.com/notebook-blrs1', null, false)
 			),
 			new Team(
 				createTeamInfo(blrs2Id, 'BLRS2', 'BLRS Team 2', 'City B', 'State B', 'Country B', 'B2', 'School B', 'High School', 'BLRS'),
-				createTeamData(blrs2Id, 'https://example.com/notebook-blrs2', false)
+				createTeamData(blrs2Id, 'https://example.com/notebook-blrs2', null, false)
 			),
 			new Team(
 				createTeamInfo(team99aId, 'TEAM99A', 'Team 99A', 'City C', 'State C', 'Country C', 'T99A', 'School C', 'Middle School', 'TEAM99'),
-				createTeamData(team99aId, 'https://example.com/notebook-team99a', false)
+				createTeamData(team99aId, 'https://example.com/notebook-team99a', null, false)
 			),
 			new Team(
 				createTeamInfo(team99bId, 'TEAM99B', 'Team 99B', 'City D', 'State D', 'Country D', 'T99B', 'School D', 'Middle School', 'TEAM99'),
-				createTeamData(team99bId, 'https://example.com/notebook-team99b', false)
+				createTeamData(team99bId, 'https://example.com/notebook-team99b', null, false)
 			),
 			new Team(
 				createTeamInfo(abc123xId, 'ABC123X', 'ABC 123 X', 'City E', 'State E', 'Country E', 'A123X', 'School E', 'College', 'ABC123'),
-				createTeamData(abc123xId, 'https://example.com/notebook-abc123x', false)
+				createTeamData(abc123xId, 'https://example.com/notebook-abc123x', null, false)
 			)
 		];
 

@@ -79,13 +79,7 @@
 	 */
 	function loadCurrentData() {
 		const eventSetup = app.getEssentialData();
-		const allTeamData: Record<string, TeamData> = app.getAllTeamData().reduce(
-			(acc, team) => {
-				acc[team.id] = team;
-				return acc;
-			},
-			{} as Record<string, TeamData>
-		);
+		const allTeamData = app.getAllTeamData();
 		const allJudges = app.getAllJudges();
 
 		if (eventSetup) {
@@ -199,8 +193,8 @@
 				AppUI.appPhase = 'workspace';
 			} else {
 				app.handleEssentialDataUpdate(essentialData);
-				app.handleTeamDataUpdate(teams.map((team) => team.data));
-				app.handleJudgesUpdate(judges);
+				app.handleAllTeamDataUpdate(teams.map((team) => team.data));
+				app.handleAllJudgesUpdate(judges);
 
 				await app.createSession();
 				// For Judge Advisor who created the session, auto-select role and show share dialog

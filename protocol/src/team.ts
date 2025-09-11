@@ -35,6 +35,7 @@ export type TeamInfo = z.infer<typeof TeamInfoSchema>;
 export const TeamDataSchema = z.object({
 	id: z.uuidv4(),
 	notebookLink: z.string(),
+	isDevelopedNotebook: z.boolean().nullable(),
 	excluded: z.boolean()
 });
 

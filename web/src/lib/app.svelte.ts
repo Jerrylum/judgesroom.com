@@ -13,7 +13,7 @@ import type { Award } from '@judging.jerryio/protocol/src/award';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
-import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl } from './utils.svelte';
+import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
 
 export class AppStorage {
@@ -80,7 +80,7 @@ export class App {
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
 	private allDevices: readonly DeviceInfo[] = $state([]);
-	private allTeamData: readonly TeamData[] = $state([]);
+	private allTeamData: Record<string, TeamData> = $state({});
 	private allJudges: readonly Judge[] = $state([]);
 
 	// Error handling
@@ -115,8 +115,8 @@ export class App {
 		// Join the session, this will call createWRPCClient
 		const starterKit = await this.wrpcClient.handshake.joinSession.mutation();
 		this.handleEssentialDataUpdate(starterKit.essentialData);
-		this.handleTeamDataUpdate(starterKit.teamData);
-		this.handleJudgesUpdate(starterKit.judges);
+		this.handleAllTeamDataUpdate(starterKit.teamData);
+		this.handleAllJudgesUpdate(starterKit.judges);
 
 		// Load user from storage
 		const user = this.loadUserFromStorage();
@@ -197,7 +197,7 @@ export class App {
 
 			const response = await this.wrpcClient.handshake.createSession.mutation({
 				essentialData: this.essentialData,
-				teamData: [...this.allTeamData],
+				teamData: [...Object.values(this.allTeamData)],
 				judges: [...this.allJudges]
 			});
 			if (response.success) {
@@ -338,11 +338,15 @@ export class App {
 		return this.essentialData.awards;
 	}
 
-	handleTeamDataUpdate(data: Readonly<Readonly<TeamData>[]>): void {
-		this.allTeamData = $state.snapshot(data);
+	handleAllTeamDataUpdate(data: Readonly<Readonly<TeamData>[]>): void {
+		this.allTeamData = $state.snapshot(processTeamDataArray(data));
 	}
 
-	getAllTeamData(): Readonly<Readonly<TeamData>[]> {
+	handleTeamDataUpdate(data: Readonly<TeamData>): void {
+		this.allTeamData[data.id] = $state.snapshot(data);
+	}
+
+	getAllTeamData(): Readonly<Record<string, Readonly<TeamData>>> {
 		return $state.snapshot(this.allTeamData);
 	}
 
@@ -356,7 +360,7 @@ export class App {
 		return judge ? $state.snapshot(judge) : null;
 	}
 
-	handleJudgesUpdate(data: Readonly<Readonly<Judge>[]>): void {
+	handleAllJudgesUpdate(data: Readonly<Readonly<Judge>[]>): void {
 		this.allJudges = $state.snapshot(data);
 	}
 

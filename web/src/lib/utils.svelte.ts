@@ -1,3 +1,4 @@
+import type { TeamData } from '@judging.jerryio/protocol/src/team';
 import { SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
 
@@ -80,4 +81,14 @@ export function errorToString(error: unknown): string {
 		return error.message;
 	}
 	return String(error);
+}
+
+export function processTeamDataArray(input: Readonly<Readonly<TeamData>[]>): Record<string, TeamData> {
+	return input.reduce(
+		(acc: Record<string, TeamData>, team) => {
+			acc[team.id] = team;
+			return acc;
+		},
+		{} as Record<string, TeamData>
+	);
 }
