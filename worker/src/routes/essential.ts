@@ -41,7 +41,7 @@ export async function getTeamInfos(db: DatabaseOrTransaction, group?: string): P
 
 export async function getJudgeGroups(db: DatabaseOrTransaction): Promise<JudgeGroup[]> {
 	const rows = await db
-		.select({ id: judgeGroups.id, name: judgeGroups.name, teamNumber: teams.number })
+		.select({ id: judgeGroups.id, name: judgeGroups.name, teamId: teams.id })
 		.from(judgeGroups)
 		.leftJoin(judgeGroupsAssignedTeams, eq(judgeGroupsAssignedTeams.judgeGroupId, judgeGroups.id))
 		.leftJoin(teams, eq(teams.id, judgeGroupsAssignedTeams.teamId));
@@ -53,8 +53,8 @@ export async function getJudgeGroups(db: DatabaseOrTransaction): Promise<JudgeGr
 			group = { id: row.id, name: row.name, assignedTeams: [] };
 			groupsMap.set(row.id, group);
 		}
-		if (row.teamNumber) {
-			group.assignedTeams.push(row.teamNumber);
+		if (row.teamId) {
+			group.assignedTeams.push(row.teamId);
 		}
 	}
 	return Array.from(groupsMap.values());

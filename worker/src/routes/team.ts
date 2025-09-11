@@ -30,9 +30,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 		updateTeamData: w.procedure.input(TeamDataSchema).mutation(async ({ ctx, input, session }) => {
 			await updateTeamData(ctx.db, input);
 			// Do not wait for the broadcast to complete
-			getTeamData(ctx.db).then((teamData) => {
-				session.broadcast<ClientRouter>().onAllTeamDataUpdate.mutation(teamData);
-			});
+			session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(input);
 		}),
 		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
 			await ctx.db.transaction(async (tx) => {

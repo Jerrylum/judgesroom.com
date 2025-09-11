@@ -63,6 +63,17 @@ export class NotebookRubricTab implements BaseTab {
 	}
 }
 
+export class NotebookSortingTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'notebook_sorting';
+	readonly title = 'Notebook Sorting';
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
 export class AwardRankingsTab implements BaseTab {
 	id: string;
 	readonly closable = true;
@@ -81,7 +92,7 @@ export interface CustomTab extends BaseTab {
 	props: Record<string, unknown>;
 }
 
-export type Tab = OverviewTab | TeamInterviewRubricTab | NotebookRubricTab | AwardRankingsTab | CustomTab;
+export type Tab = OverviewTab | TeamInterviewRubricTab | NotebookRubricTab | NotebookSortingTab | AwardRankingsTab | CustomTab;
 
 export class TabController {
 	private tabs: Tab[] = $state([]);

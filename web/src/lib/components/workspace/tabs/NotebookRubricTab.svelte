@@ -16,6 +16,7 @@
 	const allTeams = $derived(app.getAllTeams());
 	const allTeamsData = $derived(app.getAllTeamData());
 	const currentUser = $derived(app.getCurrentUser());
+	const essentialData = $derived(app.getEssentialData());
 
 	// Use current user's judge information with reactive validation
 	const currentJudge = $derived(() => {
@@ -24,6 +25,18 @@
 		}
 		return currentUser.judge;
 	});
+
+	// Check if the event uses assigned judging method
+	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+
+	// Get current judge's group
+	const currentJudgeGroup = $derived(() => {
+		if (!currentJudge()) return null;
+		return app.getCurrentUserJudgeGroup(currentJudge().id);
+	});
+
+	// State for showing only assigned teams
+	let showOnlyAssignedTeams = $state(true);
 
 	// Local state for the rubric form (no judge selection needed)
 	let selectedTeamId = $state(tab.teamId || '');
@@ -34,6 +47,36 @@
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
 	let isSyncing = false;
+
+	// Get teams to display based on filter and sort by isDevelopedNotebook
+	const teamsToShow = $derived(() => {
+		let teams = [...allTeams];
+		
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup()) {
+			// Filter to only show assigned teams for current judge group
+			const assignedTeamIds = new Set(currentJudgeGroup()!.assignedTeams);
+			teams = teams.filter(team => assignedTeamIds.has(team.id));
+		}
+		
+		// Sort teams: isDevelopedNotebook = true first, then by team numbers
+		return teams.sort((a, b) => {
+			const aData = allTeamsData[a.id];
+			const bData = allTeamsData[b.id];
+			const aIsDeveloped = aData?.isDevelopedNotebook ?? null;
+			const bIsDeveloped = bData?.isDevelopedNotebook ?? null;
+			
+			// Sort by isDevelopedNotebook: true first, then false, then null
+			if (aIsDeveloped !== bIsDeveloped) {
+				if (aIsDeveloped === true) return -1;
+				if (bIsDeveloped === true) return 1;
+				if (aIsDeveloped === false) return -1;
+				if (bIsDeveloped === false) return 1;
+			}
+			
+			// Then sort by team number
+			return a.number.localeCompare(b.number);
+		});
+	});
 
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
@@ -97,13 +140,36 @@
 			<!-- Header -->
 
 			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-				<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
+				
+				<!-- Filter Controls -->
+				{#if isAssignedJudging}
+					<div class="mb-4">
+						<label class="flex items-center">
+							<input 
+								type="checkbox" 
+								bind:checked={showOnlyAssignedTeams}
+								class="mr-2 rounded border-gray-300"
+							>
+							<span class="text-sm text-gray-700">
+								Only show assigned teams for your current judge group
+								{#if currentJudgeGroup()}
+									({currentJudgeGroup()!.name})
+								{/if}
+							</span>
+						</label>
+					</div>
+				{/if}
+				
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
 					<select id="team-select" bind:value={selectedTeamId} class="classic mt-1 block w-full">
 						<option value="">Select a team...</option>
-						{#each allTeams as team (team.id)}
-							<option value={team.id}>{team.number} - {team.name}</option>
+						{#each teamsToShow() as team (team.id)}
+							{@const teamData = allTeamsData[team.id]}
+							{@const isDeveloped = teamData?.isDevelopedNotebook ?? null}
+							{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
+							<option value={team.id}>{team.number} - {team.name}{statusText}</option>
 						{/each}
 					</select>
 				</div>

@@ -5,6 +5,7 @@
 	import OverviewTab from './tabs/OverviewTab.svelte';
 	import TeamInterviewRubricTab from './tabs/TeamInterviewRubricTab.svelte';
 	import NotebookRubricTab from './tabs/NotebookRubricTab.svelte';
+	import NotebookSortingTab from './tabs/NotebookSortingTab.svelte';
 	import AwardRankingsTab from './tabs/AwardRankingsTab.svelte';
 
 	// Get tab state
@@ -42,6 +43,8 @@
 				<TeamInterviewRubricTab {tab} isActive={activeTabId === tab.id} />
 			{:else if tab.type === 'notebook_rubric'}
 				<NotebookRubricTab {tab} isActive={activeTabId === tab.id} />
+			{:else if tab.type === 'notebook_sorting'}
+				<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
 			{:else if tab.type === 'award_rankings'}
 				<AwardRankingsTab {tab} isActive={activeTabId === tab.id} />
 			{:else if tab.type === 'custom' && 'component' in tab}

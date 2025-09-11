@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
-	import { AwardRankingsTab, NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import { AwardRankingsTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import Tab from './Tab.svelte';
 
 	interface Props {
@@ -27,6 +27,14 @@
 			return;
 		}
 		tabs.addTab(new NotebookRubricTab(null));
+	}
+
+	function addNotebookSortingTab() {
+		if (!isJudge) {
+			console.error('CRITICAL: Only judges can create notebook sorting tabs');
+			return;
+		}
+		tabs.addTab(new NotebookSortingTab());
 	}
 
 	function addAwardRankingsTab() {
@@ -62,28 +70,28 @@
 				{/if}
 			</div>
 
-			<!-- Quick Actions -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<h2 class="text-lg font-medium text-gray-900">Quick Actions</h2>
+				<h2 class="text-lg font-medium text-gray-900">Start</h2>
 				<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					{#if isJudge}
 						<button
-							onclick={addTeamInterviewTab}
+							onclick={addNotebookSortingTab}
 							class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 						>
-							<div class="rounded-full bg-blue-100 p-2">
-								<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="rounded-full bg-purple-100 p-2">
+								<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="2"
-										d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+										d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
 									/>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
 								</svg>
 							</div>
 							<div>
-								<div class="font-medium">Team Interview</div>
-								<div class="text-sm text-gray-500">Conduct team interviews</div>
+								<div class="font-medium">Notebook Sorting</div>
+								<div class="text-sm text-gray-500">Sort the engineering notebooks</div>
 							</div>
 						</button>
 
@@ -104,6 +112,26 @@
 							<div>
 								<div class="font-medium">Notebook Review</div>
 								<div class="text-sm text-gray-500">Review engineering notebooks</div>
+							</div>
+						</button>
+
+						<button
+							onclick={addTeamInterviewTab}
+							class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+						>
+							<div class="rounded-full bg-blue-100 p-2">
+								<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<div class="font-medium">Team Interview</div>
+								<div class="text-sm text-gray-500">Conduct team interviews</div>
 							</div>
 						</button>
 					{/if}

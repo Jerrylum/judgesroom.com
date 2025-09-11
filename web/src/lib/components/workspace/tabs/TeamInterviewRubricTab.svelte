@@ -15,6 +15,7 @@
 
 	const allTeams = $derived(app.getAllTeams());
 	const currentUser = $derived(app.getCurrentUser());
+	const essentialData = $derived(app.getEssentialData());
 
 	// Use current user's judge information with reactive validation
 	const currentJudge = $derived(() => {
@@ -24,6 +25,18 @@
 		return currentUser.judge;
 	});
 
+	// Check if the event uses assigned judging method
+	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+
+	// Get current judge's group
+	const currentJudgeGroup = $derived(() => {
+		if (!currentJudge()) return null;
+		return app.getCurrentUserJudgeGroup(currentJudge().id);
+	});
+
+	// State for showing only assigned teams
+	let showOnlyAssignedTeams = $state(true);
+
 	// Local state for the rubric form (no judge selection needed)
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
@@ -31,6 +44,20 @@
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
 	let isSyncing = false;
+
+	// Get teams to display based on filter
+	const teamsToShow = $derived(() => {
+		let teams = [...allTeams];
+		
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup()) {
+			// Filter to only show assigned teams for current judge group
+			const assignedTeamIds = new Set(currentJudgeGroup()!.assignedTeams);
+			teams = teams.filter(team => assignedTeamIds.has(team.id));
+		}
+		
+		// Sort teams by number for consistent display
+		return teams.sort((a, b) => a.number.localeCompare(b.number));
+	});
 
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === tab.teamId));
@@ -96,11 +123,31 @@
 			<!-- Header -->
 			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+				
+				<!-- Filter Controls -->
+				{#if isAssignedJudging}
+					<div class="mb-4">
+						<label class="flex items-center">
+							<input 
+								type="checkbox" 
+								bind:checked={showOnlyAssignedTeams}
+								class="mr-2 rounded border-gray-300"
+							>
+							<span class="text-sm text-gray-700">
+								Only show assigned teams for your current judge group
+								{#if currentJudgeGroup()}
+									({currentJudgeGroup()!.name})
+								{/if}
+							</span>
+						</label>
+					</div>
+				{/if}
+				
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
 					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full">
 						<option value="">Select a team...</option>
-						{#each allTeams as team (team.id)}
+						{#each teamsToShow() as team (team.id)}
 							<option value={team.id}>{team.number} - {team.name}</option>
 						{/each}
 					</select>
