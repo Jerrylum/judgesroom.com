@@ -14,6 +14,7 @@
 
 	// Get essential data for teams and judge groups
 	const allTeams = $derived(app.getAllTeams());
+	const allTeamsData = $derived(app.getAllTeamData());
 	const currentUser = $derived(app.getCurrentUser());
 
 	// Use current user's judge information with reactive validation
@@ -36,6 +37,7 @@
 
 	// Get the selected team details
 	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
+	const selectedTeamData = $derived(allTeamsData.find((team) => team.id === selectedTeamId));
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -107,11 +109,20 @@
 				</div>
 
 				{#if selectedTeam}
+					{@const notebookLink = selectedTeamData?.notebookLink || '(Not provided)'}
 					<div class="mb-4 rounded-lg bg-gray-50 p-4">
 						<div class=" text-sm text-gray-800">
 							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
 							<p><strong>School:</strong> {selectedTeam.school}</p>
 							<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
+							<p>
+								<strong>Notebook Link:</strong>
+								{#if notebookLink === '(Not provided)'}
+									{notebookLink}
+								{:else}
+									<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
+								{/if}
+							</p>
 						</div>
 					</div>
 				{/if}
