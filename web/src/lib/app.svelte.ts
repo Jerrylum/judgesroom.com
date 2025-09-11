@@ -6,12 +6,10 @@ import {
 	type WRPCClientManager
 } from '@judging.jerryio/wrpc/client';
 import type { Judge, JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import type { ClientInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
-import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+import type { DeviceInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
 import type { EssentialData } from '@judging.jerryio/protocol/src/event';
 import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
-import type { Award, CompetitionType } from '@judging.jerryio/protocol/src/award';
-import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
+import type { Award } from '@judging.jerryio/protocol/src/award';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
@@ -81,7 +79,7 @@ export class App {
 	private sessionInfo: SessionInfo | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
-	private allClients: readonly ClientInfo[] = $state([]);
+	private allDevices: readonly DeviceInfo[] = $state([]);
 	private allTeamData: readonly TeamData[] = $state([]);
 	private allJudges: readonly Judge[] = $state([]);
 
@@ -376,27 +374,27 @@ export class App {
 	// ===== SESSION MANAGEMENT METHODS =====
 
 	/**
-	 * Handle client list update from server
+	 * Handle device list update from server
 	 */
-	handleClientListUpdate(clients: Readonly<Readonly<ClientInfo>[]>): void {
-		this.allClients = $state.snapshot(clients);
+	handleDeviceListUpdate(clients: Readonly<Readonly<DeviceInfo>[]>): void {
+		this.allDevices = $state.snapshot(clients);
 	}
 
 	/**
 	 * Get connected clients
 	 */
-	getClients(): Readonly<Readonly<ClientInfo>[]> {
-		return $state.snapshot(this.allClients);
+	getDevices(): Readonly<Readonly<DeviceInfo>[]> {
+		return $state.snapshot(this.allDevices);
 	}
 
 	/**
 	 * Kick a client from session
 	 */
-	async kickClient(clientId: string): Promise<void> {
+	async kickDevice(deviceId: string): Promise<void> {
 		try {
-			await this.wrpcClient.client.kickClient.mutation({ clientId });
+			await this.wrpcClient.device.kickDevice.mutation({ deviceId });
 		} catch (error) {
-			this.addErrorNotice(`Failed to kick client: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(`Failed to kick device: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
 	}
@@ -505,8 +503,9 @@ export class App {
 
 		return {
 			wsUrl,
-			clientId: this.sessionInfo.clientId,
+			clientId: generateUUID(),
 			sessionId: this.sessionInfo.sessionId,
+			deviceId: this.sessionInfo.deviceId,
 			deviceName: this.sessionInfo.deviceName,
 			onContext: async () => ({}),
 			onOpen: () => {},
@@ -536,9 +535,9 @@ export class App {
 	}
 
 	private createNewSessionInfo(sessionId: string): SessionInfo {
-		const clientId = generateUUID();
+		const deviceId = generateUUID();
 		const deviceName = getDeviceNameFromUserAgent();
-		return { sessionId, clientId, deviceName, createdAt: Date.now() };
+		return { sessionId, deviceId, deviceName, createdAt: Date.now() };
 	}
 
 	private loadSessionFromStorage(): SessionInfo | null {

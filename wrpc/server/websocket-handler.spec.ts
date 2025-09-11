@@ -78,6 +78,7 @@ describe('WebSocket Handler', () => {
 			const connectionOpts = {
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device'
 			};
 
@@ -97,6 +98,7 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device'
 			});
 		});
@@ -319,6 +321,7 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device'
 			});
 
@@ -365,6 +368,7 @@ describe('WebSocket Handler', () => {
 			await wsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device'
 			});
 
@@ -440,6 +444,7 @@ describe('WebSocket Handler', () => {
 			await contextWsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device'
 			});
 
@@ -483,6 +488,7 @@ describe('WebSocket Handler', () => {
 			await contextWsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'admin-client',
+				deviceId: 'test-device',
 				deviceName: 'Admin Device'
 			});
 
@@ -525,6 +531,7 @@ describe('WebSocket Handler', () => {
 			await contextWsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'user-client',
+				deviceId: 'test-device',
 				deviceName: 'User Device'
 			});
 
@@ -566,6 +573,7 @@ describe('WebSocket Handler', () => {
 			await contextWsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'context-client',
+				deviceId: 'test-device',
 				deviceName: 'Context Device'
 			});
 
@@ -604,6 +612,7 @@ describe('WebSocket Handler', () => {
 			await contextWsHandler.handleConnection(mockWs as any, {
 				sessionId: 'test-session',
 				clientId: 'empty-context-client',
+				deviceId: 'test-device',
 				deviceName: 'Empty Context Device'
 			});
 

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { initWRPC } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
-import { ClientInfoSchema } from '@judging.jerryio/protocol/src/client';
+import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
 import { app } from './app-page.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
@@ -25,12 +25,12 @@ const clientRouter = w.router({
 	}),
 
 	/**
-	 * Server pushes client list updates to client
+	 * Server pushes device list updates to client
 	 */
-	onClientListUpdate: w.procedure.input(z.array(ClientInfoSchema)).mutation(async ({ input }) => {
-		console.log(`📊 Client list updated:`, input);
-		app.handleClientListUpdate(input);
-		return `Client list updated`;
+	onDeviceListUpdate: w.procedure.input(z.array(DeviceInfoSchema)).mutation(async ({ input }) => {
+		console.log(`📊 Device list updated:`, input);
+		app.handleDeviceListUpdate(input);
+		return `Device list updated`;
 	}),
 
 	/**

@@ -50,6 +50,7 @@ export interface WebSocketHandlerOptions<TRouter extends AnyRouter> {
 export interface WebSocketConnectionMetadata {
 	sessionId: string;
 	clientId: string;
+	deviceId: string;
 	deviceName: string;
 }
 
@@ -162,6 +163,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 						connectionManager,
 						connectionManager.getSessionId(),
 						clientId || 'unknown',
+						clientData?.deviceId || 'unknown',
 						clientData?.deviceName || 'unknown'
 					);
 
@@ -238,7 +240,7 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 		 */
 		async handleConnection(ws: WebSocket, metadata: WebSocketConnectionMetadata) {
 			// Add connection to manager (async with storage)
-			await connectionManager.addConnection(ws, metadata.sessionId, metadata.clientId, metadata.deviceName);
+			await connectionManager.addConnection(ws, metadata.sessionId, metadata.clientId, metadata.deviceId, metadata.deviceName);
 			console.log('WebSocket connection established', metadata);
 		},
 

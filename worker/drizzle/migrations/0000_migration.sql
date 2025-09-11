@@ -90,12 +90,10 @@ CREATE TABLE `Metadata` (
 	`judgingMethod` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `OfflineClients` (
-	`clientId` text PRIMARY KEY NOT NULL,
+CREATE TABLE `OfflineDevices` (
+	`deviceId` text PRIMARY KEY NOT NULL,
 	`deviceName` text NOT NULL,
-	`connectedAt` integer NOT NULL,
-	`judgeId` text,
-	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE set null
+	`connectedAt` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `TeamInterviewNotes` (

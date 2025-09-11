@@ -6,7 +6,7 @@ import { buildTeamRoute } from './routes/team';
 import { buildJudgeRoute } from './routes/judge';
 import { buildJudgingRoute } from './routes/judging';
 import { buildEssentialRoute } from './routes/essential';
-import { buildClientRoute } from './routes/client';
+import { buildDeviceRoute } from './routes/device';
 
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
@@ -29,7 +29,7 @@ const serverRouter = w.router({
 	team: buildTeamRoute(w),
 	judge: buildJudgeRoute(w),
 	judging: buildJudgingRoute(w),
-	client: buildClientRoute(w)
+	device: buildDeviceRoute(w)
 });
 
 export { serverRouter };

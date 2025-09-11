@@ -38,6 +38,7 @@ export interface Session<TServerRouter extends AnyRouter> {
 	 */
 	readonly currentClient: {
 		clientId: string;
+		deviceId: string;
 		deviceName: string;
 	};
 }
@@ -98,6 +99,7 @@ export function createServerSideSession(
 	connectionManager: Network,
 	sessionId: string,
 	clientId: string,
+	deviceId: string,
 	deviceName: string
 ): Session<never> {
 	return {
@@ -109,6 +111,7 @@ export function createServerSideSession(
 		sessionId,
 		currentClient: {
 			clientId,
+			deviceId,
 			deviceName
 		}
 	};

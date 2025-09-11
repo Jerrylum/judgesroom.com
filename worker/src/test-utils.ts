@@ -55,6 +55,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 
 	// Minimal in-memory mock network implementation
 	const connectedClientIds = new Set<string>();
+	const connectedDeviceIds = new Set<string>();
 	const clientData = new Map<string, ClientData>();
 
 	const network: Network = {
@@ -69,6 +70,9 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 		},
 		isClientConnected(clientId: string) {
 			return connectedClientIds.has(clientId);
+		},
+		isDeviceConnected(deviceId: string) {
+			return connectedDeviceIds.has(deviceId);
 		},
 		getAllClientData() {
 			return Array.from(clientData.values());

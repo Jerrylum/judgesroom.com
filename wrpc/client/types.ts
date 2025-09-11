@@ -12,6 +12,7 @@ export interface ClientOptions<TRouter extends AnyRouter> {
 	wsUrl: string;
 	sessionId: string;
 	clientId: string;
+	deviceId: string;
 	deviceName?: string;
 	onContext: (request: WRPCRequest) => Promise<InferRouterContext<TRouter>>;
 	onOpen: () => void;

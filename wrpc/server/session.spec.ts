@@ -14,13 +14,14 @@ describe('Server-side Session', () => {
 			broadcast: vi.fn(),
 			getConnectedClients: vi.fn(),
 			isClientConnected: vi.fn(),
+			isDeviceConnected: vi.fn(),
 			getAllClientData: vi.fn(),
 			getClientData: vi.fn(),
 			kickClient: vi.fn(),
 			destroy: vi.fn()
 		};
 
-		session = createServerSideSession(mockNetwork, 'test-session-id', 'test-client-id', 'Test Device');
+		session = createServerSideSession(mockNetwork, 'test-session-id', 'test-client-id', 'test-device-id', 'Test Device');
 	});
 
 	describe('session metadata', () => {
@@ -31,6 +32,7 @@ describe('Server-side Session', () => {
 		it('should have correct currentClient metadata', () => {
 			expect(session.currentClient).toEqual({
 				clientId: 'test-client-id',
+				deviceId: 'test-device-id',
 				deviceName: 'Test Device'
 			});
 		});

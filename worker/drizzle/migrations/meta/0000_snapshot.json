@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "37e0d42f-b6e5-4701-8181-8d18d181988d",
+  "id": "83e294f4-d558-4d7b-bc5f-9a9ba1e33002",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -643,11 +643,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "OfflineClients": {
-      "name": "OfflineClients",
+    "OfflineDevices": {
+      "name": "OfflineDevices",
       "columns": {
-        "clientId": {
-          "name": "clientId",
+        "deviceId": {
+          "name": "deviceId",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -666,31 +666,10 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "judgeId": {
-          "name": "judgeId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "OfflineClients_judgeId_Judges_id_fk": {
-          "name": "OfflineClients_judgeId_Judges_id_fk",
-          "tableFrom": "OfflineClients",
-          "tableTo": "Judges",
-          "columnsFrom": [
-            "judgeId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

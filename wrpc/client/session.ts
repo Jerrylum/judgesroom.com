@@ -8,6 +8,7 @@ export function createClientSideSession<TServerRouter extends AnyRouter, TClient
 	wsClient: WebsocketClient<TClientRouter>,
 	sessionId: string,
 	clientId: string,
+	deviceId: string,
 	deviceName: string
 ): Session<TServerRouter> {
 	/**
@@ -38,6 +39,7 @@ export function createClientSideSession<TServerRouter extends AnyRouter, TClient
 		sessionId,
 		currentClient: {
 			clientId,
+			deviceId,
 			deviceName
 		}
 	};

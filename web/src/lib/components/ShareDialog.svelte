@@ -1,6 +1,6 @@
 <script lang="ts">
 	import QRCode from 'qrcode';
-	import type { ClientInfo } from '@judging.jerryio/protocol/src/client';
+	import type { DeviceInfo } from '@judging.jerryio/protocol/src/client';
 	import { app, dialogs } from '$lib/app-page.svelte';
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
@@ -10,7 +10,7 @@
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state('Copy');
 
-	const clients = $derived(app.getClients());
+	const devices = $derived(app.getDevices());
 	const connectionState = $derived(app.getConnectionState());
 	const currentUser = $derived(app.getCurrentUser());
 	const sessionInfo = $derived(app.getSessionInfo());
@@ -21,16 +21,16 @@
 		return connectionState !== 'connected';
 	}
 
-	// Get current client info
-	function getCurrentClient(): Readonly<ClientInfo> | null {
+	// Get current device info
+	function getCurrentDevice(): Readonly<DeviceInfo> | null {
 		if (!sessionInfo) return null;
-		return clients.find((client) => client.clientId === sessionInfo.clientId) || null;
+		return devices.find((device) => device.deviceId === sessionInfo.deviceId) || null;
 	}
 
-	// Get other clients (excluding current client)
-	function getOtherClients(): ClientInfo[] {
+	// Get other devices (excluding current device)
+	function getOtherDevices(): DeviceInfo[] {
 		if (!sessionInfo) return [];
-		return clients.filter((client) => client.clientId !== sessionInfo.clientId);
+		return devices.filter((device) => device.deviceId !== sessionInfo.deviceId);
 	}
 
 	// Check if current user is judge advisor
@@ -38,12 +38,12 @@
 		return currentUser?.role === 'judge_advisor';
 	}
 
-	// Handle kick client
-	async function handleKickClient(targetClientId: string) {
+	// Handle kick device
+	async function handleKickDevice(targetDeviceId: string) {
 		try {
-			await app.kickClient(targetClientId);
+			await app.kickDevice(targetDeviceId);
 		} catch (error) {
-			console.error('Failed to kick client:', error);
+			console.error('Failed to kick device:', error);
 		}
 	}
 
@@ -152,9 +152,9 @@
 				</div>
 			</div>
 
-			<!-- Right Column: Connected Clients -->
+			<!-- Right Column: Connected Devices -->
 			<div class="flex max-h-140 flex-1 flex-col space-y-4 overflow-hidden">
-				<h4 class="text-lg font-medium text-gray-900">Connected Clients</h4>
+				<h4 class="text-lg font-medium text-gray-900">Connected Devices</h4>
 
 				{#if isDisconnectedFromServer()}
 					<div class="rounded-lg bg-red-50 p-4">
@@ -166,23 +166,23 @@
 							</div>
 						</div>
 					</div>
-				{:else if clients.length === 0}
+				{:else if devices.length === 0}
 					<div class="py-8 text-center text-gray-500">
 						<ClientsIcon />
-						<p class="mt-2 text-sm">No clients currently connected</p>
+						<p class="mt-2 text-sm">No devices currently connected</p>
 					</div>
 				{:else}
-					<!-- Current Client Section -->
+					<!-- Current Device Section -->
 					<div class="space-y-3">
-						<h5 class="text-sm font-medium text-gray-700">Current Client</h5>
-						{#if getCurrentClient()}
+						<h5 class="text-sm font-medium text-gray-700">Current Device</h5>
+						{#if getCurrentDevice()}
 							<div class="flex items-center justify-between rounded-lg bg-blue-50 p-3">
 								<div class="flex items-center space-x-3">
 									<div class="h-2 w-2 rounded-full bg-blue-500"></div>
 									<div>
-										<div class="font-medium text-gray-900">{getCurrentClient()!.deviceName}</div>
+										<div class="font-medium text-gray-900">{getCurrentDevice()!.deviceName}</div>
 										<div class="text-xs text-gray-500">
-											Connected {getConnectionDuration(getCurrentClient()!.connectedAt)} ago
+											Connected {getConnectionDuration(getCurrentDevice()!.connectedAt)} ago
 										</div>
 									</div>
 								</div>
@@ -190,34 +190,33 @@
 						{/if}
 					</div>
 
-					<!-- Other Clients Section -->
-					{#if getOtherClients().length > 0}
+					<!-- Other Devices Section -->
+					{#if getOtherDevices().length > 0}
 						<div class="flex min-h-0 flex-col space-y-3">
-							<h5 class="text-sm font-medium text-gray-700">Other Clients</h5>
+							<h5 class="text-sm font-medium text-gray-700">Other Devices</h5>
 
 							<div class="min-h-0 space-y-3 overflow-hidden pr-1 lg:overflow-auto">
-								{#each getOtherClients() as client (client.clientId)}
+								{#each getOtherDevices() as device (device.deviceId)}
 									<div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
 										<div class="flex items-center space-x-3">
-											<!-- <div class="h-2 w-2 rounded-full bg-green-500"></div> -->
-											{#if client.isOnline}
+											{#if device.isOnline}
 												<div class="h-2 w-2 rounded-full bg-green-500"></div>
 											{:else}
 												<div class="h-2 w-2 rounded-full bg-red-500"></div>
 											{/if}
 											<div>
-												<div class="font-medium text-gray-900">{client.deviceName}</div>
+												<div class="font-medium text-gray-900">{device.deviceName}</div>
 												<div class="text-xs text-gray-500">
-													Joined {getConnectionDuration(client.connectedAt)} ago
+													Joined {getConnectionDuration(device.connectedAt)} ago
 												</div>
 											</div>
 										</div>
 										{#if isJudgeAdvisor()}
 											<button
-												onclick={() => handleKickClient(client.clientId)}
+												onclick={() => handleKickDevice(device.deviceId)}
 												class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
-												title="Kick client"
-												aria-label="Kick client"
+												title="Kick device"
+												aria-label="Kick device"
 											>
 												<CloseIcon size={16} />
 											</button>

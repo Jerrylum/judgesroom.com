@@ -5,11 +5,12 @@ import { ServerRouter, serverRouter } from './server-router';
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
-import { broadcastClientListUpdate } from './routes/client';
+import { broadcastDeviceListUpdate } from './routes/device';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
 	clientId: z.uuidv4(),
+	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),
 	action: z.enum(['create', 'join', 'rejoin'])
 });
@@ -21,6 +22,7 @@ function parseIntention(request: Request): Intention | null {
 	const result = IntentionSchema.safeParse({
 		sessionId: url.searchParams.get('sessionId'),
 		clientId: url.searchParams.get('clientId'),
+		deviceId: url.searchParams.get('deviceId'),
 		deviceName: url.searchParams.get('deviceName'),
 		action: url.searchParams.get('action')
 	});
@@ -73,7 +75,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		if (!intention) {
 			return new Response('Invalid request', { status: 400 });
 		}
-		const { sessionId, clientId, deviceName } = intention;
+		const { sessionId, clientId, deviceId, deviceName } = intention;
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
@@ -95,9 +97,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		this.ctx.acceptWebSocket(server, [clientId]);
 
 		// Set up connection with the WebSocket handler (now async for storage)
-		await this.wsHandler.handleConnection(server, { sessionId, clientId, deviceName });
+		await this.wsHandler.handleConnection(server, { sessionId, clientId, deviceId, deviceName });
 
-		// We do not broadcast client list update here, it will be done when the client sends a join request
+		// We do not broadcast device list update here, it will be done when the device sends a join request
 
 		return new Response(null, { status: 101, webSocket: client });
 	}
@@ -115,9 +117,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Delegate to the WebSocket handler
 		await this.wsHandler.handleClose(ws, code, reason);
 
-		// Broadcast client list update to all clients
+		// Broadcast device list update to all devices
 		// Do not wait for the broadcast to complete
-		broadcastClientListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler.broadcast());
+		broadcastDeviceListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler.broadcast());
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {

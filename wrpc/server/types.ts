@@ -116,6 +116,7 @@ export type RouterBroadcastProxy<TRouter extends AnyRouter> = InferRouterBroadca
  */
 export interface ClientData {
 	clientId: string;
+	deviceId: string;
 	deviceName?: string;
 	connectedAt: number;
 }
@@ -143,6 +144,11 @@ export interface Network {
 	 * Check if a client is connected
 	 */
 	isClientConnected(clientId: string): boolean;
+
+	/**
+	 * Check if a device is connected
+	 */
+	isDeviceConnected(deviceId: string): boolean;
 
 	/**
 	 * Get all client data

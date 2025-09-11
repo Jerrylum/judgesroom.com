@@ -58,22 +58,27 @@ export class WebSocketConnectionManager implements Network {
 	/**
 	 * Add a WebSocket connection with hibernation support
 	 */
-	async addConnection(ws: WebSocket, sessionId: string, clientId: string, deviceName?: string) {
+	async addConnection(ws: WebSocket, sessionId: string, clientId: string, deviceId: string, deviceName: string) {
 		if (!this.isRunning()) {
-			throw new Error('Connection manager not initialized');
+			throw new Error('CRITICAL: Connection manager not initialized');
 		}
 
 		if (this.serverData.sessionId !== null && this.serverData.sessionId !== sessionId) {
-			throw new Error('Session ID mismatch');
+			throw new Error('CRITICAL: Session ID mismatch');
 		}
 		this.serverData.sessionId = sessionId;
 
-		// Remove existing client data if reconnecting
-		this.serverData.clients = this.serverData.clients.filter((c) => c.clientId !== clientId);
+		// Check if client already exists
+		const existingClient = this.serverData.clients.find((c) => c.clientId === clientId);
+		if (existingClient) {
+			ws.close(ConnectionCloseCode.KICKED, 'Client already connected');
+			throw new Error('CRITICAL: Client already connected');
+		}
 
 		// Add new client data
 		this.serverData.clients.push({
 			clientId,
+			deviceId,
 			deviceName,
 			connectedAt: Date.now()
 		});
@@ -215,6 +220,17 @@ export class WebSocketConnectionManager implements Network {
 	 */
 	isClientConnected(clientId: string): boolean {
 		return this.opts.getWebSocket(clientId) !== null;
+	}
+
+	/**
+	 * Check if a device is connected (hibernation-compatible)
+	 */
+	isDeviceConnected(deviceId: string): boolean {
+		return (
+			this.serverData.clients
+				.filter((c) => c.deviceId === deviceId) // Find all clients with the same device ID
+				.find((c) => this.opts.getWebSocket(c.clientId) !== null) !== undefined // Check if any of the clients are connected
+		);
 	}
 
 	/**

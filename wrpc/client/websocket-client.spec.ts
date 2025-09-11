@@ -77,6 +77,7 @@ describe('WebsocketClient', () => {
 			wsUrl: 'ws://localhost:8080/ws',
 			sessionId: 'test-session',
 			clientId: 'test-client',
+			deviceId: 'test-device',
 			deviceName: 'Test Device',
 			onContext: async () => ({}),
 			onOpen: () => {},
@@ -119,7 +120,7 @@ describe('WebsocketClient', () => {
 
 			// Check that WebSocket was created with correct URL
 			expect(MockWebSocket).toHaveBeenCalledWith(
-				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceName=Test+Device&action=join'
+				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
 			);
 
 			// Clean up the pending request
@@ -131,6 +132,7 @@ describe('WebsocketClient', () => {
 				wsUrl: 'ws://localhost:8080/ws',
 				sessionId: 'test-session',
 				clientId: 'test-client',
+				deviceId: 'test-device',
 				deviceName: 'Test Device',
 				onContext: async () => ({}),
 				onOpen: () => {},
@@ -143,7 +145,7 @@ describe('WebsocketClient', () => {
 			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			expect(MockWebSocket).toHaveBeenCalledWith(
-				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceName=Test+Device&action=join'
+				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
 			);
 
 			minimalClient.disconnect();
@@ -707,6 +709,7 @@ describe('WebsocketClient', () => {
 				wsUrl: 'ws://localhost:8080/ws',
 				sessionId: 'context-session',
 				clientId: 'context-client',
+				deviceId: 'context-device',
 				deviceName: 'Context Test Device',
 				onContext: async (request) => {
 					// Simulate context generation based on request

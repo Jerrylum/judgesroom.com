@@ -28,6 +28,7 @@ describe('createWRPCClient', () => {
 			wsUrl: 'ws://localhost:8080/ws',
 			sessionId: 'test-session',
 			clientId: 'test-client',
+			deviceId: 'test-device',
 			deviceName: 'Test Device',
 			onContext: async () => ({}),
 			onOpen: () => {},

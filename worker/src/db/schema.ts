@@ -2,13 +2,10 @@ import { sqliteTable, integer, text, primaryKey, index, uniqueIndex } from 'driz
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
-export const offlineClients = sqliteTable('OfflineClients', {
-	clientId: text('clientId').primaryKey(),
+export const offlineDevices = sqliteTable('OfflineDevices', {
+	deviceId: text('deviceId').primaryKey(),
 	deviceName: text('deviceName').notNull(),
-	connectedAt: integer('connectedAt', { mode: 'timestamp' }).notNull(),
-	// nullable because we don't want to delete the client if the judge is deleted
-	// client might not be assigned to a judge yet
-	judgeId: text('judgeId').references(() => judges.id, { onDelete: 'set null' })
+	connectedAt: integer('connectedAt', { mode: 'timestamp' }).notNull()
 });
 
 export const metadata = sqliteTable('Metadata', {

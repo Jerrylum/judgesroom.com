@@ -78,11 +78,12 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
 
 			const clientData = connectionManager.getClientData('client1');
 			expect(clientData).toEqual({
 				clientId: 'client1',
+				deviceId: 'device1',
 				deviceName: 'Test Device',
 				connectedAt: expect.any(Number)
 			});
@@ -95,11 +96,11 @@ describe('WebSocketConnectionManager', () => {
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set('client1', mockWs);
 
-				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Device1');
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Device1');
 
-				await expect(connectionManager.addConnection(mockWs as unknown as WebSocket, 'session2', 'client2', 'Device2')).rejects.toThrow(
-					'Session ID mismatch'
-				);
+				await expect(
+					connectionManager.addConnection(mockWs as unknown as WebSocket, 'session2', 'client2', 'device2', 'Device2')
+				).rejects.toThrow('Session ID mismatch');
 			});
 
 			it('getSessionId should throw before first connection and return after', async () => {
@@ -110,7 +111,7 @@ describe('WebSocketConnectionManager', () => {
 
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set('clientA', mockWs);
-				await newManager.addConnection(mockWs as unknown as WebSocket, 'abc-session', 'clientA', 'A');
+				await newManager.addConnection(mockWs as unknown as WebSocket, 'abc-session', 'clientA', 'deviceA', 'A');
 
 				expect(newManager.getSessionId()).toBe('abc-session');
 			});
@@ -120,7 +121,7 @@ describe('WebSocketConnectionManager', () => {
 			it('should close socket and remove client', async () => {
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set('clientZ', mockWs);
-				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'clientZ', 'Z');
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'clientZ', 'deviceZ', 'Z');
 
 				await connectionManager.kickClient('clientZ');
 
@@ -129,28 +130,30 @@ describe('WebSocketConnectionManager', () => {
 			});
 		});
 
-		it('should remove existing client when reconnecting', async () => {
+		it('should return error when reconnecting with same client ID', async () => {
 			const mockWs1 = new MockWebSocket();
 			const mockWs2 = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs1);
 
 			// Add initial connection
-			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'Device1');
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Device1');
 
 			// Add reconnection with same client ID
 			mockWebSockets.set('client1', mockWs2);
-			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client1', 'Device1 Updated');
+			await expect(
+				connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Device1 Updated')
+			).rejects.toThrow('Client already connected');
 
 			const allClients = connectionManager.getAllClientData();
 			expect(allClients).toHaveLength(1);
-			expect(allClients[0].deviceName).toBe('Device1 Updated');
+			expect(allClients[0].deviceName).toBe('Device1');
 		});
 
 		it('should remove a connection', async () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
 
 			await connectionManager.removeConnection('client1');
 
@@ -170,13 +173,14 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
 		});
 
 		it('should get client data by ID', () => {
 			const clientData = connectionManager.getClientData('client1');
 			expect(clientData).toEqual({
 				clientId: 'client1',
+				deviceId: 'device1',
 				deviceName: 'Test Device',
 				connectedAt: expect.any(Number)
 			});
@@ -206,7 +210,7 @@ describe('WebSocketConnectionManager', () => {
 		it('should filter out clients without active WebSocket connections', async () => {
 			// Add another client but don't add WebSocket
 			const mockWs2 = new MockWebSocket();
-			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'Device2');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device2', 'Device2');
 
 			// Remove WebSocket for client2 (simulating disconnection)
 			mockWebSockets.delete('client2');
@@ -224,7 +228,7 @@ describe('WebSocketConnectionManager', () => {
 			mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
 
 			testRequest = {
 				kind: 'request',
@@ -307,7 +311,7 @@ describe('WebSocketConnectionManager', () => {
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set(`client${i}`, mockWs);
 
-				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', `client${i}`, `Device${i}`);
+				await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', `client${i}`, `device${i}`, `Device${i}`);
 			}
 
 			testRequest = {
@@ -401,7 +405,7 @@ describe('WebSocketConnectionManager', () => {
 			const mockWs = new MockWebSocket();
 			mockWebSockets.set('client1', mockWs);
 
-			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'Test Device');
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
 
 			// Start a request
 			const testRequest: WRPCRequest = {
@@ -419,6 +423,117 @@ describe('WebSocketConnectionManager', () => {
 
 			// The request should be rejected
 			await expect(requestPromise).rejects.toThrow('Client client1 disconnected');
+		});
+	});
+
+	describe('device management', () => {
+		it('should check if device is connected when no clients from device exist', () => {
+			expect(connectionManager.isDeviceConnected('device1')).toBe(false);
+		});
+
+		it('should check if device is connected when one client from device is connected', async () => {
+			const mockWs = new MockWebSocket();
+			mockWebSockets.set('client1', mockWs);
+
+			await connectionManager.addConnection(mockWs as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(true);
+		});
+
+		it('should check if device is connected when multiple clients from same device are connected', async () => {
+			// Add first client from device1
+			const mockWs1 = new MockWebSocket();
+			mockWebSockets.set('client1', mockWs1);
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
+
+			// Add second client from device1
+			const mockWs2 = new MockWebSocket();
+			mockWebSockets.set('client2', mockWs2);
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device1', 'Test Device');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(true);
+
+			// Both clients should be in client data
+			const allClients = connectionManager.getAllClientData();
+			expect(allClients).toHaveLength(2);
+			expect(allClients.every((c) => c.deviceId === 'device1')).toBe(true);
+		});
+
+		it('should return false when device has no connected clients (all disconnected)', async () => {
+			// Add two clients from device1
+			const mockWs1 = new MockWebSocket();
+			const mockWs2 = new MockWebSocket();
+			mockWebSockets.set('client1', mockWs1);
+			mockWebSockets.set('client2', mockWs2);
+
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device1', 'Test Device');
+
+			// Remove both WebSocket connections (simulating disconnection)
+			mockWebSockets.delete('client1');
+			mockWebSockets.delete('client2');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(false);
+		});
+
+		it('should return true when device has at least one connected client', async () => {
+			// Add two clients from device1
+			const mockWs1 = new MockWebSocket();
+			const mockWs2 = new MockWebSocket();
+			mockWebSockets.set('client1', mockWs1);
+			mockWebSockets.set('client2', mockWs2);
+
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Test Device');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device1', 'Test Device');
+
+			// Remove one WebSocket connection (simulating partial disconnection)
+			mockWebSockets.delete('client1');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(true);
+		});
+
+		it('should handle multiple devices correctly', async () => {
+			// Add clients from different devices
+			const mockWs1 = new MockWebSocket();
+			const mockWs2 = new MockWebSocket();
+			const mockWs3 = new MockWebSocket();
+
+			mockWebSockets.set('client1', mockWs1);
+			mockWebSockets.set('client2', mockWs2);
+			mockWebSockets.set('client3', mockWs3);
+
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Device 1');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device2', 'Device 2');
+			await connectionManager.addConnection(mockWs3 as unknown as WebSocket, 'session1', 'client3', 'device1', 'Device 1');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(true);
+			expect(connectionManager.isDeviceConnected('device2')).toBe(true);
+			expect(connectionManager.isDeviceConnected('device3')).toBe(false);
+
+			// Disconnect device2's only client
+			mockWebSockets.delete('client2');
+
+			expect(connectionManager.isDeviceConnected('device1')).toBe(true); // Still has client1 and client3
+			expect(connectionManager.isDeviceConnected('device2')).toBe(false); // No connected clients
+		});
+
+		it('should allow same deviceId with different deviceName', async () => {
+			// This tests the scenario where a device updates its name
+			const mockWs1 = new MockWebSocket();
+			const mockWs2 = new MockWebSocket();
+
+			mockWebSockets.set('client1', mockWs1);
+			mockWebSockets.set('client2', mockWs2);
+
+			await connectionManager.addConnection(mockWs1 as unknown as WebSocket, 'session1', 'client1', 'device1', 'Old Device Name');
+			await connectionManager.addConnection(mockWs2 as unknown as WebSocket, 'session1', 'client2', 'device1', 'New Device Name');
+
+			const allClients = connectionManager.getAllClientData();
+			expect(allClients).toHaveLength(2);
+			expect(allClients[0].deviceId).toBe('device1');
+			expect(allClients[1].deviceId).toBe('device1');
+			expect(allClients[0].deviceName).toBe('Old Device Name');
+			expect(allClients[1].deviceName).toBe('New Device Name');
 		});
 	});
 

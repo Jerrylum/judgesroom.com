@@ -58,11 +58,12 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 		this.connectionState = 'connecting';
 		this.connectingPromise = new Promise((resolve, reject) => {
-			const { wsUrl, sessionId, clientId, deviceName } = this.options;
+			const { wsUrl, sessionId, clientId, deviceId, deviceName } = this.options;
 			const url = new URL(wsUrl);
 
-			if (sessionId) url.searchParams.set('sessionId', sessionId);
-			if (clientId) url.searchParams.set('clientId', clientId);
+			url.searchParams.set('sessionId', sessionId);
+			url.searchParams.set('clientId', clientId);
+			url.searchParams.set('deviceId', deviceId);
 			if (deviceName) url.searchParams.set('deviceName', deviceName);
 			url.searchParams.set('action', 'join');
 
@@ -155,8 +156,9 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 			const session = createClientSideSession(
 				this,
-				this.options.sessionId || 'unknown',
-				this.options.clientId || 'unknown',
+				this.options.sessionId,
+				this.options.clientId,
+				this.options.deviceId,
 				this.options.deviceName || 'unknown'
 			);
 

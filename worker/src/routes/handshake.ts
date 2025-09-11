@@ -7,9 +7,9 @@ import { type ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
-import { broadcastClientListUpdate, getClients } from './client';
+import { broadcastDeviceListUpdate, getDevices } from './device';
 import type { ServerContext } from '../server-router';
-import { offlineClients } from '../db/schema';
+import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { WRPCError } from '@judging.jerryio/wrpc/server/types';
 
@@ -29,24 +29,24 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				throw new WRPCError('Session not found');
 			}
 
-			const offlineClient = {
-				clientId: session.currentClient.clientId,
+			const offlineDevice = {
+				deviceId: session.currentClient.deviceId,
 				deviceName: session.currentClient.deviceName,
 				connectedAt: new Date()
 			};
 
 			// insert or update
 			await ctx.db
-				.insert(offlineClients)
-				.values(offlineClient)
+				.insert(offlineDevices)
+				.values(offlineDevice)
 				.onConflictDoUpdate({
-					target: [offlineClients.clientId],
-					set: offlineClient
+					target: [offlineDevices.deviceId],
+					set: offlineDevice
 				});
 
 			// Broadcast client list update to all clients
 			// Do not wait for the broadcast to complete
-			broadcastClientListUpdate(ctx.db, ctx.network, session.broadcast<ClientRouter>());
+			broadcastDeviceListUpdate(ctx.db, ctx.network, session.broadcast<ClientRouter>());
 
 			return transaction(ctx.db, async (tx) => {
 				return {
@@ -67,25 +67,25 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 					return { success: false, message: 'Session already exists' };
 				}
 
-				const offlineClient = {
-					clientId: session.currentClient.clientId,
+				const offlineDevice = {
+					deviceId: session.currentClient.deviceId,
 					deviceName: session.currentClient.deviceName,
 					connectedAt: new Date()
 				};
 
 				// insert or update
 				await ctx.db
-					.insert(offlineClients)
-					.values(offlineClient)
+					.insert(offlineDevices)
+					.values(offlineDevice)
 					.onConflictDoUpdate({
-						target: [offlineClients.clientId],
-						set: offlineClient
+						target: [offlineDevices.deviceId],
+						set: offlineDevice
 					});
 
-				// TODO :broadcast to all listening clients
+				// TODO :broadcast to all listening devices
 				// Do not wait for the broadcast to complete
-				getClients(ctx.db, ctx.network).then((clients) => {
-					session.broadcast<ClientRouter>().onClientListUpdate.mutation(clients);
+				getDevices(ctx.db, ctx.network).then((devices) => {
+					session.broadcast<ClientRouter>().onDeviceListUpdate.mutation(devices);
 				});
 
 				return transaction(ctx.db, async (tx) => {
