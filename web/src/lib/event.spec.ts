@@ -167,6 +167,8 @@ describe('Integration Tests', () => {
 		expect(selectedGradeLevel).toBeDefined();
 		expect(selectedGradeLevel?.grades).toEqual(['High School']);
 
+		const team123AUuid = uuidv4();
+
 		// Create a complete event setup using the selected grade level
 		const eventSetup: EssentialData = {
 			eventName: 'Regional Championship',
@@ -191,7 +193,7 @@ describe('Integration Tests', () => {
 			],
 			teamInfos: [
 				{
-					id: uuidv4(),
+					id: team123AUuid,
 					number: '123A',
 					name: 'Test Team',
 					city: 'Test City',
@@ -207,7 +209,7 @@ describe('Integration Tests', () => {
 				{
 					id: uuidv4(),
 					name: 'Judge Group 1',
-					assignedTeams: ['123A']
+					assignedTeams: [team123AUuid]
 				}
 			]
 		};
