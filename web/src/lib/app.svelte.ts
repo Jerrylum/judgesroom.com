@@ -16,6 +16,15 @@ import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
 
+export type UserClearReason = 'kicked' | 'session_destroyed';
+
+export interface Notice {
+	id: string;
+	message: string;
+	type: 'success' | 'error';
+	timestamp: number;
+}
+
 export class AppStorage {
 	/**
 	 * Save data to localStorage with the given key
@@ -84,7 +93,7 @@ export class App {
 	private allJudges: readonly Judge[] = $state([]);
 
 	// Error handling
-	private errorNotices: string[] = $state([]);
+	private notices: Notice[] = $state([]);
 	private userClearReason: string | null = $state(null);
 
 	constructor(storage: AppStorage, isDevelopment: boolean = false) {
@@ -446,45 +455,92 @@ export class App {
 	}
 
 	// ============================================================================
-	// Error Management
+	// Notice Management
 	// ============================================================================
 
 	/**
-	 * Add error notice
+	 * Add notice with type
 	 */
-	addErrorNotice(message: string): void {
-		this.errorNotices.push(message);
+	addNotice(message: string, type: 'success' | 'error'): void {
+		const notice: Notice = {
+			id: `notice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+			message,
+			type,
+			timestamp: Date.now()
+		};
+		
+		this.notices.push(notice);
 
-		// Auto-remove error notices after 10 seconds
+		// Auto-remove notices after 10 seconds
 		setTimeout(() => {
-			const index = this.errorNotices.indexOf(message);
+			const index = this.notices.findIndex(n => n.id === notice.id);
 			if (index > -1) {
-				this.errorNotices.splice(index, 1);
+				this.notices.splice(index, 1);
 			}
 		}, 10000);
 	}
 
 	/**
-	 * Get all error notices
+	 * Add error notice (backward compatibility)
 	 */
-	getErrorNotices(): readonly string[] {
-		return $state.snapshot(this.errorNotices);
+	addErrorNotice(message: string): void {
+		this.addNotice(message, 'error');
 	}
 
 	/**
-	 * Clear a specific error notice by index
+	 * Add success notice
 	 */
-	clearErrorNotice(index: number): void {
-		if (index >= 0 && index < this.errorNotices.length) {
-			this.errorNotices = this.errorNotices.filter((_, i) => i !== index);
+	addSuccessNotice(message: string): void {
+		this.addNotice(message, 'success');
+	}
+
+	/**
+	 * Get all notices
+	 */
+	getNotices(): readonly Notice[] {
+		return $state.snapshot(this.notices);
+	}
+
+	/**
+	 * Get all error notices (backward compatibility)
+	 */
+	getErrorNotices(): readonly string[] {
+		return $state.snapshot(this.notices.filter(n => n.type === 'error').map(n => n.message));
+	}
+
+	/**
+	 * Clear a specific notice by ID
+	 */
+	clearNotice(id: string): void {
+		const index = this.notices.findIndex(n => n.id === id);
+		if (index > -1) {
+			this.notices.splice(index, 1);
 		}
 	}
 
 	/**
-	 * Clear all error notices
+	 * Clear a specific error notice by index (backward compatibility)
+	 */
+	clearErrorNotice(index: number): void {
+		const errorNotices = this.notices.filter(n => n.type === 'error');
+		if (index >= 0 && index < errorNotices.length) {
+			const noticeToRemove = errorNotices[index];
+			this.clearNotice(noticeToRemove.id);
+		}
+	}
+
+	/**
+	 * Clear all notices
+	 */
+	clearAllNotices(): void {
+		this.notices = [];
+	}
+
+	/**
+	 * Clear all error notices (backward compatibility)
 	 */
 	clearAllErrorNotices(): void {
-		this.errorNotices = [];
+		this.notices = this.notices.filter(n => n.type !== 'error');
 	}
 
 	get wrpcClient() {
@@ -582,3 +638,4 @@ export class App {
 		this.storage.remove('currentUser');
 	}
 }
+

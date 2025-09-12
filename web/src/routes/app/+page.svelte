@@ -97,11 +97,11 @@
 		}
 	}
 
-	let errorNotices = $derived(app.getErrorNotices());
+	let notices = $derived(app.getNotices());
 	let currentDialog = $derived(dialogs.currentDialog);
 
-	function dismissError(index: number) {
-		app.clearErrorNotice(index);
+	function dismissNotice(id: string) {
+		app.clearNotice(id);
 	}
 </script>
 
@@ -120,19 +120,25 @@
 		<Workspace />
 	{/if}
 
-	<!-- Error Notices -->
-	{#if errorNotices.length > 0}
+	<!-- Notices -->
+	{#if notices.length > 0}
 		<div class="fixed right-4 bottom-4 z-50 space-y-2">
-			{#each errorNotices as notice, index (index)}
-				<div class="flex max-w-sm min-w-xs items-center justify-between rounded-lg bg-red-100 p-4 text-red-700 shadow-lg">
+			{#each notices as notice (notice.id)}
+				{@const isError = notice.type === 'error'}
+				<div class="flex max-w-sm min-w-xs items-center justify-between rounded-lg p-4 shadow-lg {isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
 					<div class="flex items-center">
-						<svg class="mr-2 h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-							></path>
-						</svg>
-						<span class="text-sm">{notice}</span>
+						{#if isError}
+							<svg class="mr-2 h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+							</svg>
+						{:else}
+							<svg class="mr-2 h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+							</svg>
+						{/if}
+						<span class="text-sm">{notice.message}</span>
 					</div>
-					<button onclick={() => dismissError(index)} class="ml-2 rounded-full p-1 hover:bg-red-200" aria-label="Dismiss error">
+					<button onclick={() => dismissNotice(notice.id)} class="ml-2 rounded-full p-1 {isError ? 'hover:bg-red-200' : 'hover:bg-green-200'}" aria-label="Dismiss notice">
 						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 						</svg>
