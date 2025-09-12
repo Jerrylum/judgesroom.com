@@ -1,6 +1,6 @@
 import type { ServerContext } from '../server-router';
 import z from 'zod';
-import { EngineeringNotebookRubricSchema, TeamInterviewNoteSchema, TeamInterviewRubricSchema } from '@judging.jerryio/protocol/src/rubric';
+import { EngineeringNotebookRubricSchema, SubmissionSchema, TeamInterviewNoteSchema, TeamInterviewRubricSchema } from '@judging.jerryio/protocol/src/rubric';
 import type { EngineeringNotebookRubric, TeamInterviewNote, TeamInterviewRubric } from '@judging.jerryio/protocol/src/rubric';
 import { eq, sql } from 'drizzle-orm';
 import {
@@ -8,8 +8,10 @@ import {
 	engineeringNotebookRubrics,
 	finalAwardRankings,
 	judgeGroupAwardNominations,
+	judgeGroupsAssignedTeams,
 	teamInterviewNotes,
-	teamInterviewRubrics
+	teamInterviewRubrics,
+	teams
 } from '../db/schema';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
@@ -18,31 +20,100 @@ import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
-		getRubricAndNoteByJudgeGroup: w.procedure
-			.input(z.object({ judgeGroupId: z.uuidv4() }))
+		// getRubricsAndNotesByJudgeGroup: w.procedure
+		// 	.input(z.object({ judgeGroupId: z.uuidv4() }))
+		// 	.output(
+		// 		z.array(
+		// 			z.object({
+		// 				teamId: z.uuidv4(),
+		// 				engineeringNotebookRubric: z.number(), // No. of submitted
+		// 				teamInterviewRubric: z.number(), // No. of submitted
+		// 				teamInterviewNote: z.number() // No. of submitted
+		// 			})
+		// 		)
+		// 	)
+		// 	.query(async ({ ctx, input }) => {
+		// 		const result = await ctx.db
+		// 			.select({
+		// 				teamId: engineeringNotebookRubrics.teamId,
+		// 				engineeringNotebookRubric: sql<number>`COUNT(${engineeringNotebookRubrics.id})`,
+		// 				teamInterviewRubric: sql<number>`COUNT(${teamInterviewRubrics.id})`,
+		// 				teamInterviewNote: sql<number>`COUNT(${teamInterviewNotes.id})`
+		// 			})
+		// 			.from(engineeringNotebookRubrics)
+		// 			.leftJoin(teamInterviewRubrics, eq(teamInterviewRubrics.id, engineeringNotebookRubrics.id))
+		// 			.leftJoin(teamInterviewNotes, eq(teamInterviewNotes.id, engineeringNotebookRubrics.id))
+		// 			.where(eq(engineeringNotebookRubrics.judgeId, input.judgeGroupId))
+		// 			.groupBy(engineeringNotebookRubrics.teamId);
+		// 		return result;
+		// 	}),
+		getRubricsAndNotes: w.procedure
+			.input(z.object({ judgeGroupId: z.uuidv4().optional() }))
 			.output(
 				z.array(
 					z.object({
 						teamId: z.uuidv4(),
-						engineeringNotebookRubric: z.number(), // No. of submitted
-						teamInterviewRubric: z.number(), // No. of submitted
-						teamInterviewNote: z.number() // No. of submitted
+						engineeringNotebookRubrics: z.array(SubmissionSchema),
+						teamInterviewRubrics: z.array(SubmissionSchema),
+						teamInterviewNotes: z.array(SubmissionSchema)
 					})
 				)
 			)
 			.query(async ({ ctx, input }) => {
-				const result = await ctx.db
+				// Import schema tables
+				// Get teams based on judge group filter
+				let allTeams;
+				if (input.judgeGroupId) {
+					// Filter teams by judge group assignment
+					allTeams = await ctx.db
+						.select({ id: teams.id })
+						.from(teams)
+						.innerJoin(judgeGroupsAssignedTeams, eq(teams.id, judgeGroupsAssignedTeams.teamId))
+						.where(eq(judgeGroupsAssignedTeams.judgeGroupId, input.judgeGroupId));
+				} else {
+					// Get all teams
+					allTeams = await ctx.db.select({ id: teams.id }).from(teams);
+				}
+				
+				// Get all rubrics and notes
+				const engineeringRubrics = await ctx.db
 					.select({
+						id: engineeringNotebookRubrics.id,
 						teamId: engineeringNotebookRubrics.teamId,
-						engineeringNotebookRubric: sql<number>`COUNT(${engineeringNotebookRubrics.id})`,
-						teamInterviewRubric: sql<number>`COUNT(${teamInterviewRubrics.id})`,
-						teamInterviewNote: sql<number>`COUNT(${teamInterviewNotes.id})`
+						judgeId: engineeringNotebookRubrics.judgeId
 					})
-					.from(engineeringNotebookRubrics)
-					.leftJoin(teamInterviewRubrics, eq(teamInterviewRubrics.id, engineeringNotebookRubrics.id))
-					.leftJoin(teamInterviewNotes, eq(teamInterviewNotes.id, engineeringNotebookRubrics.id))
-					.where(eq(engineeringNotebookRubrics.judgeId, input.judgeGroupId))
-					.groupBy(engineeringNotebookRubrics.teamId);
+					.from(engineeringNotebookRubrics);
+				
+				const teamRubrics = await ctx.db
+					.select({
+						id: teamInterviewRubrics.id,
+						teamId: teamInterviewRubrics.teamId,
+						judgeId: teamInterviewRubrics.judgeId
+					})
+					.from(teamInterviewRubrics);
+				
+				const teamNotes = await ctx.db
+					.select({
+						id: teamInterviewNotes.id,
+						teamId: teamInterviewNotes.teamId,
+						judgeId: teamInterviewNotes.judgeId
+					})
+					.from(teamInterviewNotes);
+				
+				// Group by team
+				const result = allTeams.map(team => ({
+					teamId: team.id,
+					engineeringNotebookRubrics: engineeringRubrics
+						.filter(r => r.teamId === team.id)
+						.map(r => ({ id: r.id, judgeId: r.judgeId })),
+					teamInterviewRubrics: teamRubrics
+						.filter(r => r.teamId === team.id)
+						.map(r => ({ id: r.id, judgeId: r.judgeId })),
+					teamInterviewNotes: teamNotes
+						.filter(r => r.teamId === team.id)
+						.map(r => ({ id: r.id, judgeId: r.judgeId }))
+				}));
+				
 				return result;
 			}),
 

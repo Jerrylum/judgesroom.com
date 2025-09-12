@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { TeamNumberSchema } from './team';
 
 export const JudgingMethodSchema = z.enum(['walk_in', 'assigned']);
 export type JudgingMethod = z.infer<typeof JudgingMethodSchema>;

@@ -72,7 +72,7 @@
 		if (existingTab) {
 			tabs.switchToTab(existingTab.id);
 		} else {
-			tabs.addTab(new NotebookRubricTab(teamId));
+			tabs.addTab(new NotebookRubricTab({ teamId }));
 		}
 	}
 

@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+export const SubmissionSchema = z.object({
+	id: z.uuidv4(),
+	judgeId: z.uuidv4()
+});
+
+export type Submission = z.infer<typeof SubmissionSchema>;
+
 export const RankSchema = z.number().min(0).max(5);
 
 export const EngineeringNotebookRubricSchema = z.object({

@@ -102,6 +102,27 @@
 		}
 	});
 
+	// Load existing rubric data if rubricId is provided
+	$effect(() => {
+		if (tab.rubricId) {
+			(async () => {
+				try {
+					const existingRubric = await app.wrpcClient.judging.getEngineeringNotebookRubrics.query({ id: tab.rubricId! });
+					if (existingRubric) {
+						selectedTeamId = existingRubric.teamId;
+						rubricScores = existingRubric.rubric as number[];
+						notes = existingRubric.notes;
+						innovateAwardNotes = existingRubric.innovateAwardNotes;
+						isSubmitted = true; // Mark as submitted since it exists
+					}
+				} catch (error) {
+					console.error('Failed to load existing rubric:', error);
+					app.addErrorNotice('Failed to load existing rubric');
+				}
+			})();
+		}
+	});
+
 	async function saveRubric() {
 		if (!selectedTeamId) {
 			app.addErrorNotice('Please select a team');
@@ -133,7 +154,7 @@
 
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
-				id: generateUUID(),
+				id: tab.rubricId || generateUUID(), // Use existing ID if editing, or generate new one
 				teamId: selectedTeamId,
 				judgeId: currentJudge().id,
 				rubric: rubricScores,
@@ -153,6 +174,17 @@
 		tabs.closeTab(tab.id);
 	}
 
+	function editRubric() {
+		// Enable editing mode
+		isSubmitted = false;
+		showValidationErrors = false;
+
+		// Scroll to top
+		if (mainScrollContainer) {
+			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	}
+
 	function newRubric() {
 		// Reset all form data
 		selectedTeamId = '';
@@ -161,7 +193,7 @@
 		innovateAwardNotes = '';
 		showValidationErrors = false;
 		isSubmitted = false;
-		
+
 		// Scroll to top
 		if (mainScrollContainer) {
 			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -540,13 +572,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[6]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[6]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[6]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[6]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -568,13 +600,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[7]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[7]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[7]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[7]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -600,13 +632,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[8]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[8]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[8]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[8]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -633,13 +665,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[9]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[9]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[9]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[9]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -664,13 +696,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[10]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[10]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[10]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[10]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<div class="p-2">
@@ -693,16 +725,11 @@
 
 				<div class="mt-6 flex justify-center gap-4">
 					{#if isSubmitted}
-						<button onclick={closeRubric} class="secondary">
-							Close Rubric
-						</button>
-						<button onclick={newRubric} class="primary">
-							New Rubric
-						</button>
+						<button onclick={editRubric} class="secondary"> Edit Rubric </button>
+						<button onclick={closeRubric} class="secondary"> Close Rubric </button>
+						<button onclick={newRubric} class="primary"> New Rubric </button>
 					{:else}
-						<button onclick={saveRubric} class="primary">
-							Submit Rubric
-						</button>
+						<button onclick={saveRubric} class="primary"> Submit Rubric </button>
 					{/if}
 				</div>
 			</div>

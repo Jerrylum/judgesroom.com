@@ -37,27 +37,29 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-hidden">
 		{#each allTabs as tab (tab.id)}
-			{#if tab.type === 'overview'}
-				<OverviewTab isActive={activeTabId === tab.id} />
-			{:else if tab.type === 'team_interview_rubric'}
-				<TeamInterviewRubricTab {tab} isActive={activeTabId === tab.id} />
-			{:else if tab.type === 'notebook_rubric'}
-				<NotebookRubricTab {tab} isActive={activeTabId === tab.id} />
-			{:else if tab.type === 'notebook_sorting'}
-				<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
-			{:else if tab.type === 'award_rankings'}
-				<AwardRankingsTab {tab} isActive={activeTabId === tab.id} />
-			{:else if tab.type === 'custom' && 'component' in tab}
-				{@const CustomComponent = tab.component}
-				<CustomComponent {...tab.props} />
-			{:else}
-				<div class="flex items-center justify-center p-8 text-gray-500">
-					<div class="text-center">
-						<p>Unknown tab type: {(tab as any).type}</p>
-						<p class="mt-2 text-sm">This tab type is not yet implemented.</p>
+			<div class="h-full" class:hidden={activeTabId !== tab.id}>
+				{#if tab.type === 'overview'}
+					<OverviewTab isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'team_interview_rubric'}
+					<TeamInterviewRubricTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'notebook_rubric'}
+					<NotebookRubricTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'notebook_sorting'}
+					<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'award_rankings'}
+					<AwardRankingsTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'custom' && 'component' in tab}
+					{@const CustomComponent = tab.component}
+					<CustomComponent {...tab.props} />
+				{:else}
+					<div class="flex items-center justify-center p-8 text-gray-500">
+						<div class="text-center">
+							<p>Unknown tab type: {(tab as any).type}</p>
+							<p class="mt-2 text-sm">This tab type is not yet implemented.</p>
+						</div>
 					</div>
-				</div>
-			{/if}
+				{/if}
+			</div>
 		{/each}
 	</main>
 </div>

@@ -33,16 +33,24 @@ export class TeamInterviewRubricTab implements BaseTab {
 	readonly type = 'team_interview_rubric';
 	// teamNumber: string | null = null;
 	teamId: string | null = $state(null);
+	rubricId: string | null = $state(null);
 
 	get title() {
 		const team = app.getAllTeams().find((team) => team.id === this.teamId);
 		return team ? `${team.number} Team Interview` : 'Team Interview';
 	}
 
-	constructor(teamId: string | null) {
+	constructor(params: { teamId: string | null } | { rubricId: string }) {
 		this.id = generateUUID();
-		this.teamId = teamId;
 		this.type = 'team_interview_rubric';
+		
+		if ('rubricId' in params) {
+			this.rubricId = params.rubricId;
+			this.teamId = null; // Will be set when rubric loads
+		} else {
+			this.teamId = params.teamId;
+			this.rubricId = null;
+		}
 	}
 }
 
@@ -51,15 +59,23 @@ export class NotebookRubricTab implements BaseTab {
 	readonly closable = true;
 	readonly type = 'notebook_rubric';
 	teamId: string | null = $state(null);
+	rubricId: string | null = $state(null);
 
 	get title() {
 		const team = app.getAllTeams().find((team) => team.id === this.teamId);
 		return team ? `${team.number} Notebook Review` : 'Notebook Review';
 	}
 
-	constructor(teamId: string | null) {
+	constructor(params: { teamId: string | null } | { rubricId: string }) {
 		this.id = generateUUID();
-		this.teamId = teamId;
+		
+		if ('rubricId' in params) {
+			this.rubricId = params.rubricId;
+			this.teamId = null; // Will be set when rubric loads
+		} else {
+			this.teamId = params.teamId;
+			this.rubricId = null;
+		}
 	}
 }
 
