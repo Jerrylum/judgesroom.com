@@ -6,14 +6,14 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { TeamList, type Team } from '$lib/team.svelte';
+	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 
 	interface Props {
 		groupName: string;
-		teamList: Team[];
-		selectedItems: TeamList;
+		teamList: EditingTeam[];
+		selectedItems: EditingTeamList;
 		activeZoneId: string;
-		onEditTeam: (team: Team) => void;
+		onEditTeam: (team: EditingTeam) => void;
 		onRenameGroup: (oldName: string, newName: string) => boolean;
 		onDeleteGroup: (groupName: string) => void;
 		showGrade?: boolean;
@@ -44,7 +44,7 @@
 
 	interface DropEvent {
 		detail: {
-			items: Team[];
+			items: EditingTeam[];
 			info: {
 				trigger: string;
 				source: string;
@@ -64,15 +64,15 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						teamList = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+						teamList = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					});
 				} else {
-					selectedItems = new TeamList();
+					selectedItems = new EditingTeamList();
 				}
 			}
 		}
 
-		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new TeamList();
+		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new EditingTeamList();
 		teamList = newItems;
 	}
 
@@ -84,17 +84,17 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				teamList = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+				teamList = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
-					const idx = newItems.findIndex((item: Team) => item.id === id);
+					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
 					// to support arrow up when keyboard dragging
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					newItems.splice(idx - sidx, 0, ...selectedItems);
 					teamList = newItems;
 					activeZoneId = zoneId;
-					if (source !== SOURCES.KEYBOARD) selectedItems = new TeamList();
+					if (source !== SOURCES.KEYBOARD) selectedItems = new EditingTeamList();
 				});
 			}
 		} else {
@@ -107,7 +107,7 @@
 		e.stopPropagation();
 
 		if (activeZoneId !== zoneId) {
-			selectedItems = new TeamList();
+			selectedItems = new EditingTeamList();
 			activeZoneId = zoneId;
 		}
 

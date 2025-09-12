@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { AwardOptions } from '$lib/award.svelte';
 	import type { JudgeGroupClass } from '$lib/judging.svelte';
-	import { Team, groupTeamsByGroup } from '$lib/team.svelte';
+	import { EditingTeam, groupTeamsByGroup } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
@@ -11,7 +11,7 @@
 	interface Props {
 		selectedCompetitionType: CompetitionType;
 		selectedEventGradeLevel: EventGradeLevel;
-		teams: Team[];
+		teams: EditingTeam[];
 		performanceAwards: AwardOptionsWithId[];
 		judgedAwards: AwardOptionsWithId[];
 		volunteerNominatedAwards: AwardOptionsWithId[];

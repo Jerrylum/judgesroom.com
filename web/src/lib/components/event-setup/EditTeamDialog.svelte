@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { dialogs } from '$lib/app-page.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
-	import type { Team } from '$lib/team.svelte';
+	import type { EditingTeam } from '$lib/team.svelte';
 	import { GradeSchema } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
-		team: Team;
+		team: EditingTeam;
 	}
 
 	let { team }: Props = $props();

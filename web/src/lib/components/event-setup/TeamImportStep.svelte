@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Team } from '$lib/team.svelte';
+	import type { EditingTeam } from '$lib/team.svelte';
 	import TeamImport from './TeamImport.svelte';
 
 	interface Props {
-		teams: Team[];
+		teams: EditingTeam[];
 		onNext: () => void;
 		onPrev: () => void;
 	}

@@ -5,6 +5,7 @@
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import ScoringButtons from './ScoringButtons.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -13,35 +14,46 @@
 
 	let { tab, isActive }: Props = $props();
 
-	const allTeams = $derived(app.getAllTeams());
-	const currentUser = $derived(app.getCurrentUser());
+	const includedTeams = $derived(app.getAllTeamInfoAndData(false));
 	const essentialData = $derived(app.getEssentialData());
-
-	// Use current user's judge information with reactive validation
-	const currentJudge = $derived(() => {
-		if (!currentUser || currentUser.role !== 'judge') {
-			throw new Error('CRITICAL: TeamInterviewRubricTab can only be accessed by judges');
-		}
-		return currentUser.judge;
-	});
-
-	// Check if the event uses assigned judging method
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
-
-	// Get current judge's group
-	const currentJudgeGroup = $derived.by(() => {
-		if (!currentJudge()) return null;
-		return app.getCurrentUserJudgeGroup(currentJudge().id);
-	});
+	const currentJudge = $derived(app.getCurrentUserJudge());
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
 
-	// Local state for the rubric form (no judge selection needed)
+	let showValidationErrors = $state(false);
+	let isSubmitted = $state(tab.rubricId !== null);
+
+	let judgeId = $state<string | null>(null);
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
-	let showValidationErrors = $state(false);
-	let isSubmitted = $state(false);
+
+	async function loadRubric() {
+		if (!tab.rubricId) return;
+		try {
+			const existingRubric = await app.wrpcClient.judging.getTeamInterviewRubrics.query({ id: tab.rubricId });
+			tab.teamId = existingRubric.teamId;
+			judgeId = existingRubric.judgeId;
+			rubricScores = existingRubric.rubric as number[];
+			notes = existingRubric.notes;
+		} catch (error) {
+			console.error('Failed to load existing rubric:', error);
+			app.addErrorNotice('Failed to load existing rubric');
+		}
+	}
+
+	// Load existing rubric data if rubricId is provided
+	$effect(() => {
+		untrack(loadRubric);
+	});
+
+	$effect(() => {
+		if (!isSubmitted) {
+			judgeId = currentJudge?.id ?? null;
+		}
+	});
 
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
@@ -50,16 +62,9 @@
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived(() => {
-		let teams = [...allTeams];
+		let teams = Object.values(includedTeams);
 
-		// Filter out excluded teams
-		const allTeamsData = app.getAllTeamData();
-		teams = teams.filter((team) => {
-			const teamData = allTeamsData[team.id];
-			return !teamData?.excluded;
-		});
-
-		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
 			// Filter to only show assigned teams for current judge group
 			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
 			teams = teams.filter((team) => assignedTeamIds.has(team.id));
@@ -68,9 +73,6 @@
 		// Sort teams by number for consistent display
 		return teams.sort((a, b) => a.number.localeCompare(b.number));
 	});
-
-	// Get the selected team details
-	const selectedTeam = $derived(allTeams.find((team) => team.id === tab.teamId));
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -81,32 +83,16 @@
 		}
 	});
 
-	// Load existing rubric data if rubricId is provided
-	$effect(() => {
-		if (tab.rubricId) {
-			(async () => {
-				try {
-					const existingRubric = await app.wrpcClient.judging.getTeamInterviewRubrics.query({ id: tab.rubricId! });
-					if (existingRubric) {
-						rubricScores = existingRubric.rubric as number[];
-						notes = existingRubric.notes;
-						isSubmitted = true; // Mark as submitted since it exists
-					}
-				} catch (error) {
-					console.error('Failed to load existing rubric:', error);
-					app.addErrorNotice('Failed to load existing rubric');
-				}
-			})();
-		}
-	});
-
 	async function saveRubric() {
 		if (!tab.teamId) {
 			app.addErrorNotice('Please select a team');
 			// Scroll to top to help user select team
-			if (mainScrollContainer) {
-				mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-			}
+			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+			return;
+		}
+
+		if (!judgeId) {
+			app.addErrorNotice('CRITICAL: Please switch to a judge');
 			return;
 		}
 
@@ -121,11 +107,11 @@
 		try {
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeTeamInterviewRubric.mutation({
-				id: tab.rubricId || generateUUID(), // Use existing ID if editing, or generate new one
+				id: (tab.rubricId = generateUUID()),
 				teamId: tab.teamId,
-				judgeId: currentJudge().id,
+				judgeId,
 				rubric: rubricScores,
-				notes: notes
+				notes
 			});
 
 			isSubmitted = true;
@@ -136,33 +122,31 @@
 		}
 	}
 
-	function closeRubric() {
-		tabs.closeTab(tab.id);
-	}
-
 	function editRubric() {
 		// Enable editing mode
 		isSubmitted = false;
 		showValidationErrors = false;
-		
+
 		// Scroll to top
-		if (mainScrollContainer) {
-			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-		}
+		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+	}
+
+	function closeRubric() {
+		tabs.closeTab(tab.id);
 	}
 
 	function newRubric() {
 		// Reset all form data
 		tab.teamId = null;
+		tab.rubricId = null;
+		judgeId = currentJudge?.id ?? null;
 		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
 		notes = '';
 		showValidationErrors = false;
 		isSubmitted = false;
-		
+
 		// Scroll to top
-		if (mainScrollContainer) {
-			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-		}
+		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	// Synchronize scroll positions across all containers
@@ -201,15 +185,12 @@
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
 
 				<!-- Filter Controls -->
-				{#if isAssignedJudging}
+				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
 					<div class="mb-4">
 						<label class="flex items-center">
 							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
 							<span class="text-sm text-gray-700">
-								Only show assigned teams for your current judge group
-								{#if currentJudgeGroup}
-									({currentJudgeGroup.name})
-								{/if}
+								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
 							</span>
 						</label>
 					</div>
@@ -217,7 +198,7 @@
 
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full">
+					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full" disabled={isSubmitted}>
 						<option value="">Select a team...</option>
 						{#each teamsToShow() as team (team.id)}
 							<option value={team.id}>{team.number} - {team.name}</option>
@@ -225,7 +206,8 @@
 					</select>
 				</div>
 
-				{#if selectedTeam}
+				{#if tab.teamId}
+					{@const selectedTeam = includedTeams[tab.teamId]}
 					<div class="mb-4 rounded-lg bg-gray-50 p-4">
 						<div class=" text-sm text-gray-800">
 							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -237,7 +219,11 @@
 
 				<!-- Current Judge Information (Read-only) -->
 				<div class="mt-2 text-sm text-gray-700">
-					<p><strong>Judge Name:{' '}</strong>{currentJudge().name}</p>
+					{#if judgeId}
+						<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
+					{:else}
+						<p>(Please switch to a judge in order to submit the rubric)</p>
+					{/if}
 				</div>
 			</div>
 			<div class="rounded-lg bg-white p-6 shadow-sm">
@@ -290,13 +276,13 @@
 									<div>Team <u>shows little to no evidence</u> of independent inquiry in their design process.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[0]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[0]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[0]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[0]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -310,13 +296,13 @@
 									<div>Team <u>did not explain</u> game strategy, or strategy is not student-directed.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[1]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[1]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[1]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[1]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -332,13 +318,13 @@
 									<div>Team <u>did not explain</u> robot design, or design is not student-directed.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[2]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[2]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[2]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[2]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -352,13 +338,13 @@
 									<div>Team <u>did not explain</u> robot build, or build is not student-directed.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[3]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[3]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[3]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[3]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -375,13 +361,13 @@
 									<div>Team <u>did not explain</u> programming, or programming is not student-directed.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[4]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[4]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[4]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[4]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -395,13 +381,13 @@
 									<div>Team has difficulty describing a creative solution or gives minimal response.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[5]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[5]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[5]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[5]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -421,13 +407,13 @@
 									<div>Team <u>cannot explain how team progress was monitored</u> or how resources were managed.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[6]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[6]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[6]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[6]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -448,13 +434,13 @@
 									</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[7]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[7]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[7]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[7]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -468,13 +454,13 @@
 									<div>Team interactions lack respectful and courteous behavior.</div>
 								</content>
 							</scroll-container>
-						<scoring class="min-w-14">
-							{#if isSubmitted}
-								<p class="text-lg">{rubricScores[8]}</p>
-							{:else}
-								<ScoringButtons bind:variable={rubricScores[8]} showError={showValidationErrors} />
-							{/if}
-						</scoring>
+							<scoring class="min-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[8]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[8]} showError={showValidationErrors} />
+								{/if}
+							</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -488,7 +474,8 @@
 											Does the team have any special attributes, accomplishments, or exemplary effort in overcoming challenges at this
 											event? Did anything stand out about this team in their interview? Please describe:
 										</p>
-										<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes}></textarea>
+										<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes} readonly={isSubmitted}
+										></textarea>
 									</div>
 								</content>
 							</scroll-container>
@@ -507,19 +494,11 @@
 
 				<div class="mt-6 flex justify-center gap-4">
 					{#if isSubmitted}
-						<button onclick={editRubric} class="secondary">
-							Edit Rubric
-						</button>
-						<button onclick={closeRubric} class="secondary">
-							Close Rubric
-						</button>
-						<button onclick={newRubric} class="primary">
-							New Rubric
-						</button>
+						<button onclick={editRubric} class="secondary">Edit Rubric</button>
+						<button onclick={closeRubric} class="secondary">Close Rubric</button>
+						<button onclick={newRubric} class="primary">New Rubric</button>
 					{:else}
-						<button onclick={saveRubric} class="primary">
-							Submit Rubric
-						</button>
+						<button onclick={saveRubric} class="primary" disabled={!judgeId}>Submit Rubric</button>
 					{/if}
 				</div>
 			</div>

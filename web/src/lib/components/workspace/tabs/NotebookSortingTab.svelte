@@ -30,7 +30,7 @@
 	// Get current judge's group
 	const currentJudgeGroup = $derived.by(() => {
 		if (!currentJudge()) return null;
-		return app.getCurrentUserJudgeGroup(currentJudge().id);
+		return app.findJudgeGroupByJudgeId(currentJudge().id);
 	});
 
 	// State for showing only assigned teams

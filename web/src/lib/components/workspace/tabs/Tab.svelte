@@ -11,8 +11,6 @@
 	let { isActive, tabId, tabType, children }: Props = $props();
 </script>
 
-{#if isActive}
-	<div class="tab-content h-full w-full" data-tab-id={tabId} data-tab-type={tabType}>
-		{@render children()}
-	</div>
-{/if}
+<div class="tab-content h-full w-full" class:hidden={!isActive} data-tab-id={tabId} data-tab-type={tabType}>
+	{@render children()}
+</div>

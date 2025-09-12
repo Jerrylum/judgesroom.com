@@ -15,6 +15,7 @@ import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
+import type { TeamInfoAndData } from './team.svelte';
 
 export type UserClearReason = 'kicked' | 'session_destroyed';
 
@@ -88,9 +89,9 @@ export class App {
 	private sessionInfo: SessionInfo | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
-	private allDevices: readonly DeviceInfo[] = $state([]);
 	private allTeamData: Record<string, TeamData> = $state({});
 	private allJudges: readonly Judge[] = $state([]);
+	private allDevices: readonly DeviceInfo[] = $state([]);
 
 	// Error handling
 	private notices: Notice[] = $state([]);
@@ -272,8 +273,12 @@ export class App {
 		}
 	}
 
+	getConnectionState(): ConnectionState {
+		return this.clientManager.getConnectionState();
+	}
+
 	// ============================================================================
-	// Data Update Methods
+	// Essential Data
 	// ============================================================================
 
 	/**
@@ -281,19 +286,6 @@ export class App {
 	 */
 	handleEssentialDataUpdate(data: Readonly<EssentialData>): void {
 		this.essentialData = $state.snapshot(data);
-	}
-
-	/**
-	 * Update event setup (sends to server via updateEssentialData)
-	 */
-	async updateEssentialData(eventSetup: Readonly<EssentialData>): Promise<void> {
-		try {
-			await this.wrpcClient.essential.updateEssentialData.mutation(eventSetup);
-			// The server will broadcast the update back to us via onEssentialDataUpdate
-		} catch (error) {
-			this.addErrorNotice(`Failed to update event setup: ${error instanceof Error ? error.message : 'Unknown error'}`);
-			throw error;
-		}
 	}
 
 	getEssentialData(): Readonly<EssentialData> | null {
@@ -316,16 +308,10 @@ export class App {
 		return this.essentialData?.teamInfos.length || 0;
 	}
 
-	/**
-	 * Get judge groups from cached EssentialData
-	 */
 	getJudgeGroups(): Readonly<Readonly<JudgeGroup>[]> {
 		return $state.snapshot(this.essentialData?.judgeGroups || []);
 	}
 
-	/**
-	 * Get judge group count from cached EssentialData
-	 */
 	getJudgeGroupCount(): number {
 		return this.essentialData?.judgeGroups.length || 0;
 	}
@@ -347,10 +333,20 @@ export class App {
 		return this.essentialData.awards;
 	}
 
+	// ============================================================================
+	// Team Data
+	// ============================================================================
+
+	/**
+	 * Handle all team data update from server
+	 */
 	handleAllTeamDataUpdate(data: Readonly<Readonly<TeamData>[]>): void {
 		this.allTeamData = $state.snapshot(processTeamDataArray(data));
 	}
 
+	/**
+	 * Handle team data update from server
+	 */
 	handleTeamDataUpdate(data: Readonly<TeamData>): void {
 		this.allTeamData[data.id] = $state.snapshot(data);
 	}
@@ -359,15 +355,9 @@ export class App {
 		return $state.snapshot(this.allTeamData);
 	}
 
-	getConnectionState(): ConnectionState {
-		return this.clientManager.getConnectionState();
-	}
-
-	findJudgeById(judgeId: string): Readonly<Judge> | null {
-		const allJudges = this.getAllJudges();
-		const judge = allJudges.find((j) => j.id === judgeId);
-		return judge ? $state.snapshot(judge) : null;
-	}
+	// ============================================================================
+	// Judges
+	// ============================================================================
 
 	handleAllJudgesUpdate(data: Readonly<Readonly<Judge>[]>): void {
 		this.allJudges = $state.snapshot(data);
@@ -377,14 +367,13 @@ export class App {
 		return $state.snapshot(this.allJudges);
 	}
 
-	/**
-	 * Get judge count
-	 */
 	getJudgeCount(): number {
 		return this.allJudges.length;
 	}
 
-	// ===== SESSION MANAGEMENT METHODS =====
+	// ============================================================================
+	// Device Management
+	// ============================================================================
 
 	/**
 	 * Handle device list update from server
@@ -412,12 +401,45 @@ export class App {
 		}
 	}
 
-	// ===== UTILITY METHODS =====
+	// ============================================================================
+	// Utility Methods
+	// ============================================================================
 
-	/**
-	 * Get current user's judge group
-	 */
-	getCurrentUserJudgeGroup(judgeId: string): Readonly<JudgeGroup> | null {
+	getAllTeamInfoAndData(withExcluded: boolean): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
+		const allTeamData = this.getAllTeamData();
+		return this.getAllTeams()
+			.filter((team) => withExcluded || !allTeamData[team.id]?.excluded)
+			.reduce(
+				(acc, team) => ({
+					...acc,
+					[team.id]: {
+						...team,
+						...allTeamData[team.id]
+					}
+				}),
+				{} as Record<string, Readonly<TeamInfoAndData>>
+			);
+	}
+
+	findTeamById(teamId: string): Readonly<TeamInfo> | null {
+		const allTeams = this.getAllTeams();
+		const team = allTeams.find((t) => t.id === teamId);
+		return team ? $state.snapshot(team) : null;
+	}
+
+	findTeamDataById(teamId: string): Readonly<TeamData> | null {
+		const allTeamData = this.getAllTeamData();
+		const teamData = allTeamData[teamId];
+		return teamData ? $state.snapshot(teamData) : null;
+	}
+
+	findJudgeById(judgeId: string): Readonly<Judge> | null {
+		const allJudges = this.getAllJudges();
+		const judge = allJudges.find((j) => j.id === judgeId);
+		return judge ? $state.snapshot(judge) : null;
+	}
+
+	findJudgeGroupByJudgeId(judgeId: string): Readonly<JudgeGroup> | null {
 		const judge = this.findJudgeById(judgeId);
 		if (!judge) return null;
 
@@ -441,6 +463,18 @@ export class App {
 
 	getCurrentUser(): Readonly<User> | null {
 		return this.currentUser ? $state.snapshot(this.currentUser) : null;
+	}
+
+	getCurrentUserJudge(): Readonly<Judge> | null {
+		const user = this.getCurrentUser();
+		if (!user || user.role !== 'judge') return null;
+		return this.findJudgeById(user.judge.id);
+	}
+
+	getCurrentUserJudgeGroup(): Readonly<JudgeGroup> | null {
+		const judge = this.getCurrentUserJudge();
+		if (!judge) return null;
+		return this.findJudgeGroupByJudgeId(judge.id);
 	}
 
 	/**
@@ -468,12 +502,12 @@ export class App {
 			type,
 			timestamp: Date.now()
 		};
-		
+
 		this.notices.push(notice);
 
 		// Auto-remove notices after 10 seconds
 		setTimeout(() => {
-			const index = this.notices.findIndex(n => n.id === notice.id);
+			const index = this.notices.findIndex((n) => n.id === notice.id);
 			if (index > -1) {
 				this.notices.splice(index, 1);
 			}
@@ -502,30 +536,12 @@ export class App {
 	}
 
 	/**
-	 * Get all error notices (backward compatibility)
-	 */
-	getErrorNotices(): readonly string[] {
-		return $state.snapshot(this.notices.filter(n => n.type === 'error').map(n => n.message));
-	}
-
-	/**
 	 * Clear a specific notice by ID
 	 */
 	clearNotice(id: string): void {
-		const index = this.notices.findIndex(n => n.id === id);
+		const index = this.notices.findIndex((n) => n.id === id);
 		if (index > -1) {
 			this.notices.splice(index, 1);
-		}
-	}
-
-	/**
-	 * Clear a specific error notice by index (backward compatibility)
-	 */
-	clearErrorNotice(index: number): void {
-		const errorNotices = this.notices.filter(n => n.type === 'error');
-		if (index >= 0 && index < errorNotices.length) {
-			const noticeToRemove = errorNotices[index];
-			this.clearNotice(noticeToRemove.id);
 		}
 	}
 
@@ -534,13 +550,6 @@ export class App {
 	 */
 	clearAllNotices(): void {
 		this.notices = [];
-	}
-
-	/**
-	 * Clear all error notices (backward compatibility)
-	 */
-	clearAllErrorNotices(): void {
-		this.notices = this.notices.filter(n => n.type !== 'error');
 	}
 
 	get wrpcClient() {
@@ -638,4 +647,3 @@ export class App {
 		this.storage.remove('currentUser');
 	}
 }
-

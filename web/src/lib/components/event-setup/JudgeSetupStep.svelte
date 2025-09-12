@@ -5,14 +5,14 @@
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
 	import { JudgeGroupClass, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
-	import { TeamList, type Team } from '$lib/team.svelte';
+	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
-		teams: Team[];
+		teams: EditingTeam[];
 		judgingMethod: JudgingMethod;
 		judgeGroups: JudgeGroupClass[];
-		unassignedTeams: Team[];
+		unassignedTeams: EditingTeam[];
 		judges: Judge[];
 		onNext: () => void;
 		onPrev: () => void;
@@ -29,7 +29,7 @@
 	}: Props = $props();
 
 	// Multi-select drag and drop states
-	let selectedItems = $state(new TeamList());
+	let selectedItems = $state(new EditingTeamList());
 	let activeZoneId = $state('');
 
 	const allTeamsHaveSameGrade = $derived(teamsProp.every((team) => team.grade === teamsProp[0].grade));
@@ -46,7 +46,7 @@
 
 	interface DropEvent {
 		detail: {
-			items: Team[];
+			items: EditingTeam[];
 			info: {
 				trigger: string;
 				source: string;
@@ -66,15 +66,15 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						unassignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+						unassignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					});
 				} else {
-					selectedItems = new TeamList();
+					selectedItems = new EditingTeamList();
 				}
 			}
 		}
 
-		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new TeamList();
+		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new EditingTeamList();
 		unassignedTeams = newItems;
 	}
 
@@ -92,17 +92,17 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				unassignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+				unassignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
-					const idx = newItems.findIndex((item: Team) => item.id === id);
+					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
 					// to support arrow up when keyboard dragging
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					newItems.splice(idx - sidx, 0, ...selectedItems);
 					unassignedTeams = newItems;
 					activeZoneId = unassignedZoneId;
-					if (source !== SOURCES.KEYBOARD) selectedItems = new TeamList();
+					if (source !== SOURCES.KEYBOARD) selectedItems = new EditingTeamList();
 				});
 			}
 		} else {
@@ -115,7 +115,7 @@
 		e.stopPropagation();
 
 		if (activeZoneId !== unassignedZoneId) {
-			selectedItems = new TeamList();
+			selectedItems = new EditingTeamList();
 			activeZoneId = unassignedZoneId;
 		}
 

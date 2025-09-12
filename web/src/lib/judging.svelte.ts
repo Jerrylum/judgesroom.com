@@ -1,19 +1,19 @@
 import { z } from 'zod/v4';
 import { v4 as uuidv4 } from 'uuid';
-import { type Team } from './team.svelte';
+import { type EditingTeam } from './team.svelte';
 import { type Judge } from '@judging.jerryio/protocol/src/judging';
 
 export class JudgeGroupClass {
 	public readonly id: string;
 	public name: string = $state('');
-	public assignedTeams: Team[] = $state([]);
+	public assignedTeams: EditingTeam[] = $state([]);
 
 	constructor(name: string) {
 		this.id = uuidv4();
 		this.name = name;
 	}
 
-	assignTeam(team: Team) {
+	assignTeam(team: EditingTeam) {
 		if (!this.assignedTeams.find((t) => t.id === team.id)) {
 			this.assignedTeams.push(team);
 		}
@@ -46,7 +46,7 @@ export function parseJudgeNamesFromInput(input: string): string[] {
 		.filter((name) => name.length > 0);
 }
 
-export function randomlyAssignTeamsToGroups(teams: Team[], judgeGroups: JudgeGroupClass[]): void {
+export function randomlyAssignTeamsToGroups(teams: EditingTeam[], judgeGroups: JudgeGroupClass[]): void {
 	if (judgeGroups.length === 0) return;
 
 	// Clear existing assignments

@@ -2,10 +2,10 @@
 	import TeamGroup from './TeamGroup.svelte';
 	import EditTeamDialog from './EditTeamDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
-	import { Team, TeamList, groupTeamsByGroup, parseTournamentManagerCSV, parseNotebookData, mergeTeamData } from '$lib/team.svelte';
+	import { EditingTeam, EditingTeamList, groupTeamsByGroup, parseTournamentManagerCSV, parseNotebookData, mergeTeamData } from '$lib/team.svelte';
 
 	interface Props {
-		teams: Team[];
+		teams: EditingTeam[];
 	}
 
 	let { teams = $bindable() }: Props = $props();
@@ -18,11 +18,11 @@
 	let uploadSuccess = $state('');
 
 	// Team management states
-	let teamGroups = $state<Record<string, Team[]>>(groupTeamsByGroup(teams));
+	let teamGroups = $state<Record<string, EditingTeam[]>>(groupTeamsByGroup(teams));
 	let newGroupName = $state('');
 
 	// Multi-select drag and drop states
-	let selectedItems = $state(new TeamList());
+	let selectedItems = $state(new EditingTeamList());
 	let activeZoneId = $state('');
 
 	const allTeamsHaveSameGrade = $derived(teams.every((team) => team.grade === teams[0].grade));
@@ -133,7 +133,7 @@
 		teamGroups = { ...teamGroups };
 	}
 
-	async function editTeam(team: Team) {
+	async function editTeam(team: EditingTeam) {
 		const saved = await dialogs.showCustom(EditTeamDialog, {
 			props: { team },
 			maxWidth: 'max-w-2xl'

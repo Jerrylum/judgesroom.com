@@ -8,7 +8,7 @@ import {
 	randomlyAssignTeamsToGroups,
 	getJudgesInGroup
 } from './judging.svelte';
-import { Team, createTeamInfo, createTeamData } from './team.svelte';
+import { EditingTeam, createTeamInfo, createTeamData } from './team.svelte';
 import { JudgeSchema, type Judge } from '@judging.jerryio/protocol/src/judging';
 
 describe('Judge Class', () => {
@@ -43,7 +43,7 @@ describe('Judge Class', () => {
 
 describe('JudgeGroupClass', () => {
 	let judgeGroup: JudgeGroupClass;
-	let mockTeams: Team[];
+	let mockTeams: EditingTeam[];
 
 	beforeEach(() => {
 		judgeGroup = new JudgeGroupClass('Technical Judges');
@@ -53,15 +53,15 @@ describe('JudgeGroupClass', () => {
 		const teamId2 = uuidv4();
 		const teamId3 = uuidv4();
 		mockTeams = [
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamId1, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
 				createTeamData(teamId1, 'https://example.com/notebook-a', false, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamId2, '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
 				createTeamData(teamId2, 'https://example.com/notebook-b', false, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamId3, '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
 				createTeamData(teamId3, 'https://example.com/notebook-c', false, false)
 			)
@@ -209,14 +209,14 @@ describe('parseJudgeNamesFromInput', () => {
 });
 
 describe('randomlyAssignTeamsToGroups', () => {
-	let mockTeams: Team[];
+	let mockTeams: EditingTeam[];
 	let judgeGroups: JudgeGroupClass[];
 
 	beforeEach(() => {
 		// Create mock teams
 		mockTeams = Array.from({ length: 10 }, (_, i) => {
 			const teamId = uuidv4();
-			return new Team(
+			return new EditingTeam(
 				createTeamInfo(
 					teamId,
 					`${100 + i}A`,
@@ -382,7 +382,7 @@ describe('Integration Tests', () => {
 		// Create teams
 		const teams = Array.from({ length: 6 }, (_, i) => {
 			const teamId = uuidv4();
-			return new Team(
+			return new EditingTeam(
 				createTeamInfo(
 					teamId,
 					`${100 + i}A`,
@@ -431,7 +431,7 @@ describe('Integration Tests', () => {
 		const singleGroup = new JudgeGroupClass('Single Group');
 		const singleJudge = createJudgeFromString('Solo Judge', singleGroup.id);
 		const soloTeamId = uuidv4();
-		const singleTeam = new Team(
+		const singleTeam = new EditingTeam(
 			createTeamInfo(soloTeamId, '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
 			createTeamData(soloTeamId, 'https://example.com/notebook', false, false)
 		);

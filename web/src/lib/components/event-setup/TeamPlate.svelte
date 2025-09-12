@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Team } from '$lib/team.svelte';
+	import type { EditingTeam } from '$lib/team.svelte';
 
 	interface Props {
-		team: Team;
+		team: EditingTeam;
 		showGrade?: boolean;
 		isSelected?: boolean;
 	}

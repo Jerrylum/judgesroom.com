@@ -7,11 +7,11 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { TeamList, type Team } from '$lib/team.svelte';
+	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 
 	interface Props {
 		judgeGroup: JudgeGroupClass;
-		selectedItems: TeamList;
+		selectedItems: EditingTeamList;
 		activeZoneId: string;
 		onDeleteGroup: (groupId: string) => void;
 		showGrade?: boolean;
@@ -52,7 +52,7 @@
 
 	interface DropEvent {
 		detail: {
-			items: Team[];
+			items: EditingTeam[];
 			info: {
 				trigger: string;
 				source: string;
@@ -72,15 +72,15 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						judgeGroup.assignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+						judgeGroup.assignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					});
 				} else {
-					selectedItems = new TeamList();
+					selectedItems = new EditingTeamList();
 				}
 			}
 		}
 
-		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new TeamList();
+		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new EditingTeamList();
 		judgeGroup.assignedTeams = newItems;
 	}
 
@@ -92,16 +92,16 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				judgeGroup.assignedTeams = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+				judgeGroup.assignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
-					const idx = newItems.findIndex((item: Team) => item.id === id);
+					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: Team) => !selectedItems.includes(item.id));
+					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
 					newItems.splice(idx - sidx, 0, ...selectedItems);
 					judgeGroup.assignedTeams = newItems;
 					activeZoneId = zoneId;
-					if (source !== SOURCES.KEYBOARD) selectedItems = new TeamList();
+					if (source !== SOURCES.KEYBOARD) selectedItems = new EditingTeamList();
 				});
 			}
 		} else {
@@ -114,7 +114,7 @@
 		e.stopPropagation();
 
 		if (activeZoneId !== zoneId) {
-			selectedItems = new TeamList();
+			selectedItems = new EditingTeamList();
 			activeZoneId = zoneId;
 		}
 

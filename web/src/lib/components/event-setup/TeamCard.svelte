@@ -2,11 +2,11 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import type { Team } from '$lib/team.svelte';
+	import type { EditingTeam } from '$lib/team.svelte';
 
 	interface Props {
-		team: Team;
-		onEdit: (team: Team) => void;
+		team: EditingTeam;
+		onEdit: (team: EditingTeam) => void;
 		showGrade?: boolean;
 	}
 

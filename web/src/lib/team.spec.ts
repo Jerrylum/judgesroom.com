@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
 	createTeamInfo,
 	createTeamData,
-	Team,
-	TeamList,
+	EditingTeam,
+	EditingTeamList,
 	parseTournamentManagerCSV,
 	parseNotebookData,
 	extractGroupFromTeamNumber,
@@ -91,7 +91,7 @@ describe('TeamData Class', () => {
 });
 
 describe('Team Class', () => {
-	let team: Team;
+	let team: EditingTeam;
 	let teamInfo: TeamInfo;
 	let teamData: TeamData;
 
@@ -109,7 +109,7 @@ describe('Team Class', () => {
 			'123'
 		);
 		teamData = createTeamData(teamInfo.id, 'https://example.com/notebook', null, false);
-		team = new Team(teamInfo, teamData);
+		team = new EditingTeam(teamInfo, teamData);
 	});
 
 	it('should create a Team instance with correct properties', () => {
@@ -159,40 +159,40 @@ describe('Team Class', () => {
 	});
 });
 
-describe('TeamList Class', () => {
-	let teamList: TeamList;
-	let teams: Team[];
+describe('EditingTeamList Class', () => {
+	let teamList: EditingTeamList;
+	let teams: EditingTeam[];
 
 	beforeEach(() => {
 		const teamId1 = uuidv4();
 		const teamId2 = uuidv4();
 		teams = [
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamId1, '123A', 'Team A', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
 				createTeamData(teamId1, 'https://example.com/notebook-a', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamId2, '456B', 'Team B', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
 				createTeamData(teamId2, 'https://example.com/notebook-b', null, false)
 			)
 		];
-		teamList = new TeamList(teams);
+		teamList = new EditingTeamList(teams);
 	});
 
-	it('should create a TeamList with initial teams', () => {
+	it('should create a EditingTeamList with initial teams', () => {
 		expect(teamList.length).toBe(2);
 		expect(teamList.get(0)?.number).toBe('123A');
 		expect(teamList.get(1)?.number).toBe('456B');
 	});
 
-	it('should create an empty TeamList', () => {
-		const emptyList = new TeamList();
+	it('should create an empty EditingTeamList', () => {
+		const emptyList = new EditingTeamList();
 		expect(emptyList.length).toBe(0);
 	});
 
 	it('should be able to add teams', () => {
 		const teamId3 = uuidv4();
-		const newTeam = new Team(
+		const newTeam = new EditingTeam(
 			createTeamInfo(teamId3, '789C', 'Team C', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
 			createTeamData(teamId3, 'https://example.com/notebook-c', null, false)
 		);
@@ -577,7 +577,7 @@ describe('mergeTeamData', () => {
 });
 
 describe('groupTeamsByGroup', () => {
-	let teams: Team[];
+	let teams: EditingTeam[];
 
 	beforeEach(() => {
 		const teamIdA = uuidv4();
@@ -585,19 +585,19 @@ describe('groupTeamsByGroup', () => {
 		const teamIdC = uuidv4();
 		const teamIdD = uuidv4();
 		teams = [
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamIdA, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
 				createTeamData(teamIdA, 'https://example.com/notebook-a', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamIdB, '123B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'High School', '123'),
 				createTeamData(teamIdB, 'https://example.com/notebook-b', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamIdC, '456C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'Middle School', '456'),
 				createTeamData(teamIdC, 'https://example.com/notebook-c', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(teamIdD, '789D', 'Team Delta', 'City D', 'State D', 'Country D', 'TD', 'School D', 'College', ''),
 				createTeamData(teamIdD, 'https://example.com/notebook-d', null, false)
 			)
@@ -642,19 +642,19 @@ describe('groupTeamsByGroup', () => {
 		const banana2Id = uuidv4();
 		const cherry3Id = uuidv4();
 		const letterTeams = [
-			new Team(
+			new EditingTeam(
 				createTeamInfo(appleId, 'APPLE', 'Team Apple', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', 'APPLE'),
 				createTeamData(appleId, 'https://example.com/notebook-apple', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(banana1Id, 'BANANA1', 'Team Banana 1', 'City B', 'State B', 'Country B', 'TB1', 'School B', 'High School', 'BANANA'),
 				createTeamData(banana1Id, 'https://example.com/notebook-banana1', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(banana2Id, 'BANANA2', 'Team Banana 2', 'City C', 'State C', 'Country C', 'TB2', 'School C', 'High School', 'BANANA'),
 				createTeamData(banana2Id, 'https://example.com/notebook-banana2', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(
 					cherry3Id,
 					'CHERRY3',
@@ -691,23 +691,23 @@ describe('groupTeamsByGroup', () => {
 		const team99bId = uuidv4();
 		const abc123xId = uuidv4();
 		const mixedTeams = [
-			new Team(
+			new EditingTeam(
 				createTeamInfo(blrs1Id, 'BLRS1', 'BLRS Team 1', 'City A', 'State A', 'Country A', 'B1', 'School A', 'High School', 'BLRS'),
 				createTeamData(blrs1Id, 'https://example.com/notebook-blrs1', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(blrs2Id, 'BLRS2', 'BLRS Team 2', 'City B', 'State B', 'Country B', 'B2', 'School B', 'High School', 'BLRS'),
 				createTeamData(blrs2Id, 'https://example.com/notebook-blrs2', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(team99aId, 'TEAM99A', 'Team 99A', 'City C', 'State C', 'Country C', 'T99A', 'School C', 'Middle School', 'TEAM99'),
 				createTeamData(team99aId, 'https://example.com/notebook-team99a', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(team99bId, 'TEAM99B', 'Team 99B', 'City D', 'State D', 'Country D', 'T99B', 'School D', 'Middle School', 'TEAM99'),
 				createTeamData(team99bId, 'https://example.com/notebook-team99b', null, false)
 			),
-			new Team(
+			new EditingTeam(
 				createTeamInfo(abc123xId, 'ABC123X', 'ABC 123 X', 'City E', 'State E', 'Country E', 'A123X', 'School E', 'College', 'ABC123'),
 				createTeamData(abc123xId, 'https://example.com/notebook-abc123x', null, false)
 			)

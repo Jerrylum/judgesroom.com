@@ -31,7 +31,6 @@ export class TeamInterviewRubricTab implements BaseTab {
 	id: string;
 	readonly closable = true;
 	readonly type = 'team_interview_rubric';
-	// teamNumber: string | null = null;
 	teamId: string | null = $state(null);
 	rubricId: string | null = $state(null);
 
@@ -68,7 +67,7 @@ export class NotebookRubricTab implements BaseTab {
 
 	constructor(params: { teamId: string | null } | { rubricId: string }) {
 		this.id = generateUUID();
-		
+
 		if ('rubricId' in params) {
 			this.rubricId = params.rubricId;
 			this.teamId = null; // Will be set when rubric loads

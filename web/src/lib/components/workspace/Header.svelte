@@ -15,7 +15,7 @@
 	const judgeGroupName = $derived(() => {
 		if (!app.hasEssentialData() || !currentUser || currentUser.role === 'judge_advisor') return null;
 		if (currentUser.role === 'judge') {
-			const group = app.getCurrentUserJudgeGroup(currentUser.judge.id);
+			const group = app.findJudgeGroupByJudgeId(currentUser.judge.id);
 			return group?.name || null;
 		}
 		return null;

@@ -6,6 +6,7 @@
 	import ScoringButtons from './ScoringButtons.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import WarningIcon from '$lib/icon/WarningIcon.svelte';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -14,39 +15,48 @@
 
 	let { tab, isActive }: Props = $props();
 
-	// Get essential data for teams and judge groups
-	const allTeams = $derived(app.getAllTeams());
-	const allTeamsData = $derived(app.getAllTeamData());
-	const currentUser = $derived(app.getCurrentUser());
+	const includedTeams = $derived(app.getAllTeamInfoAndData(false));
 	const essentialData = $derived(app.getEssentialData());
-
-	// Use current user's judge information with reactive validation
-	const currentJudge = $derived(() => {
-		if (!currentUser || currentUser.role !== 'judge') {
-			throw new Error('CRITICAL: NotebookRubricTab can only be accessed by judges');
-		}
-		return currentUser.judge;
-	});
-
-	// Check if the event uses assigned judging method
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
-
-	// Get current judge's group
-	const currentJudgeGroup = $derived.by(() => {
-		if (!currentJudge()) return null;
-		return app.getCurrentUserJudgeGroup(currentJudge().id);
-	});
+	const currentJudge = $derived(app.getCurrentUserJudge());
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
 
-	// Local state for the rubric form (no judge selection needed)
-	let selectedTeamId = $state(tab.teamId || '');
+	let showValidationErrors = $state(false);
+	let isSubmitted = $state(tab.rubricId !== null);
+
+	let judgeId = $state<string | null>(null); // Store judge ID for existing rubrics
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
 	let innovateAwardNotes = $state('');
-	let showValidationErrors = $state(false);
-	let isSubmitted = $state(false);
+
+	async function loadRubric() {
+		if (!tab.rubricId) return;
+		try {
+			const existingRubric = await app.wrpcClient.judging.getEngineeringNotebookRubrics.query({ id: tab.rubricId! });
+			tab.teamId = existingRubric.teamId;
+			judgeId = existingRubric.judgeId;
+			rubricScores = existingRubric.rubric as number[];
+			notes = existingRubric.notes;
+			innovateAwardNotes = existingRubric.innovateAwardNotes;
+		} catch (error) {
+			console.error('Failed to load existing rubric:', error);
+			app.addErrorNotice('Failed to load existing rubric');
+		}
+	}
+
+	// Load existing rubric data if rubricId is provided
+	$effect(() => {
+		untrack(loadRubric);
+	});
+
+	$effect(() => {
+		if (!isSubmitted) {
+			judgeId = currentJudge?.id ?? null;
+		}
+	});
 
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
@@ -55,15 +65,9 @@
 
 	// Get teams to display based on filter and sort by isDevelopedNotebook
 	const teamsToShow = $derived(() => {
-		let teams = [...allTeams];
+		let teams = Object.values(includedTeams);
 
-		// Filter out excluded teams
-		teams = teams.filter((team) => {
-			const teamData = allTeamsData[team.id];
-			return !teamData?.excluded;
-		});
-
-		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
 			// Filter to only show assigned teams for current judge group
 			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
 			teams = teams.filter((team) => assignedTeamIds.has(team.id));
@@ -71,10 +75,8 @@
 
 		// Sort teams: isDevelopedNotebook = true first, then by team numbers
 		return teams.sort((a, b) => {
-			const aData = allTeamsData[a.id];
-			const bData = allTeamsData[b.id];
-			const aIsDeveloped = aData?.isDevelopedNotebook ?? null;
-			const bIsDeveloped = bData?.isDevelopedNotebook ?? null;
+			const aIsDeveloped = a.isDevelopedNotebook ?? null;
+			const bIsDeveloped = b.isDevelopedNotebook ?? null;
 
 			// Sort by isDevelopedNotebook: true first, then false, then null
 			if (aIsDeveloped !== bIsDeveloped) {
@@ -89,10 +91,6 @@
 		});
 	});
 
-	// Get the selected team details
-	const selectedTeam = $derived(allTeams.find((team) => team.id === selectedTeamId));
-	const selectedTeamData = $derived(allTeamsData[selectedTeamId]);
-
 	// Calculate total score
 	const totalScore = $derived.by(() => {
 		if (rubricScores.find((score) => score === -1)) {
@@ -102,34 +100,16 @@
 		}
 	});
 
-	// Load existing rubric data if rubricId is provided
-	$effect(() => {
-		if (tab.rubricId) {
-			(async () => {
-				try {
-					const existingRubric = await app.wrpcClient.judging.getEngineeringNotebookRubrics.query({ id: tab.rubricId! });
-					if (existingRubric) {
-						selectedTeamId = existingRubric.teamId;
-						rubricScores = existingRubric.rubric as number[];
-						notes = existingRubric.notes;
-						innovateAwardNotes = existingRubric.innovateAwardNotes;
-						isSubmitted = true; // Mark as submitted since it exists
-					}
-				} catch (error) {
-					console.error('Failed to load existing rubric:', error);
-					app.addErrorNotice('Failed to load existing rubric');
-				}
-			})();
-		}
-	});
-
 	async function saveRubric() {
-		if (!selectedTeamId) {
+		if (!tab.teamId) {
 			app.addErrorNotice('Please select a team');
 			// Scroll to top to help user select team
-			if (mainScrollContainer) {
-				mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-			}
+			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+			return;
+		}
+
+		if (!judgeId) {
+			app.addErrorNotice('CRITICAL: Please switch to a judge');
 			return;
 		}
 
@@ -142,21 +122,20 @@
 		}
 
 		try {
-			const selectedTeamData = allTeamsData[selectedTeamId];
-
+			const selectedTeam = includedTeams[tab.teamId];
 			// If the notebook is developing or not reviewed, mark it as fully developed
-			if (selectedTeamData?.isDevelopedNotebook !== true) {
+			if (selectedTeam.isDevelopedNotebook !== true) {
 				await app.wrpcClient.team.updateTeamData.mutation({
-					...selectedTeamData,
+					...selectedTeam,
 					isDevelopedNotebook: true
 				});
 			}
 
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
-				id: tab.rubricId || generateUUID(), // Use existing ID if editing, or generate new one
-				teamId: selectedTeamId,
-				judgeId: currentJudge().id,
+				id: tab.rubricId || generateUUID(),
+				teamId: tab.teamId,
+				judgeId,
 				rubric: rubricScores,
 				notes,
 				innovateAwardNotes
@@ -180,14 +159,14 @@
 		showValidationErrors = false;
 
 		// Scroll to top
-		if (mainScrollContainer) {
-			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-		}
+		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	function newRubric() {
 		// Reset all form data
-		selectedTeamId = '';
+		tab.teamId = '';
+		tab.rubricId = null;
+		judgeId = null;
 		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
 		notes = '';
 		innovateAwardNotes = '';
@@ -195,9 +174,7 @@
 		isSubmitted = false;
 
 		// Scroll to top
-		if (mainScrollContainer) {
-			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-		}
+		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	// Synchronize scroll positions across all containers
@@ -237,7 +214,7 @@
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
 
 				<!-- Filter Controls -->
-				{#if isAssignedJudging}
+				{#if isAssignedJudging && !isSubmitted}
 					<div class="mb-4">
 						<label class="flex items-center">
 							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
@@ -253,20 +230,20 @@
 
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-					<select id="team-select" bind:value={selectedTeamId} class="classic mt-1 block w-full">
+					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full" disabled={isSubmitted}>
 						<option value="">Select a team...</option>
 						{#each teamsToShow() as team (team.id)}
-							{@const teamData = allTeamsData[team.id]}
-							{@const isDeveloped = teamData?.isDevelopedNotebook ?? null}
+							{@const isDeveloped = team.isDevelopedNotebook ?? null}
 							{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
 							<option value={team.id}>{team.number}{statusText}</option>
 						{/each}
 					</select>
 				</div>
 
-				{#if selectedTeam}
-					{@const notebookLink = selectedTeamData?.notebookLink || '(Not provided)'}
-					{@const isDeveloped = selectedTeamData?.isDevelopedNotebook ?? null}
+				{#if tab.teamId}
+					{@const selectedTeam = includedTeams[tab.teamId]}
+					{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
+					{@const isDeveloped = selectedTeam.isDevelopedNotebook ?? null}
 					<div class="mb-4 rounded-lg bg-gray-50 p-4">
 						<div class=" text-sm text-gray-800">
 							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -307,7 +284,11 @@
 
 				<!-- Current Judge Information (Read-only) -->
 				<div class="mt-2 text-sm text-gray-700">
-					<p><strong>Judge Name:{' '}</strong>{currentJudge().name}</p>
+					{#if judgeId}
+						<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
+					{:else}
+						<p>(Please switch to a judge in order to submit the rubric)</p>
+					{/if}
 				</div>
 			</div>
 			<div class="rounded-lg bg-white p-6 shadow-sm">
@@ -510,7 +491,8 @@
 						<row class="border-t-3! bg-gray-100">
 							<div class="p-2">
 								<p class="text-sm font-bold">NOTES:</p>
-								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes}></textarea>
+								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes} readonly={isSubmitted}
+								></textarea>
 							</div>
 							<scoring class="min-w-14 max-w-14"></scoring>
 						</row>
@@ -707,7 +689,11 @@
 						<row>
 							<div class="p-2">
 								<p class="text-sm font-bold">INNOVATE AWARD NOTES (optional):</p>
-								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={innovateAwardNotes}></textarea>
+								<textarea
+									class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1"
+									bind:value={innovateAwardNotes}
+									readonly={isSubmitted}
+								></textarea>
 							</div>
 							<scoring class="flex-col! min-w-14 max-w-14 gap-2">
 								<p>TOTAL<br />SCORE</p>
@@ -729,7 +715,7 @@
 						<button onclick={closeRubric} class="secondary"> Close Rubric </button>
 						<button onclick={newRubric} class="primary"> New Rubric </button>
 					{:else}
-						<button onclick={saveRubric} class="primary"> Submit Rubric </button>
+						<button onclick={saveRubric} class="primary" disabled={!judgeId}> Submit Rubric </button>
 					{/if}
 				</div>
 			</div>

@@ -5,6 +5,8 @@ import { SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
 import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
 
+export type TeamInfoAndData = TeamInfo & TeamData;
+
 // Factory functions
 export function createTeamInfo(
 	id: string,
@@ -41,7 +43,7 @@ export function createTeamData(id: string, notebookLink: string, isDevelopedNote
 	};
 }
 
-export class Team {
+export class EditingTeam {
 	public readonly id: string;
 	public info: TeamInfo;
 	public data: TeamData;
@@ -129,8 +131,8 @@ export class Team {
 	}
 }
 
-export class TeamList extends List<Team, 'id'> {
-	constructor(initialItems: Team[] = []) {
+export class EditingTeamList extends List<EditingTeam, 'id'> {
+	constructor(initialItems: EditingTeam[] = []) {
 		super('id', initialItems);
 	}
 }
@@ -317,7 +319,7 @@ export function mapGradeToGradeLevel(gradeString: string): Grade {
 	return 'College';
 }
 
-export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebookLinks: Record<string, string>): Team[] {
+export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebookLinks: Record<string, string>): EditingTeam[] {
 	return csvTeams.map((team) => {
 		const id = uuidv4();
 		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
@@ -338,12 +340,12 @@ export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebook
 
 		const teamData = createTeamData(id, notebookLink, team.isDevelopedNotebook || null, team.excluded || false);
 
-		return new Team(teamInfo, teamData);
+		return new EditingTeam(teamInfo, teamData);
 	});
 }
 
-export function groupTeamsByGroup(teams: Team[]): Record<string, Team[]> {
-	const groups: Record<string, Team[]> = {};
+export function groupTeamsByGroup(teams: EditingTeam[]): Record<string, EditingTeam[]> {
+	const groups: Record<string, EditingTeam[]> = {};
 
 	teams.forEach((team) => {
 		const groupName = team.group || 'Ungrouped';

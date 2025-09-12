@@ -9,7 +9,7 @@
 	import { AwardOptions, getOfficialAwardOptionsList } from '$lib/award.svelte';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import { JudgeGroupClass } from '$lib/judging.svelte';
-	import { Team } from '$lib/team.svelte';
+	import { EditingTeam } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
@@ -33,13 +33,13 @@
 	let volunteerNominatedAwards: AwardOptionsWithId[] = $state([]);
 
 	// Teams
-	let teams: Team[] = $state([]);
+	let teams: EditingTeam[] = $state([]);
 
 	// Judging
 	let judgingMethod: JudgingMethod = $state('assigned');
 	let judgeGroups: JudgeGroupClass[] = $state([]);
 	let judges: Judge[] = $state([]);
-	let unassignedTeams: Team[] = $state([]);
+	let unassignedTeams: EditingTeam[] = $state([]);
 
 	// Get current grades based on selection - this is computed in CompetitionSetupStep now
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
@@ -107,7 +107,7 @@
 					notebookLink: '',
 					excluded: false
 				};
-				return new Team(teamInfo, teamData);
+				return new EditingTeam(teamInfo, teamData);
 			});
 
 			// Load judging setup
