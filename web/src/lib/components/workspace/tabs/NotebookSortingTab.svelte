@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app, tabs } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
+	import { NotebookRubricTab } from '$lib/tab.svelte';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -39,9 +40,14 @@
 	const teamsToShow = $derived(() => {
 		let teams = [...allTeams];
 
+		// Filter out excluded teams
+		teams = teams.filter((team) => {
+			const teamData = allTeamData[team.id];
+			return !teamData?.excluded;
+		});
+
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
 			// Filter to only show assigned teams for current judge group
-
 			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
 			teams = teams.filter((team) => assignedTeamIds.has(team.id));
 		}
@@ -53,18 +59,20 @@
 	// Function to update notebook development status
 	async function updateNotebookStatus(teamId: string, isDeveloped: boolean | null) {
 		try {
-			// TODO: Implement actual update via WRPC
-			console.log('Updating notebook status:', { teamId, isDeveloped });
-
-			// For now, we'll just update local state
-			// In a real implementation, this would call the WRPC method
-
-			// alert(`Notebook status updated for team ${allTeams.find((t) => t.id === teamId)?.number} (This is a placeholder)`);
-
 			const teamData = allTeamData[teamId];
 			await app.wrpcClient.team.updateTeamData.mutation({ ...teamData, isDevelopedNotebook: isDeveloped });
 		} catch (error) {
 			app.addErrorNotice('Failed to update notebook status');
+		}
+	}
+
+	// Function to open notebook rubric for a team
+	function openNotebookRubric(teamId: string) {
+		const existingTab = tabs.findTab('notebook_rubric', { teamId });
+		if (existingTab) {
+			tabs.switchToTab(existingTab.id);
+		} else {
+			tabs.addTab(new NotebookRubricTab(teamId));
 		}
 	}
 
@@ -89,11 +97,14 @@
 			<!-- Header -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>
-				<p class="mb-4 text-sm text-gray-600">
-					<strong>Instructions:</strong> Judges perform a quick scan of all the Engineering Notebooks and divide them into two categories: Developing
-					and Fully Developed. If it is unclear whether a notebook should be categorized as Developing or Fully Developed, either another Judge
-					can help make that determination or the notebook should be given the benefit of the doubt and categorized as Fully Developed.
+				<p class="mb-2 text-sm text-gray-600">
+					<strong>Instructions:</strong> Judges perform a quick scan of all the Engineering Notebooks and divide them into two categories:
+					<b>Developing</b>
+					and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as Developing or Fully Developed, either
+					another Judge can help make that determination or the notebook should be given the benefit of the doubt and categorized as Fully
+					Developed.
 				</p>
+				<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be completed the Engineering Notebook Rubric.</p>
 
 				<!-- Filter Controls -->
 				{#if isAssignedJudging}
@@ -139,9 +150,9 @@
 											<h4 class="text-lg font-medium text-gray-900">
 												#{team.number} - {team.name}
 											</h4>
-											<span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {getStatusColorClass(isDeveloped)}">
+											<!-- <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {getStatusColorClass(isDeveloped)}">
 												{getStatusText(isDeveloped)}
-											</span>
+											</span> -->
 										</div>
 
 										<div class="space-y-1 text-sm text-gray-600">
@@ -175,7 +186,7 @@
 											<button
 												onclick={() => updateNotebookStatus(team.id, false)}
 												class="block w-full rounded-md border px-3 py-2 text-left text-sm {isDeveloped === false
-													? 'border-yellow-300 bg-yellow-50 text-yellow-700'
+													? 'border-gray-300 bg-gray-100 text-gray-700'
 													: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}"
 											>
 												⚠ Developing
@@ -183,12 +194,23 @@
 											<button
 												onclick={() => updateNotebookStatus(team.id, null)}
 												class="block w-full rounded-md border px-3 py-2 text-left text-sm {isDeveloped === null
-													? 'border-gray-300 bg-gray-50 text-gray-700'
+													? 'border-gray-300 bg-gray-100 text-gray-700'
 													: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}"
 											>
 												○ No Notebook/Not Reviewed
 											</button>
 										</div>
+
+										{#if isDeveloped === true}
+											<div class="mt-3">
+												<button
+													onclick={() => openNotebookRubric(team.id)}
+													class="primary tiny w-full"
+												>
+													Start Notebook Rubric
+												</button>
+											</div>
+										{/if}
 									</div>
 								</div>
 							</div>

@@ -157,6 +157,57 @@
 					</button>
 				</div>
 			</div>
+
+			<!-- Teams Information -->
+			{#if app.hasEssentialData()}
+				{@const allTeams = app.getAllTeams()}
+				{@const allTeamData = app.getAllTeamData()}
+				{@const activeTeams = allTeams.filter(team => !allTeamData[team.id]?.excluded)}
+				<div class="rounded-lg bg-white p-6 shadow-sm">
+					<h2 class="text-lg font-medium text-gray-900">Teams</h2>
+					<div class="mt-4">
+						
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{activeTeams.length}
+								</div>
+								<div class="text-sm text-gray-500">Active Teams</div>
+							</div>
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{allTeams.filter(team => allTeamData[team.id]?.excluded).length}
+								</div>
+								<div class="text-sm text-gray-500">Excluded Teams</div>
+							</div>
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{activeTeams.filter(team => allTeamData[team.id]?.isDevelopedNotebook === true).length}
+								</div>
+								<div class="text-sm text-gray-500">Fully Developed Notebooks</div>
+							</div>
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{activeTeams.filter(team => allTeamData[team.id]?.isDevelopedNotebook === false).length}
+								</div>
+								<div class="text-sm text-gray-500">Developing Notebooks</div>
+							</div>
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{activeTeams.filter(team => allTeamData[team.id]?.isDevelopedNotebook === null || allTeamData[team.id]?.isDevelopedNotebook === undefined).length}
+								</div>
+								<div class="text-sm text-gray-500">Not Reviewed Notebooks</div>
+							</div>
+							<div class="rounded-lg bg-gray-50 p-4">
+								<div class="text-2xl font-bold text-gray-900">
+									{activeTeams.filter(team => (allTeamData[team.id]?.notebookLink || '').trim() !== '').length}
+								</div>
+								<div class="text-sm text-gray-500">Teams with Notebook Links</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </Tab>

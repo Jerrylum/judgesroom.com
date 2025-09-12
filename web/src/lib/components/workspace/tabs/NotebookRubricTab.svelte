@@ -1,9 +1,11 @@
 <script lang="ts">
 	import './rubric.css';
-	import { app } from '$lib/app-page.svelte';
+	import { app, tabs } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
-	import ScoreButtons from './ScoreButtons.svelte';
+	import ScoringButtons from './ScoringButtons.svelte';
+	import { generateUUID } from '$lib/utils.svelte';
+	import WarningIcon from '$lib/icon/WarningIcon.svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -30,7 +32,7 @@
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 
 	// Get current judge's group
-	const currentJudgeGroup = $derived(() => {
+	const currentJudgeGroup = $derived.by(() => {
 		if (!currentJudge()) return null;
 		return app.getCurrentUserJudgeGroup(currentJudge().id);
 	});
@@ -43,28 +45,37 @@
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
 	let innovateAwardNotes = $state('');
+	let showValidationErrors = $state(false);
+	let isSubmitted = $state(false);
 
 	// Scroll container references for synchronization
 	let scrollContainers: HTMLElement[] = [];
 	let isSyncing = false;
+	let mainScrollContainer: HTMLElement;
 
 	// Get teams to display based on filter and sort by isDevelopedNotebook
 	const teamsToShow = $derived(() => {
 		let teams = [...allTeams];
-		
-		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup()) {
+
+		// Filter out excluded teams
+		teams = teams.filter((team) => {
+			const teamData = allTeamsData[team.id];
+			return !teamData?.excluded;
+		});
+
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
 			// Filter to only show assigned teams for current judge group
-			const assignedTeamIds = new Set(currentJudgeGroup()!.assignedTeams);
-			teams = teams.filter(team => assignedTeamIds.has(team.id));
+			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
+			teams = teams.filter((team) => assignedTeamIds.has(team.id));
 		}
-		
+
 		// Sort teams: isDevelopedNotebook = true first, then by team numbers
 		return teams.sort((a, b) => {
 			const aData = allTeamsData[a.id];
 			const bData = allTeamsData[b.id];
 			const aIsDeveloped = aData?.isDevelopedNotebook ?? null;
 			const bIsDeveloped = bData?.isDevelopedNotebook ?? null;
-			
+
 			// Sort by isDevelopedNotebook: true first, then false, then null
 			if (aIsDeveloped !== bIsDeveloped) {
 				if (aIsDeveloped === true) return -1;
@@ -72,7 +83,7 @@
 				if (aIsDeveloped === false) return -1;
 				if (bIsDeveloped === false) return 1;
 			}
-			
+
 			// Then sort by team number
 			return a.number.localeCompare(b.number);
 		});
@@ -93,17 +104,68 @@
 
 	async function saveRubric() {
 		if (!selectedTeamId) {
-			alert('Please select a team');
+			app.addErrorNotice('Please select a team');
+			// Scroll to top to help user select team
+			if (mainScrollContainer) {
+				mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+			}
 			return;
 		}
 
-		// TODO: Implement actual save functionality via WRPC
-		console.log('Saving notebook rubric:', {
-			teamId: selectedTeamId,
-			judgeId: currentJudge().id
-		});
+		// Check if all scores are provided
+		const missingScores = rubricScores.some((score) => score === -1);
+		if (missingScores) {
+			showValidationErrors = true;
+			app.addErrorNotice('Please complete all scoring sections before submitting the rubric.');
+			return;
+		}
 
-		alert('Notebook rubric saved successfully! (This is a placeholder)');
+		try {
+			const selectedTeamData = allTeamsData[selectedTeamId];
+
+			// If the notebook is developing or not reviewed, mark it as fully developed
+			if (selectedTeamData?.isDevelopedNotebook !== true) {
+				await app.wrpcClient.team.updateTeamData.mutation({
+					...selectedTeamData,
+					isDevelopedNotebook: true
+				});
+			}
+
+			// Save the rubric via WRPC
+			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
+				id: generateUUID(),
+				teamId: selectedTeamId,
+				judgeId: currentJudge().id,
+				rubric: rubricScores,
+				notes,
+				innovateAwardNotes
+			});
+
+			isSubmitted = true;
+			app.addSuccessNotice('Notebook rubric saved successfully!');
+		} catch (error) {
+			console.error('Failed to save notebook rubric:', error);
+			app.addErrorNotice('Failed to save notebook rubric');
+		}
+	}
+
+	function closeRubric() {
+		tabs.closeTab(tab.id);
+	}
+
+	function newRubric() {
+		// Reset all form data
+		selectedTeamId = '';
+		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+		notes = '';
+		innovateAwardNotes = '';
+		showValidationErrors = false;
+		isSubmitted = false;
+		
+		// Scroll to top
+		if (mainScrollContainer) {
+			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+		}
 	}
 
 	// Synchronize scroll positions across all containers
@@ -135,32 +197,28 @@
 </script>
 
 <Tab {isActive} tabId={tab.id} tabType={tab.type}>
-	<div class="h-full overflow-auto p-6">
+	<div class="h-full overflow-auto p-6" bind:this={mainScrollContainer}>
 		<div class="mx-auto max-w-5xl space-y-6">
 			<!-- Header -->
 
 			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
-				
+
 				<!-- Filter Controls -->
 				{#if isAssignedJudging}
 					<div class="mb-4">
 						<label class="flex items-center">
-							<input 
-								type="checkbox" 
-								bind:checked={showOnlyAssignedTeams}
-								class="mr-2 rounded border-gray-300"
-							>
+							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
 							<span class="text-sm text-gray-700">
 								Only show assigned teams for your current judge group
-								{#if currentJudgeGroup()}
-									({currentJudgeGroup()!.name})
+								{#if currentJudgeGroup}
+									({currentJudgeGroup.name})
 								{/if}
 							</span>
 						</label>
 					</div>
 				{/if}
-				
+
 				<div class="mb-4">
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
 					<select id="team-select" bind:value={selectedTeamId} class="classic mt-1 block w-full">
@@ -169,13 +227,14 @@
 							{@const teamData = allTeamsData[team.id]}
 							{@const isDeveloped = teamData?.isDevelopedNotebook ?? null}
 							{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
-							<option value={team.id}>{team.number} - {team.name}{statusText}</option>
+							<option value={team.id}>{team.number}{statusText}</option>
 						{/each}
 					</select>
 				</div>
 
 				{#if selectedTeam}
 					{@const notebookLink = selectedTeamData?.notebookLink || '(Not provided)'}
+					{@const isDeveloped = selectedTeamData?.isDevelopedNotebook ?? null}
 					<div class="mb-4 rounded-lg bg-gray-50 p-4">
 						<div class=" text-sm text-gray-800">
 							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -191,6 +250,27 @@
 							</p>
 						</div>
 					</div>
+
+					{#if isDeveloped !== true}
+						<div class="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+							<div class="flex">
+								<div class="flex-shrink-0">
+									<WarningIcon />
+								</div>
+								<div class="ml-3">
+									<h3 class="text-sm font-medium text-yellow-800">
+										{isDeveloped === false ? 'Developing Notebook' : 'Not Reviewed Notebook'}
+									</h3>
+									<div class="mt-2 text-sm text-yellow-700">
+										<p>
+											Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will
+											be marked as <strong>Fully Developed</strong> if the rubric is submitted.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					{/if}
 				{/if}
 
 				<!-- Current Judge Information (Read-only) -->
@@ -211,14 +291,14 @@
 				<!--  hidden for test only -->
 				<rubric-table>
 					<rubric-header>
-						<div class="flex max-w-42 min-w-42 flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
-							<div class="flex-1 flex-grow border-b-3 bg-gray-200">CRITERIA</div>
-							<div class="pt-1 pb-1 leading-none">ENGINEERING DESIGN PROCESS</div>
+						<div class="max-w-42 min-w-42 flex flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
+							<div class="border-b-3 flex-1 flex-grow bg-gray-200">CRITERIA</div>
+							<div class="pb-1 pt-1 leading-none">ENGINEERING DESIGN PROCESS</div>
 						</div>
 						<scroll-container use:registerScrollContainer>
 							<content class="min-w-120 flex-col! gap-2 bg-gray-200">
 								<div class="p-0! pt-1 text-center text-base font-bold">PROFICIENCY LEVEL</div>
-								<div class="flex border-0! p-0! text-center">
+								<div class="border-0! p-0! flex text-center">
 									<div class="flex-1 border-r pb-1">
 										<p class="font-bold">EXPERT</p>
 										<p class="text-xs">(4-5 POINTS)</p>
@@ -234,7 +314,7 @@
 								</div>
 							</content>
 						</scroll-container>
-						<scoring class="min-w-14 flex-col! bg-gray-200">
+						<scoring class="flex-col! min-w-14 bg-gray-200">
 							<div class="pt-1">&nbsp;</div>
 							<div class="flex items-center p-1 font-bold">
 								<span>POINTS</span>
@@ -260,9 +340,12 @@
 									<div><u>Does not identify the problem / design goal(s)</u> at the start of each design cycle.</div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[0]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[0]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[0]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row>
@@ -279,9 +362,12 @@
 									<div><u>Does not explore different solutions</u> or solutions are recorded with <u>little explanation</u>.</div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[1]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[1]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[1]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row>
@@ -300,9 +386,12 @@
 									<div><u>Minimally explains the “why” behind design decisions.</u></div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[2]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[2]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[2]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row>
@@ -324,9 +413,12 @@
 									<div><u>Does not record the key steps</u> to build and program the solution.</div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[3]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[3]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[3]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row>
@@ -346,9 +438,12 @@
 									<div><u>Does not record steps</u> to test the solution. Testing or results are borrowed from another team’s work.</div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[4]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[4]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[4]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row>
@@ -372,9 +467,12 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="max-w-14 min-w-14">
-								<ScoreButtons bind:variable={rubricScores[5]} />
-								<!-- <p class="text-lg">{q1}</p> -->
+							<scoring class="min-w-14 max-w-14">
+								{#if isSubmitted}
+									<p class="text-lg">{rubricScores[5]}</p>
+								{:else}
+									<ScoringButtons bind:variable={rubricScores[5]} showError={showValidationErrors} />
+								{/if}
 							</scoring>
 						</row>
 						<row class="border-t-3! bg-gray-100">
@@ -382,14 +480,14 @@
 								<p class="text-sm font-bold">NOTES:</p>
 								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes}></textarea>
 							</div>
-							<scoring class="max-w-14 min-w-14"></scoring>
+							<scoring class="min-w-14 max-w-14"></scoring>
 						</row>
 					</rubric-body>
 				</rubric-table>
 				<!--  -->
 				<rubric-table class="mt-6">
 					<rubric-header>
-						<div class="flex max-h-42 min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
+						<div class="max-h-42 flex min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
 							Engineering Notebook Rubric (Page 2 of 2)
 						</div>
 					</rubric-header>
@@ -399,7 +497,7 @@
 						</criteria>
 						<scroll-container use:registerScrollContainer class="flex items-stretch bg-gray-200">
 							<content class="min-w-120 flex-col! gap-2">
-								<div class="flex border-0! p-0! text-center">
+								<div class="border-0! p-0! flex text-center">
 									<div class="flex flex-1 flex-col justify-center border-r">
 										<p class="font-bold">EXPERT</p>
 										<p class="text-xs">(4-5 POINTS)</p>
@@ -442,10 +540,13 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">
-								<ScoreButtons bind:variable={rubricScores[6]} />
-								<!-- <p class="text-lg">{q1}</p> -->
-							</scoring>
+						<scoring class="min-w-14">
+							{#if isSubmitted}
+								<p class="text-lg">{rubricScores[6]}</p>
+							{:else}
+								<ScoringButtons bind:variable={rubricScores[6]} showError={showValidationErrors} />
+							{/if}
+						</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -467,10 +568,13 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">
-								<ScoreButtons bind:variable={rubricScores[7]} />
-								<!-- <p class="text-lg">{q1}</p> -->
-							</scoring>
+						<scoring class="min-w-14">
+							{#if isSubmitted}
+								<p class="text-lg">{rubricScores[7]}</p>
+							{:else}
+								<ScoringButtons bind:variable={rubricScores[7]} showError={showValidationErrors} />
+							{/if}
+						</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -496,10 +600,13 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">
-								<ScoreButtons bind:variable={rubricScores[8]} />
-								<!-- <p class="text-lg">{q1}</p> -->
-							</scoring>
+						<scoring class="min-w-14">
+							{#if isSubmitted}
+								<p class="text-lg">{rubricScores[8]}</p>
+							{:else}
+								<ScoringButtons bind:variable={rubricScores[8]} showError={showValidationErrors} />
+							{/if}
+						</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -526,10 +633,13 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">
-								<ScoreButtons bind:variable={rubricScores[9]} />
-								<!-- <p class="text-lg">{q1}</p> -->
-							</scoring>
+						<scoring class="min-w-14">
+							{#if isSubmitted}
+								<p class="text-lg">{rubricScores[9]}</p>
+							{:else}
+								<ScoringButtons bind:variable={rubricScores[9]} showError={showValidationErrors} />
+							{/if}
+						</scoring>
 						</row>
 						<row>
 							<criteria class="max-w-42 min-w-42">
@@ -554,17 +664,20 @@
 									</div>
 								</content>
 							</scroll-container>
-							<scoring class="min-w-14">
-								<ScoreButtons bind:variable={rubricScores[10]} />
-								<!-- <p class="text-lg">{q1}</p> -->
-							</scoring>
+						<scoring class="min-w-14">
+							{#if isSubmitted}
+								<p class="text-lg">{rubricScores[10]}</p>
+							{:else}
+								<ScoringButtons bind:variable={rubricScores[10]} showError={showValidationErrors} />
+							{/if}
+						</scoring>
 						</row>
 						<row>
 							<div class="p-2">
 								<p class="text-sm font-bold">INNOVATE AWARD NOTES (optional):</p>
 								<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={innovateAwardNotes}></textarea>
 							</div>
-							<scoring class="max-w-14 min-w-14 flex-col! gap-2">
+							<scoring class="flex-col! min-w-14 max-w-14 gap-2">
 								<p>TOTAL<br />SCORE</p>
 								<p class="text-lg">{totalScore}</p>
 								<!-- TODO -->
@@ -577,6 +690,21 @@
 					All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at
 					the end of the event.
 				</p>
+
+				<div class="mt-6 flex justify-center gap-4">
+					{#if isSubmitted}
+						<button onclick={closeRubric} class="secondary">
+							Close Rubric
+						</button>
+						<button onclick={newRubric} class="primary">
+							New Rubric
+						</button>
+					{:else}
+						<button onclick={saveRubric} class="primary">
+							Submit Rubric
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>
