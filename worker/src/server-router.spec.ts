@@ -25,6 +25,7 @@ describe('ServerRouter', () => {
 					onDeviceListUpdate: { mutation: async () => [] },
 					onEssentialDataUpdate: { mutation: async () => [] },
 					onAllTeamDataUpdate: { mutation: async () => [] },
+					onTeamDataUpdate: { mutation: async () => [] },
 					onAllJudgesUpdate: { mutation: async () => [] }
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				}) as any,
