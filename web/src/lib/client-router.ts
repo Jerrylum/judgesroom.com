@@ -42,6 +42,9 @@ const clientRouter = w.router({
 		return `All team data updated`;
 	}),
 
+	/**
+	 * Server pushes team data update to client
+	 */
 	onTeamDataUpdate: w.procedure.input(TeamDataSchema).mutation(async ({ input }) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleTeamDataUpdate(input);

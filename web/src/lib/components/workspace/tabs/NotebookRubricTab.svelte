@@ -15,7 +15,7 @@
 
 	let { tab, isActive }: Props = $props();
 
-	const includedTeams = $derived(app.getAllTeamInfoAndData(false));
+	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 	const currentJudge = $derived(app.getCurrentUserJudge());

@@ -405,10 +405,9 @@ export class App {
 	// Utility Methods
 	// ============================================================================
 
-	getAllTeamInfoAndData(withExcluded: boolean): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
+	getAllTeamInfoAndData(): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
 		const allTeamData = this.getAllTeamData();
 		return this.getAllTeams()
-			.filter((team) => withExcluded || !allTeamData[team.id]?.excluded)
 			.reduce(
 				(acc, team) => ({
 					...acc,
