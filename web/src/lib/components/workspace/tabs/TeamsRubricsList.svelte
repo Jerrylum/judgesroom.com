@@ -136,53 +136,41 @@
 				<!-- Rubrics Section -->
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<!-- Engineering Notebook Rubrics -->
-					<div class="rounded-lg bg-gray-50 p-3">
+					<div class="rounded-lg p-3">
 						<h4 class="mb-2 font-medium text-gray-900">Engineering Notebook Rubrics</h4>
-						{#if teamRubrics.engineeringNotebookRubrics.length === 0}
-							<p class="mb-2 text-sm text-gray-500">No rubrics submitted</p>
-							<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-blue-600 underline hover:text-blue-800">
-								Start New Rubric
-							</button>
-						{:else}
-							<div class="space-y-1">
-								{#each teamRubrics.engineeringNotebookRubrics as rubric}
-									<button
-										onclick={() => openNotebookRubric(team.id, rubric.id)}
-										class="block w-full rounded px-2 py-1 text-left text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800"
-									>
-										Rubric by {getJudgeName(rubric.judgeId)}
-									</button>
-								{/each}
-								<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
-									+ New Rubric
+
+						<div class="flex flex-row flex-wrap gap-2">
+							{#each teamRubrics.engineeringNotebookRubrics as rubric}
+								<button
+									onclick={() => openNotebookRubric(team.id, rubric.id)}
+									class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
+								>
+									{getJudgeName(rubric.judgeId)}
 								</button>
-							</div>
-						{/if}
+							{/each}
+							<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
+								+ New Rubric
+							</button>
+						</div>
 					</div>
 
 					<!-- Team Interview Rubrics -->
-					<div class="rounded-lg bg-gray-50 p-3">
+					<div class="rounded-lg p-3">
 						<h4 class="mb-2 font-medium text-gray-900">Team Interview Rubrics</h4>
-						{#if teamRubrics.teamInterviewRubrics.length === 0}
-							<p class="mb-2 text-sm text-gray-500">No rubrics submitted</p>
-							<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-blue-600 underline hover:text-blue-800">
-								Start New Rubric
-							</button>
-						{:else}
-							<div class="space-y-1">
-								{#each teamRubrics.teamInterviewRubrics as rubric}
-									<button
-										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
-										class="block w-full rounded px-2 py-1 text-left text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800"
-									>
-										Rubric by {getJudgeName(rubric.judgeId)}
-									</button>
-								{/each}
-								<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
-									+ New Rubric
+
+						<div class="flex flex-row flex-wrap gap-2">
+							{#each teamRubrics.teamInterviewRubrics as rubric}
+								<button
+									onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
+									class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
+								>
+									{getJudgeName(rubric.judgeId)}
 								</button>
-							</div>
-						{/if}
+							{/each}
+							<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
+								+ New Rubric
+							</button>
+						</div>
 					</div>
 				</div>
 
