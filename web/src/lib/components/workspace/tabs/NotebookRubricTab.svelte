@@ -8,6 +8,7 @@
 	import WarningIcon from '$lib/icon/WarningIcon.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByIsDevelopedNotebook, sortByTeamNumber } from '$lib/team.svelte';
+	import WarningSign from './WarningSign.svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -242,24 +243,17 @@
 					</div>
 
 					{#if isDeveloped !== true}
-						<div class="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-							<div class="flex">
-								<div class="flex-shrink-0">
-									<WarningIcon />
-								</div>
-								<div class="ml-3">
-									<h3 class="text-sm font-medium text-yellow-800">
-										{isDeveloped === false ? 'Developing Notebook' : 'Not Reviewed Notebook'}
-									</h3>
-									<div class="mt-2 text-sm text-yellow-700">
-										<p>
-											Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will
-											be marked as <strong>Fully Developed</strong> if the rubric is submitted.
-										</p>
-									</div>
-								</div>
-							</div>
-						</div>
+						<WarningSign title="Developing Notebook">
+							<p>
+								Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will be
+								marked as <strong>Fully Developed</strong> if the rubric is submitted.
+							</p>
+						</WarningSign>
+					{/if}
+					{#if selectedTeam.excluded}
+						<WarningSign title="Excluded Team">
+							<p>This team has been marked as excluded. They are not eligible for any Judging Awards.</p>
+						</WarningSign>
 					{/if}
 				{/if}
 

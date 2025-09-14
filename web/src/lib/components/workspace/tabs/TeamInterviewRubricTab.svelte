@@ -8,6 +8,7 @@
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
 	import type { teams } from '@judging.jerryio/worker/src/db/schema';
+	import WarningSign from './WarningSign.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -212,6 +213,12 @@
 							<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
 						</div>
 					</div>
+
+					{#if selectedTeam.excluded}
+						<WarningSign title="Excluded Team">
+							<p>This team has been marked as excluded. They are not eligible for any Judging Awards.</p>
+						</WarningSign>
+					{/if}
 				{/if}
 
 				<!-- Current Judge Information (Read-only) -->

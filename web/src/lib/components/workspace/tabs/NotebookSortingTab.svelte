@@ -3,6 +3,7 @@
 	import Tab from './Tab.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
+	import { sortByAssignedTeams, sortByIsDevelopedNotebook, sortByTeamNumber } from '$lib/team.svelte';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -11,8 +12,9 @@
 
 	let { tab, isActive }: Props = $props();
 
-	const allTeams = $derived(app.getAllTeams());
-	const allTeamData = $derived(app.getAllTeamData());
+	// const allTeams = $derived(app.getAllTeams());
+	// const allTeamData = $derived(app.getAllTeamData());
+	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const currentUser = $derived(app.getCurrentUser());
 	const essentialData = $derived(app.getEssentialData());
 
@@ -38,29 +40,17 @@
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived(() => {
-		let teams = [...allTeams];
-
-		// Filter out excluded teams
-		teams = teams.filter((team) => {
-			const teamData = allTeamData[team.id];
-			return !teamData?.excluded;
-		});
-
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
-			// Filter to only show assigned teams for current judge group
-			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
-			teams = teams.filter((team) => assignedTeamIds.has(team.id));
+			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		} else {
+			return sortByTeamNumber(Object.values(includedTeams));
 		}
-
-		// Sort teams by number for consistent display
-		return teams.sort((a, b) => a.number.localeCompare(b.number));
 	});
 
 	// Function to update notebook development status
 	async function updateNotebookStatus(teamId: string, isDeveloped: boolean | null) {
 		try {
-			const teamData = allTeamData[teamId];
-			await app.wrpcClient.team.updateTeamData.mutation({ ...teamData, isDevelopedNotebook: isDeveloped });
+			await app.wrpcClient.team.updateTeamData.mutation({ ...includedTeams[teamId], isDevelopedNotebook: isDeveloped });
 		} catch (error) {
 			app.addErrorNotice('Failed to update notebook status');
 		}
@@ -74,20 +64,6 @@
 		} else {
 			tabs.addTab(new NotebookRubricTab({ teamId }));
 		}
-	}
-
-	// Get status text for display
-	function getStatusText(isDeveloped: boolean | null): string {
-		if (isDeveloped === true) return 'Fully Developed';
-		if (isDeveloped === false) return 'Developing';
-		return 'Not Reviewed';
-	}
-
-	// Get status color class
-	function getStatusColorClass(isDeveloped: boolean | null): string {
-		if (isDeveloped === true) return 'bg-green-100 text-green-800';
-		if (isDeveloped === false) return 'bg-yellow-100 text-yellow-800';
-		return 'bg-gray-100 text-gray-800';
 	}
 </script>
 
@@ -139,20 +115,19 @@
 				{:else}
 					<div class="space-y-4">
 						{#each teamsToShow() as team (team.id)}
-							{@const teamData = allTeamData[team.id]}
-							{@const notebookLink = teamData?.notebookLink || ''}
-							{@const isDeveloped = teamData?.isDevelopedNotebook ?? null}
+							{@const notebookLink = team.notebookLink || ''}
+							{@const isDeveloped = team.isDevelopedNotebook ?? null}
 
 							<div class="rounded-lg border border-gray-200 p-4">
 								<div class="flex items-start justify-between">
 									<div class="flex-1">
 										<div class="mb-2 flex items-center space-x-4">
 											<h4 class="text-lg font-medium text-gray-900">
-												#{team.number} - {team.name}
+												{team.number} - {team.name}
 											</h4>
-											<!-- <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {getStatusColorClass(isDeveloped)}">
-												{getStatusText(isDeveloped)}
-											</span> -->
+											{#if team.excluded}
+												<span class="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">Excluded</span>
+											{/if}
 										</div>
 
 										<div class="space-y-1 text-sm text-gray-600">
