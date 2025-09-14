@@ -7,6 +7,7 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import WarningIcon from '$lib/icon/WarningIcon.svelte';
 	import { untrack } from 'svelte';
+	import { sortByAssignedTeams, sortByIsDevelopedNotebook, sortByTeamNumber } from '$lib/team.svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -63,32 +64,12 @@
 	let isSyncing = false;
 	let mainScrollContainer: HTMLElement;
 
-	// Get teams to display based on filter and sort by isDevelopedNotebook
 	const teamsToShow = $derived(() => {
-		let teams = Object.values(includedTeams);
-
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
-			// Filter to only show assigned teams for current judge group
-			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
-			teams = teams.filter((team) => assignedTeamIds.has(team.id));
+			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		} else {
+			return sortByIsDevelopedNotebook(sortByTeamNumber(Object.values(includedTeams)));
 		}
-
-		// Sort teams: isDevelopedNotebook = true first, then by team numbers
-		return teams.sort((a, b) => {
-			const aIsDeveloped = a.isDevelopedNotebook ?? null;
-			const bIsDeveloped = b.isDevelopedNotebook ?? null;
-
-			// Sort by isDevelopedNotebook: true first, then false, then null
-			if (aIsDeveloped !== bIsDeveloped) {
-				if (aIsDeveloped === true) return -1;
-				if (bIsDeveloped === true) return 1;
-				if (aIsDeveloped === false) return -1;
-				if (bIsDeveloped === false) return 1;
-			}
-
-			// Then sort by team number
-			return a.number.localeCompare(b.number);
-		});
 	});
 
 	// Calculate total score

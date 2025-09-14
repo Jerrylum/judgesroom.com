@@ -19,7 +19,7 @@
 			console.error('CRITICAL: Only judges can create team interview tabs');
 			return;
 		}
-		tabs.addTab(new TeamInterviewRubricTab({ teamId: null }));
+		tabs.addTab(new TeamInterviewRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookReviewTab() {
@@ -27,7 +27,7 @@
 			console.error('CRITICAL: Only judges can create notebook review tabs');
 			return;
 		}
-		tabs.addTab(new NotebookRubricTab({ teamId: null }));
+		tabs.addTab(new NotebookRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookSortingTab() {

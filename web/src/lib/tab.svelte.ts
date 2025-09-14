@@ -31,7 +31,7 @@ export class TeamInterviewRubricTab implements BaseTab {
 	id: string;
 	readonly closable = true;
 	readonly type = 'team_interview_rubric';
-	teamId: string | null = $state(null);
+	teamId: string = $state('');
 	rubricId: string | null = $state(null);
 
 	get title() {
@@ -39,13 +39,13 @@ export class TeamInterviewRubricTab implements BaseTab {
 		return team ? `${team.number} Team Interview` : 'Team Interview';
 	}
 
-	constructor(params: { teamId: string | null } | { rubricId: string }) {
+	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 		this.type = 'team_interview_rubric';
 		
 		if ('rubricId' in params) {
 			this.rubricId = params.rubricId;
-			this.teamId = null; // Will be set when rubric loads
+			this.teamId = ''; // Will be set when rubric loads
 		} else {
 			this.teamId = params.teamId;
 			this.rubricId = null;
@@ -57,7 +57,7 @@ export class NotebookRubricTab implements BaseTab {
 	id: string;
 	readonly closable = true;
 	readonly type = 'notebook_rubric';
-	teamId: string | null = $state(null);
+	teamId: string = $state('');
 	rubricId: string | null = $state(null);
 
 	get title() {
@@ -65,12 +65,12 @@ export class NotebookRubricTab implements BaseTab {
 		return team ? `${team.number} Notebook Review` : 'Notebook Review';
 	}
 
-	constructor(params: { teamId: string | null } | { rubricId: string }) {
+	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 
 		if ('rubricId' in params) {
 			this.rubricId = params.rubricId;
-			this.teamId = null; // Will be set when rubric loads
+			this.teamId = ''; // Will be set when rubric loads
 		} else {
 			this.teamId = params.teamId;
 			this.rubricId = null;

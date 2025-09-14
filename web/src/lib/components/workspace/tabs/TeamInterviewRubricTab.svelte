@@ -6,6 +6,8 @@
 	import ScoringButtons from './ScoringButtons.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
+	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
+	import type { teams } from '@judging.jerryio/worker/src/db/schema';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -62,16 +64,11 @@
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived(() => {
-		let teams = Object.values(includedTeams);
-
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
-			// Filter to only show assigned teams for current judge group
-			const assignedTeamIds = new Set(currentJudgeGroup.assignedTeams);
-			teams = teams.filter((team) => assignedTeamIds.has(team.id));
+			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		} else {
+			return sortByTeamNumber(Object.values(includedTeams));
 		}
-
-		// Sort teams by number for consistent display
-		return teams.sort((a, b) => a.number.localeCompare(b.number));
 	});
 
 	// Calculate total score
@@ -137,7 +134,7 @@
 
 	function newRubric() {
 		// Reset all form data
-		tab.teamId = null;
+		tab.teamId = '';
 		tab.rubricId = null;
 		judgeId = currentJudge?.id ?? null;
 		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1];

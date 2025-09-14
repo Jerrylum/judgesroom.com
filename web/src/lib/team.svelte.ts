@@ -357,3 +357,41 @@ export function groupTeamsByGroup(teams: EditingTeam[]): Record<string, EditingT
 
 	return groups;
 }
+
+export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
+	return teams.sort((a, b) => {
+		const aIsStartWithDigit = /[0-9]/.test(a.number);
+		const bIsStartWithDigit = /[0-9]/.test(b.number);
+
+		if (aIsStartWithDigit && !bIsStartWithDigit) {
+			return -1;
+		} else if (!aIsStartWithDigit && bIsStartWithDigit) {
+			return 1;
+		} else if (aIsStartWithDigit && bIsStartWithDigit) {
+			// 0000A -> 0000 (all letters after the digits are ignored)
+			const aNumber = parseInt(a.number);
+			const bNumber = parseInt(b.number);
+			return aNumber - bNumber;
+		} else {
+			return a.number.localeCompare(b.number);
+		}
+	});
+}
+
+export function sortByAssignedTeams(includedTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>, assignedTeamIds: string[]): TeamInfoAndData[] {
+	return assignedTeamIds.map((id) => includedTeams[id]);
+}
+
+export function sortByIsDevelopedNotebook(teams: TeamInfoAndData[]): TeamInfoAndData[] {
+	return teams.sort((a, b) => {
+		const aIsDeveloped = a.isDevelopedNotebook ?? null;
+		const bIsDeveloped = b.isDevelopedNotebook ?? null;
+		if (aIsDeveloped !== bIsDeveloped) {
+			if (aIsDeveloped) return -1;
+			if (bIsDeveloped) return 1;
+			if (aIsDeveloped === false) return -1;
+			if (bIsDeveloped === false) return 1;
+		}
+		return 0;
+	});
+}
