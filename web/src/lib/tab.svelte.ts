@@ -42,7 +42,7 @@ export class TeamInterviewRubricTab implements BaseTab {
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 		this.type = 'team_interview_rubric';
-		
+
 		if ('rubricId' in params) {
 			this.rubricId = params.rubricId;
 			this.teamId = ''; // Will be set when rubric loads

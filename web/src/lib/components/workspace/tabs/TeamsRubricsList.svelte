@@ -9,13 +9,13 @@
 	let rubricsData = $state<any[]>([]);
 	let loading = $state(true);
 	let showOnlyAssignedTeams = $state(true); // Default to true as requested
-	
+
 	// Get essential data and judge info
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 	const currentJudge = $derived(() => {
 		const user = app.getCurrentUser();
-		return (user?.role === 'judge') ? user.judge : null;
+		return user?.role === 'judge' ? user.judge : null;
 	});
 	const currentJudgeGroup = $derived(() => {
 		if (!currentJudge()) return null;
@@ -29,9 +29,7 @@
 		(async () => {
 			try {
 				loading = true;
-				const judgeGroupId = isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup() 
-					? currentJudgeGroup()!.id 
-					: undefined;
+				const judgeGroupId = isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup() ? currentJudgeGroup()!.id : undefined;
 				const data = await app.wrpcClient.judging.getRubricsAndNotes.query({ judgeGroupId });
 				rubricsData = data;
 			} catch (error) {
@@ -50,11 +48,13 @@
 
 	// Get rubrics for a specific team
 	function getTeamRubrics(teamId: string) {
-		return rubricsData.find(r => r.teamId === teamId) || {
-			engineeringNotebookRubrics: [],
-			teamInterviewRubrics: [],
-			teamInterviewNotes: []
-		};
+		return (
+			rubricsData.find((r) => r.teamId === teamId) || {
+				engineeringNotebookRubrics: [],
+				teamInterviewRubrics: [],
+				teamInterviewNotes: []
+			}
+		);
 	}
 
 	// Get notebook status display
@@ -66,24 +66,20 @@
 
 	// Get judge name by ID
 	function getJudgeName(judgeId: string): string {
-		const judge = allJudges.find(j => j.id === judgeId);
+		const judge = allJudges.find((j) => j.id === judgeId);
 		return judge ? judge.name : 'Unknown Judge';
 	}
 
 	// Open notebook rubric for a team
 	function openNotebookRubric(teamId: string, rubricId?: string) {
-		const tab = rubricId 
-			? new NotebookRubricTab({ rubricId })
-			: new NotebookRubricTab({ teamId });
+		const tab = rubricId ? new NotebookRubricTab({ rubricId }) : new NotebookRubricTab({ teamId });
 		tabs.addTab(tab);
 		tabs.switchToTab(tab.id);
 	}
 
 	// Open team interview rubric for a team
 	function openTeamInterviewRubric(teamId: string, rubricId?: string) {
-		const tab = rubricId 
-			? new TeamInterviewRubricTab({ rubricId })
-			: new TeamInterviewRubricTab({ teamId });
+		const tab = rubricId ? new TeamInterviewRubricTab({ rubricId }) : new TeamInterviewRubricTab({ teamId });
 		tabs.addTab(tab);
 		tabs.switchToTab(tab.id);
 	}
@@ -112,9 +108,9 @@
 			{@const teamData = getTeamData(team.id)}
 			{@const teamRubrics = getTeamRubrics(team.id)}
 			{@const notebookStatus = getNotebookStatus(teamData?.isDevelopedNotebook)}
-			<div class="border border-gray-200 rounded-lg p-4">
+			<div class="rounded-lg border border-gray-200 p-4">
 				<!-- Team Header -->
-				<div class="flex items-center justify-between mb-3">
+				<div class="mb-3 flex items-center justify-between">
 					<div>
 						<h3 class="text-lg font-semibold text-gray-900">
 							{team.number} - {team.name}
@@ -128,11 +124,7 @@
 							{notebookStatus.text}
 						</div>
 						{#if teamData?.notebookLink && teamData.notebookLink.trim() !== ''}
-							<a
-								href={teamData.notebookLink}
-								target="_blank"
-								class="text-sm text-blue-600 hover:text-blue-800 underline"
-							>
+							<a href={teamData.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800">
 								View Notebook
 							</a>
 						{:else}
@@ -142,16 +134,13 @@
 				</div>
 
 				<!-- Rubrics Section -->
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<!-- Engineering Notebook Rubrics -->
-					<div class="bg-gray-50 rounded-lg p-3">
-						<h4 class="font-medium text-gray-900 mb-2">Engineering Notebook Rubrics</h4>
+					<div class="rounded-lg bg-gray-50 p-3">
+						<h4 class="mb-2 font-medium text-gray-900">Engineering Notebook Rubrics</h4>
 						{#if teamRubrics.engineeringNotebookRubrics.length === 0}
-							<p class="text-sm text-gray-500 mb-2">No rubrics submitted</p>
-							<button
-								onclick={() => openNotebookRubric(team.id)}
-								class="text-sm text-blue-600 hover:text-blue-800 underline"
-							>
+							<p class="mb-2 text-sm text-gray-500">No rubrics submitted</p>
+							<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-blue-600 underline hover:text-blue-800">
 								Start New Rubric
 							</button>
 						{:else}
@@ -159,15 +148,12 @@
 								{#each teamRubrics.engineeringNotebookRubrics as rubric}
 									<button
 										onclick={() => openNotebookRubric(team.id, rubric.id)}
-										class="block w-full text-left text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded"
+										class="block w-full rounded px-2 py-1 text-left text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800"
 									>
 										Rubric by {getJudgeName(rubric.judgeId)}
 									</button>
 								{/each}
-								<button
-									onclick={() => openNotebookRubric(team.id)}
-									class="text-sm text-green-600 hover:text-green-800 underline"
-								>
+								<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
 									+ New Rubric
 								</button>
 							</div>
@@ -175,14 +161,11 @@
 					</div>
 
 					<!-- Team Interview Rubrics -->
-					<div class="bg-gray-50 rounded-lg p-3">
-						<h4 class="font-medium text-gray-900 mb-2">Team Interview Rubrics</h4>
+					<div class="rounded-lg bg-gray-50 p-3">
+						<h4 class="mb-2 font-medium text-gray-900">Team Interview Rubrics</h4>
 						{#if teamRubrics.teamInterviewRubrics.length === 0}
-							<p class="text-sm text-gray-500 mb-2">No rubrics submitted</p>
-							<button
-								onclick={() => openTeamInterviewRubric(team.id)}
-								class="text-sm text-blue-600 hover:text-blue-800 underline"
-							>
+							<p class="mb-2 text-sm text-gray-500">No rubrics submitted</p>
+							<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-blue-600 underline hover:text-blue-800">
 								Start New Rubric
 							</button>
 						{:else}
@@ -190,15 +173,12 @@
 								{#each teamRubrics.teamInterviewRubrics as rubric}
 									<button
 										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
-										class="block w-full text-left text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded"
+										class="block w-full rounded px-2 py-1 text-left text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800"
 									>
 										Rubric by {getJudgeName(rubric.judgeId)}
 									</button>
 								{/each}
-								<button
-									onclick={() => openTeamInterviewRubric(team.id)}
-									class="text-sm text-green-600 hover:text-green-800 underline"
-								>
+								<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
 									+ New Rubric
 								</button>
 							</div>
@@ -208,8 +188,8 @@
 
 				<!-- Team Interview Notes (if any) -->
 				{#if teamRubrics.teamInterviewNotes.length > 0}
-					<div class="mt-3 bg-blue-50 rounded-lg p-3">
-						<h4 class="font-medium text-gray-900 mb-2">Team Interview Notes</h4>
+					<div class="mt-3 rounded-lg bg-blue-50 p-3">
+						<h4 class="mb-2 font-medium text-gray-900">Team Interview Notes</h4>
 						<div class="space-y-1">
 							{#each teamRubrics.teamInterviewNotes as note}
 								<div class="text-sm text-gray-700">

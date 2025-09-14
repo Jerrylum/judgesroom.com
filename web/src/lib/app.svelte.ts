@@ -407,17 +407,16 @@ export class App {
 
 	getAllTeamInfoAndData(): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
 		const allTeamData = this.getAllTeamData();
-		return this.getAllTeams()
-			.reduce(
-				(acc, team) => ({
-					...acc,
-					[team.id]: {
-						...team,
-						...allTeamData[team.id]
-					}
-				}),
-				{} as Record<string, Readonly<TeamInfoAndData>>
-			);
+		return this.getAllTeams().reduce(
+			(acc, team) => ({
+				...acc,
+				[team.id]: {
+					...team,
+					...allTeamData[team.id]
+				}
+			}),
+			{} as Record<string, Readonly<TeamInfoAndData>>
+		);
 	}
 
 	findTeamById(teamId: string): Readonly<TeamInfo> | null {

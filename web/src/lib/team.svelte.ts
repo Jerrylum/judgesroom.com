@@ -378,7 +378,10 @@ export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
 	});
 }
 
-export function sortByAssignedTeams(includedTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>, assignedTeamIds: string[]): TeamInfoAndData[] {
+export function sortByAssignedTeams(
+	includedTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>,
+	assignedTeamIds: string[]
+): TeamInfoAndData[] {
 	return assignedTeamIds.map((id) => includedTeams[id]);
 }
 

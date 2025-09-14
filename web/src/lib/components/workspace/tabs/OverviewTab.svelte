@@ -162,9 +162,9 @@
 			{#if app.hasEssentialData()}
 				{@const allTeams = app.getAllTeams()}
 				{@const allTeamData = app.getAllTeamData()}
-				{@const activeTeams = allTeams.filter(team => !allTeamData[team.id]?.excluded)}
+				{@const activeTeams = allTeams.filter((team) => !allTeamData[team.id]?.excluded)}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h2 class="text-lg font-medium text-gray-900 mb-4">Teams & Rubrics</h2>
+					<h2 class="mb-4 text-lg font-medium text-gray-900">Teams & Rubrics</h2>
 					<TeamsRubricsList teams={activeTeams} />
 				</div>
 			{/if}

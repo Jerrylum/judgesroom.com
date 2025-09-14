@@ -2,7 +2,14 @@
 	import TeamGroup from './TeamGroup.svelte';
 	import EditTeamDialog from './EditTeamDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
-	import { EditingTeam, EditingTeamList, groupTeamsByGroup, parseTournamentManagerCSV, parseNotebookData, mergeTeamData } from '$lib/team.svelte';
+	import {
+		EditingTeam,
+		EditingTeamList,
+		groupTeamsByGroup,
+		parseTournamentManagerCSV,
+		parseNotebookData,
+		mergeTeamData
+	} from '$lib/team.svelte';
 
 	interface Props {
 		teams: EditingTeam[];

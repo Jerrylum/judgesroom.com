@@ -203,12 +203,7 @@
 
 										{#if isDeveloped === true}
 											<div class="mt-3">
-												<button
-													onclick={() => openNotebookRubric(team.id)}
-													class="primary tiny w-full"
-												>
-													Start Notebook Rubric
-												</button>
+												<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full"> Start Notebook Rubric </button>
 											</div>
 										{/if}
 									</div>
