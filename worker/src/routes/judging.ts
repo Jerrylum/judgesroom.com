@@ -20,33 +20,6 @@ import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
-		// getRubricsAndNotesByJudgeGroup: w.procedure
-		// 	.input(z.object({ judgeGroupId: z.uuidv4() }))
-		// 	.output(
-		// 		z.array(
-		// 			z.object({
-		// 				teamId: z.uuidv4(),
-		// 				engineeringNotebookRubric: z.number(), // No. of submitted
-		// 				teamInterviewRubric: z.number(), // No. of submitted
-		// 				teamInterviewNote: z.number() // No. of submitted
-		// 			})
-		// 		)
-		// 	)
-		// 	.query(async ({ ctx, input }) => {
-		// 		const result = await ctx.db
-		// 			.select({
-		// 				teamId: engineeringNotebookRubrics.teamId,
-		// 				engineeringNotebookRubric: sql<number>`COUNT(${engineeringNotebookRubrics.id})`,
-		// 				teamInterviewRubric: sql<number>`COUNT(${teamInterviewRubrics.id})`,
-		// 				teamInterviewNote: sql<number>`COUNT(${teamInterviewNotes.id})`
-		// 			})
-		// 			.from(engineeringNotebookRubrics)
-		// 			.leftJoin(teamInterviewRubrics, eq(teamInterviewRubrics.id, engineeringNotebookRubrics.id))
-		// 			.leftJoin(teamInterviewNotes, eq(teamInterviewNotes.id, engineeringNotebookRubrics.id))
-		// 			.where(eq(engineeringNotebookRubrics.judgeId, input.judgeGroupId))
-		// 			.groupBy(engineeringNotebookRubrics.teamId);
-		// 		return result;
-		// 	}),
 		getRubricsAndNotes: w.procedure
 			.input(z.object({ judgeGroupId: z.uuidv4().optional() }))
 			.output(

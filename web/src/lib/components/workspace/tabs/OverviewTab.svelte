@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
+	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import { AwardRankingsTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
 	import Tab from './Tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 
@@ -8,38 +10,53 @@
 		isActive: boolean;
 	}
 
+	type RubricsAndNotes = Awaited<ReturnType<typeof app.wrpcClient.judging.getRubricsAndNotes.query>>;
+
 	let { isActive }: Props = $props();
 
 	const currentUser = $derived(app.getCurrentUser());
 	const isJudge = $derived(currentUser?.role === 'judge');
+	// Get essential data and judge info
+	const includedTeams = $derived(app.getAllTeamInfoAndData());
+	const essentialData = $derived(app.getEssentialData());
+	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
+	let showOnlyAssignedTeams = $state(true); // Default to true as requested
+	let rubricsAndNotes = $state<RubricsAndNotes>([]);
+
+	const teamsToShow = $derived(() => {
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
+			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		} else {
+			return sortByTeamNumber(Object.values(includedTeams));
+		}
+	});
 
 	// Quick action functions
 	function addTeamInterviewTab() {
-		if (!isJudge) {
-			console.error('CRITICAL: Only judges can create team interview tabs');
-			return;
-		}
 		tabs.addTab(new TeamInterviewRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookReviewTab() {
-		if (!isJudge) {
-			console.error('CRITICAL: Only judges can create notebook review tabs');
-			return;
-		}
 		tabs.addTab(new NotebookRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookSortingTab() {
-		if (!isJudge) {
-			console.error('CRITICAL: Only judges can create notebook sorting tabs');
-			return;
-		}
 		tabs.addTab(new NotebookSortingTab());
 	}
 
 	function addAwardRankingsTab() {
 		tabs.addTab(new AwardRankingsTab());
+	}
+
+	async function refreshRubricsAndNotes() {
+		const judgeGroupId = app.getCurrentUserJudgeGroup()?.id;
+		try {
+			rubricsAndNotes = await app.wrpcClient.judging.getRubricsAndNotes.query({ judgeGroupId });
+		} catch (error) {
+			console.error('Failed to load rubrics data:', error);
+			app.addErrorNotice('Failed to load rubrics data');
+		}
 	}
 </script>
 
@@ -160,12 +177,32 @@
 			</div>
 			<!-- Teams List with Rubric Submissions -->
 			{#if app.hasEssentialData()}
-				{@const allTeams = app.getAllTeams()}
-				{@const allTeamData = app.getAllTeamData()}
-				{@const activeTeams = allTeams.filter((team) => !allTeamData[team.id]?.excluded)}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h2 class="mb-4 text-lg font-medium text-gray-900">Teams & Rubrics</h2>
-					<TeamsRubricsList teams={activeTeams} />
+					<div class="mb-4 flex items-center justify-between">
+						<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
+						<button
+							onclick={refreshRubricsAndNotes}
+							class="inline-flex items-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+							aria-label="Refresh teams and rubrics"
+						>
+							<RefreshIcon />
+							<span>Refresh</span>
+						</button>
+					</div>
+
+					{#if isAssignedJudging && currentJudgeGroup}
+						<div class="mb-4">
+							<label class="flex items-center space-x-2">
+								<input
+									type="checkbox"
+									bind:checked={showOnlyAssignedTeams}
+									class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+								/>
+								<span class="text-sm text-gray-700">Only show assigned teams for your current judge group</span>
+							</label>
+						</div>
+					{/if}
+					<TeamsRubricsList teams={teamsToShow()} {rubricsAndNotes} />
 				</div>
 			{/if}
 		</div>
