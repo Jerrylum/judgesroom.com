@@ -16,7 +16,6 @@ import type {
 import { eq } from 'drizzle-orm';
 import {
 	awardRankings,
-	awards,
 	engineeringNotebookRubrics,
 	finalAwardRankings,
 	judgeGroupAwardNominations,
@@ -31,10 +30,19 @@ import { and } from 'drizzle-orm';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeJudgeGroupTopic } from './subscriptions';
 import { transaction } from '../utils';
+import { getAwards } from './essential';
 
 export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: string): Promise<AwardRankingsFullUpdate> {
 	const { judgedAwards, rankingsData } = await transaction(db, async (tx) => {
-		const judgedAwards = (await tx.select().from(awards).where(eq(awards.type, 'judged'))).map((award) => award.name);
+		const judgedAwards = (await getAwards(tx, 'judged'))
+			.map((award) => award.name)
+			.filter(
+				(award) =>
+					award !== 'Excellence Award' &&
+					award !== 'Excellence Award - High School' &&
+					award !== 'Excellence Award - Middle School' &&
+					award !== 'Excellence Award - Elementary School'
+			);
 		const rankingsData = await tx.select().from(awardRankings).where(eq(awardRankings.judgeGroupId, judgeGroupId));
 		return { judgedAwards, rankingsData };
 	});
