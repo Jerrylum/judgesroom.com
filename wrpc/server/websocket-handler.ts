@@ -250,12 +250,13 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 		 */
 		async handleClose(ws: WebSocket, code: number, reason: string) {
 			const clientId = opts.getClientIdByWebSocket(ws);
+
 			if (clientId) {
 				await connectionManager.removeConnection(clientId);
-				return clientId;
 			}
+
 			console.log(`WebSocket closed with code ${code}: ${reason}`);
-			return null;
+			return clientId;
 		},
 
 		/**
