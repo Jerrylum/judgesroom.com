@@ -96,6 +96,14 @@ CREATE TABLE `OfflineDevices` (
 	`connectedAt` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE `Subscriptions` (
+	`id` text NOT NULL,
+	`judgeGroupId` text NOT NULL,
+	`topic` text NOT NULL,
+	PRIMARY KEY(`id`, `judgeGroupId`, `topic`),
+	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `TeamInterviewNotes` (
 	`id` text PRIMARY KEY NOT NULL,
 	`teamId` text NOT NULL,

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b35fff55-7a4e-4f34-93d9-a11b8a02bfa9",
+  "id": "43cacb62-20dc-46f5-b10b-4a2e638567c6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -671,6 +671,60 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Subscriptions": {
+      "name": "Subscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "topic": {
+          "name": "topic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Subscriptions_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "Subscriptions_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "Subscriptions",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "Subscriptions_id_judgeGroupId_topic_pk": {
+          "columns": [
+            "id",
+            "judgeGroupId",
+            "topic"
+          ],
+          "name": "Subscriptions_id_judgeGroupId_topic_pk"
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
