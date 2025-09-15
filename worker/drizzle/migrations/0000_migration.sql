@@ -15,7 +15,8 @@ CREATE TABLE `Awards` (
 	`type` text NOT NULL,
 	`acceptedGrades` text NOT NULL,
 	`winnersCount` integer NOT NULL,
-	`requireNotebook` integer NOT NULL
+	`requireNotebook` integer NOT NULL,
+	`position` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE INDEX `type` ON `Awards` (`type`);--> statement-breakpoint

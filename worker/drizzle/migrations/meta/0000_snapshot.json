@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "43cacb62-20dc-46f5-b10b-4a2e638567c6",
+  "id": "fd661df8-1fe8-4f72-a186-f2b1386ec7d3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -132,6 +132,13 @@
         },
         "requireNotebook": {
           "name": "requireNotebook",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,

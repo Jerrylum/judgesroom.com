@@ -34,7 +34,8 @@ export const awards = sqliteTable(
 		type: text('type', { enum: ['performance', 'judged', 'volunteer_nominated'] }).notNull(), // Performance, Judged, Volunteer Nominated award
 		acceptedGrades: text('acceptedGrades', { mode: 'json' }).notNull(),
 		winnersCount: integer('winnersCount').notNull(),
-		requireNotebook: integer('requireNotebook', { mode: 'boolean' }).notNull()
+		requireNotebook: integer('requireNotebook', { mode: 'boolean' }).notNull(),
+		position: integer('position').notNull()
 	},
 	(table) => [index('type').on(table.type)]
 );

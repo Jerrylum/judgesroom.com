@@ -181,9 +181,7 @@
 				})),
 				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards]
 					.filter((award) => award.isSelected)
-					.map((award) => ({
-						...award.generateAward()
-					}))
+					.map((award) => award.generateAward())
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready

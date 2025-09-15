@@ -14,9 +14,9 @@ import { transaction } from '../utils';
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
 	if (type) {
-		return db.select().from(awards).where(eq(awards.type, type)) as Promise<Award[]>;
+		return db.select().from(awards).where(eq(awards.type, type)).orderBy(awards.position) as Promise<Award[]>;
 	}
-	return db.select().from(awards) as Promise<Award[]>;
+	return db.select().from(awards).orderBy(awards.position) as Promise<Award[]>;
 }
 
 export async function getTeamInfos(db: DatabaseOrTransaction, group?: string): Promise<TeamInfo[]> {
@@ -98,6 +98,10 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	};
 
 	async function updateInsertAndDeleteAwards(tx: DatabaseOrTransaction, values: Award[]) {
+		type AwardInDB = SQLiteInsertValue<typeof awards>;
+
+		const valuesInDB = values.map((v, i) => ({ ...v, position: i }));
+
 		await tx.delete(awards).where(
 			not(
 				inArray(
@@ -109,13 +113,13 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 
 		// Use for loop instead of bulk insert to avoid SQLite error
 		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
-		for (const v of values) {
+		for (const v of valuesInDB) {
 			await tx
 				.insert(awards)
 				.values(v)
 				.onConflictDoUpdate({
 					target: [awards.name],
-					set: buildConflictUpdateColumns(awards, Object.keys(v) as (keyof Award)[])
+					set: buildConflictUpdateColumns(awards, Object.keys(v) as (keyof AwardInDB)[])
 				});
 		}
 	}
@@ -144,7 +148,6 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	}
 
 	async function updateInsertAndDeleteJudgeGroups(tx: DatabaseOrTransaction, values: JudgeGroup[]) {
-		type DBJudgeGroup = SQLiteInsertValue<typeof judgeGroups>;
 		await tx.delete(judgeGroups).where(
 			not(
 				inArray(
