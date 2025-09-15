@@ -46,12 +46,13 @@
 	// Validate custom award form (pure function, no state mutation)
 	function canSubmitCustomAward() {
 		const hasName = customAwardName.trim().length > 0;
+		const hasUniqueName = !existingAwards.some((award) => award.name === customAwardName);
 		const hasLeadingTrailingWhitespace = customAwardName.length > 0 && customAwardName !== customAwardName.trim();
-		const hasGrades = customAwardGrades.length > 0;
-		const hasValidWinners = customAwardWinners > 0 && customAwardWinners <= 10000;
 		const isNameTooLong = customAwardName.trim().length > 100;
+		const hasValidWinners = customAwardWinners > 0 && customAwardWinners <= 10000;
+		const hasGrades = customAwardGrades.length > 0;
 
-		return hasName && !hasLeadingTrailingWhitespace && !isNameTooLong && hasGrades && hasValidWinners;
+		return hasName && hasUniqueName && !hasLeadingTrailingWhitespace && !isNameTooLong && hasValidWinners && hasGrades;
 	}
 
 	// Update error message reactively (only after user interaction)
@@ -62,6 +63,7 @@
 		}
 
 		const hasName = customAwardName.trim().length > 0;
+		const hasUniqueName = !existingAwards.some((award) => award.name === customAwardName);
 		const hasLeadingTrailingWhitespace = customAwardName.length > 0 && customAwardName !== customAwardName.trim();
 		const isNameTooLong = customAwardName.trim().length > 100;
 		const hasGrades = customAwardGrades.length > 0;
@@ -72,7 +74,7 @@
 			customAwardError = 'Award name must not have leading or trailing whitespace';
 		} else if (isNameTooLong) {
 			customAwardError = 'Award name must be 100 characters or less';
-		} else if (existingAwards.some((award) => award.name === customAwardName)) {
+		} else if (!hasUniqueName) {
 			customAwardError = 'Award name must be unique';
 		} else if (!hasGrades) {
 			customAwardError = 'At least one grade level must be selected';
