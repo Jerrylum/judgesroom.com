@@ -179,9 +179,11 @@
 					name: group.name,
 					assignedTeams: group.assignedTeams.map((team) => team.id)
 				})),
-				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards].map((award) => ({
-					...award.generateAward()
-				}))
+				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards]
+					.filter((award) => award.isSelected)
+					.map((award) => ({
+						...award.generateAward()
+					}))
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready

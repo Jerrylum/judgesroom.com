@@ -53,6 +53,7 @@
 	async function openCustomAwardDialog() {
 		const result = await dialogs.showCustom(CustomAwardDialog, {
 			props: {
+				existingAwards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards],
 				selectedCompetitionType,
 				possibleGrades
 			}

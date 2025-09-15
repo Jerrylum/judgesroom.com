@@ -4,14 +4,13 @@
 	import Dialog from '$lib/components/Dialog.svelte';
 	import { type CompetitionType, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
 
-	type AwardOptionsWithId = AwardOptions & { id: string };
-
 	interface Props {
+		existingAwards: AwardOptions[];
 		selectedCompetitionType: CompetitionType;
 		possibleGrades: Grade[];
 	}
 
-	let { selectedCompetitionType, possibleGrades }: Props = $props();
+	let { existingAwards, selectedCompetitionType, possibleGrades }: Props = $props();
 
 	// Custom award form
 	let customAwardName = $state('');
@@ -64,14 +63,17 @@
 
 		const hasName = customAwardName.trim().length > 0;
 		const hasLeadingTrailingWhitespace = customAwardName.length > 0 && customAwardName !== customAwardName.trim();
+		const isNameTooLong = customAwardName.trim().length > 100;
 		const hasGrades = customAwardGrades.length > 0;
 
 		if (!hasName) {
 			customAwardError = 'Award name is required';
 		} else if (hasLeadingTrailingWhitespace) {
 			customAwardError = 'Award name must not have leading or trailing whitespace';
-		} else if (customAwardName.trim().length > 100) {
+		} else if (isNameTooLong) {
 			customAwardError = 'Award name must be 100 characters or less';
+		} else if (existingAwards.some((award) => award.name === customAwardName)) {
+			customAwardError = 'Award name must be unique';
 		} else if (!hasGrades) {
 			customAwardError = 'At least one grade level must be selected';
 		} else if (customAwardWinners <= 0) {
