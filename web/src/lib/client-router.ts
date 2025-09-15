@@ -3,9 +3,14 @@ import { initWRPC } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
-import { app } from './app-page.svelte';
+import { app, subscriptions } from './app-page.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
+import {
+	AwardRankingsFullUpdateSchema,
+	AwardRankingsPartialUpdateSchema,
+	type AwardRankingsFullUpdate
+} from '@judging.jerryio/protocol/src/rubric';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -30,7 +35,6 @@ const clientRouter = w.router({
 	onDeviceListUpdate: w.procedure.input(z.array(DeviceInfoSchema)).mutation(async ({ input }) => {
 		console.log(`📊 Device list updated:`, input);
 		app.handleDeviceListUpdate(input);
-		return `Device list updated`;
 	}),
 
 	/**
@@ -39,7 +43,6 @@ const clientRouter = w.router({
 	onAllTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleAllTeamDataUpdate(input);
-		return `All team data updated`;
 	}),
 
 	/**
@@ -48,7 +51,6 @@ const clientRouter = w.router({
 	onTeamDataUpdate: w.procedure.input(TeamDataSchema).mutation(async ({ input }) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleTeamDataUpdate(input);
-		return `Team data updated`;
 	}),
 
 	/**
@@ -57,7 +59,28 @@ const clientRouter = w.router({
 	onAllJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
 		console.log(`📊 Judges updated:`, input);
 		app.handleAllJudgesUpdate(input);
-		return `All judges updated`;
+	}),
+
+	// onAwardRankingsFullUpdate: w.procedure.input(AwardRankingsFullUpdateSchema).mutation(async ({ input }) => {
+	// 	console.log(`📊 Award rankings full updated:`, input);
+	// 	subscriptions.awardRankings = input;
+	// }),
+
+	onAwardRankingsUpdate: w.procedure.input(AwardRankingsPartialUpdateSchema).mutation(async ({ input }) => {
+		console.log(`📊 Award rankings partial updated:`, input);
+
+		const awardRankings = subscriptions.allJudgeGroupsAwardRankings[input.judgeGroupId];
+
+		if (input.judgeGroupId !== awardRankings?.judgeGroupId) {
+			throw new Error('Award rankings update for wrong judge group');
+		}
+
+		const index = awardRankings.judgedAwards.indexOf(input.awardName);
+		if (index === -1) {
+			throw new Error('Award not found');
+		}
+
+		awardRankings.rankings[input.teamId][index] = input.ranking;
 	})
 });
 

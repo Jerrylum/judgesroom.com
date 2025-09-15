@@ -2,6 +2,18 @@ import { sqliteTable, integer, text, primaryKey, index, uniqueIndex } from 'driz
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
+export const subscriptions = sqliteTable(
+	'Subscriptions',
+	{
+		id: text('id').notNull(),
+		judgeGroupId: text('judgeGroupId')
+			.references(() => judgeGroups.id, { onDelete: 'cascade' })
+			.notNull(),
+		topic: text('topic').notNull()
+	},
+	(table) => [primaryKey({ columns: [table.id, table.judgeGroupId, table.topic] })]
+);
+
 export const offlineDevices = sqliteTable('OfflineDevices', {
 	deviceId: text('deviceId').primaryKey(),
 	deviceName: text('deviceName').notNull(),

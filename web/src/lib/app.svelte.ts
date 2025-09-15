@@ -16,6 +16,7 @@ import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
+import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 export type UserClearReason = 'kicked' | 'session_destroyed';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, tabs } from '$lib/app-page.svelte';
+	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
 	import Header from './Header.svelte';
 	import TabButton from './tabs/TabButton.svelte';
 	import OverviewTab from './tabs/OverviewTab.svelte';
@@ -7,6 +7,7 @@
 	import NotebookRubricTab from './tabs/NotebookRubricTab.svelte';
 	import NotebookSortingTab from './tabs/NotebookSortingTab.svelte';
 	import AwardRankingsTab from './tabs/AwardRankingsTab.svelte';
+	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);
@@ -19,6 +20,34 @@
 	function closeTab(tabId: string) {
 		tabs.closeTab(tabId);
 	}
+
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
+
+	$effect(() => {
+		if (!app.isJudgingReady()) return;
+
+		console.log('Subscribing to award rankings', currentJudgeGroup);
+
+		const allJudgeGroups = app.getJudgeGroups();
+
+		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
+		const targetJudgeGroupIds = currentJudgeGroup ? [currentJudgeGroup.id] : allJudgeGroups.map((group) => group.id);
+		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
+			subscriptions.allJudgeGroupsAwardRankings = data.reduce(
+				(acc, curr) => {
+					acc[curr.judgeGroupId] = curr;
+					return acc;
+				},
+				{} as Record<string, AwardRankingsFullUpdate>
+			);
+		});
+
+		return async () => {
+			console.log('Unsubscribing from award rankings', targetJudgeGroupIds);
+
+			await app.wrpcClient.judging.unsubscribeAwardRankings.mutation();
+		};
+	});
 </script>
 
 <div class="flex h-screen flex-col bg-gray-50">

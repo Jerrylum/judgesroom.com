@@ -59,7 +59,7 @@ export interface WebSocketHandler<TRouter extends AnyRouter> {
 	initialize: () => Promise<void>;
 	handleMessage: (ws: WebSocket, message: string, ctx: InferRouterContext<TRouter>) => Promise<void>;
 	handleConnection: (ws: WebSocket, metadata: WebSocketConnectionMetadata) => Promise<void>;
-	handleClose: (ws: WebSocket, code: number, reason: string) => Promise<void>;
+	handleClose: (ws: WebSocket, code: number, reason: string) => Promise<string | null>;
 	handleError: (ws: WebSocket, error: Error) => void;
 	getClient<TClientRouter extends AnyRouter>(clientId: string): RouterProxy<TClientRouter>;
 	broadcast<TClientRouter extends AnyRouter>(): RouterBroadcastProxy<TClientRouter>;
@@ -252,8 +252,10 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 			const clientId = opts.getClientIdByWebSocket(ws);
 			if (clientId) {
 				await connectionManager.removeConnection(clientId);
+				return clientId;
 			}
 			console.log(`WebSocket closed with code ${code}: ${reason}`);
+			return null;
 		},
 
 		/**

@@ -252,7 +252,7 @@
 					{/if}
 					{#if selectedTeam.excluded}
 						<WarningSign title="Excluded Team">
-							<p>This team has been marked as excluded. They are not eligible for any Judging Awards.</p>
+							<p>This team has been marked as excluded. They are not eligible for any Judged Awards.</p>
 						</WarningSign>
 					{/if}
 				{/if}

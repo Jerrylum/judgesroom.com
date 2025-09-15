@@ -2,6 +2,7 @@ import { App, AppStorage } from '$lib/app.svelte';
 import type { Component } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { TabController } from '$lib/tab.svelte';
+import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 // ============================================================================
 // Dialog System
@@ -186,3 +187,11 @@ export const AppUI = $state({
 export const app = new App(new AppStorage(), import.meta.env.DEV);
 export const dialogs = new DialogController();
 export const tabs = new TabController();
+
+export interface SubscriptionsStorage {
+	allJudgeGroupsAwardRankings: Record<string, AwardRankingsFullUpdate>;
+}
+
+export const subscriptions: SubscriptionsStorage = $state({
+	allJudgeGroupsAwardRankings: {}
+});

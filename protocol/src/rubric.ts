@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AwardNameSchema } from './award';
 
 export const SubmissionSchema = z.object({
 	id: z.uuidv4(),
@@ -38,3 +39,21 @@ export const TeamInterviewNoteSchema = z.object({
 });
 
 export type TeamInterviewNote = z.infer<typeof TeamInterviewNoteSchema>;
+
+export const AwardRankingsFullUpdateSchema = z.object({
+	judgeGroupId: z.uuidv4(),
+	judgedAwards: z.array(AwardNameSchema),
+	// team id: [award 1 rank, award 2 rank, ...]
+	rankings: z.record(z.uuidv4(), z.array(RankSchema))
+});
+
+export type AwardRankingsFullUpdate = z.infer<typeof AwardRankingsFullUpdateSchema>;
+
+export const AwardRankingsPartialUpdateSchema = z.object({
+	judgeGroupId: z.uuidv4(),
+	teamId: z.uuidv4(),
+	awardName: AwardNameSchema,
+	ranking: RankSchema
+});
+
+export type AwardRankingsPartialUpdate = z.infer<typeof AwardRankingsPartialUpdateSchema>;
