@@ -1,8 +1,8 @@
 import { eq, and } from 'drizzle-orm';
 import { subscriptions } from '../db/schema';
 import type { DatabaseOrTransaction } from '../server-router';
-import { AnyRouter, RouterProxy, Session } from '@judging.jerryio/wrpc/server';
-import { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { AnyRouter, RouterProxy, Session } from '@judging.jerryio/wrpc/server';
+import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import { transaction } from '../utils';
 
 export async function subscribeJudgeGroupTopic(
