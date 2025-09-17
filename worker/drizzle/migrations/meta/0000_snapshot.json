@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fd661df8-1fe8-4f72-a186-f2b1386ec7d3",
+  "id": "2b037a23-f0bf-40a7-a5ab-f3ba44b7981e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -564,6 +564,205 @@
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroupsReviewedTeams": {
+      "name": "JudgeGroupsReviewedTeams",
+      "columns": {
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "JudgeGroupsReviewedTeams_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "JudgeGroupsReviewedTeams_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "JudgeGroupsReviewedTeams",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsReviewedTeams_teamId_Teams_id_fk": {
+          "name": "JudgeGroupsReviewedTeams_teamId_Teams_id_fk",
+          "tableFrom": "JudgeGroupsReviewedTeams",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "JudgeGroupsReviewedTeams_judgeGroupId_teamId_pk": {
+          "columns": [
+            "judgeGroupId",
+            "teamId"
+          ],
+          "name": "JudgeGroupsReviewedTeams_judgeGroupId_teamId_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroupsSubmissionsCache": {
+      "name": "JudgeGroupsSubmissionsCache",
+      "columns": {
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeId": {
+          "name": "judgeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "enrId": {
+          "name": "enrId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tiId": {
+          "name": "tiId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tnId": {
+          "name": "tnId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "JudgeGroupsSubmissionsCache_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_teamId_Teams_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_teamId_Teams_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_judgeId_Judges_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_judgeId_Judges_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "Judges",
+          "columnsFrom": [
+            "judgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_enrId_EngineeringNotebookRubrics_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_enrId_EngineeringNotebookRubrics_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "EngineeringNotebookRubrics",
+          "columnsFrom": [
+            "enrId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_tiId_TeamInterviewRubrics_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_tiId_TeamInterviewRubrics_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "TeamInterviewRubrics",
+          "columnsFrom": [
+            "tiId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_tnId_TeamInterviewNotes_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_tnId_TeamInterviewNotes_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "TeamInterviewNotes",
+          "columnsFrom": [
+            "tnId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "JudgeGroupsSubmissionsCache_enrId_tiId_tnId_pk": {
+          "columns": [
+            "enrId",
+            "tiId",
+            "tnId"
+          ],
+          "name": "JudgeGroupsSubmissionsCache_enrId_tiId_tnId_pk"
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },

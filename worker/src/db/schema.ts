@@ -150,6 +150,38 @@ export const teamInterviewNotes = sqliteTable(
 	(table) => [index('team_interview_notes_teamId').on(table.teamId), index('team_interview_notes_judgeId').on(table.judgeId)]
 );
 
+export const judgeGroupsSubmissionsCache = sqliteTable(
+	'JudgeGroupsSubmissionsCache',
+	{
+		judgeGroupId: text('judgeGroupId')
+			.references(() => judgeGroups.id, { onDelete: 'cascade' })
+			.notNull(),
+		teamId: text('teamId')
+			.references(() => teams.id, { onDelete: 'cascade' })
+			.notNull(),
+		judgeId: text('judgeId')
+			.references(() => judges.id, { onDelete: 'cascade' })
+			.notNull(),
+		enrId: text('enrId').references(() => engineeringNotebookRubrics.id, { onDelete: 'cascade' }),
+		tiId: text('tiId').references(() => teamInterviewRubrics.id, { onDelete: 'cascade' }),
+		tnId: text('tnId').references(() => teamInterviewNotes.id, { onDelete: 'cascade' })
+	},
+	(table) => [primaryKey({ columns: [table.enrId, table.tiId, table.tnId] })]
+);
+
+export const judgeGroupsReviewedTeams = sqliteTable(
+	'JudgeGroupsReviewedTeams',
+	{
+		judgeGroupId: text('judgeGroupId')
+			.references(() => judgeGroups.id, { onDelete: 'cascade' })
+			.notNull(),
+		teamId: text('teamId')
+			.references(() => teams.id, { onDelete: 'cascade' })
+			.notNull()
+	},
+	(table) => [primaryKey({ columns: [table.judgeGroupId, table.teamId] })]
+);
+
 export const awardRankings = sqliteTable(
 	'AwardRankings',
 	{

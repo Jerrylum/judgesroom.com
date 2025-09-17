@@ -77,6 +77,30 @@ CREATE TABLE `JudgeGroupsAssignedTeams` (
 );
 --> statement-breakpoint
 CREATE INDEX `assignment` ON `JudgeGroupsAssignedTeams` (`judgeGroupId`,`teamId`);--> statement-breakpoint
+CREATE TABLE `JudgeGroupsReviewedTeams` (
+	`judgeGroupId` text NOT NULL,
+	`teamId` text NOT NULL,
+	PRIMARY KEY(`judgeGroupId`, `teamId`),
+	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `JudgeGroupsSubmissionsCache` (
+	`judgeGroupId` text NOT NULL,
+	`teamId` text NOT NULL,
+	`judgeId` text NOT NULL,
+	`enrId` text,
+	`tiId` text,
+	`tnId` text,
+	PRIMARY KEY(`enrId`, `tiId`, `tnId`),
+	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`enrId`) REFERENCES `EngineeringNotebookRubrics`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`tiId`) REFERENCES `TeamInterviewRubrics`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`tnId`) REFERENCES `TeamInterviewNotes`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `Judges` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,

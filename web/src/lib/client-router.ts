@@ -61,26 +61,33 @@ const clientRouter = w.router({
 		app.handleAllJudgesUpdate(input);
 	}),
 
-	// onAwardRankingsFullUpdate: w.procedure.input(AwardRankingsFullUpdateSchema).mutation(async ({ input }) => {
-	// 	console.log(`📊 Award rankings full updated:`, input);
-	// 	subscriptions.awardRankings = input;
-	// }),
-
 	onAwardRankingsUpdate: w.procedure.input(AwardRankingsPartialUpdateSchema).mutation(async ({ input }) => {
 		console.log(`📊 Award rankings partial updated:`, input);
 
 		const awardRankings = subscriptions.allJudgeGroupsAwardRankings[input.judgeGroupId];
 
 		if (input.judgeGroupId !== awardRankings?.judgeGroupId) {
-			throw new Error('Award rankings update for wrong judge group');
+			throw new Error('CRITICAL: Award rankings update for wrong judge group');
 		}
 
 		const index = awardRankings.judgedAwards.indexOf(input.awardName);
 		if (index === -1) {
-			throw new Error('Award not found');
+			throw new Error('CRITICAL: Award not found');
 		}
 
 		awardRankings.rankings[input.teamId][index] = input.ranking;
+	}),
+
+	onReviewedTeamsUpdate: w.procedure.input(z.object({ judgeGroupId: z.string(), teamId: z.string() })).mutation(async ({ input }) => {
+		console.log(`📊 Reviewed teams updated:`, input);
+
+		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[input.judgeGroupId];
+
+		if (!reviewedTeams) {
+			throw new Error('CRITICAL: This judge group is not subscribed to');
+		}
+
+		reviewedTeams.push(input.teamId);
 	})
 });
 

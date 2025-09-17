@@ -48,6 +48,32 @@
 			await app.wrpcClient.judging.unsubscribeAwardRankings.mutation();
 		};
 	});
+
+	$effect(() => {
+		if (!app.isJudgingReady()) return;
+
+		console.log('Subscribing to reviewed teams', currentJudgeGroup);
+
+		const allJudgeGroups = app.getJudgeGroups();
+
+		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
+		const targetJudgeGroupIds = currentJudgeGroup ? [currentJudgeGroup.id] : allJudgeGroups.map((group) => group.id);
+		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
+			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
+				(acc, curr) => {
+					acc[curr.judgeGroupId] = curr.teamIds;
+					return acc;
+				},
+				{} as Record<string, string[]>
+			);
+		});
+
+		return async () => {
+			console.log('Unsubscribing from reviewed teams', targetJudgeGroupIds);
+
+			await app.wrpcClient.judging.unsubscribeReviewedTeams.mutation();
+		};
+	});
 </script>
 
 <div class="flex h-screen flex-col bg-gray-50">

@@ -3,7 +3,6 @@ import z from 'zod';
 import {
 	AwardRankingsFullUpdateSchema,
 	EngineeringNotebookRubricSchema,
-	SubmissionSchema,
 	TeamInterviewNoteSchema,
 	TeamInterviewRubricSchema
 } from '@judging.jerryio/protocol/src/rubric';
@@ -19,10 +18,10 @@ import {
 	engineeringNotebookRubrics,
 	finalAwardRankings,
 	judgeGroupAwardNominations,
-	judgeGroupsAssignedTeams,
+	judgeGroupsReviewedTeams,
+	judgeGroupsSubmissionsCache,
 	teamInterviewNotes,
-	teamInterviewRubrics,
-	teams
+	teamInterviewRubrics
 } from '../db/schema';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
@@ -69,6 +68,16 @@ export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: 
 	return rtn;
 }
 
+export async function getReviewedTeams(db: DatabaseOrTransaction, judgeGroupId: string): Promise<string[]> {
+	const result = await db.select().from(judgeGroupsReviewedTeams).where(eq(judgeGroupsReviewedTeams.judgeGroupId, judgeGroupId));
+	return result.map((row) => row.teamId);
+}
+
+export async function addReviewedTeam(db: DatabaseOrTransaction, judgeGroupId: string, teamId: string): Promise<boolean> {
+	const result = await db.insert(judgeGroupsReviewedTeams).values({ judgeGroupId, teamId }).onConflictDoNothing().returning();
+	return result.length > 0;
+}
+
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getRubricsAndNotes: w.procedure
@@ -76,75 +85,72 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.output(
 				z.array(
 					z.object({
+						judgeGroupId: z.uuidv4(),
 						teamId: z.uuidv4(),
-						engineeringNotebookRubrics: z.array(SubmissionSchema),
-						teamInterviewRubrics: z.array(SubmissionSchema),
-						teamInterviewNotes: z.array(SubmissionSchema)
+						judgeId: z.uuidv4(),
+						tiId: z.uuidv4().nullable(),
+						tnId: z.uuidv4().nullable(),
+						enrId: z.uuidv4().nullable()
 					})
 				)
 			)
 			.query(async ({ ctx, input }) => {
-				// Import schema tables
-				// Get teams based on judge group filter
-				let allTeams;
 				if (input.judgeGroupId) {
-					// Filter teams by judge group assignment
-					allTeams = await ctx.db
-						.select({ id: teams.id })
-						.from(teams)
-						.innerJoin(judgeGroupsAssignedTeams, eq(teams.id, judgeGroupsAssignedTeams.teamId))
-						.where(eq(judgeGroupsAssignedTeams.judgeGroupId, input.judgeGroupId));
+					return await ctx.db
+						.select()
+						.from(judgeGroupsSubmissionsCache)
+						.where(eq(judgeGroupsSubmissionsCache.judgeGroupId, input.judgeGroupId));
 				} else {
-					// Get all teams
-					allTeams = await ctx.db.select({ id: teams.id }).from(teams);
+					return await ctx.db.select().from(judgeGroupsSubmissionsCache);
 				}
-
-				// Get all rubrics and notes
-				const engineeringRubrics = await ctx.db
-					.select({
-						id: engineeringNotebookRubrics.id,
-						teamId: engineeringNotebookRubrics.teamId,
-						judgeId: engineeringNotebookRubrics.judgeId
-					})
-					.from(engineeringNotebookRubrics);
-
-				const teamRubrics = await ctx.db
-					.select({
-						id: teamInterviewRubrics.id,
-						teamId: teamInterviewRubrics.teamId,
-						judgeId: teamInterviewRubrics.judgeId
-					})
-					.from(teamInterviewRubrics);
-
-				const teamNotes = await ctx.db
-					.select({
-						id: teamInterviewNotes.id,
-						teamId: teamInterviewNotes.teamId,
-						judgeId: teamInterviewNotes.judgeId
-					})
-					.from(teamInterviewNotes);
-
-				// Group by team
-				const result = allTeams.map((team) => ({
-					teamId: team.id,
-					engineeringNotebookRubrics: engineeringRubrics.filter((r) => r.teamId === team.id).map((r) => ({ id: r.id, judgeId: r.judgeId })),
-					teamInterviewRubrics: teamRubrics.filter((r) => r.teamId === team.id).map((r) => ({ id: r.id, judgeId: r.judgeId })),
-					teamInterviewNotes: teamNotes.filter((r) => r.teamId === team.id).map((r) => ({ id: r.id, judgeId: r.judgeId }))
-				}));
-
-				return result;
 			}),
 
-		completeEngineeringNotebookRubric: w.procedure.input(EngineeringNotebookRubricSchema).mutation(async ({ ctx, input }) => {
-			// insert or update
-			await ctx.db
-				.insert(engineeringNotebookRubrics)
-				.values(input)
-				.onConflictDoUpdate({
-					target: [engineeringNotebookRubrics.id],
-					set: input
+		completeEngineeringNotebookRubric: w.procedure
+			.input(
+				z.object({
+					judgeGroupId: z.uuidv4(),
+					submission: EngineeringNotebookRubricSchema
+				})
+			)
+			.mutation(async ({ ctx, input, session }) => {
+				// insert or update
+				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+					await tx
+						.insert(engineeringNotebookRubrics)
+						.values(input.submission)
+						.onConflictDoUpdate({
+							target: [engineeringNotebookRubrics.id],
+							set: input.submission
+						});
+
+					await tx
+						.insert(judgeGroupsSubmissionsCache)
+						.values({
+							judgeGroupId: input.judgeGroupId,
+							teamId: input.submission.teamId,
+							judgeId: input.submission.judgeId,
+							enrId: input.submission.id,
+							tiId: null,
+							tnId: null
+						})
+						.onConflictDoUpdate({
+							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+							set: {
+								judgeGroupId: input.judgeGroupId,
+								teamId: input.submission.teamId,
+								judgeId: input.submission.judgeId
+							}
+						});
+
+					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
 				});
-		}),
+				if (isReviewedNewTeam) {
+					// Do not wait for the broadcast to complete
+					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
+						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+					);
+				}
+			}),
 
 		getEngineeringNotebookRubrics: w.procedure
 			.input(z.object({ id: z.uuidv4() }))
@@ -154,16 +160,49 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				return result[0] as EngineeringNotebookRubric;
 			}),
 
-		completeTeamInterviewRubric: w.procedure.input(TeamInterviewRubricSchema).mutation(async ({ ctx, input }) => {
-			// insert or update
-			await ctx.db
-				.insert(teamInterviewRubrics)
-				.values(input)
-				.onConflictDoUpdate({
-					target: [teamInterviewRubrics.id],
-					set: input
+		completeTeamInterviewRubric: w.procedure
+			.input(
+				z.object({
+					judgeGroupId: z.uuidv4(),
+					submission: TeamInterviewRubricSchema
+				})
+			)
+			.mutation(async ({ ctx, input, session }) => {
+				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+					await tx
+						.insert(teamInterviewRubrics)
+						.values(input.submission)
+						.onConflictDoUpdate({
+							target: [teamInterviewRubrics.id],
+							set: input.submission
+						});
+					await tx
+						.insert(judgeGroupsSubmissionsCache)
+						.values({
+							judgeGroupId: input.judgeGroupId,
+							teamId: input.submission.teamId,
+							judgeId: input.submission.judgeId,
+							enrId: null,
+							tiId: input.submission.id,
+							tnId: null
+						})
+						.onConflictDoUpdate({
+							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+							set: {
+								judgeGroupId: input.judgeGroupId,
+								teamId: input.submission.teamId,
+								judgeId: input.submission.judgeId
+							}
+						});
+					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
 				});
-		}),
+				if (isReviewedNewTeam) {
+					// Do not wait for the broadcast to complete
+					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
+						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+					);
+				}
+			}),
 
 		getTeamInterviewRubrics: w.procedure
 			.input(z.object({ id: z.uuidv4() }))
@@ -173,16 +212,49 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				return result[0] as TeamInterviewRubric;
 			}),
 
-		completeTeamInterviewNote: w.procedure.input(TeamInterviewNoteSchema).mutation(async ({ ctx, input }) => {
-			// insert or update
-			await ctx.db
-				.insert(teamInterviewNotes)
-				.values(input)
-				.onConflictDoUpdate({
-					target: [teamInterviewNotes.id],
-					set: input
+		completeTeamInterviewNote: w.procedure
+			.input(
+				z.object({
+					judgeGroupId: z.uuidv4(),
+					submission: TeamInterviewNoteSchema
+				})
+			)
+			.mutation(async ({ ctx, input, session }) => {
+				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+					await tx
+						.insert(teamInterviewNotes)
+						.values(input.submission)
+						.onConflictDoUpdate({
+							target: [teamInterviewNotes.id],
+							set: input.submission
+						});
+					await tx
+						.insert(judgeGroupsSubmissionsCache)
+						.values({
+							judgeGroupId: input.judgeGroupId,
+							teamId: input.submission.teamId,
+							judgeId: input.submission.judgeId,
+							tiId: input.submission.id,
+							tnId: null,
+							enrId: null
+						})
+						.onConflictDoUpdate({
+							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+							set: {
+								judgeGroupId: input.judgeGroupId,
+								teamId: input.submission.teamId,
+								judgeId: input.submission.judgeId
+							}
+						});
+					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
 				});
-		}),
+				if (isReviewedNewTeam) {
+					// Do not wait for the broadcast to complete
+					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
+						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+					);
+				}
+			}),
 
 		getTeamInterviewNote: w.procedure
 			.input(z.object({ id: z.uuidv4() }))
@@ -191,6 +263,25 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				const result = await ctx.db.select().from(teamInterviewNotes).where(eq(teamInterviewNotes.id, input.id));
 				return result[0] as TeamInterviewNote;
 			}),
+
+		subscribeReviewedTeams: w.procedure
+			.input(z.object({ judgeGroupIds: z.array(z.uuidv4()), exclusive: z.boolean() }))
+			.output(z.array(z.object({ judgeGroupId: z.uuidv4(), teamIds: z.array(z.uuidv4()) })))
+			.mutation(async ({ ctx, input, session }) => {
+				return transaction(ctx.db, async (tx) => {
+					await subscribeJudgeGroupTopic(tx, session.currentClient.clientId, input.judgeGroupIds, 'reviewedTeams', input.exclusive);
+					return Promise.all(
+						input.judgeGroupIds.map(async (judgeGroupId) => ({
+							judgeGroupId,
+							teamIds: await getReviewedTeams(tx, judgeGroupId)
+						}))
+					);
+				});
+			}),
+
+		unsubscribeReviewedTeams: w.procedure.mutation(async ({ ctx, session }) => {
+			return unsubscribeJudgeGroupTopic(ctx.db, session.currentClient.clientId, 'reviewedTeams');
+		}),
 
 		updateAwardRanking: w.procedure
 			.input(z.object({ judgeGroupId: z.uuidv4(), teamId: z.uuidv4(), awardName: AwardNameSchema, ranking: RankSchema }))

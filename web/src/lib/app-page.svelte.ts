@@ -190,8 +190,10 @@ export const tabs = new TabController();
 
 export interface SubscriptionsStorage {
 	allJudgeGroupsAwardRankings: Record<string, AwardRankingsFullUpdate>;
+	allJudgeGroupsReviewedTeams: Record<string, string[]>;
 }
 
 export const subscriptions: SubscriptionsStorage = $state({
-	allJudgeGroupsAwardRankings: {}
+	allJudgeGroupsAwardRankings: {},
+	allJudgeGroupsReviewedTeams: {}
 });

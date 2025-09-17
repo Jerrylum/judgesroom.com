@@ -1,5 +1,5 @@
 import type { TeamData } from '@judging.jerryio/protocol/src/team';
-import { SvelteURL } from 'svelte/reactivity';
+import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
 
 /**
@@ -91,4 +91,21 @@ export function processTeamDataArray(input: Readonly<Readonly<TeamData>[]>): Rec
 		},
 		{} as Record<string, TeamData>
 	);
+}
+
+/**
+ * Merge two arrays, keeping the order of the first array and adding the items of the second array that are not in the first array
+ * @param inOrder - The array to merge into
+ * @param superSet - The array to merge from
+ * @returns The merged array
+ */
+export function mergeArrays(inOrder: string[], superSet: string[]): string[] {
+	const set = new SvelteSet(inOrder);
+	const rtn = [...inOrder];
+	for (const item of superSet) {
+		if (!set.has(item)) {
+			rtn.push(item);
+		}
+	}
+	return rtn;
 }

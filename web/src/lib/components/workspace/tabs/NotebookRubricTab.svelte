@@ -90,7 +90,7 @@
 			return;
 		}
 
-		if (!judgeId) {
+		if (!judgeId || !currentJudgeGroup) {
 			app.addErrorNotice('CRITICAL: Please switch to a judge');
 			return;
 		}
@@ -115,12 +115,15 @@
 
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
-				id: tab.rubricId || generateUUID(),
-				teamId: tab.teamId,
-				judgeId,
-				rubric: rubricScores,
-				notes,
-				innovateAwardNotes
+				judgeGroupId: currentJudgeGroup.id,
+				submission: {
+					id: tab.rubricId || generateUUID(),
+					teamId: tab.teamId,
+					judgeId,
+					rubric: rubricScores,
+					notes,
+					innovateAwardNotes
+				}
 			});
 
 			isSubmitted = true;

@@ -1,26 +1,79 @@
 <script lang="ts">
-	import { app, tabs } from '$lib/app-page.svelte';
+	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
+	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
-
-	interface Props {
-		teams: readonly TeamInfoAndData[];
-		rubricsAndNotes: RubricsAndNotes;
-	}
+	import { sortByTeamNumber, type TeamInfoAndData } from '$lib/team.svelte';
+	import { mergeArrays } from '$lib/utils.svelte';
+	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
 
 	type RubricsAndNotes = Awaited<ReturnType<typeof app.wrpcClient.judging.getRubricsAndNotes.query>>;
 
-	const { teams, rubricsAndNotes }: Props = $props();
+	const teams = $derived(app.getAllTeamInfoAndData());
 
-	// Get rubrics for a specific team
-	function getTeamRubrics(teamId: string) {
-		return (
-			rubricsAndNotes.find((r) => r.teamId === teamId) || {
+	interface RubricsAndNotesPerTeam {
+		engineeringNotebookRubrics: Submission[];
+		teamInterviewRubrics: Submission[];
+		teamInterviewNotes: Submission[];
+	}
+
+	let rubricsAndNotes = $state<RubricsAndNotes>([]);
+	const includedTeams = $derived(app.getAllTeamInfoAndData());
+	const essentialData = $derived(app.getEssentialData());
+	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
+	let showOnlyAssignedTeams = $state(true); // Default to true as requested
+
+	const teamList = $derived.by(() => {
+		let teamIdsInOrder: string[] = [];
+		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
+			const assignedTeams = currentJudgeGroup.assignedTeams;
+			const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[currentJudgeGroup.id] ?? [];
+			teamIdsInOrder = mergeArrays(assignedTeams, reviewedTeams);
+		} else {
+			teamIdsInOrder = sortByTeamNumber(Object.values(includedTeams)).map((team) => team.id);
+		}
+		return teamIdsInOrder;
+	});
+
+	const data = $derived.by(() => {
+		const rtn: Record<string, RubricsAndNotesPerTeam> = {};
+
+		for (const rubric of rubricsAndNotes) {
+			const target = rtn[rubric.teamId] || {
 				engineeringNotebookRubrics: [],
 				teamInterviewRubrics: [],
 				teamInterviewNotes: []
+			};
+			if (rubric.enrId) {
+				target.engineeringNotebookRubrics.push({
+					id: rubric.enrId,
+					judgeId: rubric.judgeId
+				});
 			}
-		);
+			if (rubric.tiId) {
+				target.teamInterviewRubrics.push({
+					id: rubric.tiId,
+					judgeId: rubric.judgeId
+				});
+			}
+			if (rubric.tnId) {
+				target.teamInterviewNotes.push({
+					id: rubric.tnId,
+					judgeId: rubric.judgeId
+				});
+			}
+			rtn[rubric.teamId] = target;
+		}
+
+		return rtn;
+	});
+
+	function getEmptyRubricsAndNotesPerTeam(): RubricsAndNotesPerTeam {
+		return {
+			engineeringNotebookRubrics: [],
+			teamInterviewRubrics: [],
+			teamInterviewNotes: []
+		};
 	}
 
 	// Get notebook status display
@@ -48,11 +101,47 @@
 		tabs.addTab(tab);
 		tabs.switchToTab(tab.id);
 	}
+
+	async function refreshRubricsAndNotes() {
+		const judgeGroupId = app.getCurrentUserJudgeGroup()?.id;
+		try {
+			rubricsAndNotes = await app.wrpcClient.judging.getRubricsAndNotes.query({ judgeGroupId });
+		} catch (error) {
+			console.error('Failed to load rubrics data:', error);
+			app.addErrorNotice('Failed to load rubrics data');
+		}
+	}
 </script>
 
+<div class="mb-4 flex items-center justify-between">
+	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
+	<button
+		onclick={refreshRubricsAndNotes}
+		class="inline-flex items-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+		aria-label="Refresh teams and rubrics"
+	>
+		<RefreshIcon />
+		<span>Refresh</span>
+	</button>
+</div>
+
+{#if isAssignedJudging && currentJudgeGroup}
+	<div class="mb-4">
+		<label class="flex items-center space-x-2">
+			<input
+				type="checkbox"
+				bind:checked={showOnlyAssignedTeams}
+				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+			/>
+			<span class="text-sm text-gray-700">Only show assigned teams for your current judge group</span>
+		</label>
+	</div>
+{/if}
+
 <div class="space-y-4">
-	{#each teams as team (team.id)}
-		{@const teamRubrics = getTeamRubrics(team.id)}
+	{#each teamList as teamId (teamId)}
+		{@const team = teams[teamId]}
+		{@const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam()}
 		{@const notebookStatus = getNotebookStatus(team.isDevelopedNotebook)}
 		<div class="rounded-lg border border-gray-200 p-4">
 			<!-- Team Header -->
@@ -84,7 +173,7 @@
 					<h4 class="mb-2 font-medium text-gray-900">Engineering Notebook Rubrics</h4>
 
 					<div class="flex flex-row flex-wrap gap-2">
-						{#each teamRubrics.engineeringNotebookRubrics as rubric}
+						{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
 							<button
 								onclick={() => openNotebookRubric(team.id, rubric.id)}
 								class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
@@ -103,7 +192,7 @@
 					<h4 class="mb-2 font-medium text-gray-900">Team Interview Rubrics</h4>
 
 					<div class="flex flex-row flex-wrap gap-2">
-						{#each teamRubrics.teamInterviewRubrics as rubric}
+						{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
 							<button
 								onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
 								class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
@@ -119,11 +208,11 @@
 			</div>
 
 			<!-- Team Interview Notes (if any) -->
-			{#if teamRubrics.teamInterviewNotes.length > 0}
+			{#if teamRubricsAndNotes.teamInterviewNotes.length > 0}
 				<div class="mt-3 rounded-lg bg-blue-50 p-3">
 					<h4 class="mb-2 font-medium text-gray-900">Team Interview Notes</h4>
 					<div class="space-y-1">
-						{#each teamRubrics.teamInterviewNotes as note}
+						{#each teamRubricsAndNotes.teamInterviewNotes as note}
 							<div class="text-sm text-gray-700">
 								Note by {getJudgeName(note.judgeId)}
 							</div>
