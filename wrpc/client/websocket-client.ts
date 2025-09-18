@@ -230,7 +230,6 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		}
 		this.pendingRequests.clear();
 
-		this.options.onClosed(event.code, event.reason);
 		if (event.code === ConnectionCloseCode.NORMAL) {
 			this.connectionState = 'offline';
 		} else if (event.code === ConnectionCloseCode.KICKED) {
@@ -247,6 +246,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				this.reconnectDelay * Math.pow(2, this.reconnectAttempts)
 			);
 		}
+		this.options.onClosed(event.code, event.reason);
 	}
 
 	private async sendRequest(request: WRPCRequest): Promise<unknown> {
