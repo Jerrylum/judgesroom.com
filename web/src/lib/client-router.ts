@@ -75,6 +75,10 @@ const clientRouter = w.router({
 			throw new Error('CRITICAL: Award not found');
 		}
 
+		if (!awardRankings.rankings[input.teamId]) {
+			awardRankings.rankings[input.teamId] = [];
+		}
+
 		awardRankings.rankings[input.teamId][index] = input.ranking;
 	}),
 

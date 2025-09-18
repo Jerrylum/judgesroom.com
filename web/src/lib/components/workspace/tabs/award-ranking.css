@@ -63,7 +63,7 @@ award-rankings-table {
 
 			scroll-container {
 				content {
-					@apply min-h-4;
+					@apply min-h-11;
 				}
 			}
 

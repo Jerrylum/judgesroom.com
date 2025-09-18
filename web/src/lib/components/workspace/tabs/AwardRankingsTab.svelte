@@ -5,6 +5,7 @@
 	import './award-ranking.css';
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
+	import RankingButtons from './RankingButtons.svelte';
 
 	interface Props {
 		tab: AwardRankingsTab;
@@ -71,7 +72,11 @@
 			<!-- Header -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="text-xl font-semibold text-gray-900">Initial Award Candidate Ranking</h2>
-				<p class="mt-2 text-sm text-gray-600">Rank teams for specific awards based on judging criteria and performance.</p>
+				<p class="mt-2 text-sm text-gray-600">
+					Click on any ranking cell, then use the minus (-) and plus (+) buttons to adjust rankings to indicate teams that are strong
+					candidates for awards. All judge groups will cross-reference their lists to create a final award nomination list. This table is
+					shared and synchronized within your judge group - all judges see updates in real-time without needing to refresh the page.
+				</p>
 			</div>
 
 			{#each Object.entries(subscriptions.allJudgeGroupsAwardRankings) as [judgeGroupId, awardRankings]}
@@ -92,14 +97,12 @@
 						</table-header>
 						<table-body>
 							{#each listingTeams as teamId}
-								{@const rankings = awardRankings.rankings[teamId] ?? Array(awardRankings.judgedAwards.length).fill(0)}
-								{@const team = teams[teamId]}
 								<row>
-									<team>{team.number}</team>
+									<team>{teams[teamId].number}</team>
 									<scroll-container use:registerScrollContainer>
 										<content class="justify-start! flex-row!">
-											{#each rankings as ranking}
-												<div class="min-w-40 max-w-40 p-2 text-center">{ranking}</div>
+											{#each awardRankings.judgedAwards, awardIndex}
+												<RankingButtons {judgeGroupId} {teamId} {awardIndex} {awardRankings} />
 											{/each}
 										</content>
 									</scroll-container>
