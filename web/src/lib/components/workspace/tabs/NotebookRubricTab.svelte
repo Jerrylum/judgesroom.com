@@ -575,9 +575,10 @@
 							<scroll-container use:registerScrollContainer>
 								<content class="min-w-120">
 									<div>
-										Cited content is kept to relevant information and all cited content longer than a paragraph is located in appendices to
-										the Engineering Notebook. Information originating from outside the team is always properly cited in the notebook with
-										the source and date accessed. <u>Most or all Engineering Notebook content is original to the submitting team members.</u
+										Content is kept to relevant information and all content not original to the team longer than a paragraph is located in
+										appendices to the Engineering Notebook. Information originating from outside the team is always properly cited in the
+										notebook with the source and date accessed. <u
+											>Most or all Engineering Notebook content is original to the submitting team members.</u
 										>
 									</div>
 									<div>
