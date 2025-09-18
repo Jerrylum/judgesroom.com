@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-award-ranking-table {
+award-rankings-table {
 	@apply flex flex-col;
 
 	> :first-child {
@@ -63,7 +63,7 @@ award-ranking-table {
 
 			scroll-container {
 				content {
-					@apply min-h-23;
+					@apply min-h-4;
 				}
 			}
 

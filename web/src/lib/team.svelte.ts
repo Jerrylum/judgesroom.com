@@ -378,6 +378,26 @@ export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
 	});
 }
 
+export function sortByTeamNumberInMap(teamIds: Readonly<string>[], teamsMap: Readonly<Record<string, Readonly<TeamInfoAndData>>>) {
+	return teamIds.sort((a, b) => {
+		const aIsStartWithDigit = /[0-9]/.test(teamsMap[a].number);
+		const bIsStartWithDigit = /[0-9]/.test(teamsMap[b].number);
+
+		if (aIsStartWithDigit && !bIsStartWithDigit) {
+			return -1;
+		} else if (!aIsStartWithDigit && bIsStartWithDigit) {
+			return 1;
+		} else if (aIsStartWithDigit && bIsStartWithDigit) {
+			// 0000A -> 0000 (all letters after the digits are ignored)
+			const aNumber = parseInt(teamsMap[a].number);
+			const bNumber = parseInt(teamsMap[b].number);
+			return aNumber - bNumber;
+		} else {
+			return teamsMap[a].number.localeCompare(teamsMap[b].number);
+		}
+	});
+}
+
 export function sortByAssignedTeams(
 	includedTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>,
 	assignedTeamIds: string[]
