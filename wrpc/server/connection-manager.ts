@@ -41,6 +41,8 @@ export class WebSocketConnectionManager implements Network {
 	 */
 	async initialize() {
 		await this.load();
+		// Filter out clients that don't have a WebSocket connection
+		this.serverData.clients = this.serverData.clients.filter((c) => this.opts.getWebSocket(c.clientId) !== null);
 	}
 
 	getSessionId(): string {
