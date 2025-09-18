@@ -40,7 +40,7 @@
 		<div class="mx-auto max-w-5xl space-y-6">
 			<!-- Header -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<h2 class="text-xl font-semibold text-gray-900">Initial Award Candidate Ranking</h2>
+				<h2 class="text-xl font-semibold text-gray-900">Award Candidate Ranking</h2>
 				<p class="mt-2 text-sm text-gray-600">
 					Click on any ranking cell, then use the minus (-) and plus (+) buttons to adjust rankings to indicate teams that are strong
 					candidates for awards. All judge groups will cross-reference their lists to create a final award nomination list. This table is

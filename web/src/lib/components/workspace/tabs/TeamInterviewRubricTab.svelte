@@ -1,14 +1,14 @@
 <script lang="ts">
 	import './rubric.css';
-	import { app, tabs } from '$lib/app-page.svelte';
+	import { app, tabs, subscriptions } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import ScoringButtons from './ScoringButtons.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
-	import type { teams } from '@judging.jerryio/worker/src/db/schema';
 	import WarningSign from './WarningSign.svelte';
+	import AwardRankingsTable from './AwardRankingsTable.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -509,6 +509,19 @@
 					{/if}
 				</div>
 			</div>
+
+			<!-- Award Rankings Section -->
+			{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
+				{@const awardRankings = subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
+				<div class="rounded-lg bg-white p-6 shadow-sm">
+					<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
+					<p class="mb-4 text-sm text-gray-600">
+						Rate this team for specific awards based on your team interview by clicking on the boxes below. Use the star system (0-5 stars)
+						to indicate how strong a candidate this team is for each award.
+					</p>
+					<AwardRankingsTable listingTeams={[tab.teamId]} {awardRankings} />
+				</div>
+			{/if}
 		</div>
 	</div>
 </Tab>
