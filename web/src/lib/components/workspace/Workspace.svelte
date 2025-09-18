@@ -12,6 +12,8 @@
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);
 	const activeTabId = $derived(tabs.activeTab);
+	const isJudgingReady = $derived(app.isJudgingReady());
+	const currentJudgeGroupId = $derived(app.getCurrentUserJudgeGroup()?.id ?? null);
 
 	function switchTab(tabId: string) {
 		tabs.switchToTab(tabId);
@@ -21,17 +23,15 @@
 		tabs.closeTab(tabId);
 	}
 
-	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
-
 	$effect(() => {
-		if (!app.isJudgingReady()) return;
-
-		console.log('Subscribing to award rankings', currentJudgeGroup);
-
-		const allJudgeGroups = app.getJudgeGroups();
+		if (!isJudgingReady) return;
 
 		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
-		const targetJudgeGroupIds = currentJudgeGroup ? [currentJudgeGroup.id] : allJudgeGroups.map((group) => group.id);
+		const targetJudgeGroupIds = currentJudgeGroupId //
+			? [currentJudgeGroupId]
+			: app.getJudgeGroups().map((group) => group.id);
+
+		console.log('Subscribing to award rankings', targetJudgeGroupIds);
 		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsAwardRankings = data.reduce(
 				(acc, curr) => {
@@ -50,14 +50,15 @@
 	});
 
 	$effect(() => {
-		if (!app.isJudgingReady()) return;
+		if (!isJudgingReady) return;
 
-		console.log('Subscribing to reviewed teams', currentJudgeGroup);
-
-		const allJudgeGroups = app.getJudgeGroups();
+		console.log('Subscribing to reviewed teams', currentJudgeGroupId);
 
 		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
-		const targetJudgeGroupIds = currentJudgeGroup ? [currentJudgeGroup.id] : allJudgeGroups.map((group) => group.id);
+		const targetJudgeGroupIds = currentJudgeGroupId //
+			? [currentJudgeGroupId]
+			: app.getJudgeGroups().map((group) => group.id);
+
 		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
 				(acc, curr) => {

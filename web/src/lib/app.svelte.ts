@@ -230,6 +230,10 @@ export class App {
 		return this.sessionInfo !== null && this.essentialData !== null;
 	}
 
+	isJudgingReady(): boolean {
+		return this.sessionInfo !== null && this.essentialData !== null && this.getCurrentUser() !== null;
+	}
+
 	hasSessionInfo(): boolean {
 		return this.sessionInfo !== null;
 	}
