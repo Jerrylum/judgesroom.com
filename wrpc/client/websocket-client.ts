@@ -34,7 +34,16 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	private maxReconnectAttempts = 5;
 	private reconnectDelay = 1000;
 	private clientRouter: TClientRouter;
-	private connectionState: ConnectionState = 'offline';
+	private _connectionState: ConnectionState = 'offline';
+
+	private set connectionState(state: ConnectionState) {
+		this._connectionState = state;
+		this.options.onConnectionStateChange(state);
+	}
+
+	private get connectionState(): ConnectionState {
+		return this._connectionState;
+	}
 
 	constructor(
 		private options: ClientOptions<TClientRouter>,

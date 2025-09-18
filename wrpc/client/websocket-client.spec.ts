@@ -81,7 +81,8 @@ describe('WebsocketClient', () => {
 			deviceName: 'Test Device',
 			onContext: async () => ({}),
 			onOpen: () => {},
-			onClosed: () => {}
+			onClosed: () => {},
+			onConnectionStateChange: () => {}
 		};
 
 		// Create a test client router
@@ -136,7 +137,8 @@ describe('WebsocketClient', () => {
 				deviceName: 'Test Device',
 				onContext: async () => ({}),
 				onOpen: () => {},
-				onClosed: () => {}
+				onClosed: () => {},
+				onConnectionStateChange: () => {}
 			};
 
 			const minimalClient = new WebsocketClient(minimalOptions, clientRouter);
@@ -528,6 +530,39 @@ describe('WebsocketClient', () => {
 			expect(wsClient.getConnectionState()).toBe('offline');
 		});
 
+		it('should call onConnectionStateChange callback when state changes', async () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const testOptions = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			const testClient = new WebsocketClient(testOptions, clientRouter);
+
+			// Initially offline - no callback should be called yet
+			expect(onConnectionStateChangeSpy).not.toHaveBeenCalled();
+
+			// Start connection - should trigger connecting state
+			const queryPromise = testClient.query('test', null);
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connecting');
+
+			// Wait for connection to establish - should trigger connected state
+			await new Promise((resolve) => setTimeout(resolve, 10));
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
+
+			// Verify call order and count
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(2);
+			expect(onConnectionStateChangeSpy).toHaveBeenNthCalledWith(1, 'connecting');
+			expect(onConnectionStateChangeSpy).toHaveBeenNthCalledWith(2, 'connected');
+
+			testClient.disconnect();
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('offline');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(3);
+
+			// Clean up
+			queryPromise.catch(() => {}); // Handle rejection
+		});
+
 		it('should transition through connection states correctly', async () => {
 			// Initially offline
 			expect(wsClient.getConnectionState()).toBe('offline');
@@ -586,6 +621,58 @@ describe('WebsocketClient', () => {
 			global.WebSocket = OriginalWebSocket;
 		});
 
+		it('should call onConnectionStateChange callback on connection error', async () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const testOptions = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			// Mock WebSocket constructor to simulate immediate error
+			const OriginalWebSocket = global.WebSocket;
+			const ErrorWebSocket = vi.fn().mockImplementation((url: string) => {
+				const mockWs = {
+					readyState: 0,
+					url,
+					send: vi.fn(),
+					close: vi.fn(),
+					addEventListener: vi.fn(),
+					removeEventListener: vi.fn(),
+					dispatchEvent: vi.fn(),
+					onopen: null as any,
+					onmessage: null as any,
+					onclose: null as any,
+					onerror: null as any
+				};
+
+				// Simulate immediate error
+				setTimeout(() => {
+					if (mockWs.onerror) {
+						mockWs.onerror(new Event('error'));
+					}
+				}, 0);
+
+				return mockWs;
+			});
+
+			global.WebSocket = ErrorWebSocket as any;
+
+			const testClient = new WebsocketClient(testOptions, clientRouter);
+
+			try {
+				await testClient.query('test', 'input');
+			} catch (error) {
+				// Expected to fail
+			}
+
+			// Should have been called with connecting, then error
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(2);
+			expect(onConnectionStateChangeSpy).toHaveBeenNthCalledWith(1, 'connecting');
+			expect(onConnectionStateChangeSpy).toHaveBeenNthCalledWith(2, 'error');
+
+			global.WebSocket = OriginalWebSocket;
+		});
+
 		it('should set reconnecting state on unexpected close', async () => {
 			vi.useFakeTimers();
 
@@ -605,18 +692,65 @@ describe('WebsocketClient', () => {
 			wsClient.disconnect();
 		});
 
-		it.skip('should set offline state on normal close', async () => {
-			const queryPromise = wsClient.query('test', null);
+		it('should call onConnectionStateChange callback on reconnection attempts', async () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const testOptions = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			const testClient = new WebsocketClient(testOptions, clientRouter);
+			vi.useFakeTimers();
+
+			const queryPromise = testClient.query('test', null);
+			vi.advanceTimersByTime(10);
+
+			// Should be connected after initial connection
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
+			const connectedCallCount = onConnectionStateChangeSpy.mock.calls.length;
+
+			const mockWs = MockWebSocket.mock.results[MockWebSocket.mock.results.length - 1]?.value as any;
+
+			// Simulate unexpected close (not code 1000) to trigger reconnection
+			mockWs.simulateClose(1006, 'Connection lost');
+
+			// Should transition to reconnecting state
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('reconnecting');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(connectedCallCount + 1);
+
+			vi.useRealTimers();
+			testClient.disconnect();
+
+			// Clean up
+			queryPromise.catch(() => {}); // Handle rejection
+		});
+
+		it('should call onConnectionStateChange callback on normal close', async () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const testOptions = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			const testClient = new WebsocketClient(testOptions, clientRouter);
+			const queryPromise = testClient.query('test', null);
 			await new Promise((resolve) => setTimeout(resolve, 10));
 
-			expect(wsClient.getConnectionState()).toBe('connected');
+			// Should be connected after initial connection
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
+			const connectedCallCount = onConnectionStateChangeSpy.mock.calls.length;
 
-			const mockWs = MockWebSocket.mock.results[0]?.value as any;
+			const mockWs = MockWebSocket.mock.results[MockWebSocket.mock.results.length - 1]?.value as any;
 
 			// Simulate normal close
 			mockWs.simulateClose(1000, 'Normal closure');
 
-			expect(wsClient.getConnectionState()).toBe('offline');
+			// Should transition to offline state
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('offline');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(connectedCallCount + 1);
+
+			// Clean up
+			queryPromise.catch(() => {}); // Handle rejection
 		});
 
 		it('should maintain connection state through multiple operations', async () => {
@@ -721,7 +855,8 @@ describe('WebsocketClient', () => {
 					return context;
 				},
 				onOpen: () => {},
-				onClosed: () => {}
+				onClosed: () => {},
+				onConnectionStateChange: () => {}
 			};
 
 			// Create a context-aware client router using existing procedures

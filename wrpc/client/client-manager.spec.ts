@@ -105,7 +105,8 @@ describe('WRPCClientManager', () => {
 				deviceName: 'Test Device',
 				onContext: async () => ({}),
 				onOpen: () => {},
-				onClosed: () => {}
+				onClosed: () => {},
+				onConnectionStateChange: () => {}
 			};
 
 			vi.mocked(mockCreateOptions).mockReturnValue(expectedOptions);
@@ -239,6 +240,57 @@ describe('WRPCClientManager', () => {
 			expect(wrpcClient2).not.toBe(wrpcClient1);
 		});
 
+		it('should pass onConnectionStateChange callback to underlying client', () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const optionsWithCallback = vi.fn().mockReturnValue({
+				wsUrl: 'ws://localhost:8080/ws',
+				sessionId: 'test-session',
+				clientId: 'test-client',
+				deviceId: 'test-device',
+				deviceName: 'Test Device',
+				onContext: async () => ({}),
+				onOpen: () => {},
+				onClosed: () => {},
+				onConnectionStateChange: onConnectionStateChangeSpy
+			});
+
+			const managerWithCallback = new WRPCClientManager(optionsWithCallback, clientRouter);
+			const [wsClient] = managerWithCallback.getClient();
+
+			// Verify that the callback was passed to the underlying WebsocketClient
+			expect((wsClient as any).options.onConnectionStateChange).toBe(onConnectionStateChangeSpy);
+		});
+
+		it('should handle connection state changes through callback', () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const optionsWithCallback = vi.fn().mockReturnValue({
+				wsUrl: 'ws://localhost:8080/ws',
+				sessionId: 'test-session',
+				clientId: 'test-client',
+				deviceId: 'test-device',
+				deviceName: 'Test Device',
+				onContext: async () => ({}),
+				onOpen: () => {},
+				onClosed: () => {},
+				onConnectionStateChange: onConnectionStateChangeSpy
+			});
+
+			const managerWithCallback = new WRPCClientManager(optionsWithCallback, clientRouter);
+			
+			// Create client - this should trigger the callback through the mock
+			const [wsClient] = managerWithCallback.getClient();
+			
+			// Simulate state change by calling the callback directly
+			// (since we're using mocks, we can test that the callback is properly wired)
+			const callback = (wsClient as any).options.onConnectionStateChange;
+			callback('connecting');
+			callback('connected');
+			
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connecting');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(2);
+		});
+
 		it('should handle dynamic options', () => {
 			let sessionId = 'session-1';
 			vi.mocked(mockCreateOptions).mockImplementation(() => ({
@@ -249,7 +301,8 @@ describe('WRPCClientManager', () => {
 				deviceName: 'Test Device',
 				onContext: async () => ({}),
 				onOpen: () => {},
-				onClosed: () => {}
+				onClosed: () => {},
+				onConnectionStateChange: () => {}
 			}));
 
 			const [wsClient1] = clientManager.getClient();
@@ -273,7 +326,8 @@ describe('WRPCClientManager', () => {
 					deviceName: 'Test Device',
 					onContext: async () => ({}),
 					onOpen: () => {},
-					onClosed: () => {}
+					onClosed: () => {},
+					onConnectionStateChange: () => {}
 				}),
 				clientRouter
 			);
@@ -307,7 +361,8 @@ describe('createClientManager', () => {
 			deviceName: 'Test Device',
 			onContext: async () => ({}),
 			onOpen: () => {},
-			onClosed: () => {}
+			onClosed: () => {},
+			onConnectionStateChange: () => {}
 		});
 
 		const w = initWRPC.createClient();

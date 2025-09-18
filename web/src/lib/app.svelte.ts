@@ -87,6 +87,7 @@ export class App {
 	private readonly storage: AppStorage;
 	private readonly isDevelopment: boolean;
 	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
+	private connectionState: ConnectionState = $state('offline');
 	private sessionInfo: SessionInfo | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
@@ -279,7 +280,7 @@ export class App {
 	}
 
 	getConnectionState(): ConnectionState {
-		return this.clientManager.getConnectionState();
+		return this.connectionState;
 	}
 
 	// ============================================================================
@@ -593,6 +594,9 @@ export class App {
 
 					AppUI.appPhase = 'choose_action';
 				}
+			},
+			onConnectionStateChange: (state) => {
+				this.connectionState = state;
 			}
 		};
 	}

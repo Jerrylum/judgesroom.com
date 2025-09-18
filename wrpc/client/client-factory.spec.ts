@@ -32,7 +32,8 @@ describe('createWRPCClient', () => {
 			deviceName: 'Test Device',
 			onContext: async () => ({}),
 			onOpen: () => {},
-			onClosed: () => {}
+			onClosed: () => {},
+			onConnectionStateChange: () => {}
 		};
 
 		// Create a test client router
@@ -187,6 +188,67 @@ describe('createWRPCClient', () => {
 			expect(wrpcProxy1).not.toBe(wrpcProxy2);
 			expect((wsClient1 as any).options.clientId).toBe('client-1');
 			expect((wsClient2 as any).options.clientId).toBe('client-2');
+		});
+	});
+
+	describe('callback handling', () => {
+		it('should pass onConnectionStateChange callback to WebsocketClient', () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const optionsWithCallback = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			const [wsClient] = createWRPCClient(optionsWithCallback, clientRouter);
+
+			// Verify that the callback was passed to the WebsocketClient
+			expect(WebsocketClient).toHaveBeenCalledWith(optionsWithCallback, clientRouter);
+			expect((wsClient as any).options.onConnectionStateChange).toBe(onConnectionStateChangeSpy);
+		});
+
+		it('should handle connection state change callbacks through factory', () => {
+			const onConnectionStateChangeSpy = vi.fn();
+			const optionsWithCallback = {
+				...clientOptions,
+				onConnectionStateChange: onConnectionStateChangeSpy
+			};
+
+			const [wsClient] = createWRPCClient(optionsWithCallback, clientRouter);
+
+			// Simulate callback invocation (since we're using mocks)
+			const callback = (wsClient as any).options.onConnectionStateChange;
+			callback('connecting');
+			callback('connected');
+			callback('offline');
+
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connecting');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('offline');
+			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(3);
+		});
+
+		it('should work with different callback implementations', () => {
+			const stateHistory: string[] = [];
+			const trackingCallback = (state: string) => {
+				stateHistory.push(state);
+			};
+
+			const optionsWithTracking = {
+				...clientOptions,
+				onConnectionStateChange: trackingCallback
+			};
+
+			const [wsClient] = createWRPCClient(optionsWithTracking, clientRouter);
+			const callback = (wsClient as any).options.onConnectionStateChange;
+
+			// Simulate various state transitions
+			callback('connecting');
+			callback('connected');
+			callback('reconnecting');
+			callback('connected');
+			callback('offline');
+
+			expect(stateHistory).toEqual(['connecting', 'connected', 'reconnecting', 'connected', 'offline']);
 		});
 	});
 
