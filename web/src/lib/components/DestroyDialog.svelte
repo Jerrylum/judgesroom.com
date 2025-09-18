@@ -5,7 +5,6 @@
 	let destroyConfirmText = $state('');
 	let isDestroying = $state(false);
 
-	const isJudgingReady = $derived(app.isJudgingReady());
 	const canDestroy = $derived(true);
 	const isDestroyConfirmValid = $derived(destroyConfirmText.trim().toLowerCase() === 'destroy');
 

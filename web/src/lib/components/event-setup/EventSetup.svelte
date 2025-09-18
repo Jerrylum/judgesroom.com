@@ -69,7 +69,7 @@
 	 * Check if current event setup conflicts with original
 	 */
 	async function hasEventSetupConflict(): Promise<boolean> {
-		if (!originalEventSetupHash || !app.isJudgingReady()) return false;
+		if (!originalEventSetupHash || !app.isWorkspaceReady()) return false;
 		const currentHash = await generateEventSetupHash(app.getEssentialData());
 		return currentHash !== originalEventSetupHash;
 	}
@@ -143,7 +143,7 @@
 
 	function cancelSetup() {
 		// Only allow cancel if user is in session
-		if (app.isJudgingReady()) {
+		if (app.isWorkspaceReady()) {
 			AppUI.appPhase = 'workspace';
 		}
 	}
@@ -185,7 +185,7 @@
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready
-			if (app.isJudgingReady()) {
+			if (app.isWorkspaceReady()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
 				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
 				await app.wrpcClient.judge.updateAllJudges.mutation(judges);
@@ -335,7 +335,7 @@
 				onPrev={prevStep}
 				onComplete={completeSetup}
 				onCancel={cancelSetup}
-				isJudgingReady={app.isJudgingReady()}
+				isWorkspaceReady={app.isWorkspaceReady()}
 			/>
 		{/if}
 	</div>

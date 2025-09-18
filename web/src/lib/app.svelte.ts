@@ -226,7 +226,7 @@ export class App {
 		}
 	}
 
-	isJudgingReady(): boolean {
+	isWorkspaceReady(): boolean {
 		return this.sessionInfo !== null && this.essentialData !== null;
 	}
 
