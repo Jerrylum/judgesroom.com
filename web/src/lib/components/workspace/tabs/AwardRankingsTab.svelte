@@ -5,7 +5,7 @@
 	import './award-ranking.css';
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import RankingButtons from './RankingButtons.svelte';
+	import AwardRankingsTable from './AwardRankingsTable.svelte';
 
 	interface Props {
 		tab: AwardRankingsTab;
@@ -25,37 +25,6 @@
 			{} as Record<string, JudgeGroup>
 		)
 	);
-
-	// Scroll container references for synchronization
-	let scrollContainers: HTMLElement[] = [];
-	let isSyncing = false;
-
-	// Synchronize scroll positions across all containers
-	function syncScrollPosition(sourceContainer: HTMLElement) {
-		if (isSyncing) return; // Prevent infinite loop
-
-		isSyncing = true;
-		const scrollLeft = sourceContainer.scrollLeft;
-
-		scrollContainers.forEach((container) => {
-			if (container !== sourceContainer) {
-				container.scrollLeft = scrollLeft;
-			}
-		});
-
-		// Use setTimeout to reset the flag after all scroll events have been processed
-		setTimeout(() => {
-			isSyncing = false;
-		}, 0);
-	}
-
-	// Register scroll container and add event listener
-	function registerScrollContainer(container: HTMLElement) {
-		if (!scrollContainers.includes(container)) {
-			scrollContainers.push(container);
-			container.addEventListener('scroll', () => syncScrollPosition(container));
-		}
-	}
 
 	function getListingTeams(judgeGroupId: string) {
 		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
@@ -84,32 +53,7 @@
 				{@const listingTeams = getListingTeams(judgeGroupId)}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-2 text-lg font-semibold text-gray-900">{judgeGroup.name}</h3>
-					<award-rankings-table>
-						<table-header>
-							<team>TEAM NUMBER</team>
-							<scroll-container use:registerScrollContainer>
-								<content class="justify-start! flex-row!">
-									{#each awardRankings.judgedAwards as award}
-										<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center bg-gray-200 p-2 text-center">{award}</div>
-									{/each}
-								</content>
-							</scroll-container>
-						</table-header>
-						<table-body>
-							{#each listingTeams as teamId}
-								<row>
-									<team>{teams[teamId].number}</team>
-									<scroll-container use:registerScrollContainer>
-										<content class="justify-start! flex-row!">
-											{#each awardRankings.judgedAwards, awardIndex}
-												<RankingButtons {judgeGroupId} {teamId} {awardIndex} {awardRankings} />
-											{/each}
-										</content>
-									</scroll-container>
-								</row>
-							{/each}
-						</table-body>
-					</award-rankings-table>
+					<AwardRankingsTable {listingTeams} {awardRankings} />
 				</div>
 			{/each}
 
