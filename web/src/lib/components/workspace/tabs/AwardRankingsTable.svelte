@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 	import { app } from '$lib/app-page.svelte';
+	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import RankingButtons from './RankingButtons.svelte';
 
 	interface Props {
@@ -12,36 +13,7 @@
 
 	const teams = $derived(app.getAllTeamInfoAndData());
 
-	// Scroll container references for synchronization
-	let scrollContainers: HTMLElement[] = [];
-	let isSyncing = false;
-
-	// Synchronize scroll positions across all containers
-	function syncScrollPosition(sourceContainer: HTMLElement) {
-		if (isSyncing) return; // Prevent infinite loop
-
-		isSyncing = true;
-		const scrollLeft = sourceContainer.scrollLeft;
-
-		scrollContainers.forEach((container) => {
-			if (container !== sourceContainer) {
-				container.scrollLeft = scrollLeft;
-			}
-		});
-
-		// Use setTimeout to reset the flag after all scroll events have been processed
-		setTimeout(() => {
-			isSyncing = false;
-		}, 0);
-	}
-
-	// Register scroll container and add event listener
-	function registerScrollContainer(container: HTMLElement) {
-		if (!scrollContainers.includes(container)) {
-			scrollContainers.push(container);
-			container.addEventListener('scroll', () => syncScrollPosition(container));
-		}
-	}
+	const { registerScrollContainer } = scrollSync();
 </script>
 
 <award-rankings-table>
