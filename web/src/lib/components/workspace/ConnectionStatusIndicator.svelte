@@ -50,19 +50,4 @@
 		<div class="h-2 w-2 rounded-full {getStatusColor(connectionState)}"></div>
 		<span class="text-xs text-gray-600">{getStatusText(connectionState)}</span>
 	</div>
-
-	<!-- Offline mode indicator -->
-	{#if !isWorkspaceReady}
-		<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">Offline Mode</span>
-	{/if}
-
-	<!-- Connection issues indicator -->
-	{#if connectionState === 'error'}
-		<span class="rounded-full bg-red-100 px-2 py-1 text-xs text-red-700">Connection Issues</span>
-	{/if}
-
-	<!-- Submission disabled indicator -->
-	{#if connectionState !== 'connected' && isWorkspaceReady}
-		<span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-700">Submissions Disabled</span>
-	{/if}
 </div>
