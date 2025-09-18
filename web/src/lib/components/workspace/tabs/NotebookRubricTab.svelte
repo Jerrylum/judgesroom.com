@@ -199,15 +199,12 @@
 				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
 
 				<!-- Filter Controls -->
-				{#if isAssignedJudging && !isSubmitted}
+				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
 					<div class="mb-4">
 						<label class="flex items-center">
 							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
 							<span class="text-sm text-gray-700">
-								Only show assigned teams for your current judge group
-								{#if currentJudgeGroup}
-									({currentJudgeGroup.name})
-								{/if}
+								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
 							</span>
 						</label>
 					</div>

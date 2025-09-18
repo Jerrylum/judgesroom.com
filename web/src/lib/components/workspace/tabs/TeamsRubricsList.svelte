@@ -133,7 +133,7 @@
 				bind:checked={showOnlyAssignedTeams}
 				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 			/>
-			<span class="text-sm text-gray-700">Only show assigned teams for your current judge group</span>
+			<span class="text-sm text-gray-700">Only show assigned teams for your current judge group ({currentJudgeGroup.name})</span>
 		</label>
 	</div>
 {/if}

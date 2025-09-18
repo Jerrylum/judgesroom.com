@@ -61,68 +61,66 @@
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="text-lg font-medium text-gray-900">Start</h2>
 				<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-					{#if isJudge}
-						<button
-							onclick={addNotebookSortingTab}
-							class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-						>
-							<div class="rounded-full bg-purple-100 p-2">
-								<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-									/>
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
-								</svg>
-							</div>
-							<div>
-								<div class="font-medium">Notebook Sorting</div>
-								<div class="text-sm text-gray-500">Sort the engineering notebooks</div>
-							</div>
-						</button>
+					<button
+						onclick={addNotebookSortingTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					>
+						<div class="rounded-full bg-purple-100 p-2">
+							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+								/>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+							</svg>
+						</div>
+						<div>
+							<div class="font-medium">Notebook Sorting</div>
+							<div class="text-sm text-gray-500">Sort the engineering notebooks</div>
+						</div>
+					</button>
 
-						<button
-							onclick={addNotebookReviewTab}
-							class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-						>
-							<div class="rounded-full bg-green-100 p-2">
-								<svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-									/>
-								</svg>
-							</div>
-							<div>
-								<div class="font-medium">Notebook Review</div>
-								<div class="text-sm text-gray-500">Review engineering notebooks</div>
-							</div>
-						</button>
+					<button
+						onclick={addNotebookReviewTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					>
+						<div class="rounded-full bg-green-100 p-2">
+							<svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+								/>
+							</svg>
+						</div>
+						<div>
+							<div class="font-medium">Notebook Review</div>
+							<div class="text-sm text-gray-500">Review engineering notebooks</div>
+						</div>
+					</button>
 
-						<button
-							onclick={addTeamInterviewTab}
-							class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-						>
-							<div class="rounded-full bg-blue-100 p-2">
-								<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-									/>
-								</svg>
-							</div>
-							<div>
-								<div class="font-medium">Team Interview</div>
-								<div class="text-sm text-gray-500">Conduct team interviews</div>
-							</div>
-						</button>
-					{/if}
+					<button
+						onclick={addTeamInterviewTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					>
+						<div class="rounded-full bg-blue-100 p-2">
+							<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+								/>
+							</svg>
+						</div>
+						<div>
+							<div class="font-medium">Team Interview</div>
+							<div class="text-sm text-gray-500">Conduct team interviews</div>
+						</div>
+					</button>
 
 					<button
 						onclick={addAwardRankingsTab}

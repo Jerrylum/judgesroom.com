@@ -12,28 +12,13 @@
 
 	let { tab, isActive }: Props = $props();
 
-	// const allTeams = $derived(app.getAllTeams());
-	// const allTeamData = $derived(app.getAllTeamData());
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
-	const currentUser = $derived(app.getCurrentUser());
 	const essentialData = $derived(app.getEssentialData());
-
-	// Use current user's judge information with reactive validation
-	const currentJudge = $derived(() => {
-		if (!currentUser || currentUser.role !== 'judge') {
-			throw new Error('CRITICAL: NotebookSortingTab can only be accessed by judges');
-		}
-		return currentUser.judge;
-	});
 
 	// Check if the event uses assigned judging method
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 
-	// Get current judge's group
-	const currentJudgeGroup = $derived.by(() => {
-		if (!currentJudge()) return null;
-		return app.findJudgeGroupByJudgeId(currentJudge().id);
-	});
+	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
@@ -83,15 +68,12 @@
 				<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be completed the Engineering Notebook Rubric.</p>
 
 				<!-- Filter Controls -->
-				{#if isAssignedJudging}
+				{#if isAssignedJudging && currentJudgeGroup}
 					<div>
 						<label class="flex items-center">
 							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
 							<span class="text-sm text-gray-700">
-								Only show assigned teams for your current judge group
-								{#if currentJudgeGroup}
-									({currentJudgeGroup.name})
-								{/if}
+								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
 							</span>
 						</label>
 					</div>
