@@ -114,7 +114,7 @@
 </script>
 
 <div class="mb-4 flex items-center justify-between">
-	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
+	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics ({teamList.length} teams)</h2>
 	<button
 		onclick={refreshRubricsAndNotes}
 		class="inline-flex items-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
