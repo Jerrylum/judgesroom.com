@@ -99,34 +99,39 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 /**
  * Sample test data for awards
  */
-export const sampleAwards: Award[] = [
+type AwardInDatabase = Award & { position: number };
+export const sampleAwards: AwardInDatabase[] = [
 	{
 		name: 'Excellence Award',
 		type: 'performance',
 		acceptedGrades: ['High School', 'Middle School'],
 		winnersCount: 1,
-		requireNotebook: true
+		requireNotebook: true,
+		position: 0
 	},
 	{
 		name: 'Design Award',
 		type: 'judged',
 		acceptedGrades: ['High School'],
 		winnersCount: 3,
-		requireNotebook: true
+		requireNotebook: true,
+		position: 1
 	},
 	{
 		name: 'Teamwork Award',
 		type: 'judged',
 		acceptedGrades: ['Middle School', 'High School'],
 		winnersCount: 2,
-		requireNotebook: false
+		requireNotebook: false,
+		position: 2
 	},
 	{
 		name: 'Volunteer Award',
 		type: 'volunteer_nominated',
 		acceptedGrades: ['Elementary School', 'Middle School', 'High School'],
 		winnersCount: 1,
-		requireNotebook: false
+		requireNotebook: false,
+		position: 3
 	}
 ];
 
