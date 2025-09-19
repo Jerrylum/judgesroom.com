@@ -175,6 +175,7 @@ describe('Integration Tests', () => {
 			competitionType: 'V5RC',
 			eventGradeLevel: selectedGradeLevel!.value,
 			judgingMethod: 'walk_in',
+			judgingStep: 'beginning',
 			awards: [
 				{
 					name: 'Tournament Champions',
@@ -237,6 +238,7 @@ describe('Integration Tests', () => {
 			competitionType: 'VIQRC',
 			eventGradeLevel: blendedOption!.value,
 			judgingMethod: 'walk_in',
+			judgingStep: 'beginning',
 			teamInfos: [],
 			awards: [],
 			judgeGroups: [

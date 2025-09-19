@@ -3,6 +3,9 @@ import { z } from 'zod';
 export const JudgingMethodSchema = z.enum(['walk_in', 'assigned']);
 export type JudgingMethod = z.infer<typeof JudgingMethodSchema>;
 
+export const JudgingStepSchema = z.enum(['beginning', 'award_deliberations']);
+export type JudgingStep = z.infer<typeof JudgingStepSchema>;
+
 export const JudgeNameSchema = z
 	.string()
 	.nonempty()

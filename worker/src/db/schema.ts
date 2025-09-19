@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, primaryKey, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, primaryKey, index, uniqueIndex, unique } from 'drizzle-orm/sqlite-core';
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
@@ -24,7 +24,8 @@ export const metadata = sqliteTable('Metadata', {
 	eventName: text('eventName').notNull(),
 	competitionType: text('competitionType', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),
-	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull()
+	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
+	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull()
 });
 
 export const awards = sqliteTable(
@@ -63,7 +64,6 @@ export const teams = sqliteTable(
 export const judgeGroups = sqliteTable('JudgeGroups', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull()
-	// assignedTeams: text('assignedTeams', { mode: 'json' }).notNull()
 });
 
 export const judgeGroupsAssignedTeams = sqliteTable(
@@ -86,18 +86,6 @@ export const judges = sqliteTable('Judges', {
 		.references(() => judgeGroups.id, { onDelete: 'cascade' })
 		.notNull()
 });
-
-export const finalAwardRankings = sqliteTable(
-	'FinalAwardRankings',
-	{
-		teamId: text('teamId')
-			.references(() => teams.id, { onDelete: 'cascade' })
-			.notNull(),
-		awardName: text('awardName').notNull(),
-		ranking: integer('ranking').notNull()
-	},
-	(table) => [index('final_award_rankings_teamId').on(table.teamId), index('final_award_rankings_awardName').on(table.awardName)]
-);
 
 export const engineeringNotebookRubrics = sqliteTable(
 	'EngineeringNotebookRubrics',
@@ -166,7 +154,10 @@ export const judgeGroupsSubmissionsCache = sqliteTable(
 		tiId: text('tiId').references(() => teamInterviewRubrics.id, { onDelete: 'cascade' }),
 		tnId: text('tnId').references(() => teamInterviewNotes.id, { onDelete: 'cascade' })
 	},
-	(table) => [primaryKey({ columns: [table.enrId, table.tiId, table.tnId] })]
+	(table) => [
+		primaryKey({ columns: [table.enrId, table.tiId, table.tnId] }),
+		index('judge_groups_submissions_cache_judgeGroupId').on(table.judgeGroupId)
+	]
 );
 
 export const judgeGroupsReviewedTeams = sqliteTable(
@@ -202,39 +193,20 @@ export const awardRankings = sqliteTable(
 	]
 );
 
-export const judgeGroupAwardNominations = sqliteTable(
-	'JudgeGroupAwardNominations',
-	{
-		judgeGroupId: text('judgeGroupId')
-			.references(() => judgeGroups.id, { onDelete: 'cascade' })
-			.notNull(),
-		awardName: text('awardName')
-			.references(() => awards.name, { onDelete: 'cascade' })
-			.notNull(),
-		teamId: text('teamId')
-			.references(() => teams.id, { onDelete: 'cascade' })
-			.notNull()
-	},
-	(table) => [
-		primaryKey({ columns: [table.judgeGroupId, table.awardName, table.teamId] }),
-		index('judge_group_award_nominations_judgeGroupId').on(table.judgeGroupId)
-	]
-);
-
 export const finalAwardNominations = sqliteTable(
 	'FinalAwardNominations',
 	{
 		awardName: text('awardName')
 			.references(() => awards.name, { onDelete: 'cascade' })
 			.notNull(),
-		ranking: integer('ranking').notNull(),
+		ranking: integer('ranking').notNull(), // start at 0
 		teamId: text('teamId')
 			.references(() => teams.id, { onDelete: 'cascade' })
-			.notNull()
+			.notNull(),
+		judgeGroupId: text('judgeGroupId').references(() => judgeGroups.id, { onDelete: 'cascade' })
 	},
 	(table) => [
-		primaryKey({ columns: [table.awardName, table.ranking] }),
-		index('awardName').on(table.awardName),
-		index('awardRanking').on(table.awardName, table.ranking)
+		uniqueIndex('final_award_nominations_awardName_ranking').on(table.awardName, table.ranking),
+		unique('final_award_nominations_awardName_teamId').on(table.awardName, table.teamId)
 	]
 );

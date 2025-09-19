@@ -57,3 +57,10 @@ export const AwardRankingsPartialUpdateSchema = z.object({
 });
 
 export type AwardRankingsPartialUpdate = z.infer<typeof AwardRankingsPartialUpdateSchema>;
+
+export const AwardNominationSchema = z.object({
+	teamId: z.uuidv4(),
+	judgeGroupId: z.uuidv4().nullable()
+});
+
+export type AwardNomination = z.infer<typeof AwardNominationSchema>;

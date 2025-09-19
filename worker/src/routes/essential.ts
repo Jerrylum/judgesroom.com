@@ -77,6 +77,7 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 			competitionType: metadataRows[0].competitionType,
 			eventGradeLevel: metadataRows[0].eventGradeLevel,
 			judgingMethod: metadataRows[0].judgingMethod,
+			judgingStep: metadataRows[0].judgingStep,
 			awards: await getAwards(tx),
 			teamInfos: await getTeamInfos(tx),
 			judgeGroups: await getJudgeGroups(tx)

@@ -12,8 +12,7 @@
 	import { EditingTeam } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
-	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
-	import type { TeamData } from '@judging.jerryio/protocol/src/team';
+	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
 
 	// Extended AwardOptions type for drag and drop
 	type AwardOptionsWithId = AwardOptions & { id: string };
@@ -37,6 +36,7 @@
 
 	// Judging
 	let judgingMethod: JudgingMethod = $state('assigned');
+	let judgingStep: JudgingStep = $state('beginning');
 	let judgeGroups: JudgeGroupClass[] = $state([]);
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: EditingTeam[] = $state([]);
@@ -173,6 +173,7 @@
 				competitionType: selectedCompetitionType,
 				eventGradeLevel: selectedEventGradeLevel,
 				judgingMethod,
+				judgingStep,
 				teamInfos: teams.map((team) => ({ ...team.info, data: team.data })),
 				judgeGroups: judgeGroups.map((group) => ({
 					id: group.id,

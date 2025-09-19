@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { AwardSchema } from './award';
 import { CompetitionTypeSchema } from './award';
-import { TeamInfoSchema, TeamDataSchema } from './team';
-import { JudgingMethodSchema } from './judging';
+import { TeamInfoSchema } from './team';
+import { JudgingMethodSchema, JudgingStepSchema } from './judging';
 import { JudgeGroupSchema } from './judging';
 
 export const EventGradeLevelSchema = z.enum(['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only']);
@@ -19,6 +19,7 @@ export const EssentialDataSchema = z.object({
 	competitionType: CompetitionTypeSchema,
 	eventGradeLevel: EventGradeLevelSchema,
 	judgingMethod: JudgingMethodSchema,
+	judgingStep: JudgingStepSchema,
 	teamInfos: z.array(TeamInfoSchema),
 	judgeGroups: z.array(JudgeGroupSchema).min(1),
 	awards: z.array(AwardSchema)

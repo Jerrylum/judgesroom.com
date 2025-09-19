@@ -210,7 +210,8 @@ export async function seedTestDatabase(context: ServerContext) {
 		eventName: 'Test Event',
 		competitionType: 'VIQRC',
 		eventGradeLevel: 'MS Only',
-		judgingMethod: 'assigned'
+		judgingMethod: 'assigned',
+		judgingStep: 'beginning'
 	});
 
 	// Insert a judge group so EssentialDataSchema (min 1) is satisfied

@@ -1,23 +1,24 @@
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import z from 'zod';
 import {
+	AwardNominationSchema,
 	AwardRankingsFullUpdateSchema,
 	EngineeringNotebookRubricSchema,
 	TeamInterviewNoteSchema,
 	TeamInterviewRubricSchema
 } from '@judging.jerryio/protocol/src/rubric';
 import type {
+	AwardNomination,
 	AwardRankingsFullUpdate,
 	EngineeringNotebookRubric,
 	TeamInterviewNote,
 	TeamInterviewRubric
 } from '@judging.jerryio/protocol/src/rubric';
-import { eq } from 'drizzle-orm';
+import { eq, desc, and, asc } from 'drizzle-orm';
 import {
 	awardRankings,
 	engineeringNotebookRubrics,
-	finalAwardRankings,
-	judgeGroupAwardNominations,
+	finalAwardNominations,
 	judgeGroupsReviewedTeams,
 	judgeGroupsSubmissionsCache,
 	teamInterviewNotes,
@@ -25,11 +26,11 @@ import {
 } from '../db/schema';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
-import { and } from 'drizzle-orm';
-import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeJudgeGroupTopic } from './subscriptions';
 import { transaction } from '../utils';
 import { getAwards } from './essential';
+import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
 export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: string): Promise<AwardRankingsFullUpdate> {
 	const { judgedAwards, rankingsData } = await transaction(db, async (tx) => {
@@ -76,6 +77,37 @@ export async function getReviewedTeams(db: DatabaseOrTransaction, judgeGroupId: 
 export async function addReviewedTeam(db: DatabaseOrTransaction, judgeGroupId: string, teamId: string): Promise<boolean> {
 	const result = await db.insert(judgeGroupsReviewedTeams).values({ judgeGroupId, teamId }).onConflictDoNothing().returning();
 	return result.length > 0;
+}
+
+export async function getFinalAwardNominations(tx: DatabaseOrTransaction): Promise<Record<string, AwardNomination[]>> {
+	const result = await tx.select().from(finalAwardNominations);
+	const rtn = {} as Record<string, AwardNomination[]>;
+	for (const row of result) {
+		if (!rtn[row.awardName]) {
+			rtn[row.awardName] = [];
+		}
+		rtn[row.awardName].push({ teamId: row.teamId, judgeGroupId: row.judgeGroupId });
+	}
+	return rtn;
+}
+
+export async function getFinalAwardNominationsForAward(tx: DatabaseOrTransaction, awardName: string): Promise<AwardNomination[]> {
+	const result = await tx
+		.select({ teamId: finalAwardNominations.teamId, judgeGroupId: finalAwardNominations.judgeGroupId })
+		.from(finalAwardNominations)
+		.where(eq(finalAwardNominations.awardName, awardName))
+		.orderBy(asc(finalAwardNominations.ranking));
+	return result;
+}
+
+export function broadcastFinalAwardNominationsUpdate(
+	tx: DatabaseOrTransaction,
+	awardName: string,
+	broadcast: RouterBroadcastProxy<ClientRouter>
+) {
+	getFinalAwardNominationsForAward(tx, awardName).then((nominations) => {
+		broadcast.onFinalAwardNominationsUpdate.mutation({ awardName, nominations });
+	});
 }
 
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
@@ -314,73 +346,60 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			return unsubscribeJudgeGroupTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
 		}),
 
-		updateJudgeGroupAwardNomination: w.procedure
-			.input(z.object({ judgeGroupId: z.uuidv4(), awardName: AwardNameSchema, teamIds: z.array(z.uuidv4()) }))
-			.mutation(async ({ ctx, input }) => {
-				// remove all existing nominations for the judge group and award, transactionally
-				await ctx.db.transaction(async (tx) => {
+		nominateFinalAward: w.procedure
+			.input(z.object({ awardName: AwardNameSchema, teamId: z.uuidv4(), judgeGroupId: z.uuidv4().nullable() }))
+			.mutation(async ({ ctx, input, session }) => {
+				await transaction(ctx.db, async (tx) => {
+					const lastRanking =
+						(
+							await tx
+								.select({ ranking: finalAwardNominations.ranking })
+								.from(finalAwardNominations)
+								.where(eq(finalAwardNominations.awardName, input.awardName))
+								.orderBy(desc(finalAwardNominations.ranking))
+								.limit(1)
+						)[0]?.ranking ?? -1;
 					await tx
-						.delete(judgeGroupAwardNominations)
-						.where(
-							and(
-								eq(judgeGroupAwardNominations.judgeGroupId, input.judgeGroupId),
-								eq(judgeGroupAwardNominations.awardName, input.awardName)
-							)
-						);
-					await tx.insert(judgeGroupAwardNominations).values(
-						input.teamIds.map((teamId) => ({
-							judgeGroupId: input.judgeGroupId,
-							awardName: input.awardName,
-							teamId: teamId
-						}))
-					);
+						.insert(finalAwardNominations)
+						.values({ ...input, ranking: lastRanking + 1 })
+						.onConflictDoNothing();
 				});
+
+				// Do not wait for the broadcast to complete
+				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
 			}),
 
-		getJudgeGroupAwardNominations: w.procedure
-			.input(z.object({ judgeGroupId: z.uuidv4() }))
-			.output(z.record(AwardNameSchema, z.array(z.uuidv4())))
-			.query(async ({ ctx, input }) => {
-				const result = await ctx.db
-					.select()
-					.from(judgeGroupAwardNominations)
-					.where(eq(judgeGroupAwardNominations.judgeGroupId, input.judgeGroupId));
-				const rtn = new Map<string, string[]>();
-				for (const row of result) {
-					if (!rtn.has(row.awardName)) {
-						rtn.set(row.awardName, []);
-					}
-					rtn.get(row.awardName)?.push(row.teamId);
-				}
-				return Object.fromEntries(rtn.entries());
+		removeFromFinalAwardNominations: w.procedure
+			.input(z.object({ awardName: AwardNameSchema, teamId: z.uuidv4() }))
+			.mutation(async ({ ctx, input, session }) => {
+				await transaction(ctx.db, async (tx) => {
+					await tx
+						.delete(finalAwardNominations)
+						.where(and(eq(finalAwardNominations.awardName, input.awardName), eq(finalAwardNominations.teamId, input.teamId)));
+				});
+
+				// Do not wait for the broadcast to complete
+				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
 			}),
 
-		updateFinalAwardRankings: w.procedure
-			.input(z.object({ awardName: AwardNameSchema, teamIds: z.array(z.uuidv4()) }))
-			.mutation(async ({ ctx, input }) => {
+		updateFromFinalAwardNominations: w.procedure
+			.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
+			.mutation(async ({ ctx, input, session }) => {
 				// remove all existing rankings for the award, transactionally
 				await ctx.db.transaction(async (tx) => {
-					await tx.delete(finalAwardRankings).where(eq(finalAwardRankings.awardName, input.awardName));
-					await tx.insert(finalAwardRankings).values(
-						input.teamIds.map((teamId) => ({
+					await tx.delete(finalAwardNominations).where(eq(finalAwardNominations.awardName, input.awardName));
+					for (let i = 0; i < input.nominations.length; i++) {
+						await tx.insert(finalAwardNominations).values({
 							awardName: input.awardName,
-							ranking: input.teamIds.indexOf(teamId) + 1,
-							teamId: teamId
-						}))
-					);
+							ranking: i,
+							teamId: input.nominations[i].teamId,
+							judgeGroupId: input.nominations[i].judgeGroupId
+						});
+					}
 				});
-			}),
 
-		getFinalAwardRankings: w.procedure.output(z.record(AwardNameSchema, z.array(z.uuidv4()))).query(async ({ ctx }) => {
-			const result = await ctx.db.select().from(finalAwardRankings);
-			const rtn = new Map<string, string[]>();
-			for (const row of result) {
-				if (!rtn.has(row.awardName)) {
-					rtn.set(row.awardName, []);
-				}
-				rtn.get(row.awardName)?.push(row.teamId);
-			}
-			return Object.fromEntries(rtn.entries());
-		})
+				// Do not wait for the broadcast to complete
+				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
+			})
 	};
 }

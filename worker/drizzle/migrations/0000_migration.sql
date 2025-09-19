@@ -37,33 +37,14 @@ CREATE TABLE `FinalAwardNominations` (
 	`awardName` text NOT NULL,
 	`ranking` integer NOT NULL,
 	`teamId` text NOT NULL,
-	PRIMARY KEY(`awardName`, `ranking`),
+	`judgeGroupId` text,
 	FOREIGN KEY (`awardName`) REFERENCES `Awards`(`name`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE INDEX `awardName` ON `FinalAwardNominations` (`awardName`);--> statement-breakpoint
-CREATE INDEX `awardRanking` ON `FinalAwardNominations` (`awardName`,`ranking`);--> statement-breakpoint
-CREATE TABLE `FinalAwardRankings` (
-	`teamId` text NOT NULL,
-	`awardName` text NOT NULL,
-	`ranking` integer NOT NULL,
-	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
-CREATE INDEX `final_award_rankings_teamId` ON `FinalAwardRankings` (`teamId`);--> statement-breakpoint
-CREATE INDEX `final_award_rankings_awardName` ON `FinalAwardRankings` (`awardName`);--> statement-breakpoint
-CREATE TABLE `JudgeGroupAwardNominations` (
-	`judgeGroupId` text NOT NULL,
-	`awardName` text NOT NULL,
-	`teamId` text NOT NULL,
-	PRIMARY KEY(`judgeGroupId`, `awardName`, `teamId`),
-	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`awardName`) REFERENCES `Awards`(`name`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
-CREATE INDEX `judge_group_award_nominations_judgeGroupId` ON `JudgeGroupAwardNominations` (`judgeGroupId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `final_award_nominations_awardName_ranking` ON `FinalAwardNominations` (`awardName`,`ranking`);--> statement-breakpoint
+CREATE UNIQUE INDEX `final_award_nominations_awardName_teamId` ON `FinalAwardNominations` (`awardName`,`teamId`);--> statement-breakpoint
 CREATE TABLE `JudgeGroups` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL
@@ -101,6 +82,7 @@ CREATE TABLE `JudgeGroupsSubmissionsCache` (
 	FOREIGN KEY (`tnId`) REFERENCES `TeamInterviewNotes`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE INDEX `judge_groups_submissions_cache_judgeGroupId` ON `JudgeGroupsSubmissionsCache` (`judgeGroupId`);--> statement-breakpoint
 CREATE TABLE `Judges` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -112,7 +94,8 @@ CREATE TABLE `Metadata` (
 	`eventName` text NOT NULL,
 	`competitionType` text NOT NULL,
 	`eventGradeLevel` text NOT NULL,
-	`judgingMethod` text NOT NULL
+	`judgingMethod` text NOT NULL,
+	`judgingStep` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `OfflineDevices` (

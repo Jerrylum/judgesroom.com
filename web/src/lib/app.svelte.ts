@@ -16,7 +16,7 @@ import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
-import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
+import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 
 export type UserClearReason = 'kicked' | 'session_destroyed';
 
@@ -94,6 +94,7 @@ export class App {
 	private allTeamData: Record<string, TeamData> = $state({});
 	private allJudges: readonly Judge[] = $state([]);
 	private allDevices: readonly DeviceInfo[] = $state([]);
+	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
 
 	// Error handling
 	private notices: Notice[] = $state([]);
@@ -405,6 +406,18 @@ export class App {
 			this.addErrorNotice(`Failed to kick device: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
+	}
+
+	// ============================================================================
+	// Final Award Rankings
+	// ============================================================================
+
+	handleFinalAwardNominationsUpdate(awardName: string, data: AwardNomination[]): void {
+		this.allFinalAwardNominations[awardName] = $state.snapshot(data);
+	}
+
+	getAllFinalAwardNominations(): Readonly<Record<string, AwardNomination[]>> {
+		return $state.snapshot(this.allFinalAwardNominations);
 	}
 
 	// ============================================================================

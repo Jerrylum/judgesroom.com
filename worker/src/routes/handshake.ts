@@ -12,6 +12,9 @@ import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { WRPCError } from '@judging.jerryio/wrpc/server/types';
+import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
+import { AwardNominationSchema } from '@judging.jerryio/protocol/src/rubric';
+import { getFinalAwardNominations } from './judging';
 
 export const StarterKitSchema = z.object({
 	essentialData: EssentialDataSchema,
@@ -21,9 +24,18 @@ export const StarterKitSchema = z.object({
 
 export type StarterKit = z.infer<typeof StarterKitSchema>;
 
+export const JoiningKitSchema = z.object({
+	essentialData: EssentialDataSchema,
+	teamData: z.array(TeamDataSchema),
+	judges: z.array(JudgeSchema),
+	finalAwardNominations: z.record(AwardNameSchema, z.array(AwardNominationSchema))
+});
+
+export type JoiningKit = z.infer<typeof JoiningKitSchema>;
+
 export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
-		joinSession: w.procedure.output(StarterKitSchema).mutation(async ({ ctx, session }) => {
+		joinSession: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
 			const hasExistingEssentialData = await hasEssentialData(ctx.db);
 			if (!hasExistingEssentialData) {
 				throw new WRPCError('Session not found');
@@ -52,7 +64,8 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				return {
 					essentialData: await getEssentialData(tx),
 					teamData: await getTeamData(tx),
-					judges: await getJudges(tx)
+					judges: await getJudges(tx),
+					finalAwardNominations: await getFinalAwardNominations(tx)
 				};
 			});
 		}),

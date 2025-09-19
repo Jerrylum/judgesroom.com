@@ -7,10 +7,12 @@ import { app, subscriptions } from './app-page.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import {
+	AwardNominationSchema,
 	AwardRankingsFullUpdateSchema,
 	AwardRankingsPartialUpdateSchema,
 	type AwardRankingsFullUpdate
 } from '@judging.jerryio/protocol/src/rubric';
+import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -92,7 +94,15 @@ const clientRouter = w.router({
 		}
 
 		reviewedTeams.push(input.teamId);
-	})
+	}),
+
+	onFinalAwardNominationsUpdate: w.procedure
+		.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
+		.mutation(async ({ input }) => {
+			console.log(`📊 Final award nominations updated:`, input);
+
+			app.handleFinalAwardNominationsUpdate(input.awardName, input.nominations);
+		})
 });
 
 export { clientRouter };

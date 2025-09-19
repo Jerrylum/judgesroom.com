@@ -179,23 +179,7 @@ describe('ServerRouter', () => {
 		});
 	});
 
-	describe('judging router', () => {
-		it('update and get judge group award nominations', async () => {
-			const teamIds = sampleTeamInfoAndData.slice(0, 2).map((t) => t.id);
-			const updateResolver = serverRouter.judging.updateJudgeGroupAwardNomination._def._resolver!;
-			await updateResolver({ input: { judgeGroupId: 'group-1', awardName: 'Design Award', teamIds }, session, ctx: context });
-			const getResolver = serverRouter.judging.getJudgeGroupAwardNominations._def._resolver!;
-			const result = await getResolver({ input: { judgeGroupId: 'group-1' }, session, ctx: context });
-			expect(result['Design Award']).toEqual(teamIds);
-		});
+	// describe('judging router', () => {
 
-		it('update and get final award rankings', async () => {
-			const teamIds = sampleTeamInfoAndData.slice(0, 3).map((t) => t.id);
-			const updateResolver = serverRouter.judging.updateFinalAwardRankings._def._resolver!;
-			await updateResolver({ input: { awardName: 'Excellence Award', teamIds }, session, ctx: context });
-			const getResolver = serverRouter.judging.getFinalAwardRankings._def._resolver!;
-			const result = await getResolver({ input: undefined, session, ctx: context });
-			expect(result['Excellence Award']).toEqual(teamIds);
-		});
-	});
+	// });
 });
