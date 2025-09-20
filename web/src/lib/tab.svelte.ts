@@ -100,6 +100,28 @@ export class AwardRankingsTab implements BaseTab {
 	}
 }
 
+export class AwardNominationsTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'award_nominations';
+	readonly title = 'Award Nominations';
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
+export class FinalAwardRankingsTab implements BaseTab {
+	id: string;
+	readonly closable = true;
+	readonly type = 'award_rankings';
+	readonly title = 'Award Rankings';
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
 // Custom tab for extensibility
 export interface CustomTab extends BaseTab {
 	type: 'custom';
@@ -107,7 +129,14 @@ export interface CustomTab extends BaseTab {
 	props: Record<string, unknown>;
 }
 
-export type Tab = OverviewTab | TeamInterviewRubricTab | NotebookRubricTab | NotebookSortingTab | AwardRankingsTab | CustomTab;
+export type Tab =
+	| OverviewTab
+	| TeamInterviewRubricTab
+	| NotebookRubricTab
+	| NotebookSortingTab
+	| AwardNominationsTab
+	| AwardRankingsTab
+	| CustomTab;
 
 export class TabController {
 	private tabs: Tab[] = $state([]);

@@ -7,6 +7,7 @@
 	import NotebookRubricTab from './tabs/NotebookRubricTab.svelte';
 	import NotebookSortingTab from './tabs/NotebookSortingTab.svelte';
 	import AwardRankingsTab from './tabs/AwardRankingsTab.svelte';
+	import AwardNominationsTab from './tabs/AwardNominationsTab.svelte';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	// Get tab state
@@ -29,7 +30,7 @@
 		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
 		const targetJudgeGroupIds = currentJudgeGroupId //
 			? [currentJudgeGroupId]
-			: app.getJudgeGroups().map((group) => group.id);
+			: app.getAllJudgeGroups().map((group) => group.id);
 
 		console.log('Subscribing to award rankings', targetJudgeGroupIds);
 		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
@@ -57,7 +58,7 @@
 		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
 		const targetJudgeGroupIds = currentJudgeGroupId //
 			? [currentJudgeGroupId]
-			: app.getJudgeGroups().map((group) => group.id);
+			: app.getAllJudgeGroups().map((group) => group.id);
 
 		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
@@ -104,6 +105,8 @@
 					<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'award_rankings'}
 					<AwardRankingsTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'award_nominations'}
+					<AwardNominationsTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'custom' && 'component' in tab}
 					{@const CustomComponent = tab.component}
 					<CustomComponent {...tab.props} />

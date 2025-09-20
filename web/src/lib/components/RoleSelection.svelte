@@ -14,7 +14,7 @@
 	// Get all existing judges grouped by judge group
 	const judgesByGroup = $derived(() => app.getExistingJudgesGroupedByGroup());
 
-	const judgeGroups = $derived(app.getJudgeGroups());
+	const judgeGroups = $derived(app.getAllJudgeGroups());
 
 	async function selectExistingJudge() {
 		if (!selectedJudgeId || !app.hasEssentialData()) return;

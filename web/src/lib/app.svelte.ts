@@ -130,6 +130,7 @@ export class App {
 		this.handleEssentialDataUpdate(starterKit.essentialData);
 		this.handleAllTeamDataUpdate(starterKit.teamData);
 		this.handleAllJudgesUpdate(starterKit.judges);
+		this.allFinalAwardNominations = starterKit.finalAwardNominations;
 
 		// Load user from storage
 		const user = this.loadUserFromStorage();
@@ -315,24 +316,12 @@ export class App {
 		return this.essentialData?.teamInfos.length || 0;
 	}
 
-	getJudgeGroups(): Readonly<Readonly<JudgeGroup>[]> {
+	getAllJudgeGroups(): Readonly<Readonly<JudgeGroup>[]> {
 		return $state.snapshot(this.essentialData?.judgeGroups || []);
 	}
 
 	getJudgeGroupCount(): number {
 		return this.essentialData?.judgeGroups.length || 0;
-	}
-
-	getExistingJudgesGroupedByGroup(): Readonly<Record<string, Readonly<Judge>[]>> {
-		const judgeGroups = this.getJudgeGroups();
-		const allJudges = this.allJudges;
-
-		const groups: Record<string, Readonly<Judge>[]> = {};
-		judgeGroups.forEach((group) => {
-			groups[group.id] = allJudges.filter((judge) => judge.groupId === group.id);
-		});
-
-		return $state.snapshot(groups);
 	}
 
 	getAllAwards(): Readonly<Readonly<Award>[]> {
@@ -424,6 +413,26 @@ export class App {
 	// Utility Methods
 	// ============================================================================
 
+	getExistingJudgesGroupedByGroup(): Readonly<Record<string, Readonly<Judge>[]>> {
+		const judgeGroups = this.getAllJudgeGroups();
+		const allJudges = this.allJudges;
+
+		const groups: Record<string, Readonly<Judge>[]> = {};
+		judgeGroups.forEach((group) => {
+			groups[group.id] = allJudges.filter((judge) => judge.groupId === group.id);
+		});
+
+		return $state.snapshot(groups);
+	}
+
+	getAllJudgeGroupsInMap(): Readonly<Record<string, Readonly<JudgeGroup>>> {
+		const judgeGroups = this.getAllJudgeGroups();
+		return judgeGroups.reduce((acc, group) => {
+			acc[group.id] = group;
+			return acc;
+		}, {} as Record<string, Readonly<JudgeGroup>>);
+	}
+
 	getAllTeamInfoAndData(): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
 		const allTeamData = this.getAllTeamData();
 		return this.getAllTeams().reduce(
@@ -460,7 +469,7 @@ export class App {
 		const judge = this.findJudgeById(judgeId);
 		if (!judge) return null;
 
-		const judgeGroup = this.getJudgeGroups().find((g) => g.id === judge.groupId);
+		const judgeGroup = this.getAllJudgeGroups().find((g) => g.id === judge.groupId);
 		return judgeGroup ? $state.snapshot(judgeGroup) : null;
 	}
 

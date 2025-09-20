@@ -382,7 +382,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
 			}),
 
-		updateFromFinalAwardNominations: w.procedure
+		updateFinalRankings: w.procedure
 			.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
 			.mutation(async ({ ctx, input, session }) => {
 				// remove all existing rankings for the award, transactionally

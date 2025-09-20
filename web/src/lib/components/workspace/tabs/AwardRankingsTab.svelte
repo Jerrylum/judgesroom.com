@@ -3,7 +3,6 @@
 	import Tab from './Tab.svelte';
 	import type { AwardRankingsTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
-	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 	import AwardRankingsTable from './AwardRankingsTable.svelte';
 
@@ -16,15 +15,7 @@
 
 	const teams = $derived(app.getAllTeamInfoAndData());
 
-	const judgeGroups = $derived(
-		app.getJudgeGroups().reduce(
-			(acc, group) => {
-				acc[group.id] = group;
-				return acc;
-			},
-			{} as Record<string, JudgeGroup>
-		)
-	);
+	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
 
 	function getListingTeams(judgeGroupId: string) {
 		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
