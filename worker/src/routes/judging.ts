@@ -386,7 +386,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
 			.mutation(async ({ ctx, input, session }) => {
 				// remove all existing rankings for the award, transactionally
-				await ctx.db.transaction(async (tx) => {
+				await transaction(ctx.db, async (tx) => {
 					await tx.delete(finalAwardNominations).where(eq(finalAwardNominations.awardName, input.awardName));
 					for (let i = 0; i < input.nominations.length; i++) {
 						await tx.insert(finalAwardNominations).values({

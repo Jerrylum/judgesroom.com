@@ -114,8 +114,8 @@ export class AwardNominationTab implements BaseTab {
 export class FinalAwardRankingTab implements BaseTab {
 	id: string;
 	readonly closable = true;
-	readonly type = 'award_ranking';
-	readonly title = 'Award Ranking';
+	readonly type = 'final_award_ranking';
+	readonly title = 'Final Ranking';
 
 	constructor() {
 		this.id = generateUUID();
@@ -136,6 +136,7 @@ export type Tab =
 	| NotebookSortingTab
 	| AwardNominationTab
 	| AwardRankingTab
+	| FinalAwardRankingTab
 	| CustomTab;
 
 export class TabController {

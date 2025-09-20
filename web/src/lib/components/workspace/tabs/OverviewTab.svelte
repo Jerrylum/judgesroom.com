@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
-	import { AwardNominationTab, AwardRankingTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import { AwardNominationTab, AwardRankingTab, FinalAwardRankingTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import Tab from './Tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 
@@ -48,6 +48,18 @@
 			tabs.addTab(new AwardRankingTab());
 		}
 	}
+
+	function addFinalRankingTab() {
+		// Check if a final ranking tab already exists
+		const existingTab = tabs.findTab('final_award_ranking');
+		if (existingTab) {
+			// Switch to the existing tab instead of creating a new one
+			tabs.switchToTab(existingTab.id);
+		} else {
+			// Create a new tab if none exists
+			tabs.addTab(new FinalAwardRankingTab());
+		}
+	}
 </script>
 
 <Tab {isActive} tabId="overview" tabType="overview">
@@ -86,14 +98,10 @@
 						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 					>
 						<div class="rounded-full bg-purple-100 p-2">
-							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-								/>
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" d="M12 3v18"/>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M2 12l2 2 4-4"/>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M17 9l5 5m-5 0l5-5"/>
 							</svg>
 						</div>
 						<div>
@@ -172,13 +180,28 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 								/>
 							</svg>
 						</div>
 						<div>
 							<div class="font-medium">Award Nomination</div>
 							<div class="text-sm text-gray-500">Nominate teams for awards</div>
+						</div>
+					</button>
+
+					<button
+						onclick={addFinalRankingTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					>
+						<div class="rounded-full bg-purple-100 p-2">
+							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v7H3v-7zm6-6h4v13H9V7zm6 3h4v10h-4V10z"/>
+							</svg>
+						</div>
+						<div>
+							<div class="font-medium">Final Ranking</div>
+							<div class="text-sm text-gray-500">Final award rankings</div>
 						</div>
 					</button>
 				</div>
