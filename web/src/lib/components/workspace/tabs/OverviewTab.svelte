@@ -26,11 +26,27 @@
 	}
 
 	function addAwardNominationTab() {
-		tabs.addTab(new AwardNominationTab());
+		// Check if an award nomination tab already exists
+		const existingTab = tabs.findTab('award_nomination');
+		if (existingTab) {
+			// Switch to the existing tab instead of creating a new one
+			tabs.switchToTab(existingTab.id);
+		} else {
+			// Create a new tab if none exists
+			tabs.addTab(new AwardNominationTab());
+		}
 	}
 
 	function addAwardRankingTab() {
-		tabs.addTab(new AwardRankingTab());
+		// Check if an award ranking tab already exists
+		const existingTab = tabs.findTab('award_ranking');
+		if (existingTab) {
+			// Switch to the existing tab instead of creating a new one
+			tabs.switchToTab(existingTab.id);
+		} else {
+			// Create a new tab if none exists
+			tabs.addTab(new AwardRankingTab());
+		}
 	}
 </script>
 
