@@ -8,7 +8,7 @@
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
 	import WarningSign from './WarningSign.svelte';
-	import AwardRankingsTable from './AwardRankingsTable.svelte';
+	import AwardRankingTable from './AwardRankingTable.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -519,7 +519,7 @@
 						Rate this team for specific awards based on your team interview by clicking on the boxes below. Use the star system (0-5 stars)
 						to indicate how strong a candidate this team is for each award.
 					</p>
-					<AwardRankingsTable listingTeams={[tab.teamId]} {awardRankings} />
+					<AwardRankingTable listingTeams={[tab.teamId]} {awardRankings} />
 				</div>
 			{/if}
 		</div>

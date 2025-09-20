@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { app } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
-	import type { AwardNominationsTab } from '$lib/tab.svelte';
+	import type { AwardNominationTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
-	import AwardNominationsTable from './AwardNominationsTable.svelte';
+	import AwardNominationTable from './AwardNominationTable.svelte';
 
 	interface Props {
-		tab: AwardNominationsTab;
+		tab: AwardNominationTab;
 		isActive: boolean;
 	}
 
@@ -28,7 +28,7 @@
 				{@const judgeGroup = judgeGroups[judgeGroupId]}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-2 text-lg font-semibold text-gray-900">{judgeGroup.name}</h3>
-					<AwardNominationsTable {judgeGroupId} />
+					<AwardNominationTable {judgeGroupId} />
 				</div>
 			{/each}
 		</div>

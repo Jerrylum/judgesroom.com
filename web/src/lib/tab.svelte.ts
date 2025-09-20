@@ -89,33 +89,33 @@ export class NotebookSortingTab implements BaseTab {
 	}
 }
 
-export class AwardRankingsTab implements BaseTab {
+export class AwardRankingTab implements BaseTab {
 	id: string;
 	readonly closable = true;
-	readonly type = 'award_rankings';
-	readonly title = 'Award Rankings';
+	readonly type = 'award_ranking';
+	readonly title = 'Award Ranking';
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class AwardNominationsTab implements BaseTab {
+export class AwardNominationTab implements BaseTab {
 	id: string;
 	readonly closable = true;
-	readonly type = 'award_nominations';
-	readonly title = 'Award Nominations';
+	readonly type = 'award_nomination';
+	readonly title = 'Award Nomination';
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class FinalAwardRankingsTab implements BaseTab {
+export class FinalAwardRankingTab implements BaseTab {
 	id: string;
 	readonly closable = true;
-	readonly type = 'award_rankings';
-	readonly title = 'Award Rankings';
+	readonly type = 'award_ranking';
+	readonly title = 'Award Ranking';
 
 	constructor() {
 		this.id = generateUUID();
@@ -134,8 +134,8 @@ export type Tab =
 	| TeamInterviewRubricTab
 	| NotebookRubricTab
 	| NotebookSortingTab
-	| AwardNominationsTab
-	| AwardRankingsTab
+	| AwardNominationTab
+	| AwardRankingTab
 	| CustomTab;
 
 export class TabController {

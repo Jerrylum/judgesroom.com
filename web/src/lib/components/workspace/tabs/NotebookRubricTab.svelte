@@ -8,7 +8,7 @@
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByIsDevelopedNotebook, sortByTeamNumber } from '$lib/team.svelte';
 	import WarningSign from './WarningSign.svelte';
-	import AwardRankingsTable from './AwardRankingsTable.svelte';
+	import AwardRankingTable from './AwardRankingTable.svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -706,7 +706,7 @@
 						to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
 						all judges see updates in real-time without needing to refresh the page.
 					</p>
-					<AwardRankingsTable listingTeams={[tab.teamId]} {awardRankings} />
+					<AwardRankingTable listingTeams={[tab.teamId]} {awardRankings} />
 				</div>
 			{/if}
 		</div>

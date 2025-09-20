@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { app, subscriptions } from '$lib/app-page.svelte';
 	import Tab from './Tab.svelte';
-	import type { AwardRankingsTab } from '$lib/tab.svelte';
+	import type { AwardRankingTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import AwardRankingsTable from './AwardRankingsTable.svelte';
+	import AwardRankingTable from './AwardRankingTable.svelte';
 
 	interface Props {
-		tab: AwardRankingsTab;
+		tab: AwardRankingTab;
 		isActive: boolean;
 	}
 
@@ -44,7 +44,7 @@
 				{@const listingTeams = getListingTeams(judgeGroupId)}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-2 text-lg font-semibold text-gray-900">{judgeGroup.name}</h3>
-					<AwardRankingsTable {listingTeams} {awardRankings} />
+					<AwardRankingTable {listingTeams} {awardRankings} />
 				</div>
 			{/each}
 

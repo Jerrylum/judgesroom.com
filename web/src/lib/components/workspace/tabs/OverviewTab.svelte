@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
-	import { AwardNominationsTab, AwardRankingsTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import { AwardNominationTab, AwardRankingTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import Tab from './Tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 
@@ -25,12 +25,12 @@
 		tabs.addTab(new NotebookSortingTab());
 	}
 
-	function addAwardNominationsTab() {
-		tabs.addTab(new AwardNominationsTab());
+	function addAwardNominationTab() {
+		tabs.addTab(new AwardNominationTab());
 	}
 
-	function addAwardRankingsTab() {
-		tabs.addTab(new AwardRankingsTab());
+	function addAwardRankingTab() {
+		tabs.addTab(new AwardRankingTab());
 	}
 </script>
 
@@ -127,7 +127,7 @@
 					</button>
 
 					<button
-						onclick={addAwardRankingsTab}
+						onclick={addAwardRankingTab}
 						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 					>
 						<div class="rounded-full bg-yellow-100 p-2">
@@ -141,13 +141,13 @@
 							</svg>
 						</div>
 						<div>
-							<div class="font-medium">Award Rankings</div>
+							<div class="font-medium">Award Ranking</div>
 							<div class="text-sm text-gray-500">Rank teams for awards</div>
 						</div>
 					</button>
 
 					<button
-						onclick={addAwardNominationsTab}
+						onclick={addAwardNominationTab}
 						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 					>
 						<div class="rounded-full bg-orange-100 p-2">
@@ -161,7 +161,7 @@
 							</svg>
 						</div>
 						<div>
-							<div class="font-medium">Award Nominations</div>
+							<div class="font-medium">Award Nomination</div>
 							<div class="text-sm text-gray-500">Nominate teams for awards</div>
 						</div>
 					</button>

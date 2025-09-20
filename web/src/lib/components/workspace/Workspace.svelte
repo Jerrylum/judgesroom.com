@@ -6,8 +6,8 @@
 	import TeamInterviewRubricTab from './tabs/TeamInterviewRubricTab.svelte';
 	import NotebookRubricTab from './tabs/NotebookRubricTab.svelte';
 	import NotebookSortingTab from './tabs/NotebookSortingTab.svelte';
-	import AwardRankingsTab from './tabs/AwardRankingsTab.svelte';
-	import AwardNominationsTab from './tabs/AwardNominationsTab.svelte';
+	import AwardRankingTab from './tabs/AwardRankingTab.svelte';
+	import AwardNominationTab from './tabs/AwardNominationTab.svelte';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	// Get tab state
@@ -103,10 +103,10 @@
 					<NotebookRubricTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'notebook_sorting'}
 					<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'award_rankings'}
-					<AwardRankingsTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'award_nominations'}
-					<AwardNominationsTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'award_ranking'}
+					<AwardRankingTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'award_nomination'}
+					<AwardNominationTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'custom' && 'component' in tab}
 					{@const CustomComponent = tab.component}
 					<CustomComponent {...tab.props} />
