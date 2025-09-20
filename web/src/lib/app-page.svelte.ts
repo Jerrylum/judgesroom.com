@@ -8,8 +8,11 @@ import type { SubscriptionsStorage } from './subscriptions.svelte';
 // ============================================================================
 
 export type AppPhase = 'loading' | 'choose_action' | 'event_setup' | 'session_setup' | 'joining_session' | 'role_selection' | 'workspace';
+export interface AppUIState {
+	appPhase: AppPhase;
+}
 
-export const AppUI = $state({
+export const AppUI: AppUIState = $state({
 	appPhase: 'loading'
 });
 
