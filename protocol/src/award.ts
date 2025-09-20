@@ -23,3 +23,10 @@ export const AwardSchema = z.object({
 	requireNotebook: z.boolean()
 });
 export type Award = z.infer<typeof AwardSchema>;
+
+export function isExcellenceAward(awardName: string): boolean {
+	return awardName === 'Excellence Award' ||
+		awardName === 'Excellence Award - High School' ||
+		awardName === 'Excellence Award - Middle School' ||
+		awardName === 'Excellence Award - Elementary School';
+}

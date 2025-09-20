@@ -24,7 +24,7 @@ import {
 	teamInterviewNotes,
 	teamInterviewRubrics
 } from '../db/schema';
-import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
+import { AwardNameSchema, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
 import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeJudgeGroupTopic } from './subscriptions';
@@ -34,15 +34,7 @@ import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 
 export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: string): Promise<AwardRankingsFullUpdate> {
 	const { judgedAwards, rankingsData } = await transaction(db, async (tx) => {
-		const judgedAwards = (await getAwards(tx, 'judged'))
-			.map((award) => award.name)
-			.filter(
-				(award) =>
-					award !== 'Excellence Award' &&
-					award !== 'Excellence Award - High School' &&
-					award !== 'Excellence Award - Middle School' &&
-					award !== 'Excellence Award - Elementary School'
-			);
+		const judgedAwards = (await getAwards(tx, 'judged')).map((award) => award.name).filter((award) => !isExcellenceAward(award));
 		const rankingsData = await tx.select().from(awardRankings).where(eq(awardRankings.judgeGroupId, judgeGroupId));
 		return { judgedAwards, rankingsData };
 	});
