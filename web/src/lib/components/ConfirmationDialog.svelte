@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ConfirmationDialog } from '$lib/app-page.svelte';
+	import type { ConfirmationDialog } from '$lib/dialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 
