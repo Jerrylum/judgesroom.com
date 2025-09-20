@@ -1,7 +1,7 @@
 import { App, AppStorage } from '$lib/app.svelte';
 import { DialogController } from './dialog.svelte';
 import { TabController } from '$lib/tab.svelte';
-import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
+import type { SubscriptionsStorage } from './subscriptions.svelte';
 
 // ============================================================================
 // App State
@@ -16,12 +16,6 @@ export const AppUI = $state({
 export const app = new App(new AppStorage(), import.meta.env.DEV);
 export const dialogs = new DialogController();
 export const tabs = new TabController();
-
-export interface SubscriptionsStorage {
-	allJudgeGroupsAwardRankings: Record<string, AwardRankingsFullUpdate>;
-	allJudgeGroupsReviewedTeams: Record<string, string[]>;
-}
-
 export const subscriptions: SubscriptionsStorage = $state({
 	allJudgeGroupsAwardRankings: {},
 	allJudgeGroupsReviewedTeams: {}
