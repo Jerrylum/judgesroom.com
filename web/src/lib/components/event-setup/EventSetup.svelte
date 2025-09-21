@@ -6,18 +6,18 @@
 	import ReviewStep from './ReviewStep.svelte';
 	import { untrack, onMount, onDestroy } from 'svelte';
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
-	import { AwardOptions, getOfficialAwardOptionsList, separateAwardOptionsByType } from '$lib/award.svelte';
-	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
+	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 
 	// Extended AwardOptions type for drag and drop
 
 	// Step management
-	let currentStep = $state(1);
+	let currentStep = $state(0);
 	const totalSteps = 5;
 
 	// Event setup state
@@ -79,9 +79,10 @@
 			selectedEventGradeLevel = eventSetup.eventGradeLevel;
 
 			// Load awards
-			// performanceAwards = eventSetup.awards
-			// 	.filter((award) => award.type === 'performance')
-			// 	.map((award, index) => Object.assign(award, { id: `performance-${index}` }));
+			const gradeOptions = getEventGradeLevelOptions(selectedCompetitionType);
+			const possibleGrades = gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? [];
+			const officialAwardOptions = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
+			awardOptions = restoreAwardOptions(eventSetup.awards, officialAwardOptions, selectedCompetitionType);
 
 			// Load teams
 			teams = eventSetup.teamInfos.map((teamWithData) => {
@@ -217,6 +218,8 @@
 		if (eventSetup) {
 			originalEventSetupHash = await generateEventSetupHash(eventSetup);
 		}
+
+		currentStep = 1; // IMPORTANT: set to 1 after loading current data
 	});
 
 	// Clear hash on unmount

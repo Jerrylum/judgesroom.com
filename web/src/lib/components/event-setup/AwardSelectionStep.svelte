@@ -19,6 +19,8 @@
 
 	let { selectedCompetitionType, selectedEventGradeLevel, awardOptions = $bindable(), onNext, onPrev }: Props = $props();
 
+	$inspect("awardOptions", awardOptions);
+	
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 

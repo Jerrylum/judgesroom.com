@@ -287,6 +287,83 @@ export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
 	};
 }
 
-// export function temp(awards: Award[], officialAwards: AwardOptions) {
+/**
+ * Restores AwardOptions from existing Awards while preserving the structure and order of official awards.
+ *
+ * This function reconstructs an AwardOptions array by merging selected awards with official award templates.
+ * It attempts to preserve the original order of awards when possible, and handles both official awards
+ * (which get marked as selected) and custom awards (which get converted to AwardOptions).
+ *
+ * @param awards - Array of existing Award objects that were previously selected/configured
+ * @param officialAwards - Array of official AwardOptions templates available for the competition
+ * @param competitionType - The type of competition (affects custom award creation)
+ *
+ * @returns Array of AwardOptions with:
+ *   - Official awards marked as selected with updated winner counts and notebook requirements
+ *   - Custom awards converted to AwardOptions format
+ *   - Unselected official awards preserved for potential selection
+ *   - Order preserved when the original award selection maintained official award ordering
+ */
+export function restoreAwardOptions(awards: Award[], officialAwards: AwardOptions[], competitionType: CompetitionType): AwardOptions[] {
+	const rtn: AwardOptions[] = [];
 
-// }
+	const v = awards.map((o) => o.name);
+	const w = officialAwards.map((o) => o.name);
+	const x = v.filter((a) => w.includes(a));
+	const y = w.filter((a) => x.includes(a));
+	// check the order of two lists is the same
+	const z = y.every((a, index) => a === x[index]);
+
+	if (z) {
+		let i = 0;
+		let j = 0;
+		let k = 0;
+
+		while (k < y.length) {
+			while (officialAwards[j].name !== y[k]) {
+				rtn.push(officialAwards[j++]);
+			}
+
+			while (awards[i].name !== y[k]) {
+				const a = awards[i++];
+				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+			}
+
+			const o = officialAwards[j++];
+			o.isSelected = true;
+			o.possibleWinners = awards.find((a) => a.name === o.name)?.winnersCount ?? 1;
+			rtn.push(o);
+			i++;
+			k++;
+		}
+		while (j < officialAwards.length) {
+			const o = officialAwards[j++];
+			rtn.push(o);
+		}
+		while (i < awards.length) {
+			const a = awards[i++];
+			rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+		}
+	} else {
+		for (let i = 0; i < awards.length; i++) {
+			const a = awards[i];
+			const o = officialAwards.find((o) => o.name === a.name);
+			if (o) {
+				o.isSelected = true;
+				o.possibleWinners = a.winnersCount;
+				o.requireNotebook = a.requireNotebook;
+				rtn.push(o);
+			} else {
+				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+			}
+		}
+		for (let j = 0; j < officialAwards.length; j++) {
+			const o = officialAwards[j];
+			if (!x.includes(o.name)) {
+				rtn.push(o);
+			}
+		}
+	}
+
+	return rtn;
+}
