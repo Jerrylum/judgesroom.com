@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	createJudge,
-	JudgeGroupClass,
+	EditingJudgeGroup,
 	createJudgeFromString,
 	parseJudgeNamesFromInput,
 	randomlyAssignTeamsToGroups,
@@ -41,12 +41,12 @@ describe('Judge Class', () => {
 	});
 });
 
-describe('JudgeGroupClass', () => {
-	let judgeGroup: JudgeGroupClass;
+describe('EditingJudgeGroup', () => {
+	let judgeGroup: EditingJudgeGroup;
 	let mockTeams: EditingTeam[];
 
 	beforeEach(() => {
-		judgeGroup = new JudgeGroupClass('Technical Judges');
+		judgeGroup = new EditingJudgeGroup('Technical Judges');
 
 		// Create mock teams
 		const teamId1 = uuidv4();
@@ -68,7 +68,7 @@ describe('JudgeGroupClass', () => {
 		];
 	});
 
-	it('should create a JudgeGroupClass instance with correct properties', () => {
+	it('should create a EditingJudgeGroup instance with correct properties', () => {
 		expect(judgeGroup.name).toBe('Technical Judges');
 		expect(judgeGroup.assignedTeams).toEqual([]);
 		expect(typeof judgeGroup.id).toBe('string');
@@ -210,7 +210,7 @@ describe('parseJudgeNamesFromInput', () => {
 
 describe('randomlyAssignTeamsToGroups', () => {
 	let mockTeams: EditingTeam[];
-	let judgeGroups: JudgeGroupClass[];
+	let judgeGroups: EditingJudgeGroup[];
 
 	beforeEach(() => {
 		// Create mock teams
@@ -234,7 +234,7 @@ describe('randomlyAssignTeamsToGroups', () => {
 		});
 
 		// Create judge groups
-		judgeGroups = [new JudgeGroupClass('Group A'), new JudgeGroupClass('Group B'), new JudgeGroupClass('Group C')];
+		judgeGroups = [new EditingJudgeGroup('Group A'), new EditingJudgeGroup('Group B'), new EditingJudgeGroup('Group C')];
 	});
 
 	it('should assign all teams to groups', () => {
@@ -295,14 +295,14 @@ describe('randomlyAssignTeamsToGroups', () => {
 	});
 
 	it('should handle single judge group', () => {
-		const singleGroup = [new JudgeGroupClass('Only Group')];
+		const singleGroup = [new EditingJudgeGroup('Only Group')];
 		randomlyAssignTeamsToGroups(mockTeams, singleGroup);
 
 		expect(singleGroup[0].assignedTeams).toHaveLength(mockTeams.length);
 	});
 
 	it('should handle more groups than teams', () => {
-		const manyGroups = Array.from({ length: 15 }, (_, i) => new JudgeGroupClass(`Group ${i + 1}`));
+		const manyGroups = Array.from({ length: 15 }, (_, i) => new EditingJudgeGroup(`Group ${i + 1}`));
 
 		randomlyAssignTeamsToGroups(mockTeams, manyGroups);
 
@@ -370,8 +370,8 @@ describe('getJudgesInGroup', () => {
 describe('Integration Tests', () => {
 	it('should create complete judging workflow', () => {
 		// Create judge groups
-		const group1 = new JudgeGroupClass('Technical Judges');
-		const group2 = new JudgeGroupClass('Design Panel');
+		const group1 = new EditingJudgeGroup('Technical Judges');
+		const group2 = new EditingJudgeGroup('Design Panel');
 
 		// Create judges
 		const judgeNames = parseJudgeNamesFromInput('John Doe, Jane Smith\nBob Johnson, Alice Williams');
@@ -421,14 +421,14 @@ describe('Integration Tests', () => {
 
 	it('should handle edge cases in complete workflow', () => {
 		// Empty judges and teams
-		const emptyGroups = [new JudgeGroupClass('Empty Group')];
+		const emptyGroups = [new EditingJudgeGroup('Empty Group')];
 		randomlyAssignTeamsToGroups([], emptyGroups);
 
 		expect(emptyGroups[0].assignedTeams).toHaveLength(0);
 		expect(getJudgesInGroup([], emptyGroups[0].id)).toHaveLength(0);
 
 		// Single judge, single team
-		const singleGroup = new JudgeGroupClass('Single Group');
+		const singleGroup = new EditingJudgeGroup('Single Group');
 		const singleJudge = createJudgeFromString('Solo Judge', singleGroup.id);
 		const soloTeamId = uuidv4();
 		const singleTeam = new EditingTeam(

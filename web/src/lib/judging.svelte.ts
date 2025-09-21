@@ -1,9 +1,8 @@
-import { z } from 'zod/v4';
 import { v4 as uuidv4 } from 'uuid';
 import { type EditingTeam } from './team.svelte';
 import { type Judge } from '@judging.jerryio/protocol/src/judging';
 
-export class JudgeGroupClass {
+export class EditingJudgeGroup {
 	public readonly id: string;
 	public name: string = $state('');
 	public assignedTeams: EditingTeam[] = $state([]);
@@ -46,7 +45,7 @@ export function parseJudgeNamesFromInput(input: string): string[] {
 		.filter((name) => name.length > 0);
 }
 
-export function randomlyAssignTeamsToGroups(teams: EditingTeam[], judgeGroups: JudgeGroupClass[]): void {
+export function randomlyAssignTeamsToGroups(teams: EditingTeam[], judgeGroups: EditingJudgeGroup[]): void {
 	if (judgeGroups.length === 0) return;
 
 	// Clear existing assignments

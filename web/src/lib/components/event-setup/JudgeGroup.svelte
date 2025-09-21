@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { JudgeGroupClass, parseJudgeNamesFromInput } from '$lib/judging.svelte';
+	import { EditingJudgeGroup, parseJudgeNamesFromInput } from '$lib/judging.svelte';
 	import { dndzone, TRIGGERS, SOURCES } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
@@ -10,7 +10,7 @@
 	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 
 	interface Props {
-		judgeGroup: JudgeGroupClass;
+		judgeGroup: EditingJudgeGroup;
 		selectedItems: EditingTeamList;
 		activeZoneId: string;
 		onDeleteGroup: (groupId: string) => void;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { AwardOptions } from '$lib/award.svelte';
-	import type { JudgeGroupClass } from '$lib/judging.svelte';
+	import type { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam, groupTeamsByGroup } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
@@ -16,7 +16,7 @@
 		judgedAwards: AwardOptionsWithId[];
 		volunteerNominatedAwards: AwardOptionsWithId[];
 		judgingMethod: JudgingMethod;
-		judgeGroups: JudgeGroupClass[];
+		judgeGroups: EditingJudgeGroup[];
 		judges: { id: string; name: string; groupId: string }[];
 		onPrev: () => void;
 		onComplete: () => void;

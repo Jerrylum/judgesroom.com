@@ -8,7 +8,7 @@
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList } from '$lib/award.svelte';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
-	import { JudgeGroupClass } from '$lib/judging.svelte';
+	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
@@ -37,7 +37,7 @@
 	// Judging
 	let judgingMethod: JudgingMethod = $state('assigned');
 	let judgingStep: JudgingStep = $state('beginning');
-	let judgeGroups: JudgeGroupClass[] = $state([]);
+	let judgeGroups: EditingJudgeGroup[] = $state([]);
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: EditingTeam[] = $state([]);
 
@@ -113,7 +113,7 @@
 			// Load judging setup
 			judgingMethod = eventSetup.judgingMethod;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
-				const judgeGroup = new JudgeGroupClass(group.name);
+				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
 				Object.assign(judgeGroup, { id: group.id });
 				judgeGroup.assignedTeams = group.assignedTeams.map((teamNumber) => teams.find((t) => t.number === teamNumber)!).filter(Boolean);

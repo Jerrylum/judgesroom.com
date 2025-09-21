@@ -4,14 +4,14 @@
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
-	import { JudgeGroupClass, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
+	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
 	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
 		teams: EditingTeam[];
 		judgingMethod: JudgingMethod;
-		judgeGroups: JudgeGroupClass[];
+		judgeGroups: EditingJudgeGroup[];
 		unassignedTeams: EditingTeam[];
 		judges: Judge[];
 		onNext: () => void;
@@ -40,7 +40,7 @@
 	// There must be at least one group
 	$effect(() => {
 		if (judgeGroups.length === 0) {
-			judgeGroups.push(new JudgeGroupClass('Group 1'));
+			judgeGroups.push(new EditingJudgeGroup('Group 1'));
 		}
 	});
 
@@ -127,7 +127,7 @@
 	}
 
 	function addJudgeGroup() {
-		judgeGroups.push(new JudgeGroupClass(`Group ${judgeGroups.length + 1}`));
+		judgeGroups.push(new EditingJudgeGroup(`Group ${judgeGroups.length + 1}`));
 	}
 
 	function deleteJudgeGroup(groupId: string) {
