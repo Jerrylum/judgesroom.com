@@ -525,9 +525,11 @@ describe('mergeTeamData', () => {
 		expect(result[0].number).toBe('123A');
 		expect(result[0].name).toBe('Team Alpha');
 		expect(result[0].notebookLink).toBe('https://example.com/notebook-a');
+		expect(result[0].excluded).toBe(false);
 		expect(result[1].number).toBe('456B');
 		expect(result[1].name).toBe('Team Beta');
 		expect(result[1].notebookLink).toBe('https://example.com/notebook-b');
+		expect(result[1].excluded).toBe(false);
 	});
 
 	it('should handle missing notebook links', () => {
@@ -573,6 +575,263 @@ describe('mergeTeamData', () => {
 		expect(result[0].grade).toBe('College');
 		expect(result[0].group).toBe('');
 		expect(result[0].excluded).toBe(false);
+		expect(result[0].data.isDevelopedNotebook).toBe(null);
+	});
+
+	it('should reuse existing team IDs when existing teams are provided', () => {
+		const existingTeamId1 = uuidv4();
+		const existingTeamId2 = uuidv4();
+		
+		const existingTeams = [
+			new EditingTeam(
+				createTeamInfo(existingTeamId1, '123A', 'Old Team Alpha', 'Old City', 'Old State', 'Old Country', 'OTA', 'Old School', 'College', '123'),
+				createTeamData(existingTeamId1, 'https://old-notebook.com', true, false)
+			),
+			new EditingTeam(
+				createTeamInfo(existingTeamId2, '456B', 'Old Team Beta', 'Old Beta City', 'Old Beta State', 'Old Beta Country', 'OTB', 'Old Beta School', 'Elementary School', '456'),
+				createTeamData(existingTeamId2, 'https://old-beta-notebook.com', false, true)
+			)
+		];
+
+		const csvTeams = [
+			{
+				number: '123A',
+				name: 'New Team Alpha',
+				city: 'New Alpha City',
+				state: 'New Alpha State',
+				country: 'New Alpha Country',
+				shortName: 'NTA',
+				school: 'New Alpha School',
+				grade: 'High School' as Grade,
+				group: '123',
+				excluded: false
+			},
+			{
+				number: '789C',
+				name: 'Team Charlie',
+				city: 'Charlie City',
+				state: 'Charlie State',
+				country: 'Charlie Country',
+				shortName: 'TC',
+				school: 'Charlie School',
+				grade: 'Middle School' as Grade,
+				group: '789',
+				excluded: false
+			}
+		];
+
+		const notebookLinks = {
+			'123A': 'https://example.com/notebook-a',
+			'789C': 'https://example.com/notebook-c'
+		};
+
+		const result = mergeTeamData(csvTeams, notebookLinks, existingTeams);
+
+		expect(result).toHaveLength(2);
+		
+		// First team should reuse existing ID
+		expect(result[0].id).toBe(existingTeamId1);
+		expect(result[0].number).toBe('123A');
+		expect(result[0].name).toBe('New Team Alpha'); // Should use new data
+		expect(result[0].notebookLink).toBe('https://example.com/notebook-a');
+		
+		// Second team should get a new ID
+		expect(result[1].id).not.toBe(existingTeamId1);
+		expect(result[1].id).not.toBe(existingTeamId2);
+		expect(result[1].number).toBe('789C');
+		expect(result[1].name).toBe('Team Charlie');
+		expect(result[1].notebookLink).toBe('https://example.com/notebook-c');
+	});
+
+	it('should handle isDevelopedNotebook field properly', () => {
+		const csvTeams = [
+			{
+				number: '123A',
+				name: 'Team Alpha',
+				isDevelopedNotebook: true,
+				excluded: false
+			},
+			{
+				number: '456B',
+				name: 'Team Beta',
+				isDevelopedNotebook: false,
+				excluded: true
+			},
+			{
+				number: '789C',
+				name: 'Team Charlie',
+				// isDevelopedNotebook not specified (should default to null)
+				excluded: false
+			}
+		];
+
+		const notebookLinks = {};
+
+		const result = mergeTeamData(csvTeams, notebookLinks);
+
+		expect(result).toHaveLength(3);
+		expect(result[0].data.isDevelopedNotebook).toBe(true);
+		expect(result[0].excluded).toBe(false);
+		expect(result[1].data.isDevelopedNotebook).toBe(false);
+		expect(result[1].excluded).toBe(true);
+		expect(result[2].data.isDevelopedNotebook).toBe(null);
+		expect(result[2].excluded).toBe(false);
+	});
+
+	it('should handle mixed existing and new teams correctly', () => {
+		const existingTeamId1 = uuidv4();
+		const existingTeamId3 = uuidv4();
+		
+		const existingTeams = [
+			new EditingTeam(
+				createTeamInfo(existingTeamId1, '123A', 'Existing Team Alpha', 'City A', 'State A', 'Country A', 'ETA', 'School A', 'High School', '123'),
+				createTeamData(existingTeamId1, 'https://existing-notebook-a.com', null, false)
+			),
+			new EditingTeam(
+				createTeamInfo(existingTeamId3, '789C', 'Existing Team Charlie', 'City C', 'State C', 'Country C', 'ETC', 'School C', 'College', '789'),
+				createTeamData(existingTeamId3, 'https://existing-notebook-c.com', true, false)
+			)
+		];
+
+		const csvTeams = [
+			{
+				number: '123A',
+				name: 'Updated Team Alpha',
+				city: 'Updated City A',
+				grade: 'High School' as Grade,
+				group: '123'
+			},
+			{
+				number: '456B',
+				name: 'New Team Beta',
+				city: 'City B',
+				grade: 'Middle School' as Grade,
+				group: '456'
+			},
+			{
+				number: '789C',
+				name: 'Updated Team Charlie',
+				city: 'Updated City C',
+				grade: 'College' as Grade,
+				group: '789'
+			}
+		];
+
+		const notebookLinks = {
+			'456B': 'https://example.com/notebook-b'
+		};
+
+		const result = mergeTeamData(csvTeams, notebookLinks, existingTeams);
+
+		expect(result).toHaveLength(3);
+		
+		// Team A should reuse existing ID
+		expect(result[0].id).toBe(existingTeamId1);
+		expect(result[0].number).toBe('123A');
+		expect(result[0].name).toBe('Updated Team Alpha');
+		
+		// Team B should get new ID  
+		expect(result[1].id).not.toBe(existingTeamId1);
+		expect(result[1].id).not.toBe(existingTeamId3);
+		expect(result[1].number).toBe('456B');
+		expect(result[1].name).toBe('New Team Beta');
+		expect(result[1].notebookLink).toBe('https://example.com/notebook-b');
+		
+		// Team C should reuse existing ID
+		expect(result[2].id).toBe(existingTeamId3);
+		expect(result[2].number).toBe('789C');
+		expect(result[2].name).toBe('Updated Team Charlie');
+	});
+
+	it('should generate new IDs for teams when no existing teams provided', () => {
+		const csvTeams = [
+			{
+				number: '123A',
+				name: 'Team Alpha',
+				grade: 'High School' as Grade,
+				group: '123'
+			},
+			{
+				number: '456B',
+				name: 'Team Beta', 
+				grade: 'Middle School' as Grade,
+				group: '456'
+			}
+		];
+
+		const notebookLinks = {};
+
+		const result = mergeTeamData(csvTeams, notebookLinks);
+
+		expect(result).toHaveLength(2);
+		expect(result[0].id).toBeDefined();
+		expect(result[1].id).toBeDefined();
+		expect(result[0].id).not.toBe(result[1].id);
+		
+		// Check that IDs are valid UUIDs (basic validation)
+		expect(result[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+		expect(result[1].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+	});
+
+	it('should create correct EditingTeam instances with proper info and data objects', () => {
+		const csvTeams = [
+			{
+				number: '123A',
+				name: 'Team Alpha',
+				city: 'Alpha City',
+				state: 'Alpha State',
+				country: 'Alpha Country',
+				shortName: 'TA',
+				school: 'Alpha School',
+				grade: 'High School' as Grade,
+				group: '123',
+				excluded: true,
+				isDevelopedNotebook: true
+			}
+		];
+
+		const notebookLinks = {
+			'123A': 'https://example.com/notebook-a'
+		};
+
+		const result = mergeTeamData(csvTeams, notebookLinks);
+
+		expect(result).toHaveLength(1);
+		const team = result[0];
+		
+		expect(team).toBeInstanceOf(EditingTeam);
+		expect(team.info.id).toBe(team.data.id);
+		expect(team.info.id).toBe(team.id);
+		
+		// Verify all info properties
+		expect(team.info.number).toBe('123A');
+		expect(team.info.name).toBe('Team Alpha');
+		expect(team.info.city).toBe('Alpha City');
+		expect(team.info.state).toBe('Alpha State');
+		expect(team.info.country).toBe('Alpha Country');
+		expect(team.info.shortName).toBe('TA');
+		expect(team.info.school).toBe('Alpha School');
+		expect(team.info.grade).toBe('High School');
+		expect(team.info.group).toBe('123');
+		
+		// Verify all data properties
+		expect(team.data.notebookLink).toBe('https://example.com/notebook-a');
+		expect(team.data.excluded).toBe(true);
+		expect(team.data.isDevelopedNotebook).toBe(true);
+		
+		// Verify convenience getters work
+		expect(team.number).toBe('123A');
+		expect(team.name).toBe('Team Alpha');
+		expect(team.notebookLink).toBe('https://example.com/notebook-a');
+		expect(team.excluded).toBe(true);
+	});
+
+	it('should handle empty arrays gracefully', () => {
+		const result = mergeTeamData([], {}, []);
+		expect(result).toEqual([]);
+		
+		const result2 = mergeTeamData([], {});
+		expect(result2).toEqual([]);
 	});
 });
 

@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { List } from './list.svelte';
-import { SvelteSet } from 'svelte/reactivity';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
 import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
 
@@ -319,9 +319,15 @@ export function mapGradeToGradeLevel(gradeString: string): Grade {
 	return 'College';
 }
 
-export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebookLinks: Record<string, string>): EditingTeam[] {
+export function mergeTeamData(
+	csvTeams: Partial<TeamInfo & TeamData>[],
+	notebookLinks: Record<string, string>,
+	existingTeams: EditingTeam[] = []
+): EditingTeam[] {
+	const existingTeamMap = new SvelteMap(existingTeams.map((team) => [team.number, team.id]));
+
 	return csvTeams.map((team) => {
-		const id = uuidv4();
+		const id = existingTeamMap.get(team.number!) || uuidv4(); // reuse existing team id if it exists
 		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
 		const notebookLink = notebookLinks[teamNumber] || '';
 
@@ -338,7 +344,7 @@ export function mergeTeamData(csvTeams: Partial<TeamInfo & TeamData>[], notebook
 			team.group || ''
 		);
 
-		const teamData = createTeamData(id, notebookLink, team.isDevelopedNotebook || null, team.excluded || false);
+		const teamData = createTeamData(id, notebookLink, team.isDevelopedNotebook ?? null, team.excluded || false);
 
 		return new EditingTeam(teamInfo, teamData);
 	});

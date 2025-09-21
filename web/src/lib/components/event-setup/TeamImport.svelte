@@ -92,7 +92,7 @@
 			const csvTeams = parseTournamentManagerCSV(csvContent);
 			const notebookLinks = notebookContent.trim() ? parseNotebookData(notebookContent) : {};
 
-			const mergedTeams = mergeTeamData(csvTeams, notebookLinks);
+			const mergedTeams = mergeTeamData(csvTeams, notebookLinks, teams);
 			teams = mergedTeams;
 			teamGroups = groupTeamsByGroup(mergedTeams);
 
