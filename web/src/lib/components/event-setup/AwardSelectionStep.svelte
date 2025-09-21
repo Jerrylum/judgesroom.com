@@ -4,28 +4,40 @@
 	import { dialogs } from '$lib/app-page.svelte';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import type { AwardOptions } from '$lib/award.svelte';
+	import { getOfficialAwardOptionsList, separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
 	import type { CompetitionType, Grade } from '@judging.jerryio/protocol/src/award';
+	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 
 	interface Props {
 		selectedCompetitionType: CompetitionType;
-		possibleGrades: Grade[];
-		performanceAwards: AwardOptions[];
-		judgedAwards: AwardOptions[];
-		volunteerNominatedAwards: AwardOptions[];
+		selectedEventGradeLevel: EventGradeLevel;
+		awardOptions: AwardOptions[];
 		onNext: () => void;
 		onPrev: () => void;
 	}
 
-	let {
-		selectedCompetitionType,
-		possibleGrades,
-		performanceAwards = $bindable(),
-		judgedAwards = $bindable(),
-		volunteerNominatedAwards = $bindable(),
-		onNext,
-		onPrev
-	}: Props = $props();
+	let { selectedCompetitionType, selectedEventGradeLevel, awardOptions = $bindable(), onNext, onPrev }: Props = $props();
+
+	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
+	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
+
+	let performanceAwards = $state<AwardOptions[]>([]);
+	let judgedAwards = $state<AwardOptions[]>([]);
+	let volunteerNominatedAwards = $state<AwardOptions[]>([]);
+
+	$effect(() => {
+		let using = awardOptions;
+
+		if (using.length === 0) {
+			using = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
+		}
+
+		const { performanceAwards: p, judgedAwards: j, volunteerNominatedAwards: v } = separateAwardOptionsByType(using);
+		performanceAwards = p;
+		judgedAwards = j;
+		volunteerNominatedAwards = v;
+	});
 
 	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
@@ -67,6 +79,10 @@
 				volunteerNominatedAwards = [...volunteerNominatedAwards, customAward];
 			}
 		}
+	}
+
+	function submit() {
+		awardOptions = [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards];
 	}
 </script>
 
@@ -162,7 +178,19 @@
 	</div>
 
 	<div class="flex justify-between pt-4">
-		<button onclick={onPrev} class="secondary">Back</button>
-		<button onclick={onNext} class="primary">Next: Team Import</button>
+		<button
+			onclick={() => {
+				submit();
+				onPrev();
+			}}
+			class="secondary">Back</button
+		>
+		<button
+			onclick={() => {
+				submit();
+				onNext();
+			}}
+			class="primary">Next: Team Import</button
+		>
 	</div>
 </div>

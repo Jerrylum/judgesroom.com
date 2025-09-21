@@ -6,7 +6,7 @@
 	import ReviewStep from './ReviewStep.svelte';
 	import { untrack, onMount, onDestroy } from 'svelte';
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
-	import { AwardOptions, getOfficialAwardOptionsList } from '$lib/award.svelte';
+	import { AwardOptions, getOfficialAwardOptionsList, separateAwardOptionsByType } from '$lib/award.svelte';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam } from '$lib/team.svelte';
@@ -26,9 +26,7 @@
 	let selectedEventGradeLevel: EventGradeLevel = $state('Blended');
 
 	// Award state - will be managed by the AwardSelectionStep
-	let performanceAwards: AwardOptions[] = $state([]);
-	let judgedAwards: AwardOptions[] = $state([]);
-	let volunteerNominatedAwards: AwardOptions[] = $state([]);
+	let awardOptions: AwardOptions[] = $state([]);
 
 	// Teams
 	let teams: EditingTeam[] = $state([]);
@@ -40,15 +38,8 @@
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: EditingTeam[] = $state([]);
 
-	// Get current grades based on selection - this is computed in CompetitionSetupStep now
-	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
-	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
-
 	// Hash comparison for conflict detection
 	let originalEventSetupHash: string | null = null;
-
-	// Current app data for comparison
-	// const currentEssentialData = $derived(app.getEssentialData());
 
 	/**
 	 * Generate SHA-256 hash of event setup data
@@ -152,6 +143,10 @@
 		}
 	}
 
+	function resetAwards() {
+		awardOptions = [];
+	}
+
 	async function completeSetup() {
 		try {
 			// Check for event setup conflicts before saving
@@ -184,9 +179,7 @@
 					name: group.name,
 					assignedTeams: group.assignedTeams.map((team) => team.id)
 				})),
-				awards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards]
-					.filter((award) => award.isSelected)
-					.map((award) => award.generateAward())
+				awards: awardOptions.filter((award) => award.isSelected).map((award) => award.generateAward())
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready
@@ -214,13 +207,6 @@
 		}
 	}
 
-	// Reset grade level when competition type changes
-	$effect(() => {
-		if (gradeOptions.length > 0) {
-			selectedEventGradeLevel = gradeOptions[gradeOptions.length - 1].value;
-		}
-	});
-
 	// Initialize component
 	onMount(async () => {
 		// Load current data from app
@@ -245,22 +231,6 @@
 				app.addErrorNotice('Event setup has been modified on another device. Your changes may conflict.');
 			}
 		});
-	});
-
-	// Load official awards when competition type or grade changes
-	$effect(() => {
-		if (selectedCompetitionType && possibleGrades.length > 0) {
-			const officialAwards = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
-
-			// Separate awards by type
-			performanceAwards = officialAwards.filter((award) => award.possibleTypes.includes('performance'));
-
-			judgedAwards = officialAwards.filter((award) => award.possibleTypes.includes('judged'));
-
-			volunteerNominatedAwards = officialAwards.filter(
-				(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
-			);
-		}
 	});
 
 	// If teams are updated, reset all teams to unassigned
@@ -307,17 +277,17 @@
 	<!-- Step Content -->
 	<div class="rounded-lg bg-white p-6 shadow-lg">
 		{#if currentStep === 1}
-			<CompetitionSetupStep bind:eventName bind:selectedCompetitionType bind:selectedEventGradeLevel onNext={nextStep} />
-		{:else if currentStep === 2}
-			<AwardSelectionStep
-				{selectedCompetitionType}
-				{possibleGrades}
-				bind:performanceAwards
-				bind:judgedAwards
-				bind:volunteerNominatedAwards
+			<CompetitionSetupStep
+				bind:eventName
+				bind:selectedCompetitionType
+				bind:selectedEventGradeLevel
+				onResetAwards={resetAwards}
 				onNext={nextStep}
-				onPrev={prevStep}
+				onCancel={cancelSetup}
+				isWorkspaceReady={app.isWorkspaceReady()}
 			/>
+		{:else if currentStep === 2}
+			<AwardSelectionStep {selectedCompetitionType} {selectedEventGradeLevel} bind:awardOptions onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 3}
 			<TeamImportStep bind:teams onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 4}
@@ -327,9 +297,7 @@
 				{selectedCompetitionType}
 				{selectedEventGradeLevel}
 				{teams}
-				{performanceAwards}
-				{judgedAwards}
-				{volunteerNominatedAwards}
+				{awardOptions}
 				{judgingMethod}
 				{judgeGroups}
 				{judges}

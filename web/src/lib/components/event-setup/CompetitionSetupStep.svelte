@@ -7,10 +7,24 @@
 		eventName: string;
 		selectedCompetitionType: CompetitionType;
 		selectedEventGradeLevel: EventGradeLevel;
+		onResetAwards: () => void;
 		onNext: () => void;
+		onCancel: () => void;
+		isWorkspaceReady: boolean;
 	}
 
-	let { eventName = $bindable(), selectedCompetitionType = $bindable(), selectedEventGradeLevel = $bindable(), onNext }: Props = $props();
+	let {
+		eventName = $bindable(),
+		selectedCompetitionType = $bindable(),
+		selectedEventGradeLevel = $bindable(),
+		onResetAwards,
+		onNext,
+		onCancel,
+		isWorkspaceReady
+	}: Props = $props();
+
+	const originalSelectedEventGradeLevel = selectedEventGradeLevel;
+	const originalSelectedCompetitionType = selectedCompetitionType;
 
 	// Computed grade options based on competition type
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
@@ -24,9 +38,19 @@
 
 	function handleNext() {
 		if (canProceed) {
+			if (originalSelectedEventGradeLevel !== selectedEventGradeLevel || originalSelectedCompetitionType !== selectedCompetitionType) {
+				onResetAwards();
+			}
 			onNext();
 		}
 	}
+
+	// Reset grade level when competition type changes
+	$effect(() => {
+		if (gradeOptions.length > 0) {
+			selectedEventGradeLevel = gradeOptions[gradeOptions.length - 1].value;
+		}
+	});
 </script>
 
 <div class="space-y-6">
@@ -71,7 +95,14 @@
 		</select>
 	</div>
 
-	<div class="flex justify-end pt-4">
+	<div class="flex justify-between pt-4">
+		<div class="flex space-x-3">
+			{#if isWorkspaceReady}
+				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+					Cancel
+				</button>
+			{/if}
+		</div>
 		<button
 			onclick={handleNext}
 			class="primary"

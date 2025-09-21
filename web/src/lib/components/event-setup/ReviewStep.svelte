@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AwardOptions } from '$lib/award.svelte';
+	import { separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
 	import type { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam, groupTeamsByGroup } from '$lib/team.svelte';
 	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
@@ -10,9 +10,7 @@
 		selectedCompetitionType: CompetitionType;
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: EditingTeam[];
-		performanceAwards: AwardOptions[];
-		judgedAwards: AwardOptions[];
-		volunteerNominatedAwards: AwardOptions[];
+		awardOptions: AwardOptions[];
 		judgingMethod: JudgingMethod;
 		judgeGroups: EditingJudgeGroup[];
 		judges: { id: string; name: string; groupId: string }[];
@@ -26,9 +24,7 @@
 		selectedCompetitionType,
 		selectedEventGradeLevel,
 		teams,
-		performanceAwards,
-		judgedAwards,
-		volunteerNominatedAwards,
+		awardOptions,
 		judgingMethod,
 		judgeGroups,
 		judges,
@@ -37,6 +33,8 @@
 		onCancel,
 		isWorkspaceReady
 	}: Props = $props();
+
+	const { performanceAwards, judgedAwards, volunteerNominatedAwards } = $derived(separateAwardOptionsByType(awardOptions));
 </script>
 
 <div class="space-y-6">

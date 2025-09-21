@@ -277,7 +277,15 @@ export function createCustomAwardOptions(
 	return new AwardOptions(name, [competitionType], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
 }
 
-// export function temp2(officialAwards: AwardOptions)
+export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
+	return {
+		performanceAwards: officialAwards.filter((award) => award.possibleTypes.includes('performance')),
+		judgedAwards: officialAwards.filter((award) => award.possibleTypes.includes('judged')),
+		volunteerNominatedAwards: officialAwards.filter(
+			(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
+		)
+	};
+}
 
 // export function temp(awards: Award[], officialAwards: AwardOptions) {
 
