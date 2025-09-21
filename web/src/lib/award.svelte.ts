@@ -1,4 +1,4 @@
-import type { CompetitionType, AwardType, Grade, Award } from '@judging.jerryio/protocol/src/award';
+import { type CompetitionType, type AwardType, type Grade, type Award, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { generateUUID } from './utils.svelte';
 
 export class AwardOptions {

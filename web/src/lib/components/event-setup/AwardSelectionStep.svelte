@@ -5,9 +5,11 @@
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { getOfficialAwardOptionsList, separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
-	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward, type CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import FixedAwardOptions from './FixedAwardOptions.svelte';
+	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
 
 	interface Props {
 		selectedCompetitionType: CompetitionType;
@@ -23,7 +25,9 @@
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 
 	let performanceAwards = $state<AwardOptions[]>([]);
-	let judgedAwards = $state<AwardOptions[]>([]);
+	let excellenceAward = $state<AwardOptions[]>([]);
+	let designAward = $state<AwardOptions | null>(null);
+	let remainingJudgedAwards = $state<AwardOptions[]>([]);
 	let volunteerNominatedAwards = $state<AwardOptions[]>([]);
 
 	$effect(() => {
@@ -33,17 +37,21 @@
 			using = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
 		}
 
-		const { performanceAwards: p, judgedAwards: j, volunteerNominatedAwards: v } = separateAwardOptionsByType(using);
-		performanceAwards = p;
-		judgedAwards = j;
-		volunteerNominatedAwards = v;
+		performanceAwards = using.filter((award) => award.possibleTypes.includes('performance'));
+		const j = using.filter((award) => award.possibleTypes.includes('judged'));
+		excellenceAward = j.filter((award) => isExcellenceAward(award.name));
+		designAward = j.find((award) => award.name === 'Design Award')!;
+		remainingJudgedAwards = j.filter((award) => !isExcellenceAward(award.name) && award.name !== 'Design Award');
+		volunteerNominatedAwards = using.filter(
+			(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
+		);
 	});
 
 	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
-			judgedAwards = e.detail.items;
+			remainingJudgedAwards = e.detail.items;
 		} else {
 			volunteerNominatedAwards = e.detail.items;
 		}
@@ -53,7 +61,7 @@
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
-			judgedAwards = e.detail.items;
+			remainingJudgedAwards = e.detail.items;
 		} else {
 			volunteerNominatedAwards = e.detail.items;
 		}
@@ -62,7 +70,7 @@
 	async function openCustomAwardDialog() {
 		const result = await dialogs.showCustom(CustomAwardDialog, {
 			props: {
-				existingAwards: [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards],
+				existingAwards: [...performanceAwards, ...remainingJudgedAwards, ...volunteerNominatedAwards],
 				selectedCompetitionType,
 				possibleGrades
 			}
@@ -74,7 +82,7 @@
 			if (customAward.selectedType === 'performance') {
 				performanceAwards = [...performanceAwards, customAward];
 			} else if (customAward.selectedType === 'judged') {
-				judgedAwards = [...judgedAwards, customAward];
+				remainingJudgedAwards = [...remainingJudgedAwards, customAward];
 			} else {
 				volunteerNominatedAwards = [...volunteerNominatedAwards, customAward];
 			}
@@ -82,7 +90,7 @@
 	}
 
 	function submit() {
-		awardOptions = [...performanceAwards, ...judgedAwards, ...volunteerNominatedAwards];
+		awardOptions = [...performanceAwards, ...excellenceAward, designAward!, ...remainingJudgedAwards, ...volunteerNominatedAwards];
 	}
 </script>
 
@@ -130,22 +138,31 @@
 					needed.
 				</p>
 			</div>
-			<div
-				class="min-h-[300px] space-y-2 border-t pt-3"
-				use:dndzone={{
-					items: judgedAwards,
-					flipDurationMs: 200,
-					dropTargetStyle: { outline: '1px solid #EEE' },
-					type: 'others'
-				}}
-				onconsider={(e) => handleDndConsiderCards(e, 'judged')}
-				onfinalize={(e) => handleDndFinalizeCards(e, 'judged')}
-			>
-				{#each judgedAwards as award, index (award.id)}
-					<div animate:flip={{ duration: 200 }}>
-						<AwardOptionsComponent bind:award={judgedAwards[index]} />
-					</div>
-				{/each}
+
+			<div class="min-h-[300px] space-y-2 border-t pt-3">
+				{#if excellenceAward.length > 0}
+					<ExcellenceAwardOptions bind:awards={excellenceAward} />
+				{/if}
+				{#if designAward}
+					<FixedAwardOptions bind:award={designAward} />
+				{/if}
+				<div
+					class="space-y-2"
+					use:dndzone={{
+						items: remainingJudgedAwards,
+						flipDurationMs: 200,
+						dropTargetStyle: { outline: '1px solid #EEE' },
+						type: 'others'
+					}}
+					onconsider={(e) => handleDndConsiderCards(e, 'judged')}
+					onfinalize={(e) => handleDndFinalizeCards(e, 'judged')}
+				>
+					{#each remainingJudgedAwards as award, index (award.id)}
+						<div animate:flip={{ duration: 200 }}>
+							<AwardOptionsComponent bind:award={remainingJudgedAwards[index]} />
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
 
