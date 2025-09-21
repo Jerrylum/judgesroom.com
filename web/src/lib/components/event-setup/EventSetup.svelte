@@ -38,6 +38,8 @@
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: EditingTeam[] = $state([]);
 
+	let originalJudges = app.getAllJudges();
+
 	/**
 	 * Load current data from app
 	 */
@@ -147,7 +149,14 @@
 			if (app.isWorkspaceReady()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
 				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
-				await app.wrpcClient.judge.updateAllJudges.mutation(judges);
+
+				// Just in case: keep judges that are created during the event setup
+				const currentJudges = app.getAllJudges();
+				const newJudges = currentJudges
+					.filter((judge) => !originalJudges.some((originalJudge) => originalJudge.id === judge.id))
+					.filter((judge) => judgeGroups.some((group) => group.id === judge.groupId));
+
+				await app.wrpcClient.judge.updateAllJudges.mutation([...newJudges, ...judges]);
 				// User is already ready, go back to workspace
 				AppUI.appPhase = 'workspace';
 			} else {
