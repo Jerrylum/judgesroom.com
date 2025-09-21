@@ -8,8 +8,10 @@
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
+	import { dialogs } from '$lib/app-page.svelte';
 
 	interface Props {
+		isEditingEventSetup: boolean;
 		judgeGroup: EditingJudgeGroup;
 		selectedItems: EditingTeamList;
 		activeZoneId: string;
@@ -22,6 +24,7 @@
 	}
 
 	let {
+		isEditingEventSetup,
 		judgeGroup = $bindable(),
 		selectedItems = $bindable(),
 		activeZoneId = $bindable(),
@@ -125,8 +128,21 @@
 		}
 	}
 
-	function deleteGroup() {
-		onDeleteGroup(judgeGroup.id);
+	async function deleteGroup() {
+		const confirmed =
+			!isEditingEventSetup ||
+			(await dialogs.showConfirmation({
+				title: 'Delete Judge Group',
+				message:
+					'Are you sure you want to delete this judge group? If this judge group has been used for judging, all related rubrics and award rankings will be lost forever. This action cannot be undone.',
+				confirmText: 'Delete Group',
+				cancelText: 'Cancel',
+				confirmButtonClass: 'danger'
+			}));
+
+		if (confirmed) {
+			onDeleteGroup(judgeGroup.id);
+		}
 	}
 
 	function startEditingName() {
@@ -203,8 +219,21 @@
 		startAddingJudge(); // Allow continuous adding
 	}
 
-	function removeJudge(judgeId: string) {
-		onRemoveJudge(judgeId);
+	async function removeJudge(judgeId: string) {
+		const confirmed =
+			!isEditingEventSetup ||
+			(await dialogs.showConfirmation({
+				title: 'Remove Judge',
+				message:
+					'Are you sure you want to remove this judge? If this judge has completed rubrics, all their judging data and evaluations will be lost forever. This action cannot be undone.',
+				confirmText: 'Remove Judge',
+				cancelText: 'Cancel',
+				confirmButtonClass: 'danger'
+			}));
+
+		if (confirmed) {
+			onRemoveJudge(judgeId);
+		}
 	}
 
 	// Auto-focus effects
@@ -341,7 +370,7 @@
 				</div>
 
 				{#if judgeGroup.assignedTeams.length === 0}
-					<div class="absolute top-0 left-0 flex h-[120px] w-full items-center justify-center text-gray-500">
+					<div class="absolute left-0 top-0 flex h-[120px] w-full items-center justify-center text-gray-500">
 						<p class="text-sm">Drop teams here</p>
 					</div>
 				{/if}
@@ -361,7 +390,7 @@
 		}
 
 		:global(&[data-selected-items-count]::after) {
-			@apply absolute top-[-0.75rem] right-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
+			@apply absolute right-[-0.75rem] top-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
 		}
 	}
 </style>

@@ -4,8 +4,8 @@
 	import TeamImportStep from './TeamImportStep.svelte';
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
-	import { untrack, onMount, onDestroy } from 'svelte';
-	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
+	import { untrack, onMount } from 'svelte';
+	import { app, AppUI } from '$lib/app-page.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam } from '$lib/team.svelte';
@@ -14,11 +14,11 @@
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 
-	// Extended AwardOptions type for drag and drop
-
 	// Step management
 	let currentStep = $state(0);
 	const totalSteps = 5;
+
+	let isEditingEventSetup = $state(false);
 
 	// Event setup state
 	let eventName: string = $state('My Event');
@@ -38,32 +38,6 @@
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: EditingTeam[] = $state([]);
 
-	// Hash comparison for conflict detection
-	let originalEventSetupHash: string | null = null;
-
-	/**
-	 * Generate SHA-256 hash of event setup data
-	 */
-	async function generateEventSetupHash(eventSetup: any): Promise<string | null> {
-		if (!eventSetup) return null;
-
-		const stableString = JSON.stringify(eventSetup, Object.keys(eventSetup).sort());
-		const encoder = new TextEncoder();
-		const data = encoder.encode(stableString);
-		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-		const hashArray = Array.from(new Uint8Array(hashBuffer));
-		return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-	}
-
-	/**
-	 * Check if current event setup conflicts with original
-	 */
-	async function hasEventSetupConflict(): Promise<boolean> {
-		if (!originalEventSetupHash || !app.isWorkspaceReady()) return false;
-		const currentHash = await generateEventSetupHash(app.getEssentialData());
-		return currentHash !== originalEventSetupHash;
-	}
-
 	/**
 	 * Load current data from app
 	 */
@@ -73,6 +47,7 @@
 		const allJudges = app.getAllJudges();
 
 		if (eventSetup) {
+			isEditingEventSetup = true;
 			// Load event info
 			eventName = eventSetup.eventName;
 			selectedCompetitionType = eventSetup.competitionType;
@@ -152,23 +127,6 @@
 
 	async function completeSetup() {
 		try {
-			// Check for event setup conflicts before saving
-			const hasConflict = await hasEventSetupConflict();
-			if (hasConflict) {
-				const confirmed = await dialogs.showConfirmation({
-					title: 'Event Setup Modified',
-					message:
-						'The event setup has been modified on another device while you were editing. Do you want to continue and overwrite those changes?',
-					confirmText: 'Continue',
-					cancelText: 'Cancel',
-					confirmButtonClass: 'danger'
-				});
-
-				if (!confirmed) {
-					return;
-				}
-			}
-
 			// Create the event setup object
 			const essentialData = {
 				eventName,
@@ -215,27 +173,7 @@
 		// Load current data from app
 		loadCurrentData();
 
-		// Store original hash for conflict detection
-		const eventSetup = app.getEssentialData();
-		if (eventSetup) {
-			originalEventSetupHash = await generateEventSetupHash(eventSetup);
-		}
-
 		currentStep = 1; // IMPORTANT: set to 1 after loading current data
-	});
-
-	// Clear hash on unmount
-	onDestroy(() => {
-		originalEventSetupHash = null;
-	});
-
-	// Monitor app data changes and warn about conflicts
-	$effect(() => {
-		hasEventSetupConflict().then((hasConflict) => {
-			if (hasConflict) {
-				app.addErrorNotice('Event setup has been modified on another device. Your changes may conflict.');
-			}
-		});
 	});
 
 	// If teams are updated, reset all teams to unassigned
@@ -295,9 +233,18 @@
 		{:else if currentStep === 2}
 			<AwardSelectionStep {selectedCompetitionType} {selectedEventGradeLevel} bind:awardOptions onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 3}
-			<TeamImportStep bind:teams onNext={nextStep} onPrev={prevStep} />
+			<TeamImportStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 4}
-			<JudgeSetupStep {teams} bind:judgingMethod bind:judgeGroups bind:judges bind:unassignedTeams onNext={nextStep} onPrev={prevStep} />
+			<JudgeSetupStep
+				{isEditingEventSetup}
+				{teams}
+				bind:judgingMethod
+				bind:judgeGroups
+				bind:judges
+				bind:unassignedTeams
+				onNext={nextStep}
+				onPrev={prevStep}
+			/>
 		{:else if currentStep === 5}
 			<ReviewStep
 				{selectedCompetitionType}

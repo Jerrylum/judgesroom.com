@@ -9,6 +9,7 @@
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
+		isEditingEventSetup: boolean;
 		teams: EditingTeam[];
 		judgingMethod: JudgingMethod;
 		judgeGroups: EditingJudgeGroup[];
@@ -19,6 +20,7 @@
 	}
 
 	let {
+		isEditingEventSetup,
 		teams: teamsProp,
 		judgingMethod = $bindable(),
 		judgeGroups = $bindable(),
@@ -233,6 +235,7 @@
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
 			{#each judgeGroups as judgeGroup, index (judgeGroup.id)}
 				<JudgeGroupComponent
+					isEditingEventSetup={isEditingEventSetup}
 					judgeGroup={judgeGroups[index]}
 					bind:selectedItems
 					bind:activeZoneId
