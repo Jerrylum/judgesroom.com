@@ -15,7 +15,6 @@
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
 
 	// Extended AwardOptions type for drag and drop
-	type AwardOptionsWithId = AwardOptions & { id: string };
 
 	// Step management
 	let currentStep = $state(1);
@@ -27,9 +26,9 @@
 	let selectedEventGradeLevel: EventGradeLevel = $state('Blended');
 
 	// Award state - will be managed by the AwardSelectionStep
-	let performanceAwards: AwardOptionsWithId[] = $state([]);
-	let judgedAwards: AwardOptionsWithId[] = $state([]);
-	let volunteerNominatedAwards: AwardOptionsWithId[] = $state([]);
+	let performanceAwards: AwardOptions[] = $state([]);
+	let judgedAwards: AwardOptions[] = $state([]);
+	let volunteerNominatedAwards: AwardOptions[] = $state([]);
 
 	// Teams
 	let teams: EditingTeam[] = $state([]);
@@ -87,6 +86,11 @@
 			eventName = eventSetup.eventName;
 			selectedCompetitionType = eventSetup.competitionType;
 			selectedEventGradeLevel = eventSetup.eventGradeLevel;
+
+			// Load awards
+			// performanceAwards = eventSetup.awards
+			// 	.filter((award) => award.type === 'performance')
+			// 	.map((award, index) => Object.assign(award, { id: `performance-${index}` }));
 
 			// Load teams
 			teams = eventSetup.teamInfos.map((teamWithData) => {
@@ -249,17 +253,13 @@
 			const officialAwards = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
 
 			// Separate awards by type
-			performanceAwards = officialAwards
-				.filter((award) => award.possibleTypes.includes('performance'))
-				.map((award, index) => Object.assign(award, { id: `performance-${index}` }));
+			performanceAwards = officialAwards.filter((award) => award.possibleTypes.includes('performance'));
 
-			judgedAwards = officialAwards
-				.filter((award) => award.possibleTypes.includes('judged'))
-				.map((award, index) => Object.assign(award, { id: `judged-${index}` }));
+			judgedAwards = officialAwards.filter((award) => award.possibleTypes.includes('judged'));
 
-			volunteerNominatedAwards = officialAwards
-				.filter((award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged'))
-				.map((award, index) => Object.assign(award, { id: `vol-${index}` }));
+			volunteerNominatedAwards = officialAwards.filter(
+				(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
+			);
 		}
 	});
 

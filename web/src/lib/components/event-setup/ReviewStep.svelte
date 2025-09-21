@@ -6,15 +6,13 @@
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
 
-	type AwardOptionsWithId = AwardOptions & { id: string };
-
 	interface Props {
 		selectedCompetitionType: CompetitionType;
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: EditingTeam[];
-		performanceAwards: AwardOptionsWithId[];
-		judgedAwards: AwardOptionsWithId[];
-		volunteerNominatedAwards: AwardOptionsWithId[];
+		performanceAwards: AwardOptions[];
+		judgedAwards: AwardOptions[];
+		volunteerNominatedAwards: AwardOptions[];
 		judgingMethod: JudgingMethod;
 		judgeGroups: EditingJudgeGroup[];
 		judges: { id: string; name: string; groupId: string }[];

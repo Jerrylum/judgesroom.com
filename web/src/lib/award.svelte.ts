@@ -1,6 +1,8 @@
 import type { CompetitionType, AwardType, Grade, Award } from '@judging.jerryio/protocol/src/award';
+import { generateUUID } from './utils.svelte';
 
 export class AwardOptions {
+	public readonly id: string;
 	public name: string = $state('');
 	public possibleCompetitionTypes: CompetitionType[];
 	public possibleTypes: AwardType[] = $state([]);
@@ -21,6 +23,7 @@ export class AwardOptions {
 		isOfficial: boolean,
 		isSelected: boolean
 	) {
+		this.id = generateUUID();
 		this.name = name;
 		this.possibleCompetitionTypes = possibleCompetitionTypes;
 		this.possibleTypes = possibleTypes;
@@ -273,3 +276,9 @@ export function createCustomAwardOptions(
 ): AwardOptions {
 	return new AwardOptions(name, [competitionType], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
 }
+
+// export function temp2(officialAwards: AwardOptions)
+
+// export function temp(awards: Award[], officialAwards: AwardOptions) {
+
+// }

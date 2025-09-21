@@ -103,8 +103,7 @@
 				customAwardRequireNotebook
 			);
 
-			const customAwardWithId = Object.assign(customAward, { id: `custom-${Date.now()}` });
-			dialogs.closeDialog(customAwardWithId);
+			dialogs.closeDialog(customAward);
 		}
 	}
 

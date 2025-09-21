@@ -1,10 +1,8 @@
 <script lang="ts">
 	import type { AwardOptions } from '$lib/award.svelte';
 
-	type AwardOptionsWithId = AwardOptions & { id: string };
-
 	interface Props {
-		award: AwardOptionsWithId;
+		award: AwardOptions;
 	}
 
 	let { award = $bindable() }: Props = $props();

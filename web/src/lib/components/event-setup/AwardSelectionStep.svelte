@@ -7,15 +7,12 @@
 	import type { AwardOptions } from '$lib/award.svelte';
 	import type { CompetitionType, Grade } from '@judging.jerryio/protocol/src/award';
 
-	// Extended AwardOptions type for drag and drop
-	type AwardOptionsWithId = AwardOptions & { id: string };
-
 	interface Props {
 		selectedCompetitionType: CompetitionType;
 		possibleGrades: Grade[];
-		performanceAwards: AwardOptionsWithId[];
-		judgedAwards: AwardOptionsWithId[];
-		volunteerNominatedAwards: AwardOptionsWithId[];
+		performanceAwards: AwardOptions[];
+		judgedAwards: AwardOptions[];
+		volunteerNominatedAwards: AwardOptions[];
 		onNext: () => void;
 		onPrev: () => void;
 	}
@@ -30,7 +27,7 @@
 		onPrev
 	}: Props = $props();
 
-	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptionsWithId[] }>, listType: 'performance' | 'judged' | 'volunteer') {
+	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
@@ -40,7 +37,7 @@
 		}
 	}
 
-	function handleDndFinalizeCards(e: CustomEvent<{ items: AwardOptionsWithId[] }>, listType: 'performance' | 'judged' | 'volunteer') {
+	function handleDndFinalizeCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
 		if (listType === 'performance') {
 			performanceAwards = e.detail.items;
 		} else if (listType === 'judged') {
@@ -60,14 +57,14 @@
 		});
 
 		// If user didn't cancel, add the award to the appropriate list
-		const customAwardWithId = result as AwardOptionsWithId | null;
-		if (customAwardWithId) {
-			if (customAwardWithId.selectedType === 'performance') {
-				performanceAwards = [...performanceAwards, customAwardWithId];
-			} else if (customAwardWithId.selectedType === 'judged') {
-				judgedAwards = [...judgedAwards, customAwardWithId];
+		const customAward = result as AwardOptions | null;
+		if (customAward) {
+			if (customAward.selectedType === 'performance') {
+				performanceAwards = [...performanceAwards, customAward];
+			} else if (customAward.selectedType === 'judged') {
+				judgedAwards = [...judgedAwards, customAward];
 			} else {
-				volunteerNominatedAwards = [...volunteerNominatedAwards, customAwardWithId];
+				volunteerNominatedAwards = [...volunteerNominatedAwards, customAward];
 			}
 		}
 	}
