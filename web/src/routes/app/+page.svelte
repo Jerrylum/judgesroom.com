@@ -15,25 +15,23 @@
 	// App state persistence error message
 
 	let errorMessage = $state('');
+	const currentUser = $derived(app.getCurrentUser());
+	const currentUserJudge = $derived(app.getCurrentUserJudge());
 
 	// Monitor user state changes
 	$effect(() => {
-		const currentUser = app.getCurrentUser();
-		const clearReason = app.getUserClearReason();
-
 		// Handle role deletion
-		if (!currentUser && clearReason === 'role_deleted') {
+		if (app.isJudgingReady() && currentUser && currentUser.role === 'judge' && !currentUserJudge) {
 			// Show confirmation dialog and redirect to role selection
-			(async () => {
-				await dialogs.showConfirmation({
-					title: 'Role No Longer Available',
-					message: 'Your judge role has been removed from the event setup. Please select a new role.',
-					confirmText: 'OK',
-					cancelText: '',
-					confirmButtonClass: 'primary'
-				});
-				AppUI.appPhase = 'role_selection';
-			})();
+			app.unselectUser();
+			AppUI.appPhase = 'role_selection';
+			dialogs.showConfirmation({
+				title: 'Role Removed',
+				message: 'Your judge role has been removed from the event setup. Please select a new role.',
+				confirmText: 'OK',
+				cancelText: '',
+				confirmButtonClass: 'primary'
+			});
 		}
 	});
 
@@ -122,11 +120,11 @@
 
 	<!-- Notices -->
 	{#if notices.length > 0}
-		<div class="fixed right-4 bottom-4 z-50 space-y-2">
+		<div class="fixed bottom-4 right-4 z-50 space-y-2">
 			{#each notices as notice (notice.id)}
 				{@const isError = notice.type === 'error'}
 				<div
-					class="flex max-w-sm min-w-xs items-center justify-between rounded-lg p-4 shadow-lg {isError
+					class="min-w-xs flex max-w-sm items-center justify-between rounded-lg p-4 shadow-lg {isError
 						? 'bg-red-100 text-red-700'
 						: 'bg-green-100 text-green-700'}"
 				>

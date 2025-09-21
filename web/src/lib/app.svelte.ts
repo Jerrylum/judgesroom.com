@@ -18,8 +18,6 @@ import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 
-export type UserClearReason = 'kicked' | 'session_destroyed';
-
 export interface Notice {
 	id: string;
 	message: string;
@@ -98,8 +96,7 @@ export class App {
 
 	// Error handling
 	private notices: Notice[] = $state([]);
-	private userClearReason: string | null = $state(null);
-
+	
 	constructor(storage: AppStorage, isDevelopment: boolean = false) {
 		this.storage = storage;
 		this.isDevelopment = isDevelopment;
@@ -195,7 +192,6 @@ export class App {
 	async createSession(): Promise<void> {
 		try {
 			this.currentUser = null;
-			this.userClearReason = null;
 			this.clientManager.resetClient();
 
 			// Clear storage
@@ -250,7 +246,6 @@ export class App {
 		this.essentialData = null;
 		this.allJudges = [];
 		this.currentUser = null;
-		this.userClearReason = null;
 		// no client-held session id field to clear
 		this.clientManager.resetClient();
 
@@ -483,7 +478,11 @@ export class App {
 		}
 
 		this.currentUser = user;
-		this.userClearReason = null;
+		this.saveUserToStorage();
+	}
+
+	async unselectUser(): Promise<void> {
+		this.currentUser = null;
 		this.saveUserToStorage();
 	}
 
@@ -508,10 +507,6 @@ export class App {
 	 */
 	hasCurrentUser(): boolean {
 		return this.currentUser !== null;
-	}
-
-	getUserClearReason(): string | null {
-		return this.userClearReason;
 	}
 
 	// ============================================================================
@@ -628,7 +623,6 @@ export class App {
 	 */
 	private clearCurrentUser(reason: string): void {
 		this.currentUser = null;
-		this.userClearReason = reason;
 		this.clearUserFromStorage();
 	}
 
