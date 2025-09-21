@@ -47,7 +47,7 @@
 
 	// Reset grade level when competition type changes
 	$effect(() => {
-		if (gradeOptions.length > 0) {
+		if (!gradeOptions.some((option) => option.value === selectedEventGradeLevel)) {
 			selectedEventGradeLevel = gradeOptions[gradeOptions.length - 1].value;
 		}
 	});
