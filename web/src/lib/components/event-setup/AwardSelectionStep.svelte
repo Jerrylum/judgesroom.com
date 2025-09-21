@@ -5,7 +5,7 @@
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { getOfficialAwardOptionsList, separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
-	import type { CompetitionType, Grade } from '@judging.jerryio/protocol/src/award';
+	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 
@@ -19,8 +19,6 @@
 
 	let { selectedCompetitionType, selectedEventGradeLevel, awardOptions = $bindable(), onNext, onPrev }: Props = $props();
 
-	$inspect("awardOptions", awardOptions);
-	
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 

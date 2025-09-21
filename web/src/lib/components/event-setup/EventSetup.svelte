@@ -107,12 +107,15 @@
 			});
 
 			// Load judging setup
+			const assignedTeams: EditingTeam[] = [];
+
 			judgingMethod = eventSetup.judgingMethod;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
 				Object.assign(judgeGroup, { id: group.id });
-				judgeGroup.assignedTeams = group.assignedTeams.map((teamNumber) => teams.find((t) => t.number === teamNumber)!).filter(Boolean);
+				judgeGroup.assignedTeams = group.assignedTeams.map((id) => teams.find((t) => t.id === id)!).filter(Boolean);
+				assignedTeams.push(...judgeGroup.assignedTeams);
 				return judgeGroup;
 			});
 
@@ -120,8 +123,7 @@
 			judges = [...allJudges];
 
 			// Update unassigned teams
-			const assignedTeamNumbers = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.number)));
-			unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeamNumbers.has(team.number));
+			unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeams.includes(team));
 		}
 	}
 
@@ -239,11 +241,12 @@
 	// If teams are updated, reset all teams to unassigned
 	$effect(() => {
 		if (teams.length > 0) {
-			unassignedTeams = teams.filter((team) => !team.excluded);
 			untrack(() => {
 				judgeGroups.forEach((group) => {
-					group.assignedTeams = [];
+					group.assignedTeams = group.assignedTeams.filter((team) => !team.excluded && teams.includes(team));
 				});
+				const assignedTeamNumbers = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.number)));
+				unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeamNumbers.has(team.number));
 			});
 		}
 	});
