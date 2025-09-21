@@ -6,6 +6,7 @@ import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import { transaction } from '../utils';
 
 export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]> {
 	return db
@@ -33,10 +34,10 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 			session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(input);
 		}),
 		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
-			await ctx.db.transaction(async (tx) => {
-				input.forEach(async (teamData) => {
+			await transaction(ctx.db, async (tx) => {
+				for (const teamData of input) {
 					await tx.update(teams).set(teamData).where(eq(teams.id, teamData.id));
-				});
+				}
 			});
 			// Do not wait for the broadcast to complete
 			getTeamData(ctx.db).then((teamData) => {

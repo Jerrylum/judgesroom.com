@@ -103,17 +103,15 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 
 		const valuesInDB = values.map((v, i) => ({ ...v, position: i }));
 
-		await tx.delete(awards).where(
-			not(
-				inArray(
-					awards['name'],
-					values.map((v) => v['name'])
-				)
-			)
-		);
-
-		// Use for loop instead of bulk insert to avoid SQLite error
+		// Use for loop instead of bulk insert/delete to avoid SQLite error
 		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+		const allAwards = await tx.select().from(awards);
+		for (const v of allAwards) {
+			if (!valuesInDB.some((v2) => v2.name === v.name)) {
+				await tx.delete(awards).where(eq(awards.name, v.name));
+			}
+		}
+
 		for (const v of valuesInDB) {
 			await tx
 				.insert(awards)
@@ -126,17 +124,15 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	}
 
 	async function updateInsertAndDeleteTeams(tx: DatabaseOrTransaction, values: TeamInfo[]) {
-		await tx.delete(teams).where(
-			not(
-				inArray(
-					teams.id,
-					values.map((v) => v.id)
-				)
-			)
-		);
-
-		// Use for loop instead of bulk insert to avoid SQLite error
+		// Use for loop instead of bulk insert/delete to avoid SQLite error
 		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+		const allTeams = await tx.select().from(teams);
+		for (const v of allTeams) {
+			if (!values.some((v2) => v2.id === v.id)) {
+				await tx.delete(teams).where(eq(teams.id, v.id));
+			}
+		}
+
 		for (const v of values) {
 			await tx
 				.insert(teams)
@@ -149,14 +145,14 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	}
 
 	async function updateInsertAndDeleteJudgeGroups(tx: DatabaseOrTransaction, values: JudgeGroup[]) {
-		await tx.delete(judgeGroups).where(
-			not(
-				inArray(
-					judgeGroups.id,
-					values.map((v) => v.id)
-				)
-			)
-		);
+		// Use for loop instead of bulk insert/delete to avoid SQLite error
+		// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+		const allJudgeGroups = await tx.select().from(judgeGroups);
+		for (const v of allJudgeGroups) {
+			if (!values.some((v2) => v2.id === v.id)) {
+				await tx.delete(judgeGroups).where(eq(judgeGroups.id, v.id));
+			}
+		}
 
 		for (const v of values) {
 			await tx

@@ -6,6 +6,7 @@ import { judges } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import { transaction } from '../utils';
 
 export async function getJudges(db: DatabaseOrTransaction): Promise<Judge[]> {
 	return db.select().from(judges) as Promise<Judge[]>;
@@ -45,10 +46,26 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 			});
 		}),
 		updateAllJudges: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ ctx, input, session }) => {
-			await ctx.db.transaction(async (tx) => {
-				input.forEach(async (judge) => {
-					await tx.update(judges).set(judge).where(eq(judges.id, judge.id));
-				});
+			await transaction(ctx.db, async (tx) => {
+				// Use for loop instead of bulk insert/delete to avoid SQLite error
+				// See: https://github.com/drizzle-team/drizzle-orm/issues/2479
+				const allJudges = await tx.select().from(judges);
+				for (const v of allJudges) {
+					if (!input.some((v2) => v2.id === v.id)) {
+						await tx.delete(judges).where(eq(judges.id, v.id));
+					}
+				}
+
+				// insert the input
+				for (const judge of input) {
+					await tx
+						.insert(judges)
+						.values(judge)
+						.onConflictDoUpdate({
+							target: [judges.id],
+							set: judge
+						});
+				}
 			});
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judges) => {
