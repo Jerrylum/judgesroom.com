@@ -89,6 +89,20 @@
 		return team ? team.number : 'Unknown Team';
 	}
 
+	function getGradeLevel(teamId: string) {
+		const team = allTeams[teamId];
+		switch (team.grade) {
+			case 'Elementary School':
+				return 'ES';
+			case 'Middle School':
+				return 'MS';
+			case 'High School':
+				return 'HS';
+			default:
+				return ''; // College returns empty string
+		}
+	}
+
 	// Drag and drop functionality for judged awards
 	const flipDurationMs = 200;
 
@@ -206,13 +220,18 @@
 						<p class="text-gray-500">No judged awards configured for this event.</p>
 					</div>
 				{:else}
-					<div class="space-y-4 overflow-x-auto">
+					<div class="space-y-4 overflow-x-auto relative">
 						<div class="flex flex-row gap-2">
 							{#each allJudgedAwards as award}
 								{@const teamCards = allJudgedAwardNominations[award.name] || []}
-								<div class="min-w-35 flex flex-col gap-2">
-									<div class="flex items-center justify-center p-2 text-center">
-										{award.name}
+								<div class="min-w-35 flex flex-col gap-1">
+									<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
+										<div class=" max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+											{award.name}
+										</div>
+										<div class="text-xs text-gray-500">
+											{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
+										</div>
 									</div>
 									<div>
 										{#if teamCards.length > 0}
@@ -228,6 +247,7 @@
 												onfinalize={(e) => handleJudgedAwardDrop(award.name, e)}
 											>
 												{#each teamCards as teamCard (teamCard.id)}
+													{@const gradeLevel = getGradeLevel(teamCard.teamId)}
 													<div
 														animate:flip={{ duration: flipDurationMs }}
 														class="cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
@@ -238,11 +258,15 @@
 																	<p class="text-sm font-medium text-gray-900">
 																		{getTeamNumber(teamCard.teamId)}
 																	</p>
-																	{#if teamCard.judgeGroupId}
-																		<p class="text-xs text-gray-500">
-																			by {allJudgeGroups[teamCard.judgeGroupId].name}
-																		</p>
-																	{/if}
+																	<p class="text-xs text-gray-500">
+																		{gradeLevel}
+																		{#if gradeLevel}
+																			•
+																		{/if}
+																		{#if teamCard.judgeGroupId}
+																			{allJudgeGroups[teamCard.judgeGroupId].name}
+																		{/if}
+																	</p>
 																</div>
 															</div>
 														</div>
@@ -258,49 +282,6 @@
 								</div>
 							{/each}
 						</div>
-						<!-- {#each allJudgedAwards as award}
-							{@const teamCards = allJudgedAwardNominations[award.name] || []}
-							<div class="rounded-lg border border-gray-200 p-4">
-								<div
-									class="min-h-[80px] rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-3"
-									use:dndzone={{
-										items: teamCards,
-										flipDurationMs,
-										dropTargetStyle: { outline: '2px solid #3B82F6' },
-										type: award.name
-									}}
-									onconsider={(e) => handleJudgedAwardConsider(award.name, e)}
-									onfinalize={(e) => handleJudgedAwardDrop(award.name, e)}
-								>
-									{#each teamCards as teamCard (teamCard.id)}
-										<div
-											animate:flip={{ duration: flipDurationMs }}
-											class="mb-2 cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-										>
-											<div class="flex items-center justify-between">
-												<div class="flex items-center space-x-3">
-													<div>
-														<p class="text-sm font-medium text-gray-900">
-															{getTeamDisplayName(teamCard.teamId)}
-														</p>
-														{#if teamCard.judgeGroupId}
-															<p class="text-xs text-gray-500">
-																Judge Group: {allJudgeGroups[teamCard.judgeGroupId].name}
-															</p>
-														{/if}
-													</div>
-												</div>
-											</div>
-										</div>
-									{/each}
-								</div>
-								{#if teamCards.length === 0}
-									<div class="flex h-full min-h-[60px] items-center justify-center text-gray-500">
-										<p class="text-sm">No nominations yet</p>
-									</div>
-								{/if}
-							</div>
-						{/each} -->
 					</div>
 				{/if}
 			</div>
