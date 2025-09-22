@@ -4,7 +4,7 @@
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
 	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
 	import Workspace from '$lib/components/workspace/Workspace.svelte';
-	import RoleSelection from '$lib/components/RoleSelection.svelte';
+	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';
 	import Loading from '$lib/components/loading/Loading.svelte';
 	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
 	import JoiningSession from '$lib/components/joining-session/JoiningSession.svelte';
