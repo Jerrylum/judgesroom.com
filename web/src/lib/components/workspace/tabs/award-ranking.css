@@ -12,10 +12,10 @@ award-rankings-table {
 	}
 
 	scroll-container {
-		@apply flex-grow overflow-x-auto;
+		@apply flex flex-grow overflow-x-auto;
 
 		> content {
-			@apply flex flex-grow flex-row justify-center text-left text-sm;
+			@apply flex flex-grow flex-row justify-start text-left text-sm;
 
 			> * {
 				@apply flex-1 p-2;
@@ -28,7 +28,7 @@ award-rankings-table {
 	}
 
 	team {
-		@apply min-w-30 flex flex-grow flex-col items-center justify-center p-2 text-center text-sm;
+		@apply flex max-w-30 min-w-30 flex-grow flex-col items-center justify-center p-2 text-center text-sm;
 	}
 
 	table-header {

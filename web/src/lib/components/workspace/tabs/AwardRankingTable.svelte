@@ -19,10 +19,10 @@
 <award-rankings-table>
 	<table-header>
 		<team>TEAM NUMBER</team>
-		<scroll-container use:registerScrollContainer>
-			<content class="justify-start! flex-row!">
+		<scroll-container use:registerScrollContainer class="bg-gray-200">
+			<content>
 				{#each awardRankings.judgedAwards as award}
-					<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center bg-gray-200 p-2 text-center">{award}</div>
+					<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">{award}</div>
 				{/each}
 			</content>
 		</scroll-container>
@@ -32,7 +32,7 @@
 			<row>
 				<team>{teams[teamId].number}</team>
 				<scroll-container use:registerScrollContainer>
-					<content class="justify-start! flex-row!">
+					<content>
 						{#each awardRankings.judgedAwards as _, awardIndex}
 							<RankingButtons judgeGroupId={awardRankings.judgeGroupId} {teamId} {awardIndex} {awardRankings} />
 						{/each}
