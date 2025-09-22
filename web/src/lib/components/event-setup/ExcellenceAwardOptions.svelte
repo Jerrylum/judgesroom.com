@@ -19,7 +19,7 @@
 			}
 		} else {
 			awards[0].isSelected = false;
-			for (let i = 0; i < awards.length; i++) {
+			for (let i = 1; i < awards.length; i++) {
 				awards[i].isSelected = true;
 			}
 		}
