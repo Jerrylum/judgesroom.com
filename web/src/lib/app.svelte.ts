@@ -17,6 +17,7 @@ import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamD
 import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
+import type { JoiningKit } from '@judging.jerryio/worker/src/routes/handshake';
 
 export interface Notice {
 	id: string;
@@ -124,10 +125,7 @@ export class App {
 
 		// Join the session, this will call createWRPCClient
 		const starterKit = await this.wrpcClient.handshake.joinSession.mutation();
-		this.handleEssentialDataUpdate(starterKit.essentialData);
-		this.handleAllTeamDataUpdate(starterKit.teamData);
-		this.handleAllJudgesUpdate(starterKit.judges);
-		this.allFinalAwardNominations = starterKit.finalAwardNominations;
+		this.handleEventSetupUpdate(starterKit);
 
 		// Load user from storage
 		const user = this.loadUserFromStorage();
@@ -278,6 +276,13 @@ export class App {
 
 	getConnectionState(): ConnectionState {
 		return this.connectionState;
+	}
+
+	handleEventSetupUpdate(data: Readonly<JoiningKit>): void {
+		this.handleEssentialDataUpdate(data.essentialData);
+		this.handleAllTeamDataUpdate(data.teamData);
+		this.handleAllJudgesUpdate(data.judges);
+		this.allFinalAwardNominations = $state.snapshot(data.finalAwardNominations);
 	}
 
 	// ============================================================================

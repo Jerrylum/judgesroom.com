@@ -10,6 +10,9 @@ import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { transaction } from '../utils';
+import { getFinalAwardNominations } from './judging';
+import { getTeamData } from './team';
+import { getJudges } from './judge';
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -187,7 +190,16 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 			await updateEssentialData(ctx.db, input);
 
 			// Do not wait for the broadcast to complete
-			session.broadcast<ClientRouter>().onEssentialDataUpdate.mutation(input);
+			transaction(ctx.db, async (tx) => {
+				return {
+					essentialData: await getEssentialData(tx),
+					teamData: await getTeamData(tx),
+					judges: await getJudges(tx),
+					finalAwardNominations: await getFinalAwardNominations(tx)
+				};
+			}).then((message) => {
+				session.broadcast<ClientRouter>().onEventSetupUpdate.mutation(message);
+			});
 		})
 	};
 }

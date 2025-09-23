@@ -13,6 +13,7 @@ import {
 	type AwardRankingsFullUpdate
 } from '@judging.jerryio/protocol/src/rubric';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
+import { JoiningKitSchema } from '@judging.jerryio/worker/src/routes/handshake';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -23,12 +24,11 @@ const w = initWRPC.createClient<ServerRouter>();
  */
 const clientRouter = w.router({
 	/**
-	 * Server pushes essential data updates to client
+	 * Server pushes event setup updates to client (this is just like joining the session again)
 	 */
-	onEssentialDataUpdate: w.procedure.input(EssentialDataSchema).mutation(async ({ input }) => {
-		console.log(`📊 Essential data updated:`, input);
-		app.handleEssentialDataUpdate(input);
-		return `Essential data updated`;
+	onEventSetupUpdate: w.procedure.input(JoiningKitSchema).mutation(async ({ input }) => {
+		console.log(`📊 Event setup updated:`, input);
+		app.handleEventSetupUpdate(input);
 	}),
 
 	/**
