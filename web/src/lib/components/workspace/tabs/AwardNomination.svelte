@@ -41,7 +41,7 @@
 				</p>
 				<p class="text-xs text-gray-500">
 					{gradeLevel}
-					{#if gradeLevel}
+					{#if judgeGroup}
 						•
 					{/if}
 					{#if judgeGroup}

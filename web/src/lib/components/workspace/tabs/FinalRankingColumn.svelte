@@ -6,6 +6,7 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
+	import AddNominationDialog from './AddNominationDialog.svelte';
 
 	interface Props {
 		award: Award;
@@ -15,8 +16,10 @@
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
 		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
 		onDrop?: (award: Award, zone: string, e: DropEvent) => void;
+		onAddNomination?: (awardName: string, teamId: string) => void;
 		showFullAwardName?: boolean;
 		dropFromOthersDisabled?: boolean;
+		showAddButton?: boolean;
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -43,12 +46,17 @@
 		allFinalAwardNominations,
 		onConsider,
 		onDrop,
+		onAddNomination,
 		showFullAwardName,
-		dropFromOthersDisabled
+		dropFromOthersDisabled,
+		showAddButton
 	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
 	let editing = $state<AwardNominationWithId[]>([]);
+
+	// Dialog state
+	let showAddDialog = $state(false);
 
 	$effect(() => {
 		// Update (replace) the editing state whenever the allFinalAwardNominations state changes
@@ -67,6 +75,23 @@
 		editing = e.detail.items;
 		onDrop?.(award, usedZone, e);
 	}
+
+	// Dialog handler functions
+	function handleAddNominationClick() {
+		showAddDialog = true;
+	}
+
+	function handleDialogClose() {
+		showAddDialog = false;
+	}
+
+	function handleDialogConfirm(teamId: string, showExcluded: boolean, bypassRequirements: boolean) {
+		onAddNomination?.(award.name, teamId);
+		showAddDialog = false;
+	}
+
+	// Get excluded team IDs (already nominated)
+	let excludedTeamIds = $derived(new Set(editing.map((nom) => nom.teamId)));
 </script>
 
 <div class="flex min-w-40 max-w-40 flex-col gap-1">
@@ -111,4 +136,22 @@
 			</div>
 		{/if}
 	</div>
+	<div>
+		{#if showAddButton}
+			<button
+				onclick={handleAddNominationClick}
+				class="w-full border-gray-300 text-center text-sm text-green-600 underline hover:text-green-800">+ Add Nomination</button
+			>
+		{/if}
+	</div>
 </div>
+
+<!-- Add Nomination Dialog -->
+<AddNominationDialog
+	open={showAddDialog}
+	{award}
+	{allTeams}
+	{excludedTeamIds}
+	onClose={handleDialogClose}
+	onConfirm={handleDialogConfirm}
+/>

@@ -136,8 +136,16 @@
 				dragIn = null;
 			}
 		} else {
-			updateJudgedAwardNominations(award.name, e.detail.items);
+			if (isFinalRankingValid(award.name, e.detail.items)) {
+				await updateJudgedAwardNominations(award.name, e.detail.items);
+			} else {
+				rollbackJudgedAwardNominations();
+			}
 		}
+	}
+
+	async function handleAddNomination(awardName: string, teamId: string) {
+		await app.wrpcClient.judging.nominateFinalAward.mutation({ awardName, teamId, judgeGroupId: null });
 	}
 </script>
 
@@ -231,7 +239,15 @@
 						</div>
 						<div class="flex flex-row gap-2">
 							{#each allRemainingJudgedAwards as award (award.name)}
-								<FinalRankingColumn {award} {allTeams} {allJudgeGroups} {allFinalAwardNominations} onDrop={handleJudgedAwardDrop} />
+								<FinalRankingColumn
+									{award}
+									{allTeams}
+									{allJudgeGroups}
+									{allFinalAwardNominations}
+									onDrop={handleJudgedAwardDrop}
+									onAddNomination={handleAddNomination}
+									showAddButton={true}
+								/>
 							{/each}
 						</div>
 					</div>
