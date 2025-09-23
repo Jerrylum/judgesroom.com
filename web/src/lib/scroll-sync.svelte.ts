@@ -30,7 +30,25 @@ export function scrollSync() {
 		}
 	}
 
+	function scrollLeft() {
+		const source = scrollContainers[0];
+		if (!source) return;
+
+		const scrollLeft = source.scrollLeft - source.getBoundingClientRect().width;
+		source.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+	}
+
+	function scrollRight() {
+		const source = scrollContainers[0];
+		if (!source) return;
+
+		const scrollLeft = source.scrollLeft + source.getBoundingClientRect().width;
+		source.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+	}
+
 	return {
-		registerScrollContainer
+		registerScrollContainer,
+		scrollLeft,
+		scrollRight
 	};
 }

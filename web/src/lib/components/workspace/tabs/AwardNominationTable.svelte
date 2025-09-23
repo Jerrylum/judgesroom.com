@@ -3,15 +3,16 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import { ExcellenceAwardNameSchema, isExcellenceAward, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
+	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
+		title: string;
 		judgeGroupId: string;
 		showExcludedTeams: boolean;
 		bypassAwardRequirements: boolean;
 	}
 
-	let { judgeGroupId, showExcludedTeams, bypassAwardRequirements }: Props = $props();
+	let { title, judgeGroupId, showExcludedTeams, bypassAwardRequirements }: Props = $props();
 
 	const allExcellenceAwardNames = Object.keys(ExcellenceAwardNameSchema.enum) as ExcellenceAwardName[];
 
@@ -24,8 +25,6 @@
 	const allExcellenceAwardWinners = $derived(
 		allExcellenceAwardNames.flatMap((awardName) => finalAwardNominations[awardName]?.map((nom) => nom.teamId) ?? [])
 	);
-
-	$inspect(allExcellenceAwardWinners);
 
 	const listingTeams = $derived.by(() => {
 		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
@@ -40,9 +39,16 @@
 		return sortByTeamNumberInMap(filteredTeams, teams);
 	});
 
-	const { registerScrollContainer } = scrollSync();
+	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 </script>
 
+<div class="flex flex-row items-center justify-between">
+	<h3 class="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
+	<div class="mb-2 flex flex-row justify-end gap-2 text-sm">
+		<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
+		<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+	</div>
+</div>
 <award-rankings-table>
 	<table-header>
 		<team>TEAM NUMBER</team>
