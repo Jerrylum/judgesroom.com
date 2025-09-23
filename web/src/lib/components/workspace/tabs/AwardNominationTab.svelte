@@ -52,7 +52,7 @@
 			{#each Object.keys(judgeGroups) as judgeGroupId}
 				{@const judgeGroup = judgeGroups[judgeGroupId]}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<AwardNominationTable title={judgeGroup.name} {judgeGroupId} {showExcludedTeams} {bypassAwardRequirements} />
+					<AwardNominationTable title={judgeGroup.name} {judgeGroup} {showExcludedTeams} {bypassAwardRequirements} />
 				</div>
 			{/each}
 		</div>

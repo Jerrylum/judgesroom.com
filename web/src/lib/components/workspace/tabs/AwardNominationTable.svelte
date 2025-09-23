@@ -4,31 +4,31 @@
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
+	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
 		title: string;
-		judgeGroupId: string;
+		judgeGroup: JudgeGroup;
 		showExcludedTeams: boolean;
 		bypassAwardRequirements: boolean;
 	}
 
-	let { title, judgeGroupId, showExcludedTeams, bypassAwardRequirements }: Props = $props();
+	let { title, judgeGroup, showExcludedTeams, bypassAwardRequirements }: Props = $props();
 
 	const allExcellenceAwardNames = Object.keys(ExcellenceAwardNameSchema.enum) as ExcellenceAwardName[];
 
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
-	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
-	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroupId]);
+	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]);
 
 	const allExcellenceAwardWinners = $derived(
 		allExcellenceAwardNames.flatMap((awardName) => finalAwardNominations[awardName]?.map((nom) => nom.teamId) ?? [])
 	);
 
 	const listingTeams = $derived.by(() => {
-		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
-		const assignedTeams = judgeGroups[judgeGroupId].assignedTeams;
+		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroup.id] ?? [];
+		const assignedTeams = judgeGroup.assignedTeams;
 		const allTeams = [...reviewedTeams, ...assignedTeams];
 		const uniqueTeams = new Set(allTeams);
 		const teamIds = Array.from(uniqueTeams);
@@ -74,7 +74,7 @@
 							<NominationButtons
 								{award}
 								{team}
-								{judgeGroupId}
+								judgeGroupId={judgeGroup.id}
 								{ranking}
 								{isNominated}
 								{bypassAwardRequirements}
