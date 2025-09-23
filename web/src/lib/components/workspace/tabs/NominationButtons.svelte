@@ -9,13 +9,14 @@
 		judgeGroupId: string;
 		ranking: number;
 		isNominated: boolean;
+		bypassAwardRequirements: boolean;
 	}
 
-	let { award, team, judgeGroupId, ranking, isNominated }: Props = $props();
+	let { award, team, judgeGroupId, ranking, isNominated, bypassAwardRequirements }: Props = $props();
 
 	const isMeetNotebookRequirement = $derived(award.requireNotebook ? team.isDevelopedNotebook !== null : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
-	const isDisabled = $derived(!isMeetNotebookRequirement || !isMeetGradeRequirement);
+	const isDisabled = $derived(bypassAwardRequirements ? false : (!isMeetNotebookRequirement || !isMeetGradeRequirement));
 
 	async function removeNomination() {
 		await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName: award.name, teamId: team.id });

@@ -6,9 +6,11 @@
 
 	interface Props {
 		judgeGroupId: string;
+		showExcludedTeams: boolean;
+		bypassAwardRequirements: boolean;
 	}
 
-	let { judgeGroupId }: Props = $props();
+	let { judgeGroupId, showExcludedTeams, bypassAwardRequirements }: Props = $props();
 	
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
@@ -21,7 +23,14 @@
 		const assignedTeams = judgeGroups[judgeGroupId].assignedTeams;
 		const allTeams = [...reviewedTeams, ...assignedTeams];
 		const uniqueTeams = new Set(allTeams);
-		return sortByTeamNumberInMap(Array.from(uniqueTeams), teams);
+		const teamIds = Array.from(uniqueTeams);
+		
+		// Filter by excluded teams if showExcludedTeams is false
+		const filteredTeams = showExcludedTeams 
+			? teamIds 
+			: teamIds.filter(teamId => !teams[teamId]?.excluded);
+		
+		return sortByTeamNumberInMap(filteredTeams, teams);
 	});
 
 	const { registerScrollContainer } = scrollSync();
@@ -49,7 +58,7 @@
 							{@const award = awards[awardName]}
 							{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
 							{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
-							<NominationButtons {award} {team} {judgeGroupId} {ranking} {isNominated} />
+							<NominationButtons {award} {team} {judgeGroupId} {ranking} {isNominated} {bypassAwardRequirements} />
 						{/each}
 					</content>
 				</scroll-container>
