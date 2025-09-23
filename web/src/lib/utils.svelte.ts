@@ -1,6 +1,7 @@
 import type { TeamData } from '@judging.jerryio/protocol/src/team';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
+import { v4 } from 'uuid';
 
 /**
  * Get device name from user agent
@@ -39,7 +40,8 @@ export function getDeviceNameFromUserAgent(): string {
  * Generate a new UUID v4
  */
 export function generateUUID(): string {
-	return crypto.randomUUID();
+	// return crypto.randomUUID();
+	return v4();
 }
 
 /**

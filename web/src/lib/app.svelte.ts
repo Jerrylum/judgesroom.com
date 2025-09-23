@@ -597,7 +597,7 @@ export class App {
 	private createClientOptions(): ClientOptions<ClientRouter> {
 		const isDevelopment = import.meta.env.DEV;
 		const wsUrl = isDevelopment
-			? 'ws://localhost:8787/ws' // Local development server
+			? `ws://${window.location.hostname}:8787/ws` // Local development server
 			: 'wss://judging.jerryio.workers.dev/ws'; // Production Cloudflare Worker
 
 		if (this.sessionInfo === null) {
