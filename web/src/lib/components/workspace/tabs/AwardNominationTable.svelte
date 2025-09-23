@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { app, subscriptions } from '$lib/app-page.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
-	import RankingButtons from './RankingButtons.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 
@@ -10,7 +9,8 @@
 	}
 
 	let { judgeGroupId }: Props = $props();
-
+	
+	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
 	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
@@ -40,14 +40,16 @@
 	</table-header>
 	<table-body>
 		{#each listingTeams as teamId}
+			{@const team = teams[teamId]}
 			<row>
 				<team>{teams[teamId].number}</team>
 				<scroll-container use:registerScrollContainer>
 					<content>
 						{#each awardRankings.judgedAwards as awardName, awardIndex}
+							{@const award = awards[awardName]}
 							{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
 							{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
-							<NominationButtons {awardName} {teamId} {judgeGroupId} {ranking} {isNominated} />
+							<NominationButtons {award} {team} {judgeGroupId} {ranking} {isNominated} />
 						{/each}
 					</content>
 				</scroll-container>

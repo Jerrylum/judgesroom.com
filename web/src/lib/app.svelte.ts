@@ -413,6 +413,14 @@ export class App {
 	// Utility Methods
 	// ============================================================================
 
+	getAllAwardsInMap(): Readonly<Record<string, Readonly<Award>>> {
+		const awards = this.getAllAwards();
+		return awards.reduce((acc, award) => {
+			acc[award.name] = award;
+			return acc;
+		}, {} as Record<string, Readonly<Award>>);
+	}
+
 	getExistingJudgesGroupedByGroup(): Readonly<Record<string, Readonly<Judge>[]>> {
 		const judgeGroups = this.getAllJudgeGroups();
 		const allJudges = this.allJudges;
