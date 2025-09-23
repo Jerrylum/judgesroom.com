@@ -107,7 +107,7 @@
 			{award.name}
 		</div>
 		<div class="text-xs text-gray-500">
-			{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
+			{winners.length}/{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
 		</div>
 	</div>
 	<div class="relative">
@@ -125,7 +125,8 @@
 		>
 			{#each editing as nom, index (nom.id)}
 				{@const isWinner = winners.includes(nom.teamId)}
-				{@const isSkipped = winners.length > 0 ? editingTeamIds.indexOf(winners[0]) > index : false}
+				{@const isBeforeLastWinner = winners.length > 0 && editingTeamIds.indexOf(winners[winners.length - 1]) > index}
+				{@const isSkipped = !isWinner && isBeforeLastWinner}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<AwardNominationComponent
 						team={allTeams[nom.teamId]}
