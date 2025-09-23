@@ -375,25 +375,23 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 export function getJudgedAwardWinners(
 	judgedAwards: Readonly<Award[]>,
 	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>
-): Record<string, string | null> {
-	const rtn: Record<string, string | null> = {};
-	const winners: string[] = [];
+): Record<string, string[]> {
+	const rtn: Record<string, string[]> = {};
+	const allWinners: string[] = [];
 
 	for (let i = 0; i < judgedAwards.length; i++) {
 		const award = judgedAwards[i];
+		const possibleWinners = award.winnersCount;
 		const nom = nominations[award.name] || [];
-		let found = false;
+		const winners: string[] = [];
 		for (let j = 0; j < nom.length; j++) {
 			const n = nom[j];
-			if (winners.includes(n.teamId)) continue;
+			if (allWinners.includes(n.teamId)) continue;
+			allWinners.push(n.teamId);
 			winners.push(n.teamId);
-			rtn[award.name] = n.teamId;
-			found = true;
-			break;
+			if (winners.length >= possibleWinners) break;
 		}
-		if (!found) {
-			rtn[award.name] = null;
-		}
+		rtn[award.name] = winners;
 	}
 
 	return rtn;

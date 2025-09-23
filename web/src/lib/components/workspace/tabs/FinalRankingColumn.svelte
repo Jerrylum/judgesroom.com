@@ -20,7 +20,7 @@
 		showFullAwardName?: boolean;
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
-		winner?: string | null;
+		winners: string[];
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -51,7 +51,7 @@
 		showFullAwardName,
 		dropFromOthersDisabled,
 		showAddButton,
-		winner
+		winners
 	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
@@ -124,8 +124,8 @@
 			onfinalize={(e) => handleFinalize(e)}
 		>
 			{#each editing as nom, index (nom.id)}
-				{@const isWinner = nom.teamId === winner}
-				{@const isSkipped = winner ? editingTeamIds.indexOf(winner) > index : false}
+				{@const isWinner = winners.includes(nom.teamId)}
+				{@const isSkipped = winners.length > 0 ? editingTeamIds.indexOf(winners[0]) > index : false}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<AwardNominationComponent
 						team={allTeams[nom.teamId]}

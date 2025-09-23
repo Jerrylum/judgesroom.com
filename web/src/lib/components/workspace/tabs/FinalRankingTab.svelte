@@ -40,8 +40,6 @@
 
 	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations));
 
-	$inspect(allFinalAwardWinners);
-
 	async function updateJudgedAwardNominations(awardName: string, nominations: AwardNomination[]) {
 		try {
 			await app.wrpcClient.judging.updateFinalRankings.mutation({
@@ -144,6 +142,7 @@
 									onDrop={handleJudgedAwardDrop}
 									showFullAwardName
 									dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
+									winners={allFinalAwardWinners[award.name]}
 								/>
 							{/each}
 						</div>
@@ -157,7 +156,7 @@
 									onDrop={handleJudgedAwardDrop}
 									onAddNomination={handleAddNomination}
 									showAddButton={true}
-									winner={allFinalAwardWinners[award.name]}
+									winners={allFinalAwardWinners[award.name]}
 								/>
 							{/each}
 						</div>
