@@ -16,6 +16,7 @@
 		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
 		onDrop?: (award: Award, zone: string, e: DropEvent) => void;
 		showFullAwardName?: boolean;
+		dropFromOthersDisabled?: boolean;
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -34,7 +35,17 @@
 		};
 	}
 
-	let { award, zone, allTeams, allJudgeGroups, allFinalAwardNominations, onConsider, onDrop, showFullAwardName }: Props = $props();
+	let {
+		award,
+		zone,
+		allTeams,
+		allJudgeGroups,
+		allFinalAwardNominations,
+		onConsider,
+		onDrop,
+		showFullAwardName,
+		dropFromOthersDisabled
+	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
 	let editing = $state<AwardNominationWithId[]>([]);
@@ -78,6 +89,7 @@
 				items: editing,
 				flipDurationMs,
 				dropTargetStyle: { border: '1px solid #3B82F6' },
+				dropFromOthersDisabled: dropFromOthersDisabled,
 				type: usedZone
 			}}
 			onconsider={(e) => handleConsider(e)}

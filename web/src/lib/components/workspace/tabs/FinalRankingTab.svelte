@@ -225,6 +225,7 @@
 									{allFinalAwardNominations}
 									onDrop={handleJudgedAwardDrop}
 									showFullAwardName
+									dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 								/>
 							{/each}
 						</div>
