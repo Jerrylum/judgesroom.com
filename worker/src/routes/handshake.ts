@@ -113,8 +113,6 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 			}),
 
 		destroySession: w.procedure.mutation(async ({ ctx }) => {
-			// TODO: Broadcast to all clients
-
 			await ctx.network.destroy();
 
 			return { success: true, message: 'Session destroyed' };

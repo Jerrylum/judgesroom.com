@@ -674,7 +674,6 @@
 							<scoring class="flex-col! min-w-14 max-w-14 gap-2">
 								<p>TOTAL<br />SCORE</p>
 								<p class="text-lg">{totalScore}</p>
-								<!-- TODO -->
 							</scoring>
 						</row>
 					</rubric-body>

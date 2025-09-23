@@ -22,7 +22,7 @@
 			AppUI.appPhase = 'choose_action';
 		} catch (error) {
 			console.error('Failed to destroy data:', error);
-			// TODO: Show error message
+			app.addErrorNotice('CRITICAL: Failed to destroy data');
 		} finally {
 			isDestroying = false;
 		}
