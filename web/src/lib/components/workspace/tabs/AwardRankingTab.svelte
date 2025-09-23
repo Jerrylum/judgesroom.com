@@ -3,7 +3,6 @@
 	import Tab from './Tab.svelte';
 	import type { AwardRankingTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
-	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 
 	interface Props {
@@ -13,17 +12,11 @@
 
 	let { tab, isActive }: Props = $props();
 
-	const teams = $derived(app.getAllTeamInfoAndData());
+	// Filter states
+	let showExcludedTeams = $state(false); // Default checked
+	let bypassAwardRequirements = $state(false);
 
 	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
-
-	function getListingTeams(judgeGroupId: string) {
-		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
-		const assignedTeams = judgeGroups[judgeGroupId].assignedTeams;
-		const allTeams = [...reviewedTeams, ...assignedTeams];
-		const uniqueTeams = new Set(allTeams);
-		return sortByTeamNumberInMap(Array.from(uniqueTeams), teams);
-	}
 </script>
 
 <Tab {isActive} tabId={tab.id} tabType={tab.type}>
@@ -37,14 +30,33 @@
 					candidates for awards. All judge groups will cross-reference their lists to create a final award nomination list. This table is
 					shared and synchronized within your judge group - all judges see updates in real-time without needing to refresh the page.
 				</p>
+
+				<!-- Filter Options -->
+				<div class="mt-4 flex flex-wrap gap-4">
+					<label class="flex items-center">
+						<input
+							type="checkbox"
+							bind:checked={showExcludedTeams}
+							class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+						/>
+						<span class="text-sm text-gray-700">Show excluded teams</span>
+					</label>
+
+					<label class="flex items-center">
+						<input
+							type="checkbox"
+							bind:checked={bypassAwardRequirements}
+							class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+						/>
+						<span class="text-sm text-gray-700">Bypass award requirement checks</span>
+					</label>
+				</div>
 			</div>
 
-			{#each Object.entries(subscriptions.allJudgeGroupsAwardRankings) as [judgeGroupId, awardRankings]}
-				{@const judgeGroup = judgeGroups[judgeGroupId]}
-				{@const listingTeams = getListingTeams(judgeGroupId)}
+			{#each Object.values(subscriptions.allJudgeGroupsAwardRankings) as awardRankings}
+				{@const judgeGroup = judgeGroups[awardRankings.judgeGroupId]}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h3 class="mb-2 text-lg font-semibold text-gray-900">{judgeGroup.name}</h3>
-					<AwardRankingTable {listingTeams} {awardRankings} />
+					<AwardRankingTable title={judgeGroup.name} {judgeGroup} showingTeams={{ showExcludedTeams }} {bypassAwardRequirements} />
 				</div>
 			{/each}
 

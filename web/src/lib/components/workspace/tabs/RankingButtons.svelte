@@ -1,20 +1,28 @@
 <script lang="ts">
 	import { app } from '$lib/app-page.svelte';
+	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	interface Props {
-		judgeGroupId: string;
-		teamId: string;
 		awardIndex: number;
 		awardRankings: AwardRankingsFullUpdate;
+		award: Award;
+		team: TeamInfoAndData;
+		judgeGroupId: string;
+		bypassAwardRequirements: boolean;
 	}
 
-	let { judgeGroupId, teamId, awardIndex, awardRankings }: Props = $props();
+	let { judgeGroupId, team, awardIndex, awardRankings, award, bypassAwardRequirements }: Props = $props();
 
 	// State for edit mode
 	let isEditMode = $state(false);
 	let touchTimeout: ReturnType<typeof setTimeout> | null = null;
-	let ranking = $derived(awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0);
+	let ranking = $derived(awardRankings.rankings?.[team.id]?.[awardIndex] ?? 0);
+
+	const isMeetNotebookRequirement = $derived(award.requireNotebook ? team.isDevelopedNotebook !== null : true);
+	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
+	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
 
 	// Handle ranking update
 	async function updateRanking(newRanking: number) {
@@ -23,7 +31,7 @@
 		try {
 			await app.wrpcClient.judging.updateAwardRanking.mutation({
 				judgeGroupId,
-				teamId,
+				teamId: team.id,
 				awardName: awardRankings.judgedAwards[awardIndex],
 				ranking: newRanking
 			});
@@ -93,9 +101,19 @@
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
 	onclick={handleTouch}
+	class:cursor-default!={isDisabled}
 	onkeydown={(e) => e.key === 'Enter' && handleTouch()}
 >
-	{#if isEditMode}
+	{#if isDisabled}
+		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-xs text-gray-600">
+			{#if !isMeetNotebookRequirement}
+				<p>Notebook Required</p>
+			{/if}
+			{#if !isMeetGradeRequirement}
+				<p>{award.acceptedGrades.join(', ')} Required</p>
+			{/if}
+		</div>
+	{:else if isEditMode}
 		<!-- Edit mode: show minus, stars with count, and plus buttons -->
 		<div class="flex items-center justify-center gap-2">
 			<button

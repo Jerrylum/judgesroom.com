@@ -512,14 +512,18 @@
 
 			<!-- Award Rankings Section -->
 			{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
-				{@const awardRankings = subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
 					<p class="mb-4 text-sm text-gray-600">
 						Rate this team for specific awards based on your team interview by clicking on the boxes below. Use the star system (0-5 stars)
 						to indicate how strong a candidate this team is for each award.
 					</p>
-					<AwardRankingTable listingTeams={[tab.teamId]} {awardRankings} />
+					<AwardRankingTable
+						title=""
+						judgeGroup={currentJudgeGroup}
+						showingTeams={{ targetTeams: [tab.teamId] }}
+						bypassAwardRequirements={false}
+					/>
 				</div>
 			{/if}
 		</div>

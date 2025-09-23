@@ -697,7 +697,6 @@
 
 			<!-- Award Rankings Section -->
 			{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
-				{@const awardRankings = subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
 					<p class="mb-4 text-sm text-gray-600">
@@ -705,7 +704,12 @@
 						to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
 						all judges see updates in real-time without needing to refresh the page.
 					</p>
-					<AwardRankingTable listingTeams={[tab.teamId]} {awardRankings} />
+					<AwardRankingTable
+						title=""
+						judgeGroup={currentJudgeGroup}
+						showingTeams={{ targetTeams: [tab.teamId] }}
+						bypassAwardRequirements={false}
+					/>
 				</div>
 			{/if}
 		</div>

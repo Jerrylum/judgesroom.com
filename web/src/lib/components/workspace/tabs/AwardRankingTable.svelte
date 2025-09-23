@@ -1,21 +1,51 @@
 <script lang="ts">
-	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
-	import { app } from '$lib/app-page.svelte';
+	import { app, subscriptions } from '$lib/app-page.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import RankingButtons from './RankingButtons.svelte';
+	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
+	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 
 	interface Props {
-		listingTeams: string[];
-		awardRankings: AwardRankingsFullUpdate;
+		title: string;
+		judgeGroup: JudgeGroup;
+		showingTeams: { targetTeams: string[] } | { showExcludedTeams: boolean };
+		bypassAwardRequirements: boolean;
 	}
 
-	let { listingTeams, awardRankings }: Props = $props();
+	let { title, judgeGroup, showingTeams, bypassAwardRequirements }: Props = $props();
 
+	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
 
-	const { registerScrollContainer } = scrollSync();
+	// This assume that the award rankings are subscribed to
+	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]);
+
+	const listingTeams = $derived.by(() => {
+		if ('targetTeams' in showingTeams) {
+			return showingTeams.targetTeams;
+		}
+		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroup.id] ?? [];
+		const assignedTeams = judgeGroup.assignedTeams;
+		const allTeams = [...reviewedTeams, ...assignedTeams];
+		const uniqueTeams = new Set(allTeams);
+		const teamIds = Array.from(uniqueTeams);
+
+		// Filter by excluded teams if showExcludedTeams is false
+		const filteredTeams = showingTeams.showExcludedTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.excluded);
+
+		return sortByTeamNumberInMap(filteredTeams, teams);
+	});
+
+	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 </script>
 
+<div class="flex flex-row items-center justify-between">
+	<h3 class="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
+	<div class="mb-2 flex flex-row justify-end gap-2 text-sm">
+		<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
+		<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+	</div>
+</div>
 <award-rankings-table>
 	<table-header>
 		<team>TEAM NUMBER</team>
@@ -29,12 +59,21 @@
 	</table-header>
 	<table-body>
 		{#each listingTeams as teamId}
+			{@const team = teams[teamId]}
 			<row>
-				<team>{teams[teamId].number}</team>
+				<team>{team.number}</team>
 				<scroll-container use:registerScrollContainer>
 					<content>
 						{#each awardRankings.judgedAwards as _, awardIndex}
-							<RankingButtons judgeGroupId={awardRankings.judgeGroupId} {teamId} {awardIndex} {awardRankings} />
+							{@const award = awards[awardRankings.judgedAwards[awardIndex]]}
+							<RankingButtons
+								{awardIndex}
+								{awardRankings}
+								{award}
+								{team}
+								judgeGroupId={awardRankings.judgeGroupId}
+								{bypassAwardRequirements}
+							/>
 						{/each}
 					</content>
 				</scroll-container>
