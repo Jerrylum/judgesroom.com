@@ -35,7 +35,7 @@ export class TeamInterviewRubricTab implements BaseTab {
 	rubricId: string | null = $state(null);
 
 	get title() {
-		const team = app.getAllTeams().find((team) => team.id === this.teamId);
+		const team = app.findTeamById(this.teamId);
 		return team ? `${team.number} Team Interview` : 'Team Interview';
 	}
 
@@ -61,7 +61,7 @@ export class NotebookRubricTab implements BaseTab {
 	rubricId: string | null = $state(null);
 
 	get title() {
-		const team = app.getAllTeams().find((team) => team.id === this.teamId);
+		const team = app.findTeamById(this.teamId);
 		return team ? `${team.number} Notebook Review` : 'Notebook Review';
 	}
 
