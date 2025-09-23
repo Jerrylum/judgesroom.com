@@ -24,9 +24,14 @@ export const AwardSchema = z.object({
 });
 export type Award = z.infer<typeof AwardSchema>;
 
+export const ExcellenceAwardNameSchema = z.enum([
+	'Excellence Award',
+	'Excellence Award - High School',
+	'Excellence Award - Middle School',
+	'Excellence Award - Elementary School'
+]);
+export type ExcellenceAwardName = z.infer<typeof ExcellenceAwardNameSchema>;
+
 export function isExcellenceAward(awardName: string): boolean {
-	return awardName === 'Excellence Award' ||
-		awardName === 'Excellence Award - High School' ||
-		awardName === 'Excellence Award - Middle School' ||
-		awardName === 'Excellence Award - Elementary School';
+	return ExcellenceAwardNameSchema.safeParse(awardName).success;
 }

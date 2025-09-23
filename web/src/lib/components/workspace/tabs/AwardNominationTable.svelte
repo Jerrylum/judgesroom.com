@@ -3,6 +3,7 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
+	import { ExcellenceAwardNameSchema, isExcellenceAward, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
 		judgeGroupId: string;
@@ -11,12 +12,20 @@
 	}
 
 	let { judgeGroupId, showExcludedTeams, bypassAwardRequirements }: Props = $props();
-	
+
+	const allExcellenceAwardNames = Object.keys(ExcellenceAwardNameSchema.enum) as ExcellenceAwardName[];
+
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
 	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
 	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroupId]);
+
+	const allExcellenceAwardWinners = $derived(
+		allExcellenceAwardNames.flatMap((awardName) => finalAwardNominations[awardName]?.map((nom) => nom.teamId) ?? [])
+	);
+
+	$inspect(allExcellenceAwardWinners);
 
 	const listingTeams = $derived.by(() => {
 		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[judgeGroupId] ?? [];
@@ -24,12 +33,10 @@
 		const allTeams = [...reviewedTeams, ...assignedTeams];
 		const uniqueTeams = new Set(allTeams);
 		const teamIds = Array.from(uniqueTeams);
-		
+
 		// Filter by excluded teams if showExcludedTeams is false
-		const filteredTeams = showExcludedTeams 
-			? teamIds 
-			: teamIds.filter(teamId => !teams[teamId]?.excluded);
-		
+		const filteredTeams = showExcludedTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.excluded);
+
 		return sortByTeamNumberInMap(filteredTeams, teams);
 	});
 
@@ -58,7 +65,15 @@
 							{@const award = awards[awardName]}
 							{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
 							{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
-							<NominationButtons {award} {team} {judgeGroupId} {ranking} {isNominated} {bypassAwardRequirements} />
+							<NominationButtons
+								{award}
+								{team}
+								{judgeGroupId}
+								{ranking}
+								{isNominated}
+								{bypassAwardRequirements}
+								showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
+							/>
 						{/each}
 					</content>
 				</scroll-container>
