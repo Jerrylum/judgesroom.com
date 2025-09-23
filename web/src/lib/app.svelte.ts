@@ -405,7 +405,7 @@ export class App {
 		this.allFinalAwardNominations[awardName] = $state.snapshot(data);
 	}
 
-	getAllFinalAwardNominations(): Readonly<Record<string, AwardNomination[]>> {
+	getAllFinalAwardNominations(): Readonly<Record<string, Readonly<AwardNomination>[]>> {
 		return $state.snapshot(this.allFinalAwardNominations);
 	}
 

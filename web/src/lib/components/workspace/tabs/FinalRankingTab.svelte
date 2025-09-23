@@ -2,24 +2,24 @@
 	import { app } from '$lib/app-page.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
-	import AwardNominationComponent from './AwardNomination.svelte';
 	import Tab from './Tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
-	import { dndzone } from 'svelte-dnd-action';
-	import { flip } from 'svelte/animate';
-	import { isExcellenceAward } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward, type Award } from '@judging.jerryio/protocol/src/award';
+	import FinalRankingColumn from './FinalRankingColumn.svelte';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
 		isActive: boolean;
 	}
 
-	let { tab, isActive }: Props = $props();
-
-	// Create a team card component for drag and drop
-	interface AwardNominationWithId extends AwardNomination {
-		id: string; // Required by dndzone
+	// Interface for drag and drop events
+	interface DropEvent {
+		detail: {
+			items: AwardNomination[];
+		};
 	}
+
+	let { tab, isActive }: Props = $props();
 
 	const allAwards = $derived(app.getAllAwards());
 	const allPerformanceAwards = $derived(allAwards.filter((award) => award.type === 'performance'));
@@ -33,13 +33,6 @@
 	const allJudgeGroups = $derived(app.getAllJudgeGroupsInMap());
 
 	const allFinalAwardNominations = $derived(app.getAllFinalAwardNominations());
-	const allFinalAwardNominationsWithId = $state({} as Record<string, AwardNominationWithId[]>);
-
-	$effect(() => {
-		for (const award of allAwards) {
-			allFinalAwardNominationsWithId[award.name] = nominationsWidthId(allFinalAwardNominations[award.name] || []);
-		}
-	});
 
 	async function updatePerformanceAward(awardName: string, position: number, teamId: string) {
 		try {
@@ -83,41 +76,9 @@
 		return team ? `${team.number} - ${team.name}` : 'Unknown Team';
 	}
 
-	// Drag and drop functionality for judged awards
-	const flipDurationMs = 200;
-
-	// Interface for drag and drop events
-	interface DropEvent {
-		detail: {
-			items: AwardNominationWithId[];
-			info: {
-				trigger: string;
-				source: string;
-				id: string;
-			};
-		};
-	}
-
-	function handleJudgedAwardDrop(awardName: string, e: DropEvent) {
-		allFinalAwardNominationsWithId[awardName] = e.detail.items;
-		updateJudgedAwardNominations(awardName, e.detail.items);
-	}
-
-	function handleJudgedAwardConsider(awardName: string, e: DropEvent) {
-		// Just update the local state during drag
-		const {
-			items: newItems,
-			info: { trigger, source, id }
-		} = e.detail;
-
-		allFinalAwardNominationsWithId[awardName] = newItems;
-	}
-
-	function nominationsWidthId(nominations: AwardNomination[]): AwardNominationWithId[] {
-		return nominations.map((nom, index) => ({
-			...nom,
-			id: nom.teamId
-		}));
+	function handleJudgedAwardDrop(award: Award, e: DropEvent) {
+		console.log('handleJudgedAwardDrop', award, e);
+		updateJudgedAwardNominations(award.name, e.detail.items);
 	}
 </script>
 
@@ -193,103 +154,20 @@
 					Judged Awards are determined by judges based on award criteria and rubrics. Drag and drop teams to reorder nominations.
 				</p>
 
-				{#if allRemainingJudgedAwards.length === 0}
-					<div class="py-8 text-center">
-						<p class="text-gray-500">No judged awards configured for this event.</p>
-					</div>
-				{:else}
-					<div class="relative space-y-4 overflow-x-auto">
-						<div class="flex flex-col gap-2">
-							<div class="flex flex-row gap-2">
-								{#each allExcellenceAwards as award (award.name)}
-									{@const noms = allFinalAwardNominationsWithId[award.name] || []}
-									<div class="flex w-40 flex-col gap-1">
-										<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
-											<div class=" whitespace-initial max-w-full overflow-hidden text-ellipsis">
-												{award.name}
-											</div>
-											<div class="text-xs text-gray-500">
-												{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
-											</div>
-										</div>
-										<div class="relative">
-											<div
-												class="border-1 min-h-18 flex flex-col gap-1 rounded-lg border-dashed border-gray-300 bg-gray-50 p-1"
-												use:dndzone={{
-													items: noms,
-													flipDurationMs,
-													dropTargetStyle: { border: '1px solid #3B82F6' },
-													type: 'Design Award',
-													dropFromOthersDisabled: noms.length >= 1
-												}}
-												onconsider={(e) => handleJudgedAwardConsider(award.name, e)}
-												onfinalize={(e) => handleJudgedAwardDrop(award.name, e)}
-											>
-												{#each noms as nom (nom.id)}
-													<div animate:flip={{ duration: flipDurationMs }}>
-														<AwardNominationComponent
-															{nom}
-															team={allTeams[nom.teamId]}
-															judgeGroup={nom.judgeGroupId ? allJudgeGroups[nom.judgeGroupId] : null}
-														/>
-													</div>
-												{/each}
-											</div>
-											{#if noms.length === 0}
-												<div class="absolute bottom-0 left-0 right-0 top-0 flex h-full min-h-10 items-center justify-center text-gray-500">
-													<p class="text-sm">No nominations yet</p>
-												</div>
-											{/if}
-										</div>
-									</div>
-								{/each}
-							</div>
-							<div class="flex flex-row gap-2">
-								{#each allRemainingJudgedAwards as award (award.name)}
-									{@const noms = allFinalAwardNominationsWithId[award.name] || []}
-									<div class="flex w-40 flex-col gap-1">
-										<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
-											<div class=" max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-												{award.name}
-											</div>
-											<div class="text-xs text-gray-500">
-												{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
-											</div>
-										</div>
-										<div class="relative">
-											<div
-												class="border-1 min-h-18 flex flex-col gap-1 rounded-lg border-dashed border-gray-300 bg-gray-50 p-1"
-												use:dndzone={{
-													items: noms,
-													flipDurationMs,
-													dropTargetStyle: { border: '1px solid #3B82F6' },
-													type: award.name
-												}}
-												onconsider={(e) => handleJudgedAwardConsider(award.name, e)}
-												onfinalize={(e) => handleJudgedAwardDrop(award.name, e)}
-											>
-												{#each noms as nom (nom.id)}
-													<div animate:flip={{ duration: flipDurationMs }}>
-														<AwardNominationComponent
-															{nom}
-															team={allTeams[nom.teamId]}
-															judgeGroup={nom.judgeGroupId ? allJudgeGroups[nom.judgeGroupId] : null}
-														/>
-													</div>
-												{/each}
-											</div>
-											{#if noms.length === 0}
-												<div class="absolute bottom-0 left-0 right-0 top-0 flex h-full min-h-10 items-center justify-center text-gray-500">
-													<p class="text-sm">No nominations yet</p>
-												</div>
-											{/if}
-										</div>
-									</div>
-								{/each}
-							</div>
+				<div class="relative space-y-4 overflow-x-auto">
+					<div class="flex flex-col gap-2">
+						<div class="flex flex-row gap-2">
+							{#each allExcellenceAwards as award (award.name)}
+								<FinalRankingColumn {award} {allTeams} {allJudgeGroups} {allFinalAwardNominations} onDrop={handleJudgedAwardDrop} />
+							{/each}
+						</div>
+						<div class="flex flex-row gap-2">
+							{#each allRemainingJudgedAwards as award (award.name)}
+								<FinalRankingColumn {award} {allTeams} {allJudgeGroups} {allFinalAwardNominations} onDrop={handleJudgedAwardDrop} />
+							{/each}
 						</div>
 					</div>
-				{/if}
+				</div>
 			</div>
 		</div>
 	</div>
