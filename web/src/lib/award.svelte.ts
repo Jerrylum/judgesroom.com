@@ -1,5 +1,6 @@
 import { type CompetitionType, type AwardType, type Grade, type Award, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { generateUUID } from './utils.svelte';
+import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 
 export class AwardOptions {
 	public readonly id: string;
@@ -365,6 +366,33 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 			if (!x.includes(o.name)) {
 				rtn.push(o);
 			}
+		}
+	}
+
+	return rtn;
+}
+
+export function getJudgedAwardWinners(
+	judgedAwards: Readonly<Award[]>,
+	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>
+): Record<string, string | null> {
+	const rtn: Record<string, string | null> = {};
+	const winners: string[] = [];
+
+	for (let i = 0; i < judgedAwards.length; i++) {
+		const award = judgedAwards[i];
+		const nom = nominations[award.name] || [];
+		let found = false;
+		for (let j = 0; j < nom.length; j++) {
+			const n = nom[j];
+			if (winners.includes(n.teamId)) continue;
+			winners.push(n.teamId);
+			rtn[award.name] = n.teamId;
+			found = true;
+			break;
+		}
+		if (!found) {
+			rtn[award.name] = null;
 		}
 	}
 

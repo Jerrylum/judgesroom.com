@@ -4,17 +4,14 @@
 	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 	import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 
-	interface AwardNominationWithId extends AwardNomination {
-		id: string; // Required by dndzone
-	}
-
 	interface Props {
-		nom: AwardNomination;
 		team: TeamInfo;
 		judgeGroup: JudgeGroup | null;
+		isWinner: boolean;
+		isSkipped: boolean;
 	}
 
-	const { nom, team, judgeGroup }: Props = $props();
+	const { team, judgeGroup, isWinner, isSkipped }: Props = $props();
 
 	const gradeLevel = $derived(getGradeLevel(team.grade));
 
@@ -32,7 +29,11 @@
 	}
 </script>
 
-<div class="cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+<div
+	class="cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+	class:border-green-500={isWinner}
+	class:opacity-50={isSkipped}
+>
 	<div class="flex items-center justify-between">
 		<div class="flex items-center space-x-3">
 			<div>

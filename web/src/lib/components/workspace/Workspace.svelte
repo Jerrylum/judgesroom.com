@@ -9,6 +9,7 @@
 	import AwardRankingTab from './tabs/AwardRankingTab.svelte';
 	import AwardNominationTab from './tabs/AwardNominationTab.svelte';
 	import FinalRankingTab from './tabs/FinalRankingTab.svelte';
+	import AwardWinnerTab from './tabs/AwardWinner.svelte';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	// Get tab state
@@ -110,6 +111,8 @@
 					<AwardNominationTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'final_award_ranking'}
 					<FinalRankingTab {tab} isActive={activeTabId === tab.id} />
+				{:else if tab.type === 'award_winner'}
+					<AwardWinnerTab {tab} isActive={activeTabId === tab.id} />
 				{:else if tab.type === 'custom' && 'component' in tab}
 					{@const CustomComponent = tab.component}
 					<CustomComponent {...tab.props} />

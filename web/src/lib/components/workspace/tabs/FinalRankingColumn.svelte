@@ -20,6 +20,7 @@
 		showFullAwardName?: boolean;
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
+		winner?: string | null;
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -49,11 +50,13 @@
 		onAddNomination,
 		showFullAwardName,
 		dropFromOthersDisabled,
-		showAddButton
+		showAddButton,
+		winner
 	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
 	let editing = $state<AwardNominationWithId[]>([]);
+	const editingTeamIds = $derived(editing.map((nom) => nom.teamId));
 
 	// Dialog state
 	let showAddDialog = $state(false);
@@ -120,12 +123,15 @@
 			onconsider={(e) => handleConsider(e)}
 			onfinalize={(e) => handleFinalize(e)}
 		>
-			{#each editing as nom (nom.id)}
+			{#each editing as nom, index (nom.id)}
+				{@const isWinner = nom.teamId === winner}
+				{@const isSkipped = winner ? editingTeamIds.indexOf(winner) > index : false}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<AwardNominationComponent
-						{nom}
 						team={allTeams[nom.teamId]}
 						judgeGroup={nom.judgeGroupId ? allJudgeGroups[nom.judgeGroupId] : null}
+						{isWinner}
+						{isSkipped}
 					/>
 				</div>
 			{/each}
