@@ -6,6 +6,7 @@
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { isExcellenceAward, type Award } from '@judging.jerryio/protocol/src/award';
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
+	import { tick } from 'svelte';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -32,7 +33,12 @@
 
 	const allJudgeGroups = $derived(app.getAllJudgeGroupsInMap());
 
-	const allFinalAwardNominations = $derived(app.getAllFinalAwardNominations());
+	let allFinalAwardNominations = $state<Readonly<Record<string, Readonly<AwardNomination>[]>>>({});
+
+	$effect(() => {
+		// Just like using derived, this will update the allFinalAwardNominations state when the app.getAllFinalAwardNominations state changes
+		allFinalAwardNominations = app.getAllFinalAwardNominations();
+	});
 
 	async function updatePerformanceAward(awardName: string, position: number, teamId: string) {
 		try {
@@ -76,9 +82,62 @@
 		return team ? `${team.number} - ${team.name}` : 'Unknown Team';
 	}
 
-	function handleJudgedAwardDrop(award: Award, e: DropEvent) {
-		console.log('handleJudgedAwardDrop', award, e);
-		updateJudgedAwardNominations(award.name, e.detail.items);
+	let dropOut = $state<{ awardName: string; nominations: AwardNomination[] } | null>(null);
+	let dragIn = $state<{ awardName: string; nominations: AwardNomination[] } | null>(null);
+
+	function isFinalRankingValid(awardName: string, nominations: AwardNomination[]): boolean {
+		const award = allAwards.find((a) => a.name === awardName);
+
+		if (!award) {
+			console.error('CRITICAL: Award not found');
+			return false;
+		}
+
+		return nominations.every((nom) => {
+			const team = allTeams[nom.teamId];
+
+			return award.acceptedGrades.includes(team.grade);
+		});
+	}
+
+	function rollbackJudgedAwardNominations() {
+		// force all columns to rollback their editing state
+		// IMPORTANT: to avoid rendering warnings, we need to wait for the next tick
+		tick().then(() => {
+			allFinalAwardNominations = app.getAllFinalAwardNominations();
+		});
+	}
+
+	async function handleJudgedAwardDrop(award: Award, zone: string, e: DropEvent) {
+		if (zone === 'Design Award') {
+			const originalState = allFinalAwardNominations[award.name] || [];
+			const proposedState = e.detail.items;
+			if (originalState.length === proposedState.length) {
+				if (isFinalRankingValid(award.name, e.detail.items)) {
+					await updateJudgedAwardNominations(award.name, e.detail.items);
+				} else {
+					rollbackJudgedAwardNominations();
+				}
+				return;
+			} else if (originalState.length > proposedState.length) {
+				dropOut = { awardName: award.name, nominations: proposedState };
+			} else {
+				dragIn = { awardName: award.name, nominations: proposedState };
+			}
+
+			if (dropOut && dragIn) {
+				if (isFinalRankingValid(dragIn.awardName, dragIn.nominations) && isFinalRankingValid(dropOut.awardName, dropOut.nominations)) {
+					await updateJudgedAwardNominations(dragIn.awardName, dragIn.nominations);
+					await updateJudgedAwardNominations(dropOut.awardName, dropOut.nominations);
+				} else {
+					rollbackJudgedAwardNominations();
+				}
+				dropOut = null;
+				dragIn = null;
+			}
+		} else {
+			updateJudgedAwardNominations(award.name, e.detail.items);
+		}
 	}
 </script>
 
@@ -158,7 +217,15 @@
 					<div class="flex flex-col gap-2">
 						<div class="flex flex-row gap-2">
 							{#each allExcellenceAwards as award (award.name)}
-								<FinalRankingColumn {award} {allTeams} {allJudgeGroups} {allFinalAwardNominations} onDrop={handleJudgedAwardDrop} />
+								<FinalRankingColumn
+									{award}
+									zone="Design Award"
+									{allTeams}
+									{allJudgeGroups}
+									{allFinalAwardNominations}
+									onDrop={handleJudgedAwardDrop}
+									showFullAwardName
+								/>
 							{/each}
 						</div>
 						<div class="flex flex-row gap-2">

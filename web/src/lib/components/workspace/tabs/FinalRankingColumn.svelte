@@ -9,11 +9,13 @@
 
 	interface Props {
 		award: Award;
+		zone?: string;
 		allTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>;
 		allJudgeGroups: Readonly<Record<string, Readonly<JudgeGroup>>>;
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
-		onConsider?: (award: Award, e: DropEvent) => void;
-		onDrop?: (award: Award, e: DropEvent) => void;
+		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
+		onDrop?: (award: Award, zone: string, e: DropEvent) => void;
+		showFullAwardName?: boolean;
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -32,8 +34,9 @@
 		};
 	}
 
-	let { award, allTeams, allJudgeGroups, allFinalAwardNominations, onConsider, onDrop }: Props = $props();
+	let { award, zone, allTeams, allJudgeGroups, allFinalAwardNominations, onConsider, onDrop, showFullAwardName }: Props = $props();
 
+	let usedZone = $derived(zone ?? award.name);
 	let editing = $state<AwardNominationWithId[]>([]);
 
 	$effect(() => {
@@ -46,18 +49,22 @@
 
 	function handleConsider(e: DropEvent) {
 		editing = e.detail.items;
-		onConsider?.(award, e);
+		onConsider?.(award, usedZone, e);
 	}
 
 	function handleFinalize(e: DropEvent) {
 		editing = e.detail.items;
-		onDrop?.(award, e);
+		onDrop?.(award, usedZone, e);
 	}
 </script>
 
 <div class="flex min-w-40 max-w-40 flex-col gap-1">
 	<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
-		<div class=" max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+		<div
+			class="max-w-full overflow-hidden text-ellipsis"
+			class:whitespace-initial={showFullAwardName}
+			class:whitespace-nowrap={!showFullAwardName}
+		>
 			{award.name}
 		</div>
 		<div class="text-xs text-gray-500">
@@ -71,7 +78,7 @@
 				items: editing,
 				flipDurationMs,
 				dropTargetStyle: { border: '1px solid #3B82F6' },
-				type: award.name
+				type: usedZone
 			}}
 			onconsider={(e) => handleConsider(e)}
 			onfinalize={(e) => handleFinalize(e)}

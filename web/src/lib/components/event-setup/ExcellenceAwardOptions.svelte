@@ -7,6 +7,8 @@
 
 	let { awards = $bindable() }: Props = $props();
 
+	$inspect(awards);
+	
 	const isOneAward = $derived(awards[0].isSelected);
 	const isMultiGrades = $derived(awards.length > 1);
 
