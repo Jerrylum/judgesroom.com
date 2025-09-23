@@ -321,7 +321,9 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 
 		while (k < y.length) {
 			while (officialAwards[j].name !== y[k]) {
-				rtn.push(officialAwards[j++]);
+				const o = officialAwards[j++];
+				o.isSelected = false;
+				rtn.push(o);
 			}
 
 			while (awards[i].name !== y[k]) {
@@ -338,6 +340,7 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 		}
 		while (j < officialAwards.length) {
 			const o = officialAwards[j++];
+			o.isSelected = false;
 			rtn.push(o);
 		}
 		while (i < awards.length) {
