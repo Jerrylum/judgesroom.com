@@ -75,7 +75,7 @@
 					<div class="space-y-4">
 						{#each allPerformanceAwards as award}
 							<div class="rounded-lg border border-gray-200 p-4">
-								<div class="mb-2 flex items-center justify-between">
+								<div class="mb-2 flex items-center justify-between flex-wrap">
 									<h3 class="text-lg font-semibold text-gray-900">{award.name}</h3>
 									<span class="text-sm text-gray-500">
 										{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}

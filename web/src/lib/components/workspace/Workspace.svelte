@@ -9,7 +9,7 @@
 	import AwardRankingTab from './tabs/AwardRankingTab.svelte';
 	import AwardNominationTab from './tabs/AwardNominationTab.svelte';
 	import FinalRankingTab from './tabs/FinalRankingTab.svelte';
-	import AwardWinnerTab from './tabs/AwardWinner.svelte';
+	import AwardWinnerTab from './tabs/AwardWinnerTab.svelte';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	// Get tab state

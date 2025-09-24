@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { app, tabs } from '$lib/app-page.svelte';
-	import { AwardNominationTab, AwardRankingTab, FinalAwardRankingTab, NotebookRubricTab, NotebookSortingTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import {
+		AwardNominationTab,
+		AwardRankingTab,
+		AwardWinnerTab,
+		FinalAwardRankingTab,
+		NotebookRubricTab,
+		NotebookSortingTab,
+		TeamInterviewRubricTab
+	} from '$lib/tab.svelte';
 	import Tab from './Tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 
@@ -60,6 +68,18 @@
 			tabs.addTab(new FinalAwardRankingTab());
 		}
 	}
+
+	function addAwardWinnerTab() {
+		// Check if an award winner tab already exists
+		const existingTab = tabs.findTab('award_winner');
+		if (existingTab) {
+			// Switch to the existing tab instead of creating a new one
+			tabs.switchToTab(existingTab.id);
+		} else {
+			// Create a new tab if none exists
+			tabs.addTab(new AwardWinnerTab());
+		}
+	}
 </script>
 
 <Tab {isActive} tabId="overview" tabType="overview">
@@ -99,9 +119,9 @@
 					>
 						<div class="rounded-full bg-purple-100 p-2">
 							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" d="M12 3v18"/>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M2 12l2 2 4-4"/>
-								<path stroke-linecap="round" stroke-linejoin="round" d="M17 9l5 5m-5 0l5-5"/>
+								<path stroke-linecap="round" d="M12 3v18" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M2 12l2 2 4-4" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M17 9l5 5m-5 0l5-5" />
 							</svg>
 						</div>
 						<div>
@@ -176,12 +196,7 @@
 					>
 						<div class="rounded-full bg-orange-100 p-2">
 							<svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-								/>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 							</svg>
 						</div>
 						<div>
@@ -196,12 +211,34 @@
 					>
 						<div class="rounded-full bg-purple-100 p-2">
 							<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v7H3v-7zm6-6h4v13H9V7zm6 3h4v10h-4V10z"/>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v7H3v-7zm6-6h4v13H9V7zm6 3h4v10h-4V10z" />
 							</svg>
 						</div>
 						<div>
 							<div class="font-medium">Final Ranking</div>
 							<div class="text-sm text-gray-500">Final award rankings</div>
+						</div>
+					</button>
+
+					<button
+						onclick={addAwardWinnerTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					>
+						<div class="rounded-full bg-emerald-100 p-2">
+							<svg
+								class="h-5 w-5 text-emerald-600"
+								fill="currentColor"
+								stroke="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 640 640"
+								><!--!Font Awesome Free v7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+									d="M208.3 64L432.3 64C458.8 64 480.4 85.8 479.4 112.2C479.2 117.5 479 122.8 478.7 128L528.3 128C554.4 128 577.4 149.6 575.4 177.8C567.9 281.5 514.9 338.5 457.4 368.3C441.6 376.5 425.5 382.6 410.2 387.1C390 415.7 369 430.8 352.3 438.9L352.3 512L416.3 512C434 512 448.3 526.3 448.3 544C448.3 561.7 434 576 416.3 576L224.3 576C206.6 576 192.3 561.7 192.3 544C192.3 526.3 206.6 512 224.3 512L288.3 512L288.3 438.9C272.3 431.2 252.4 416.9 233 390.6C214.6 385.8 194.6 378.5 175.1 367.5C121 337.2 72.2 280.1 65.2 177.6C63.3 149.5 86.2 127.9 112.3 127.9L161.9 127.9C161.6 122.7 161.4 117.5 161.2 112.1C160.2 85.6 181.8 63.9 208.3 63.9zM165.5 176L113.1 176C119.3 260.7 158.2 303.1 198.3 325.6C183.9 288.3 172 239.6 165.5 176zM444 320.8C484.5 297 521.1 254.7 527.3 176L475 176C468.8 236.9 457.6 284.2 444 320.8z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">Award Winners</div>
+							<div class="text-sm text-gray-500">View and manage award winners</div>
 						</div>
 					</button>
 				</div>
