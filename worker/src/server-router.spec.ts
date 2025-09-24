@@ -23,7 +23,7 @@ describe('ServerRouter', () => {
 			broadcast: () =>
 				({
 					onDeviceListUpdate: { mutation: async () => [] },
-					onEssentialDataUpdate: { mutation: async () => [] },
+					onEventSetupUpdate: { mutation: async () => [] },
 					onAllTeamDataUpdate: { mutation: async () => [] },
 					onTeamDataUpdate: { mutation: async () => [] },
 					onAllJudgesUpdate: { mutation: async () => [] }
