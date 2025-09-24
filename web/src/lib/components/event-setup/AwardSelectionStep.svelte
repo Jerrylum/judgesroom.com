@@ -1,76 +1,121 @@
 <script lang="ts">
-	import AwardOptionsComponent from './AwardOptions.svelte';
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
-	import { dndzone } from 'svelte-dnd-action';
-	import { flip } from 'svelte/animate';
-	import { getOfficialAwardOptionsList, separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
-	import { isExcellenceAward, type CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
+	import { isExcellenceAward, type AwardType, type CompetitionType } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import FixedAwardOptions from './FixedAwardOptions.svelte';
 	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
+	import AwardSelectionColumn from './AwardSelectionColumn.svelte';
+	import { tick, untrack } from 'svelte';
 
 	interface Props {
 		selectedCompetitionType: CompetitionType;
 		selectedEventGradeLevel: EventGradeLevel;
-		awardOptions: AwardOptions[];
+		allAwardOptions: AwardOptions[];
 		onNext: () => void;
 		onPrev: () => void;
 	}
 
-	let { selectedCompetitionType, selectedEventGradeLevel, awardOptions = $bindable(), onNext, onPrev }: Props = $props();
+	type DropEvent = CustomEvent<{ items: AwardOptions[] }>;
+
+	let { selectedCompetitionType, selectedEventGradeLevel, allAwardOptions = $bindable(), onNext, onPrev }: Props = $props();
 
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 
-	let performanceAwards = $state<AwardOptions[]>([]);
 	let excellenceAward = $state<AwardOptions[]>([]);
 	let designAward = $state<AwardOptions | null>(null);
-	let remainingJudgedAwards = $state<AwardOptions[]>([]);
-	let volunteerNominatedAwards = $state<AwardOptions[]>([]);
+	let localState = $state<Record<AwardType, AwardOptions[]>>({
+		performance: [],
+		judged: [],
+		volunteer_nominated: []
+	});
 
 	$effect(() => {
-		let using = awardOptions;
+		let using = allAwardOptions;
 
 		if (using.length === 0) {
 			using = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
 		}
 
-		performanceAwards = using.filter((award) => award.possibleTypes.includes('performance'));
-		const j = using.filter((award) => award.possibleTypes.includes('judged'));
-		excellenceAward = j.filter((award) => isExcellenceAward(award.name));
-		designAward = j.find((award) => award.name === 'Design Award')!;
-		remainingJudgedAwards = j.filter((award) => !isExcellenceAward(award.name) && award.name !== 'Design Award');
-		volunteerNominatedAwards = using.filter(
-			(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
-		);
+		untrack(() => {
+			const j = using.filter((award) => award.selectedType === 'judged');
+			excellenceAward = j.filter((award) => isExcellenceAward(award.name));
+			designAward = j.find((award) => award.name === 'Design Award')!;
+			localState = {
+				performance: using.filter((award) => award.selectedType === 'performance'),
+				judged: j.filter((award) => !isExcellenceAward(award.name) && award.name !== 'Design Award'),
+				volunteer_nominated: using.filter((award) => award.selectedType === 'volunteer_nominated')
+			};
+		});
 	});
 
-	function handleDndConsiderCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
-		if (listType === 'performance') {
-			performanceAwards = e.detail.items;
-		} else if (listType === 'judged') {
-			remainingJudgedAwards = e.detail.items;
-		} else {
-			volunteerNominatedAwards = e.detail.items;
-		}
+	let dropOut = $state<{ type: AwardType; awardOptions: AwardOptions[] } | null>(null);
+	let dragIn = $state<{ type: AwardType; awardOptions: AwardOptions[] } | null>(null);
+
+	function commit(type: AwardType, awardOptions: AwardOptions[]) {
+		awardOptions.forEach((ao) => {
+			ao.selectedType = type;
+		});
+
+		localState[type] = awardOptions;
 	}
 
-	function handleDndFinalizeCards(e: CustomEvent<{ items: AwardOptions[] }>, listType: 'performance' | 'judged' | 'volunteer') {
-		if (listType === 'performance') {
-			performanceAwards = e.detail.items;
-		} else if (listType === 'judged') {
-			remainingJudgedAwards = e.detail.items;
+	function rollback(type: AwardType) {
+		// force all columns to rollback their editing state
+		// IMPORTANT: to avoid rendering warnings, we need to wait for the next tick
+		tick().then(() => {
+			localState[type] = [...localState[type]];
+		});
+	}
+
+	function isAwardSelectionValid(type: AwardType, awardOptions: AwardOptions[]): boolean {
+		return awardOptions.every((ao) => ao.possibleTypes.includes(type));
+	}
+
+	function handleAwardOptionsFinalize(type: AwardType, zone: string, e: DropEvent) {
+		if (zone === 'others') {
+			const originalState = localState[type];
+			const proposedState = e.detail.items;
+			if (originalState.length === proposedState.length) {
+				if (isAwardSelectionValid(type, proposedState)) {
+					commit(type, proposedState);
+				} else {
+					rollback(type);
+				}
+				return;
+			} else if (originalState.length > proposedState.length) {
+				dropOut = { type, awardOptions: proposedState };
+			} else {
+				dragIn = { type, awardOptions: proposedState };
+			}
+
+			if (dropOut && dragIn) {
+				if (isAwardSelectionValid(dragIn.type, dragIn.awardOptions) && isAwardSelectionValid(dropOut.type, dropOut.awardOptions)) {
+					commit(dragIn.type, dragIn.awardOptions);
+					commit(dropOut.type, dropOut.awardOptions);
+				} else {
+					rollback(dragIn.type);
+					rollback(dropOut.type);
+				}
+				dropOut = null;
+				dragIn = null;
+			}
 		} else {
-			volunteerNominatedAwards = e.detail.items;
+			if (isAwardSelectionValid(type, e.detail.items)) {
+				commit(type, e.detail.items);
+			} else {
+				rollback(type);
+			}
 		}
 	}
 
 	async function openCustomAwardDialog() {
 		const result = await dialogs.showCustom(CustomAwardDialog, {
 			props: {
-				existingAwards: [...performanceAwards, ...remainingJudgedAwards, ...volunteerNominatedAwards],
+				existingAwards: [...allAwardOptions],
 				selectedCompetitionType,
 				possibleGrades
 			}
@@ -80,17 +125,23 @@
 		const customAward = result as AwardOptions | null;
 		if (customAward) {
 			if (customAward.selectedType === 'performance') {
-				performanceAwards = [...performanceAwards, customAward];
+				localState.performance.push(customAward);
 			} else if (customAward.selectedType === 'judged') {
-				remainingJudgedAwards = [...remainingJudgedAwards, customAward];
+				localState.judged.push(customAward);
 			} else {
-				volunteerNominatedAwards = [...volunteerNominatedAwards, customAward];
+				localState.volunteer_nominated.push(customAward);
 			}
 		}
 	}
 
 	function submit() {
-		awardOptions = [...performanceAwards, ...excellenceAward, designAward!, ...remainingJudgedAwards, ...volunteerNominatedAwards];
+		allAwardOptions = [
+			...localState.performance,
+			...excellenceAward,
+			designAward!,
+			...localState.judged,
+			...localState.volunteer_nominated
+		];
 	}
 </script>
 
@@ -110,22 +161,13 @@
 					Drag to reorder if needed.
 				</p>
 			</div>
-			<div
-				class="min-h-[300px] space-y-2 border-t pt-3"
-				use:dndzone={{
-					items: performanceAwards,
-					flipDurationMs: 200,
-					dropTargetStyle: { outline: '1px solid #EEE' },
-					type: 'performance'
-				}}
-				onconsider={(e) => handleDndConsiderCards(e, 'performance')}
-				onfinalize={(e) => handleDndFinalizeCards(e, 'performance')}
-			>
-				{#each performanceAwards as award, index (award.id)}
-					<div animate:flip={{ duration: 200 }}>
-						<AwardOptionsComponent bind:award={performanceAwards[index]} />
-					</div>
-				{/each}
+			<div class="space-y-2 border-t pt-3">
+				<AwardSelectionColumn
+					type="performance"
+					zone="performance"
+					awardOptions={localState.performance}
+					onFinalize={handleAwardOptionsFinalize}
+				/>
 			</div>
 		</div>
 
@@ -138,31 +180,14 @@
 					needed.
 				</p>
 			</div>
-
-			<div class="min-h-[300px] space-y-2 border-t pt-3">
+			<div class="space-y-2 border-t pt-3">
 				{#if excellenceAward.length > 0}
 					<ExcellenceAwardOptions bind:awards={excellenceAward} />
 				{/if}
 				{#if designAward}
 					<FixedAwardOptions bind:award={designAward} />
 				{/if}
-				<div
-					class="space-y-2"
-					use:dndzone={{
-						items: remainingJudgedAwards,
-						flipDurationMs: 200,
-						dropTargetStyle: { outline: '1px solid #EEE' },
-						type: 'others'
-					}}
-					onconsider={(e) => handleDndConsiderCards(e, 'judged')}
-					onfinalize={(e) => handleDndFinalizeCards(e, 'judged')}
-				>
-					{#each remainingJudgedAwards as award, index (award.id)}
-						<div animate:flip={{ duration: 200 }}>
-							<AwardOptionsComponent bind:award={remainingJudgedAwards[index]} />
-						</div>
-					{/each}
-				</div>
+				<AwardSelectionColumn type="judged" zone="others" awardOptions={localState.judged} onFinalize={handleAwardOptionsFinalize} />
 			</div>
 		</div>
 
@@ -171,25 +196,16 @@
 			<div>
 				<h3 class="text-base font-semibold text-gray-800">Volunteer Nominated Awards</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Determined by volunteer staff and not by Judges. Sportsmapship Award and Energy Award can be dragged to this section.
+					Determined by volunteer staff and not by Judges. Sportsmanship Award and Energy Award can be dragged to this section.
 				</p>
 			</div>
-			<div
-				class="min-h-[300px] space-y-2 border-t pt-3"
-				use:dndzone={{
-					items: volunteerNominatedAwards,
-					flipDurationMs: 200,
-					dropTargetStyle: { outline: '1px solid #EEE' },
-					type: 'others'
-				}}
-				onconsider={(e) => handleDndConsiderCards(e, 'volunteer')}
-				onfinalize={(e) => handleDndFinalizeCards(e, 'volunteer')}
-			>
-				{#each volunteerNominatedAwards as award, index (award.id)}
-					<div animate:flip={{ duration: 200 }}>
-						<AwardOptionsComponent bind:award={volunteerNominatedAwards[index]} />
-					</div>
-				{/each}
+			<div class="space-y-2 border-t pt-3">
+				<AwardSelectionColumn
+					type="volunteer_nominated"
+					zone="others"
+					awardOptions={localState.volunteer_nominated}
+					onFinalize={handleAwardOptionsFinalize}
+				/>
 			</div>
 		</div>
 	</div>

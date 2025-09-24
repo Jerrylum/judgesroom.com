@@ -280,11 +280,9 @@ export function createCustomAwardOptions(
 
 export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
 	return {
-		performanceAwards: officialAwards.filter((award) => award.possibleTypes.includes('performance')),
-		judgedAwards: officialAwards.filter((award) => award.possibleTypes.includes('judged')),
-		volunteerNominatedAwards: officialAwards.filter(
-			(award) => !award.possibleTypes.includes('performance') && !award.possibleTypes.includes('judged')
-		)
+		performanceAwards: officialAwards.filter((award) => award.selectedType === 'performance'),
+		judgedAwards: officialAwards.filter((award) => award.selectedType === 'judged'),
+		volunteerNominatedAwards: officialAwards.filter((award) => award.selectedType === 'volunteer_nominated')
 	};
 }
 
@@ -332,9 +330,11 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
 			}
 
+			const a = awards.find((a) => a.name === o.name);
 			const o = officialAwards[j++];
+			o.selectedType = a?.type ?? o.possibleTypes[0];
+			o.possibleWinners = a?.winnersCount ?? 1;
 			o.isSelected = true;
-			o.possibleWinners = awards.find((a) => a.name === o.name)?.winnersCount ?? 1;
 			rtn.push(o);
 			i++;
 			k++;
@@ -353,9 +353,9 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 			const a = awards[i];
 			const o = officialAwards.find((o) => o.name === a.name);
 			if (o) {
-				o.isSelected = true;
+				o.selectedType = a.type;
 				o.possibleWinners = a.winnersCount;
-				o.requireNotebook = a.requireNotebook;
+				o.isSelected = true;
 				rtn.push(o);
 			} else {
 				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));

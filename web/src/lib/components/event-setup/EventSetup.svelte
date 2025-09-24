@@ -240,7 +240,13 @@
 				isWorkspaceReady={app.isWorkspaceReady()}
 			/>
 		{:else if currentStep === 2}
-			<AwardSelectionStep {selectedCompetitionType} {selectedEventGradeLevel} bind:awardOptions onNext={nextStep} onPrev={prevStep} />
+			<AwardSelectionStep
+				{selectedCompetitionType}
+				{selectedEventGradeLevel}
+				bind:allAwardOptions={awardOptions}
+				onNext={nextStep}
+				onPrev={prevStep}
+			/>
 		{:else if currentStep === 3}
 			<TeamImportStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
 		{:else if currentStep === 4}
