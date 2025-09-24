@@ -15,7 +15,7 @@
 		allJudgeGroups: Readonly<Record<string, Readonly<JudgeGroup>>>;
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
 		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
-		onDrop?: (award: Award, zone: string, e: DropEvent) => void;
+		onFinalize?: (award: Award, zone: string, e: DropEvent) => void;
 		onAddNomination?: (awardName: string, teamId: string) => void;
 		showFullAwardName?: boolean;
 		dropFromOthersDisabled?: boolean;
@@ -46,7 +46,7 @@
 		allJudgeGroups,
 		allFinalAwardNominations,
 		onConsider,
-		onDrop,
+		onFinalize,
 		onAddNomination,
 		showFullAwardName,
 		dropFromOthersDisabled,
@@ -76,7 +76,7 @@
 
 	function handleFinalize(e: DropEvent) {
 		editing = e.detail.items;
-		onDrop?.(award, usedZone, e);
+		onFinalize?.(award, usedZone, e);
 	}
 
 	// Dialog handler functions
@@ -118,7 +118,8 @@
 				flipDurationMs,
 				dropTargetStyle: { border: '1px solid #3B82F6' },
 				dropFromOthersDisabled: dropFromOthersDisabled,
-				type: usedZone
+				type: usedZone,
+				delayTouchStart: true
 			}}
 			onconsider={(e) => handleConsider(e)}
 			onfinalize={(e) => handleFinalize(e)}

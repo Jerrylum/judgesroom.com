@@ -139,7 +139,7 @@
 									{allTeams}
 									{allJudgeGroups}
 									{allFinalAwardNominations}
-									onDrop={handleJudgedAwardDrop}
+									onFinalize={handleJudgedAwardDrop}
 									showFullAwardName
 									dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 									winners={allFinalAwardWinners[award.name]}
@@ -153,7 +153,7 @@
 									{allTeams}
 									{allJudgeGroups}
 									{allFinalAwardNominations}
-									onDrop={handleJudgedAwardDrop}
+									onFinalize={handleJudgedAwardDrop}
 									onAddNomination={handleAddNomination}
 									showAddButton={true}
 									winners={allFinalAwardWinners[award.name]}
