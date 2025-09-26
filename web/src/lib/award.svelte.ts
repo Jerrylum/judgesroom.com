@@ -1,6 +1,7 @@
 import { type CompetitionType, type AwardType, type Grade, type Award, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
+import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 
 export class AwardOptions {
 	public readonly id: string;
@@ -376,7 +377,7 @@ export function getJudgedAwardWinners(
 	judgedAwards: Readonly<Award[]>,
 	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>
 ): Record<string, string[]> {
-	const rtn: Record<string, string[]> = {};
+	const rtn: Record<string, string[]> = {}; // award name -> team ids
 	const allWinners: string[] = [];
 
 	for (let i = 0; i < judgedAwards.length; i++) {
@@ -394,5 +395,50 @@ export function getJudgedAwardWinners(
 		rtn[award.name] = winners;
 	}
 
+	return rtn;
+}
+
+export function getAwardWinners(allAwards: Readonly<Award[]>, nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>) {
+	const judgedAwards = allAwards.filter((award) => award.type === 'judged');
+	const rtn = getJudgedAwardWinners(judgedAwards, nominations); // award name -> team ids
+
+	const otherAwards = allAwards.filter((award) => award.type !== 'judged');
+	for (let i = 0; i < otherAwards.length; i++) {
+		const award = otherAwards[i];
+		const nom = nominations[award.name] || [];
+		const winners: string[] = [];
+		for (let j = 0; j < nom.length && j < award.winnersCount; j++) {
+			winners.push(nom[j].teamId);
+		}
+		rtn[award.name] = winners;
+	}
+	return rtn;
+}
+
+export function groupAwardWinnersByTeamGroup(
+	awardWinners: Readonly<Record<string, Readonly<string>[]>>,
+	allTeams: Readonly<Record<string, Readonly<TeamInfo>>>
+): Record<string, Record<string, Readonly<string>[]>> {
+	const rtn: Record<string, Record<string, Readonly<string>[]>> = {}; // group id -> team id -> award names
+	for (const teamId in allTeams) {
+		const team = allTeams[teamId];
+		const groupId = team.group;
+		if (!rtn[groupId]) {
+			rtn[groupId] = {};
+		}
+		const group = rtn[groupId];
+		group[teamId] = [];
+	}
+
+	for (const awardName in awardWinners) {
+		const winners = awardWinners[awardName]; // team ids
+		for (let i = 0; i < winners.length; i++) {
+			const winner = winners[i]; // team id
+			const team = allTeams[winner];
+			const groupId = team.group;
+			const group = rtn[groupId];
+			group[winner].push(awardName);
+		}
+	}
 	return rtn;
 }
