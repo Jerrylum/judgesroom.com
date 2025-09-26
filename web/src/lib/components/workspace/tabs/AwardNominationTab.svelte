@@ -25,7 +25,9 @@
 			<!-- Header -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="text-xl font-semibold text-gray-900">Award Nominations</h2>
-				<p class="mt-2 text-sm text-gray-600">Nominate teams for awards based on their rankings.</p>
+				<p class="mt-2 text-sm text-gray-600">
+					After judge groups complete their team interviews, each group selects their top one or two candidates from their interviewed teams for each award. Judge groups should share their nominations to create a shortlist for each award. When there are many nominations, the Judge Advisor may ask groups to withdraw weaker candidates based on brief arguments comparing the merits of each nomination against award criteria.
+				</p>
 
 				<!-- Filter Options -->
 				<div class="mt-4 flex flex-wrap gap-4">

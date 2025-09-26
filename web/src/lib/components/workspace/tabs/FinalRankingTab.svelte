@@ -125,8 +125,11 @@
 			<!-- Judged Awards -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-semibold text-gray-900">Final Ranking</h2>
+				<p class="mb-2 text-sm text-gray-600">
+					Create the final ranking of award winners from nominated teams. After follow-up interviews are completed, judges who conducted those interviews should deliberate and rank nominees for each award. It's best practice to have first-choice winners plus three or more alternate candidates. Drag and drop teams to reorder nominations.
+				</p>
 				<p class="mb-6 text-sm text-gray-600">
-					Judged Awards are determined by judges based on award criteria and rubrics. Drag and drop teams to reorder nominations.
+					Excellence Award winners are selected from Design Award finalists who also meet Performance Award criteria, which may result in reshuffling other award winners to maintain the one-judged-award-per-team rule.
 				</p>
 
 				<div class="relative space-y-4 overflow-x-auto">

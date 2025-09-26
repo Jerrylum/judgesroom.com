@@ -63,7 +63,9 @@
 			<!-- Header -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="text-xl font-semibold text-gray-900">Award Winner</h2>
-				<p class="mt-2 text-sm text-gray-600">TODO</p>
+				<p class="mt-2 text-sm text-gray-600">
+					This is the final step in the judging process where award winners are entered and finalized. Performance Awards are determined by robot performance data from Tournament Manager, while Judged Awards come from the Final Ranking process. Before the award ceremony, the Judge Advisor should verify all award winners have been entered correctly and print the Award Summary Sheet for final confirmation.
+				</p>
 			</div>
 
 			<!-- Performance Awards -->
@@ -124,7 +126,9 @@
 			<!-- Volunteer Nominated Awards -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-semibold text-gray-900">Volunteer Nominated Awards</h2>
-				<p class="mb-6 text-sm text-gray-600">TODO</p>
+				<p class="mb-6 text-sm text-gray-600">
+					Volunteer Nominated Awards are a subset of Judged Awards that can be determined by event staff (such as Head Referees, scorekeepers, and emcees) based on observations during the event. These awards, particularly Sportsmanship and Energy Awards, may be determined by volunteer nominations instead of judges. If determined solely by volunteers, teams can still receive these awards even if they've already earned another Judged Award.
+				</p>
 
 				{#if allVolunteerNominatedAwards.length === 0}
 					<div class="py-8 text-center">
@@ -176,7 +180,9 @@
 			<!-- Summary of Award Winners by Team Group -->
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h2 class="mb-2 text-xl font-semibold text-gray-900">Summary of Award Winners</h2>
-				<p class="mb-6 text-sm text-gray-600">TODO</p>
+				<p class="mb-6 text-sm text-gray-600">
+					This summary shows all award winners organized by team group. The Judge Advisor should reconcile award winners to ensure each team earns the highest award for which they are eligible, as some teams may be candidates for multiple awards. Excellence Award winners are selected from Design Award finalists who also meet Performance Award criteria, which may result in reshuffling other award winners to maintain the one-judged-award-per-team rule.
+				</p>
 
 				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 					{#each Object.keys(allAwardWinnersByTeamGroup) as groupId}
