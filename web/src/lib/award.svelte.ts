@@ -331,8 +331,8 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
 			}
 
-			const a = awards.find((a) => a.name === o.name);
 			const o = officialAwards[j++];
+			const a = awards.find((a) => a.name === o.name);
 			o.selectedType = a?.type ?? o.possibleTypes[0];
 			o.possibleWinners = a?.winnersCount ?? 1;
 			o.isSelected = true;
