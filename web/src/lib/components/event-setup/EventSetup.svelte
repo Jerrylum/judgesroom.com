@@ -118,7 +118,7 @@
 
 	function cancelSetup() {
 		// Only allow cancel if user is in session
-		if (app.isWorkspaceReady()) {
+		if (app.isSessionJoined()) {
 			AppUI.appPhase = 'workspace';
 		}
 	}
@@ -146,7 +146,7 @@
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready
-			if (app.isWorkspaceReady()) {
+			if (app.isSessionJoined()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
 				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
 
@@ -237,7 +237,7 @@
 				onResetAwards={resetAwards}
 				onNext={nextStep}
 				onCancel={cancelSetup}
-				isWorkspaceReady={app.isWorkspaceReady()}
+				isSessionJoined={app.isSessionJoined()}
 			/>
 		{:else if currentStep === 2}
 			<AwardSelectionStep
@@ -272,7 +272,7 @@
 				onPrev={prevStep}
 				onComplete={completeSetup}
 				onCancel={cancelSetup}
-				isWorkspaceReady={app.isWorkspaceReady()}
+				isSessionJoined={app.isSessionJoined()}
 			/>
 		{/if}
 	</div>

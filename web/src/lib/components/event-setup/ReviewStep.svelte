@@ -17,7 +17,7 @@
 		onPrev: () => void;
 		onComplete: () => void;
 		onCancel: () => void;
-		isWorkspaceReady: boolean;
+		isSessionJoined: boolean;
 	}
 
 	let {
@@ -31,7 +31,7 @@
 		onPrev,
 		onComplete,
 		onCancel,
-		isWorkspaceReady
+		isSessionJoined
 	}: Props = $props();
 
 	const { performanceAwards, judgedAwards, volunteerNominatedAwards } = $derived(separateAwardOptionsByType(awardOptions));
@@ -95,7 +95,7 @@
 	<div class="flex justify-between pt-4">
 		<div class="flex space-x-3">
 			<button onclick={onPrev} class="secondary">Back</button>
-			{#if isWorkspaceReady}
+			{#if isSessionJoined}
 				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
 					Cancel
 				</button>

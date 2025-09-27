@@ -97,7 +97,7 @@ export class App {
 
 	// Error handling
 	private notices: Notice[] = $state([]);
-	
+
 	constructor(storage: AppStorage, isDevelopment: boolean = false) {
 		this.storage = storage;
 		this.isDevelopment = isDevelopment;
@@ -223,10 +223,16 @@ export class App {
 		}
 	}
 
-	isWorkspaceReady(): boolean {
+	/**
+	 * Check if the session is joined, it doesn't mean we are connected to the server
+	 */
+	isSessionJoined(): boolean {
 		return this.sessionInfo !== null && this.essentialData !== null;
 	}
 
+	/**
+	 * Check if the session is joined and the user is selected, we can now go to the workspace
+	 */
 	isJudgingReady(): boolean {
 		return this.sessionInfo !== null && this.essentialData !== null && this.getCurrentUser() !== null;
 	}
@@ -415,10 +421,13 @@ export class App {
 
 	getAllAwardsInMap(): Readonly<Record<string, Readonly<Award>>> {
 		const awards = this.getAllAwards();
-		return awards.reduce((acc, award) => {
-			acc[award.name] = award;
-			return acc;
-		}, {} as Record<string, Readonly<Award>>);
+		return awards.reduce(
+			(acc, award) => {
+				acc[award.name] = award;
+				return acc;
+			},
+			{} as Record<string, Readonly<Award>>
+		);
 	}
 
 	getExistingJudgesGroupedByGroup(): Readonly<Record<string, Readonly<Judge>[]>> {
@@ -435,10 +444,13 @@ export class App {
 
 	getAllJudgeGroupsInMap(): Readonly<Record<string, Readonly<JudgeGroup>>> {
 		const judgeGroups = this.getAllJudgeGroups();
-		return judgeGroups.reduce((acc, group) => {
-			acc[group.id] = group;
-			return acc;
-		}, {} as Record<string, Readonly<JudgeGroup>>);
+		return judgeGroups.reduce(
+			(acc, group) => {
+				acc[group.id] = group;
+				return acc;
+			},
+			{} as Record<string, Readonly<JudgeGroup>>
+		);
 	}
 
 	getAllTeamInfoAndData(): Readonly<Record<string, Readonly<TeamInfoAndData>>> {
