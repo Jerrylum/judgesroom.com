@@ -13,14 +13,12 @@
 	function onChange(e: Event) {
 		const value = (e.target as HTMLInputElement).value;
 		if (value === '1') {
-			awards[0].isSelected = true;
-			for (let i = 1; i < awards.length; i++) {
-				awards[i].isSelected = false;
+			for (let i = 0; i < awards.length; i++) {
+				awards[i].isSelected = awards[i].name === 'Excellence Award';
 			}
 		} else {
-			awards[0].isSelected = false;
-			for (let i = 1; i < awards.length; i++) {
-				awards[i].isSelected = true;
+			for (let i = 0; i < awards.length; i++) {
+				awards[i].isSelected = awards[i].name !== 'Excellence Award';
 			}
 		}
 	}
