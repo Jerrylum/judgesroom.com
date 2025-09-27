@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	let destroyConfirmText = $state('');
 	let isDestroying = $state(false);

@@ -5,8 +5,8 @@
 	import ShareIcon from '$lib/icon/ShareIcon.svelte';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import UserIcon from '$lib/icon/UserIcon.svelte';
-	import DestroyDialog from '../DestroyDialog.svelte';
-	import ShareDialog from '../ShareDialog.svelte';
+	import DestroyDialog from './DestroyDialog.svelte';
+	import ShareDialog from './ShareDialog.svelte';
 	import { onMount } from 'svelte';
 
 	let isOpen = $state(false);

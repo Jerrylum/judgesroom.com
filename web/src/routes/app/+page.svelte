@@ -8,8 +8,8 @@
 	import Loading from '$lib/components/loading/Loading.svelte';
 	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
 	import JoiningSession from '$lib/components/joining-session/JoiningSession.svelte';
-	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
-	import PromptDialog from '$lib/components/PromptDialog.svelte';
+	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
+	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
 	import { parseSessionUrl } from '$lib/utils.svelte';
 
 	// App state persistence error message

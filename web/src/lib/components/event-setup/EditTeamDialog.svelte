@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { dialogs } from '$lib/app-page.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import type { EditingTeam } from '$lib/team.svelte';
 	import { GradeSchema } from '@judging.jerryio/protocol/src/award';
 

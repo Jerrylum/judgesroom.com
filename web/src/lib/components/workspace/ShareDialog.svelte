@@ -5,7 +5,7 @@
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state('Copy');

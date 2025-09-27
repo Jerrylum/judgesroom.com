@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PromptDialog } from '$lib/dialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	interface Props {
 		dialog: PromptDialog;

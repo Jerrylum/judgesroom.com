@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import Dialog from '../../Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	interface Props {
 		open: boolean;

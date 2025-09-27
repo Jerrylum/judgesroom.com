@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dialogs } from '$lib/app-page.svelte';
 	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
-	import Dialog from '$lib/components/Dialog.svelte';
+	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import { type CompetitionType, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
