@@ -153,7 +153,7 @@
 			</div>
 
 			<!-- Right Column: Connected Devices -->
-			<div class="flex max-h-140 flex-1 flex-col space-y-4 overflow-hidden">
+			<div class="flex lg:max-h-140 flex-1 flex-col space-y-4 overflow-hidden">
 				<h4 class="text-lg font-medium text-gray-900">Connected Devices</h4>
 
 				{#if isDisconnectedFromServer()}
