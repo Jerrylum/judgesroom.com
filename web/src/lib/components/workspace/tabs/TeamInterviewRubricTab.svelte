@@ -224,8 +224,9 @@
 				<div class="rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
 					<p class="mb-4 text-sm text-gray-600">
-						Rate this team for specific awards based on your team interview by clicking on the boxes below. Use the star system (0-5 stars)
-						to indicate how strong a candidate this team is for each award.
+						Rate this team for specific awards based on your notebook review by clicking on the boxes below. Use the star system (0-5 stars)
+						to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
+						all judges see updates in real-time without needing to refresh the page.
 					</p>
 					<AwardRankingTable
 						title=""
