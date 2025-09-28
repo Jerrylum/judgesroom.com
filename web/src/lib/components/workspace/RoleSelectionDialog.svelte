@@ -4,6 +4,7 @@
 	import { app, dialogs } from '$lib/app-page.svelte';
 	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');
@@ -75,24 +76,19 @@
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-2xl">
 	<div class="space-y-6">
 		<!-- Title -->
-		<div>
-			<h3 class="text-lg font-semibold text-gray-900">Switch Role</h3>
-			<p class="mt-2 text-sm text-gray-600">Choose your new identity for the judging session.</p>
-
-			{#if connectionState !== 'offline' && connectionState !== 'connected'}
-				<div class="mt-2 text-sm">
-					Connection Status:
-					<span
-						class="font-medium"
-						class:text-yellow-600={connectionState === 'connecting' || connectionState === 'reconnecting'}
-						class:text-red-600={connectionState === 'error'}
-					>
-						{connectionState}
-					</span>
-				</div>
-			{/if}
+		<div class="flex flex-col">
+			<div class="flex items-center justify-between">
+				<h3 class="text-lg font-semibold text-gray-900">Switch Role</h3>
+				<button
+					onclick={handleClose}
+					class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+					aria-label="Close dialog"
+				>
+					<CloseIcon size={24} />
+				</button>
+			</div>
+			<p class="text-sm text-gray-600">Choose your new identity for the judging session.</p>
 		</div>
-
 		{#if !app.hasEssentialData()}
 			<div class="text-center text-gray-500">
 				<p>Loading session data...</p>
@@ -181,11 +177,11 @@
 						{#if !showNameInput}
 							<!-- Select Existing Judge -->
 							<div class="space-y-4">
-							{#if Object.keys(judgesByGroup()).length === 0}
-								<div class="rounded-lg bg-gray-50 p-4">
-									<p class="text-sm text-gray-500">No judges have been set up yet.</p>
-									<p class="text-xs text-gray-400 mt-1">You can add your name instead.</p>
-								</div>
+								{#if Object.keys(judgesByGroup()).length === 0}
+									<div class="rounded-lg bg-gray-50 p-4">
+										<p class="text-sm text-gray-500">No judges have been set up yet.</p>
+										<p class="mt-1 text-xs text-gray-400">You can add your name instead.</p>
+									</div>
 								{:else}
 									<div class="max-h-60 space-y-3 overflow-y-auto">
 										{#each judgeGroups as group (group.id)}
@@ -215,13 +211,7 @@
 									</div>
 
 									<div class="flex justify-end">
-										<button
-											onclick={selectExistingJudge}
-											disabled={!selectedJudgeId}
-											class="primary"
-										>
-											Continue as Selected Judge
-										</button>
+										<button onclick={selectExistingJudge} disabled={!selectedJudgeId} class="primary"> Continue as Selected Judge </button>
 									</div>
 								{/if}
 							</div>
@@ -250,11 +240,7 @@
 									</div>
 
 									<div class="flex justify-end">
-										<button
-											onclick={createNewJudge}
-											disabled={!newJudgeName.trim() || !selectedJudgeGroupId}
-											class="primary"
-										>
+										<button onclick={createNewJudge} disabled={!newJudgeName.trim() || !selectedJudgeGroupId} class="primary">
 											Continue with This Name
 										</button>
 									</div>
@@ -272,9 +258,7 @@
 							</p>
 						</div>
 						<div class="flex justify-end">
-							<button onclick={selectJudgeAdvisor} class="primary">
-								Continue as Judge Advisor
-							</button>
+							<button onclick={selectJudgeAdvisor} class="primary"> Continue as Judge Advisor </button>
 						</div>
 					</div>
 				{/if}
