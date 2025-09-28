@@ -44,7 +44,7 @@ export class DialogController {
 	private dialogs: Dialog[] = $state([]);
 	private resolvers = new SvelteMap<string, (result: unknown) => void>();
 
-	get currentDialog() {
+	get currentDialog(): Dialog | null {
 		return this.dialogs[this.dialogs.length - 1] || null;
 	}
 

@@ -7,6 +7,7 @@
 	import UserIcon from '$lib/icon/UserIcon.svelte';
 	import DestroyDialog from './DestroyDialog.svelte';
 	import ShareDialog from './ShareDialog.svelte';
+	import RoleSelectionDialog from './RoleSelectionDialog.svelte';
 	import { onMount } from 'svelte';
 
 	let isOpen = $state(false);
@@ -34,7 +35,10 @@
 
 	function handleSwitchRole() {
 		closeMenu();
-		AppUI.appPhase = 'role_selection';
+		dialogs.showCustom(RoleSelectionDialog, {
+			props: {},
+			maxWidth: 'max-w-4xl'
+		});
 	}
 
 	async function handleLeaveSession() {
