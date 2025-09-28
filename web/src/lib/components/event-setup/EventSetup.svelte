@@ -203,7 +203,7 @@
 	<!-- Step Indicator -->
 	<div class="mb-8 flex items-center justify-between">
 		<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
-		<div class="flex items-center space-x-4">
+		<div class="flex items-center">
 			{#each Array(totalSteps) as _, i (i)}
 				<div class="flex items-center">
 					<div

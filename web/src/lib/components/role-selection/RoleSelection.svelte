@@ -113,8 +113,8 @@
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<label
 								class="flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors"
-								class:border-indigo-500={selectedRole === 'judge'}
-								class:bg-indigo-50={selectedRole === 'judge'}
+								class:border-slate-500={selectedRole === 'judge'}
+								class:bg-slate-50={selectedRole === 'judge'}
 								class:border-gray-200={selectedRole !== 'judge'}
 							>
 								<input
@@ -122,7 +122,7 @@
 									bind:group={selectedRole}
 									value="judge"
 									onchange={handleRoleChange}
-									class="text-indigo-600 focus:ring-indigo-500"
+									class="text-slate-600 focus:ring-slate-500"
 								/>
 								<div>
 									<div class="font-medium text-gray-900">Judge</div>
@@ -132,8 +132,8 @@
 
 							<label
 								class="flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors"
-								class:border-indigo-500={selectedRole === 'judge_advisor'}
-								class:bg-indigo-50={selectedRole === 'judge_advisor'}
+								class:border-slate-500={selectedRole === 'judge_advisor'}
+								class:bg-slate-50={selectedRole === 'judge_advisor'}
 								class:border-gray-200={selectedRole !== 'judge_advisor'}
 							>
 								<input
@@ -141,7 +141,7 @@
 									bind:group={selectedRole}
 									value="judge_advisor"
 									onchange={handleRoleChange}
-									class="text-indigo-600 focus:ring-indigo-500"
+									class="text-slate-600 focus:ring-slate-500"
 								/>
 								<div>
 									<div class="font-medium text-gray-900">Judge Advisor</div>
@@ -203,7 +203,7 @@
 																		type="radio"
 																		bind:group={selectedJudgeId}
 																		value={judge.id}
-																		class="text-indigo-600 focus:ring-indigo-500"
+																		class="text-slate-600 focus:ring-slate-500"
 																	/>
 																	<span class="text-sm">{judge.name}</span>
 																</label>
@@ -218,7 +218,7 @@
 											<button
 												onclick={selectExistingJudge}
 												disabled={!selectedJudgeId}
-												class="rounded-md bg-indigo-600 px-6 py-2 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+												class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
 											>
 												Continue as Selected Judge
 											</button>
@@ -253,7 +253,7 @@
 											<button
 												onclick={createNewJudge}
 												disabled={!newJudgeName.trim() || !selectedJudgeGroupId}
-												class="rounded-md bg-indigo-600 px-6 py-2 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+												class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
 											>
 												Continue with This Name
 											</button>
@@ -265,7 +265,7 @@
 					{:else if selectedRole === 'judge_advisor'}
 						<!-- Judge Advisor Selection -->
 						<div class="space-y-4">
-							<div class="rounded-lg border bg-indigo-50 p-4 text-center">
+							<div class="rounded-lg border bg-slate-50 p-4 text-center">
 								<h4 class="font-medium text-gray-900">Judge Advisor</h4>
 								<p class="mt-2 text-sm text-gray-600">
 									As a Judge Advisor, you can manage the judging session, oversee all judges, and access all judging data.
@@ -273,7 +273,7 @@
 								<div class="mt-4">
 									<button
 										onclick={selectJudgeAdvisor}
-										class="rounded-md bg-indigo-600 px-6 py-2 text-white transition-colors hover:bg-indigo-700"
+										class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700"
 									>
 										Continue as Judge Advisor
 									</button>

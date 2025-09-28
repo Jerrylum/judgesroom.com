@@ -54,13 +54,13 @@
 
 	<div class="grid w-full max-w-4xl grid-cols-1 gap-8 lg:grid-cols-2">
 		<div class="rounded-2xl bg-white/95 p-8 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:transform">
-			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-indigo-600">🎯 Start New Event</h2>
+			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-slate-600">🎯 Start New Event</h2>
 			<p class="mb-6 leading-relaxed text-gray-700">Set up a new competition event with teams, judges, and awards.</p>
 			<button onclick={handleStartNewEvent} class="primary w-full">Start Event Setup</button>
 		</div>
 
 		<div class="rounded-2xl bg-white/95 p-8 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:transform">
-			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-indigo-600">🔗 Join Session</h2>
+			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-slate-600">🔗 Join Session</h2>
 			<p class="mb-6 leading-relaxed text-gray-700">Join an existing judging session using a link from your judge advisor.</p>
 			<div class="mb-6 space-y-4">
 				<input type="text" bind:value={sessionUrl} placeholder="Paste session URL here..." class="classic w-full" />

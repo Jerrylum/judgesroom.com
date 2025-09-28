@@ -50,7 +50,7 @@
 			<!-- Share Session Button -->
 			<!-- <button
 				onclick={onShareSession}
-				class="flex items-center space-x-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 sm:space-x-2"
+				class="flex items-center space-x-2 rounded-md bg-slate-600 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 sm:space-x-2"
 			>
 				<ShareIcon />
 				<span>Share</span>

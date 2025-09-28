@@ -14,8 +14,8 @@
 <button
 	onclick={onSwitch}
 	class="flex items-center space-x-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors"
-	class:border-indigo-500={isActive}
-	class:text-indigo-600={isActive}
+	class:border-slate-500={isActive}
+	class:text-slate-600={isActive}
 	class:border-transparent={!isActive}
 	class:text-gray-500={!isActive}
 	class:hover:text-gray-700={!isActive}
