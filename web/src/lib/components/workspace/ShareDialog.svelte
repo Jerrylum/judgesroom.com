@@ -108,7 +108,7 @@
 			</button>
 		</div>
 
-		<div class="flex shrink-0 flex-col gap-6 overflow-hidden lg:flex-row">
+		<div class="flex shrink-0 flex-col gap-6 overflow-hidden md:flex-row">
 			<!-- Left Column: Share Session -->
 			<div class="max-h-140 flex-1 space-y-6">
 				<h4 class="text-lg font-medium text-gray-900">Share Session</h4>
