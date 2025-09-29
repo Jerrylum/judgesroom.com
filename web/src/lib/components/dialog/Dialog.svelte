@@ -47,14 +47,14 @@
 
 {#if open}
 	<div
-		class="fixed inset-0 z-50 flex h-full w-full items-center justify-center bg-black/50 p-4"
+		class="fixed inset-0 z-50 flex h-full w-full items-center justify-center bg-black/50 md:p-4"
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
 		onmousedown={handleBackdropClick}
 		onkeydown={(e) => e.key === 'Escape' && onClose()}
 	>
-		<div class="max-h-full w-full overflow-auto rounded-lg bg-white p-6 {innerContainerClass}">
+		<div class="max-h-full w-full overflow-auto rounded-lg bg-white p-4 max-md:h-full max-md:max-w-full md:p-6 {innerContainerClass}">
 			{@render children?.()}
 		</div>
 	</div>
