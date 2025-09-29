@@ -22,7 +22,7 @@
 	});
 </script>
 
-<header class="border-b bg-white px-6 py-4 shadow-sm">
+<header class="bg-white px-6 py-4 shadow-sm">
 	<div class="flex items-center justify-between">
 		<div class="flex items-center space-x-4">
 			<div>

@@ -303,6 +303,13 @@ export class TabController {
 		};
 	}
 
+	/**
+	 * Reorder tabs (for drag and drop functionality)
+	 */
+	reorderTabs(newOrder: Tab[]): void {
+		this.tabs = newOrder;
+	}
+
 	private notifyTabChange(tabId: string | null): void {
 		this.tabChangeHandlers.forEach((handler) => handler(tabId));
 	}
