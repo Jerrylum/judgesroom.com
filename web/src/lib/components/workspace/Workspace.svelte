@@ -264,7 +264,7 @@
 	<Header />
 
 	<!-- Tab Bar -->
-	<div class="bg-slate-200">
+	<div class="bg-slate-200 overflow-hidden" style="box-shadow: inset 0px -8px 8px rgba(0, 0, 0, 0.025);">
 		<div class="flex px-6">
 			<div bind:this={tabContainer} class="flex space-x-1">
 				{#each allTabs as tab, index (tab.id)}
