@@ -12,7 +12,7 @@
 </script>
 
 <button
-	class="tab-button group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors"
+	class="group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors"
 	class:cursor-grab={!isDragging}
 	class:cursor-grabbing={isDragging}
 >
