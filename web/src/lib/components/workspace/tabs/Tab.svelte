@@ -4,13 +4,12 @@
 	interface Props {
 		isActive: boolean;
 		tabId: string;
-		tabType: string;
 		children: Snippet;
 	}
 
-	let { isActive, tabId, tabType, children }: Props = $props();
+	let { isActive, tabId, children }: Props = $props();
 </script>
 
-<div class="tab-content h-full w-full" class:hidden={!isActive} data-tab-id={tabId} data-tab-type={tabType}>
+<div class="tab-content h-full w-full" class:hidden={!isActive} data-tab-id={tabId}>
 	{@render children()}
 </div>

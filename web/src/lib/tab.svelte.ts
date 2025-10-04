@@ -1,36 +1,53 @@
-import type { Component } from 'svelte';
+import type { Component, ComponentProps, SvelteComponent } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { generateUUID } from './utils.svelte';
 import { app } from './app-page.svelte';
+import OverviewTabComponent from './components/workspace/tabs/OverviewTab.svelte';
+import TeamInterviewRubricTabComponent from './components/workspace/tabs/TeamInterviewRubricTab.svelte';
+import NotebookRubricTabComponent from './components/workspace/tabs/NotebookRubricTab.svelte';
+import NotebookSortingTabComponent from './components/workspace/tabs/NotebookSortingTab.svelte';
+import AwardRankingTabComponent from './components/workspace/tabs/AwardRankingTab.svelte';
+import AwardNominationTabComponent from './components/workspace/tabs/AwardNominationTab.svelte';
+import FinalRankingTabComponent from './components/workspace/tabs/FinalRankingTab.svelte';
+import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.svelte';
 
 // ============================================================================
 // Tab System
 // ============================================================================
 
+type BaseTabProps = { isActive: boolean; [key: string]: unknown };
+
 // Base tab interface
-interface BaseTab {
-	id: string;
-	type: string;
-	title: string;
+interface BaseTab<C extends Component<ComponentProps<C>>> {
+	readonly id: string;
 	closable: boolean;
+	component: C;
+	props: Omit<ComponentProps<C>, 'isActive'>;
+	get title(): string;
 }
 
-export class OverviewTab implements BaseTab {
-	id: string;
+export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
+	readonly id: string;
 	readonly closable = false;
 	readonly type = 'overview';
-	readonly title = 'Overview';
+	readonly component = OverviewTabComponent;
+	readonly props = {};
+
+	get title() {
+		return 'Overview';
+	}
 
 	constructor() {
 		this.id = generateUUID();
-		this.type = 'overview';
 	}
 }
 
-export class TeamInterviewRubricTab implements BaseTab {
-	id: string;
+export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubricTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'team_interview_rubric';
+	readonly component = TeamInterviewRubricTabComponent;
+	readonly props = { tab: this };
 	teamId: string = $state('');
 	rubricId: string | null = $state(null);
 
@@ -41,7 +58,6 @@ export class TeamInterviewRubricTab implements BaseTab {
 
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
-		this.type = 'team_interview_rubric';
 
 		if ('rubricId' in params) {
 			this.rubricId = params.rubricId;
@@ -53,10 +69,12 @@ export class TeamInterviewRubricTab implements BaseTab {
 	}
 }
 
-export class NotebookRubricTab implements BaseTab {
-	id: string;
+export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'notebook_rubric';
+	readonly component = NotebookRubricTabComponent;
+	readonly props = { tab: this };
 	teamId: string = $state('');
 	rubricId: string | null = $state(null);
 
@@ -78,66 +96,84 @@ export class NotebookRubricTab implements BaseTab {
 	}
 }
 
-export class NotebookSortingTab implements BaseTab {
-	id: string;
+export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'notebook_sorting';
-	readonly title = 'Notebook Sorting';
+	readonly component = NotebookSortingTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Notebook Sorting';
+	}
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class AwardRankingTab implements BaseTab {
-	id: string;
+export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'award_ranking';
-	readonly title = 'Award Ranking';
+	readonly component = AwardRankingTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Award Ranking';
+	}
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class AwardNominationTab implements BaseTab {
-	id: string;
+export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'award_nomination';
-	readonly title = 'Award Nomination';
+	readonly component = AwardNominationTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Award Nomination';
+	}
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class FinalAwardRankingTab implements BaseTab {
-	id: string;
+export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'final_award_ranking';
-	readonly title = 'Final Ranking';
+	readonly component = FinalRankingTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Final Ranking';
+	}
 
 	constructor() {
 		this.id = generateUUID();
 	}
 }
 
-export class AwardWinnerTab implements BaseTab {
-	id: string;
+export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
+	readonly id: string;
 	readonly closable = true;
 	readonly type = 'award_winner';
-	readonly title = 'Award Winner';
+	readonly component = AwardWinnerTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Award Winner';
+	}
 
 	constructor() {
 		this.id = generateUUID();
 	}
-}
-
-// Custom tab for extensibility
-export interface CustomTab extends BaseTab {
-	type: 'custom';
-	component: Component;
-	props: Record<string, unknown>;
 }
 
 export type Tab =
@@ -148,8 +184,7 @@ export type Tab =
 	| AwardNominationTab
 	| AwardRankingTab
 	| FinalAwardRankingTab
-	| AwardWinnerTab
-	| CustomTab;
+	| AwardWinnerTab;
 
 export class TabController {
 	private tabs: Tab[] = $state([]);
@@ -188,31 +223,6 @@ export class TabController {
 		this.tabs.push(tab);
 		this.switchToTab(tab.id);
 		return tab.id;
-	}
-
-	/**
-	 * Add a custom tab
-	 */
-	addCustomTab(
-		component: Component,
-		options: {
-			title: string;
-			props?: Record<string, unknown>;
-		}
-	): string {
-		const id = this.generateId();
-		const tab: CustomTab = {
-			id,
-			type: 'custom',
-			title: options.title,
-			closable: true,
-			component,
-			props: options.props || {}
-		};
-
-		this.tabs.push(tab);
-		this.switchToTab(id);
-		return id;
 	}
 
 	/**
@@ -262,18 +272,10 @@ export class TabController {
 	}
 
 	/**
-	 * Find tab by type and optional properties
+	 * Find tab by component and optional properties
 	 */
-	findTab(type: string, props?: Record<string, unknown>): Tab | null {
-		return (
-			this.tabs.find((tab) => {
-				if (tab.type !== type) return false;
-				if (!props) return true;
-
-				// Check if all provided props match
-				return Object.entries(props).every(([key, value]) => (tab as unknown as Record<string, unknown>)[key] === value);
-			}) || null
-		);
+	findTab(tabType: Tab['type']): Tab | null {
+		return this.tabs.find((tab) => tab.type === tabType) || null;
 	}
 
 	/**

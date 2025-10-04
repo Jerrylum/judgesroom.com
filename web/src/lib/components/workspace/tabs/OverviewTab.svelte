@@ -82,7 +82,7 @@
 	}
 </script>
 
-<Tab {isActive} tabId="overview" tabType="overview">
+<Tab {isActive} tabId="overview">
 	<div class="h-full overflow-auto p-6">
 		<div class="mx-auto max-w-5xl space-y-6">
 			<!-- Event Overview -->

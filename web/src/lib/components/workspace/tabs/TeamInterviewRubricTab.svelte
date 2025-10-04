@@ -141,7 +141,7 @@
 	}
 </script>
 
-<Tab {isActive} tabId={tab.id} tabType={tab.type}>
+<Tab {isActive} tabId={tab.id}>
 	<div class="h-full overflow-auto p-6" bind:this={mainScrollContainer}>
 		<div class="mx-auto max-w-5xl space-y-6">
 			<!-- Header -->

@@ -2,14 +2,6 @@
 	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
-	import OverviewTab from './tabs/OverviewTab.svelte';
-	import TeamInterviewRubricTab from './tabs/TeamInterviewRubricTab.svelte';
-	import NotebookRubricTab from './tabs/NotebookRubricTab.svelte';
-	import NotebookSortingTab from './tabs/NotebookSortingTab.svelte';
-	import AwardRankingTab from './tabs/AwardRankingTab.svelte';
-	import AwardNominationTab from './tabs/AwardNominationTab.svelte';
-	import FinalRankingTab from './tabs/FinalRankingTab.svelte';
-	import AwardWinnerTab from './tabs/AwardWinnerTab.svelte';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 	import type { Tab } from '$lib/tab.svelte';
 
@@ -91,45 +83,14 @@
 	<Header />
 
 	<!-- Tab Bar -->
-	<TabBar 
-		{allTabs} 
-		{activeTabId} 
-		onSwitchTab={switchTab} 
-		onCloseTab={closeTab} 
-		onReorderTabs={reorderTabs} 
-	/>
+	<TabBar {allTabs} {activeTabId} onSwitchTab={switchTab} onCloseTab={closeTab} onReorderTabs={reorderTabs} />
 
 	<!-- Main Content -->
 	<main class="flex-1 overflow-hidden shadow-lg">
 		{#each allTabs as tab (tab.id)}
+			{@const TabComponent = tab.component}
 			<div class="h-full" class:hidden={activeTabId !== tab.id}>
-				{#if tab.type === 'overview'}
-					<OverviewTab isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'team_interview_rubric'}
-					<TeamInterviewRubricTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'notebook_rubric'}
-					<NotebookRubricTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'notebook_sorting'}
-					<NotebookSortingTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'award_ranking'}
-					<AwardRankingTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'award_nomination'}
-					<AwardNominationTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'final_award_ranking'}
-					<FinalRankingTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'award_winner'}
-					<AwardWinnerTab {tab} isActive={activeTabId === tab.id} />
-				{:else if tab.type === 'custom' && 'component' in tab}
-					{@const CustomComponent = tab.component}
-					<CustomComponent {...tab.props} />
-				{:else}
-					<div class="flex items-center justify-center p-8 text-gray-500">
-						<div class="text-center">
-							<p>Unknown tab type: {(tab as any).type}</p>
-							<p class="mt-2 text-sm">This tab type is not yet implemented.</p>
-						</div>
-					</div>
-				{/if}
+				<TabComponent isActive={activeTabId === tab.id} {...(tab as Record<string, any>).props} />
 			</div>
 		{/each}
 	</main>

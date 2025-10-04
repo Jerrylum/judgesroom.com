@@ -43,7 +43,7 @@
 
 	// Function to open notebook rubric for a team
 	function openNotebookRubric(teamId: string) {
-		const existingTab = tabs.findTab('notebook_rubric', { teamId });
+		const existingTab = tabs.findTab('notebook_rubric');
 		if (existingTab) {
 			tabs.switchToTab(existingTab.id);
 		} else {
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<Tab {isActive} tabId={tab.id} tabType={tab.type}>
+<Tab {isActive} tabId={tab.id}>
 	<div class="h-full overflow-auto p-6">
 		<div class="mx-auto max-w-6xl space-y-6">
 			<!-- Header -->
