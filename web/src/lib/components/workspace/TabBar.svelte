@@ -56,10 +56,6 @@
 
 		// Calculate initial tab layout
 		calculateInitialTabLayout();
-
-		// Add visual feedback
-		tabElement.style.cursor = 'grabbing';
-		document.body.style.cursor = 'grabbing';
 	}
 
 	// Helper function to setup drag event listeners
@@ -309,12 +305,6 @@
 		}
 	}
 
-	// Helper function to restore document state
-	function restoreDocumentState() {
-		document.body.style.userSelect = '';
-		document.body.style.cursor = '';
-	}
-
 	function finalizeDrag() {
 		if (!dragState.isDragging || dragState.draggedTabId === null) return;
 
@@ -326,9 +316,6 @@
 
 		// Remove event listeners
 		removeDragEventListeners();
-
-		// Restore document state
-		restoreDocumentState();
 
 		// Reset drag state
 		resetDragState();
@@ -349,8 +336,6 @@
 					class="flex-shrink-0"
 					class:transition-transform={!isDragging}
 					class:duration-150={!isDragging}
-					class:cursor-grab={!isDragging}
-					class:cursor-grabbing={dragState.isDragging && dragState.draggedTabId === tab.id}
 					bind:this={tabElements[tab.id]}
 					onmousedown={(e) => handleTabMouseDown(e, tab, index)}
 					ontouchstart={(e) => handleTabTouchStart(e, tab, index)}

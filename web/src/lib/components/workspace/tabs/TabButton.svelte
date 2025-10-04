@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import type { Tab } from '$lib/tab.svelte';
 
 	interface Props {
@@ -11,7 +12,7 @@
 	let { tab, isActive, onClose, isDragging = false }: Props = $props();
 </script>
 
-<button
+<div
 	class="group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors"
 	class:cursor-grab={!isDragging}
 	class:cursor-grabbing={isDragging}
@@ -20,31 +21,23 @@
 		<span class="min-w-30 overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900">{tab.title}</span>
 		{#if tab.closable}
 			<div class="relative">
-				<div
+				<button
+					onmousedown={(e) => {
+						e.stopPropagation();
+					}}
+					ontouchstart={(e) => {
+						e.stopPropagation();
+					}}
 					onclick={(e) => {
 						e.stopPropagation();
 						onClose();
 					}}
 					class="relative left-1 flex-shrink-0 cursor-pointer rounded-full p-0.5 hover:bg-slate-400"
-					role="button"
 					tabindex="0"
 					aria-label="Close tab"
-					onkeydown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							e.stopPropagation();
-							onClose();
-						}
-					}}
 				>
-					<svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-						<path
-							fill-rule="evenodd"
-							d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-				</div>
+					<CloseIcon size={12} />
+				</button>
 			</div>
 		{/if}
 	</div>
@@ -89,4 +82,4 @@
 			<div class="absolute left-2 right-2 top-0 h-7 rounded-md group-hover:bg-slate-300"></div>
 		</div>
 	{/if}
-</button>
+</div>
