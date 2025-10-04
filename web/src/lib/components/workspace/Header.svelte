@@ -31,7 +31,7 @@
 				</h1>
 				<div class="flex items-center space-x-2 text-sm text-gray-500">
 					{#if currentUser?.role === 'judge_advisor'}
-						<span> Judge Advisor</span>
+						<span>Judge Advisor</span>
 					{:else if currentUser && currentUser.role === 'judge'}
 						<span>{currentUser.judge.name || 'Unknown'}</span>
 						<span>•</span>
@@ -44,19 +44,7 @@
 		</div>
 
 		<div class="flex items-center space-x-4">
-			<!-- Connection Status -->
 			<ConnectionStatusIndicator />
-
-			<!-- Share Session Button -->
-			<!-- <button
-				onclick={onShareSession}
-				class="flex items-center space-x-2 rounded-md bg-slate-600 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 sm:space-x-2"
-			>
-				<ShareIcon />
-				<span>Share</span>
-			</button> -->
-
-			<!-- User Menu -->
 			<UserMenu />
 		</div>
 	</div>
