@@ -88,14 +88,9 @@
 	<!-- Main Content -->
 	<main class="flex-1 overflow-hidden shadow-lg">
 		{#each allTabs as tab (tab.id)}
-			{@const TabComponent = tab.component}
-			<div class="h-full" class:hidden={activeTabId !== tab.id}>
-				<TabComponent isActive={activeTabId === tab.id} {...(tab as Record<string, any>).props} />
+			<div class="h-full w-full" class:hidden={activeTabId !== tab.id}>
+				<tab.component isActive={activeTabId === tab.id} {...(tab as Record<string, any>).props} />
 			</div>
 		{/each}
 	</main>
 </div>
-
-<style lang="postcss">
-	@reference 'tailwindcss';
-</style>

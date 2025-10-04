@@ -1,7 +1,6 @@
 <script lang="ts">
 	import './rubric.css';
 	import { app, tabs, subscriptions } from '$lib/app-page.svelte';
-	import Tab from './Tab.svelte';
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
@@ -152,128 +151,126 @@
 	}
 </script>
 
-<Tab {isActive} tabId={tab.id}>
-	<div class="h-full overflow-auto p-6" bind:this={mainScrollContainer}>
-		<div class="mx-auto max-w-5xl space-y-6">
-			<!-- Header -->
+<div class="h-full overflow-auto p-6" bind:this={mainScrollContainer}>
+	<div class="mx-auto max-w-5xl space-y-6">
+		<!-- Header -->
 
-			<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-				<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
+		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
 
-				<!-- Filter Controls -->
-				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
-					<div class="mb-4">
-						<label class="flex items-center">
-							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
-							<span class="text-sm text-gray-700">
-								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
-							</span>
-						</label>
-					</div>
-				{/if}
-
+			<!-- Filter Controls -->
+			{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
 				<div class="mb-4">
-					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-					<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full" disabled={isSubmitted}>
-						<option value="">Select a team...</option>
-						{#each teamsToShow() as team (team.id)}
-							{@const isDeveloped = team.isDevelopedNotebook ?? null}
-							{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
-							<option value={team.id}>{team.number}{statusText}</option>
-						{/each}
-					</select>
-				</div>
-
-				{#if tab.teamId}
-					{@const selectedTeam = includedTeams[tab.teamId]}
-					{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
-					{@const isDeveloped = selectedTeam.isDevelopedNotebook ?? null}
-					<div class="mb-4 rounded-lg bg-gray-50 p-4">
-						<div class=" text-sm text-gray-800">
-							<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
-							<p><strong>School:</strong> {selectedTeam.school}</p>
-							<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
-							<p>
-								<strong>Notebook Link:</strong>
-								{#if notebookLink === '(Not provided)'}
-									{notebookLink}
-								{:else}
-									<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
-								{/if}
-							</p>
-						</div>
-					</div>
-
-					{#if isDeveloped !== true}
-						<WarningSign title="Developing Notebook">
-							<p>
-								Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will be
-								marked as <strong>Fully Developed</strong> if the rubric is submitted.
-							</p>
-						</WarningSign>
-					{/if}
-					{#if selectedTeam.excluded}
-						<WarningSign title="Excluded Team">
-							<p>This team has been marked as excluded. They are not eligible for any Judged Awards.</p>
-						</WarningSign>
-					{/if}
-				{/if}
-
-				<!-- Current Judge Information (Read-only) -->
-				<div class="mt-2 text-sm text-gray-700">
-					{#if judgeId}
-						<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
-					{:else}
-						<p>(Please switch to a judge in order to submit the rubric)</p>
-					{/if}
-				</div>
-			</div>
-			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<p class="mb-2 text-sm text-gray-600">
-					<strong>Directions:</strong> Determine the point value that best characterizes the content of the Engineering Notebook for that criterion.
-					Write that value in the column to the right. This rubric is to be used for all Engineering Notebooks regardless of format (physical
-					or digital). Please refer to Section 5 of the Guide to Judging for information on how to use this rubric.
-				</p>
-				<p class="mb-6 text-sm text-gray-600">
-					<strong>Notes:</strong> Any student-centered or academic honesty concerns, such as plagiarism, should be brought to the attention of
-					the Judge Advisor and/or Event Partner.
-				</p>
-
-				<NotebookRubricTable bind:rubricScores bind:notes bind:innovateAwardNotes {isSubmitted} {showValidationErrors} />
-
-				<p class="mt-2 text-center text-xs italic">
-					All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at
-					the end of the event.
-				</p>
-
-				<div class="mt-6 flex justify-center gap-4">
-					{#if isSubmitted}
-						<button onclick={editRubric} class="secondary"> Edit Rubric </button>
-						<button onclick={closeRubric} class="secondary"> Close Rubric </button>
-						<button onclick={newRubric} class="primary"> New Rubric </button>
-					{:else}
-						<button onclick={saveRubric} class="primary" disabled={!judgeId}> Submit Rubric </button>
-					{/if}
-				</div>
-			</div>
-
-			<!-- Award Rankings Section -->
-			{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
-				<div class="rounded-lg bg-white p-6 shadow-sm">
-					<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
-					<p class="mb-4 text-sm text-gray-600">
-						Rate this team for specific awards based on your notebook review by clicking on the boxes below. Use the star system (0-5 stars)
-						to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
-						all judges see updates in real-time without needing to refresh the page.
-					</p>
-					<AwardRankingTable
-						title=""
-						judgeGroup={currentJudgeGroup}
-						showingTeams={{ targetTeams: [tab.teamId] }}
-						bypassAwardRequirements={false}
-					/>
+					<label class="flex items-center">
+						<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
+						<span class="text-sm text-gray-700">
+							Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+						</span>
+					</label>
 				</div>
 			{/if}
+
+			<div class="mb-4">
+				<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
+				<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full" disabled={isSubmitted}>
+					<option value="">Select a team...</option>
+					{#each teamsToShow() as team (team.id)}
+						{@const isDeveloped = team.isDevelopedNotebook ?? null}
+						{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
+						<option value={team.id}>{team.number}{statusText}</option>
+					{/each}
+				</select>
+			</div>
+
+			{#if tab.teamId}
+				{@const selectedTeam = includedTeams[tab.teamId]}
+				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
+				{@const isDeveloped = selectedTeam.isDevelopedNotebook ?? null}
+				<div class="mb-4 rounded-lg bg-gray-50 p-4">
+					<div class=" text-sm text-gray-800">
+						<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
+						<p><strong>School:</strong> {selectedTeam.school}</p>
+						<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
+						<p>
+							<strong>Notebook Link:</strong>
+							{#if notebookLink === '(Not provided)'}
+								{notebookLink}
+							{:else}
+								<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
+							{/if}
+						</p>
+					</div>
+				</div>
+
+				{#if isDeveloped !== true}
+					<WarningSign title="Developing Notebook">
+						<p>
+							Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will be
+							marked as <strong>Fully Developed</strong> if the rubric is submitted.
+						</p>
+					</WarningSign>
+				{/if}
+				{#if selectedTeam.excluded}
+					<WarningSign title="Excluded Team">
+						<p>This team has been marked as excluded. They are not eligible for any Judged Awards.</p>
+					</WarningSign>
+				{/if}
+			{/if}
+
+			<!-- Current Judge Information (Read-only) -->
+			<div class="mt-2 text-sm text-gray-700">
+				{#if judgeId}
+					<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
+				{:else}
+					<p>(Please switch to a judge in order to submit the rubric)</p>
+				{/if}
+			</div>
 		</div>
+		<div class="rounded-lg bg-white p-6 shadow-sm">
+			<p class="mb-2 text-sm text-gray-600">
+				<strong>Directions:</strong> Determine the point value that best characterizes the content of the Engineering Notebook for that criterion.
+				Write that value in the column to the right. This rubric is to be used for all Engineering Notebooks regardless of format (physical or
+				digital). Please refer to Section 5 of the Guide to Judging for information on how to use this rubric.
+			</p>
+			<p class="mb-6 text-sm text-gray-600">
+				<strong>Notes:</strong> Any student-centered or academic honesty concerns, such as plagiarism, should be brought to the attention of
+				the Judge Advisor and/or Event Partner.
+			</p>
+
+			<NotebookRubricTable bind:rubricScores bind:notes bind:innovateAwardNotes {isSubmitted} {showValidationErrors} />
+
+			<p class="mt-2 text-center text-xs italic">
+				All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at
+				the end of the event.
+			</p>
+
+			<div class="mt-6 flex justify-center gap-4">
+				{#if isSubmitted}
+					<button onclick={editRubric} class="secondary"> Edit Rubric </button>
+					<button onclick={closeRubric} class="secondary"> Close Rubric </button>
+					<button onclick={newRubric} class="primary"> New Rubric </button>
+				{:else}
+					<button onclick={saveRubric} class="primary" disabled={!judgeId}> Submit Rubric </button>
+				{/if}
+			</div>
+		</div>
+
+		<!-- Award Rankings Section -->
+		{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
+			<div class="rounded-lg bg-white p-6 shadow-sm">
+				<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
+				<p class="mb-4 text-sm text-gray-600">
+					Rate this team for specific awards based on your notebook review by clicking on the boxes below. Use the star system (0-5 stars)
+					to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
+					all judges see updates in real-time without needing to refresh the page.
+				</p>
+				<AwardRankingTable
+					title=""
+					judgeGroup={currentJudgeGroup}
+					showingTeams={{ targetTeams: [tab.teamId] }}
+					bypassAwardRequirements={false}
+				/>
+			</div>
+		{/if}
 	</div>
-</Tab>
+</div>
