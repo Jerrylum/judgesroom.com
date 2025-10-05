@@ -276,16 +276,16 @@ describe('WRPCClientManager', () => {
 			});
 
 			const managerWithCallback = new WRPCClientManager(optionsWithCallback, clientRouter);
-			
+
 			// Create client - this should trigger the callback through the mock
 			const [wsClient] = managerWithCallback.getClient();
-			
+
 			// Simulate state change by calling the callback directly
 			// (since we're using mocks, we can test that the callback is properly wired)
 			const callback = (wsClient as any).options.onConnectionStateChange;
 			callback('connecting');
 			callback('connected');
-			
+
 			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connecting');
 			expect(onConnectionStateChangeSpy).toHaveBeenCalledWith('connected');
 			expect(onConnectionStateChangeSpy).toHaveBeenCalledTimes(2);

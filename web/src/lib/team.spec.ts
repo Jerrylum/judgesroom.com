@@ -581,14 +581,36 @@ describe('mergeTeamData', () => {
 	it('should reuse existing team IDs when existing teams are provided', () => {
 		const existingTeamId1 = uuidv4();
 		const existingTeamId2 = uuidv4();
-		
+
 		const existingTeams = [
 			new EditingTeam(
-				createTeamInfo(existingTeamId1, '123A', 'Old Team Alpha', 'Old City', 'Old State', 'Old Country', 'OTA', 'Old School', 'College', '123'),
+				createTeamInfo(
+					existingTeamId1,
+					'123A',
+					'Old Team Alpha',
+					'Old City',
+					'Old State',
+					'Old Country',
+					'OTA',
+					'Old School',
+					'College',
+					'123'
+				),
 				createTeamData(existingTeamId1, 'https://old-notebook.com', true, false)
 			),
 			new EditingTeam(
-				createTeamInfo(existingTeamId2, '456B', 'Old Team Beta', 'Old Beta City', 'Old Beta State', 'Old Beta Country', 'OTB', 'Old Beta School', 'Elementary School', '456'),
+				createTeamInfo(
+					existingTeamId2,
+					'456B',
+					'Old Team Beta',
+					'Old Beta City',
+					'Old Beta State',
+					'Old Beta Country',
+					'OTB',
+					'Old Beta School',
+					'Elementary School',
+					'456'
+				),
 				createTeamData(existingTeamId2, 'https://old-beta-notebook.com', false, true)
 			)
 		];
@@ -628,13 +650,13 @@ describe('mergeTeamData', () => {
 		const result = mergeTeamData(csvTeams, notebookLinks, existingTeams);
 
 		expect(result).toHaveLength(2);
-		
+
 		// First team should reuse existing ID
 		expect(result[0].id).toBe(existingTeamId1);
 		expect(result[0].number).toBe('123A');
 		expect(result[0].name).toBe('New Team Alpha'); // Should use new data
 		expect(result[0].notebookLink).toBe('https://example.com/notebook-a');
-		
+
 		// Second team should get a new ID
 		expect(result[1].id).not.toBe(existingTeamId1);
 		expect(result[1].id).not.toBe(existingTeamId2);
@@ -681,14 +703,36 @@ describe('mergeTeamData', () => {
 	it('should handle mixed existing and new teams correctly', () => {
 		const existingTeamId1 = uuidv4();
 		const existingTeamId3 = uuidv4();
-		
+
 		const existingTeams = [
 			new EditingTeam(
-				createTeamInfo(existingTeamId1, '123A', 'Existing Team Alpha', 'City A', 'State A', 'Country A', 'ETA', 'School A', 'High School', '123'),
+				createTeamInfo(
+					existingTeamId1,
+					'123A',
+					'Existing Team Alpha',
+					'City A',
+					'State A',
+					'Country A',
+					'ETA',
+					'School A',
+					'High School',
+					'123'
+				),
 				createTeamData(existingTeamId1, 'https://existing-notebook-a.com', null, false)
 			),
 			new EditingTeam(
-				createTeamInfo(existingTeamId3, '789C', 'Existing Team Charlie', 'City C', 'State C', 'Country C', 'ETC', 'School C', 'College', '789'),
+				createTeamInfo(
+					existingTeamId3,
+					'789C',
+					'Existing Team Charlie',
+					'City C',
+					'State C',
+					'Country C',
+					'ETC',
+					'School C',
+					'College',
+					'789'
+				),
 				createTeamData(existingTeamId3, 'https://existing-notebook-c.com', true, false)
 			)
 		];
@@ -724,19 +768,19 @@ describe('mergeTeamData', () => {
 		const result = mergeTeamData(csvTeams, notebookLinks, existingTeams);
 
 		expect(result).toHaveLength(3);
-		
+
 		// Team A should reuse existing ID
 		expect(result[0].id).toBe(existingTeamId1);
 		expect(result[0].number).toBe('123A');
 		expect(result[0].name).toBe('Updated Team Alpha');
-		
-		// Team B should get new ID  
+
+		// Team B should get new ID
 		expect(result[1].id).not.toBe(existingTeamId1);
 		expect(result[1].id).not.toBe(existingTeamId3);
 		expect(result[1].number).toBe('456B');
 		expect(result[1].name).toBe('New Team Beta');
 		expect(result[1].notebookLink).toBe('https://example.com/notebook-b');
-		
+
 		// Team C should reuse existing ID
 		expect(result[2].id).toBe(existingTeamId3);
 		expect(result[2].number).toBe('789C');
@@ -753,7 +797,7 @@ describe('mergeTeamData', () => {
 			},
 			{
 				number: '456B',
-				name: 'Team Beta', 
+				name: 'Team Beta',
 				grade: 'Middle School' as Grade,
 				group: '456'
 			}
@@ -767,7 +811,7 @@ describe('mergeTeamData', () => {
 		expect(result[0].id).toBeDefined();
 		expect(result[1].id).toBeDefined();
 		expect(result[0].id).not.toBe(result[1].id);
-		
+
 		// Check that IDs are valid UUIDs (basic validation)
 		expect(result[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 		expect(result[1].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
@@ -798,11 +842,11 @@ describe('mergeTeamData', () => {
 
 		expect(result).toHaveLength(1);
 		const team = result[0];
-		
+
 		expect(team).toBeInstanceOf(EditingTeam);
 		expect(team.info.id).toBe(team.data.id);
 		expect(team.info.id).toBe(team.id);
-		
+
 		// Verify all info properties
 		expect(team.info.number).toBe('123A');
 		expect(team.info.name).toBe('Team Alpha');
@@ -813,12 +857,12 @@ describe('mergeTeamData', () => {
 		expect(team.info.school).toBe('Alpha School');
 		expect(team.info.grade).toBe('High School');
 		expect(team.info.group).toBe('123');
-		
+
 		// Verify all data properties
 		expect(team.data.notebookLink).toBe('https://example.com/notebook-a');
 		expect(team.data.excluded).toBe(true);
 		expect(team.data.isDevelopedNotebook).toBe(true);
-		
+
 		// Verify convenience getters work
 		expect(team.number).toBe('123A');
 		expect(team.name).toBe('Team Alpha');
@@ -829,7 +873,7 @@ describe('mergeTeamData', () => {
 	it('should handle empty arrays gracefully', () => {
 		const result = mergeTeamData([], {}, []);
 		expect(result).toEqual([]);
-		
+
 		const result2 = mergeTeamData([], {});
 		expect(result2).toEqual([]);
 	});

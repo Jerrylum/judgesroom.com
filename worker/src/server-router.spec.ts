@@ -44,7 +44,7 @@ describe('ServerRouter', () => {
 	afterEach(async () => {
 		// Allow any pending async operations to complete before cleanup
 		// This prevents database connection errors in broadcast operations
-		await new Promise(resolve => setTimeout(resolve, 10));
+		await new Promise((resolve) => setTimeout(resolve, 10));
 		context.cleanup();
 	});
 

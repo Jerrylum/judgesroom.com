@@ -61,7 +61,6 @@ export async function broadcastTopic<T>(
 	source: ClientSource,
 	callback: (client: RouterProxy<ClientRouter>) => Promise<T>
 ): Promise<T[]> {
-	
 	const subscribers = await db.select().from(subscriptions).where(eq(subscriptions.topic, topic));
 
 	return Promise.all(

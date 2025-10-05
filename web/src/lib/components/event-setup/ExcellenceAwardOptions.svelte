@@ -25,7 +25,7 @@
 </script>
 
 <div
-	class="min-h-15 flex flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
+	class="flex min-h-15 flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
 >
 	<div class="flex flex-1 items-center justify-between gap-4">
 		<!-- Left side: Large checkbox -->
