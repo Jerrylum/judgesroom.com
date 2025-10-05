@@ -158,21 +158,9 @@
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
 
-			<!-- Filter Controls -->
-			{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
-				<div class="mb-4">
-					<label class="flex items-center">
-						<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
-						<span class="text-sm text-gray-700">
-							Only show assigned teams for your current judge group ({currentJudgeGroup.name})
-						</span>
-					</label>
-				</div>
-			{/if}
-
 			<div class="mb-4">
 				<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-				<select id="team-select" bind:value={tab.teamId} class="classic mt-1 block w-full" disabled={isSubmitted}>
+				<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full" disabled={isSubmitted}>
 					<option value="">Select a team...</option>
 					{#each teamsToShow() as team (team.id)}
 						{@const isDeveloped = team.isDevelopedNotebook ?? null}
@@ -180,6 +168,18 @@
 						<option value={team.id}>{team.number}{statusText}</option>
 					{/each}
 				</select>
+
+				<!-- Filter Controls -->
+				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
+					<div class="mb-4">
+						<label class="flex items-center">
+							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
+							<span class="text-sm text-gray-700">
+								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+							</span>
+						</label>
+					</div>
+				{/if}
 			</div>
 
 			{#if tab.teamId}
@@ -260,9 +260,9 @@
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
 				<p class="mb-4 text-sm text-gray-600">
-					Rate this team for specific awards based on your notebook review by clicking on the boxes below. Use the star system (0-5 stars)
-					to indicate how strong a candidate this team is for each award. This table is shared and synchronized within your judge group -
-					all judges see updates in real-time without needing to refresh the page.
+					Rate this team for specific awards based on your notebook review by clicking on the boxes below. Indicate how strong a candidate
+					this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all
+					judges see updates in real-time without having to refresh the page.
 				</p>
 				<AwardRankingTable
 					title=""

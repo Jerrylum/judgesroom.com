@@ -128,9 +128,12 @@
 				interviews should deliberate and rank nominees for each award. It's best practice to have first-choice winners plus three or more
 				alternate candidates. Drag and drop teams to reorder nominations.
 			</p>
-			<p class="mb-6 text-sm text-gray-600">
+			<p class="mb-2 text-sm text-gray-600">
 				Excellence Award winners are selected from Design Award finalists who also meet Performance Award criteria, which may result in
-				reshuffling other award winners to maintain the one-judged-award-per-team rule.
+				reshuffling other award winners to maintain the one-judged-award-per-team rule. Drag team(s) from the Design Award column to the Excellence Award column(s) to designate Excellence Award winner(s).
+			</p>
+			<p class="mb-6 text-sm text-gray-600">
+				Winning teams for each award are marked by green.
 			</p>
 
 			<div class="relative space-y-4 overflow-x-auto">

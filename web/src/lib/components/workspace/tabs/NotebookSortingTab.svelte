@@ -70,7 +70,7 @@
 				another Judge can help make that determination or the notebook should be given the benefit of the doubt and categorized as Fully
 				Developed.
 			</p>
-			<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be completed the Engineering Notebook Rubric.</p>
+			<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric.</p>
 
 			<!-- Filter Controls -->
 			{#if isAssignedJudging && currentJudgeGroup}

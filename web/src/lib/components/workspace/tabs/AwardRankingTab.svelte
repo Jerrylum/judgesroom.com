@@ -24,9 +24,9 @@
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<h2 class="text-xl font-semibold text-gray-900">Award Candidate Ranking</h2>
 			<p class="mt-2 text-sm text-gray-600">
-				Click on any ranking cell, then use the minus (-) and plus (+) buttons to adjust rankings to indicate teams that are strong
+				Click on any ranking cell, then use the minus (-) and plus (+) buttons to adjust stars, this indicates teams that are strong
 				candidates for awards. In award deliberations, all judge groups will cross-reference their lists to create a final award nomination
-				list. This table is shared and synchronized within your judge group - all judges see updates in real-time without needing to refresh
+				list. This table is shared and synchronized within your judge group - all judges see updates in real-time without having to refresh
 				the page.
 			</p>
 
