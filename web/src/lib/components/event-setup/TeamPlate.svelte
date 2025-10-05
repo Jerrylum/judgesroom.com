@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="team-info min-h-19 cursor-move rounded bg-white p-3 shadow-sm transition-all hover:shadow-md"
+	class="team-info min-h-19 min-w-64 cursor-move rounded bg-white p-3 shadow-sm transition-all hover:shadow-md"
 	class:ring-2={isSelected}
 	class:ring-blue-500={isSelected}
 	class:bg-blue-50={isSelected}

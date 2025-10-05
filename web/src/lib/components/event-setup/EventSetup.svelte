@@ -4,7 +4,7 @@
 	import TeamImportStep from './TeamImportStep.svelte';
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
-	import { untrack, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { app, AppUI } from '$lib/app-page.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
@@ -183,19 +183,6 @@
 		loadCurrentData();
 
 		currentStep = 1; // IMPORTANT: set to 1 after loading current data
-	});
-
-	// If teams are updated, reset all teams to unassigned
-	$effect(() => {
-		if (teams.length > 0) {
-			untrack(() => {
-				judgeGroups.forEach((group) => {
-					group.assignedTeams = group.assignedTeams.filter((team) => !team.excluded && teams.includes(team));
-				});
-				const assignedTeamNumbers = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.number)));
-				unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeamNumbers.has(team.number));
-			});
-		}
 	});
 </script>
 

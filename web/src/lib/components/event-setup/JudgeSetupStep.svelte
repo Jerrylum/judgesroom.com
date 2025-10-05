@@ -3,7 +3,7 @@
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
 	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
@@ -44,6 +44,29 @@
 		if (judgeGroups.length === 0) {
 			judgeGroups.push(new EditingJudgeGroup('Group 1'));
 		}
+	});
+
+	// If teams are updated
+	$effect(() => {
+		const allIncludedTeams = new EditingTeamList(teamsProp.filter((team) => !team.excluded));
+		const ignoredTeams = new EditingTeamList([...allIncludedTeams]);
+
+		untrack(() => {
+			judgeGroups.forEach((group) => {
+				const includedTeams = group.assignedTeams.filter((team) => allIncludedTeams.includes(team.id));
+				group.assignedTeams = includedTeams;
+
+				includedTeams.forEach((team) => {
+					ignoredTeams.removeById(team.id);
+				});
+			});
+
+			unassignedTeams.forEach((team) => {
+				ignoredTeams.removeById(team.id);
+			});
+
+			unassignedTeams = unassignedTeams.concat([...ignoredTeams]).filter((team) => !team.excluded);
+		});
 	});
 
 	interface DropEvent {
@@ -171,9 +194,11 @@
 			return judgeGroups.length > 0;
 		} else {
 			// For assigned method, all non-excluded teams must be assigned
-			const totalAssignedTeams = judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0);
-			const totalActiveTeams = teamsProp.filter((team) => !team.excluded).length;
-			return totalAssignedTeams === totalActiveTeams;
+			const totalActiveTeams = unassignedTeams.length;
+
+			console.log('totalActiveTeams', totalActiveTeams);
+
+			return totalActiveTeams === 0;
 		}
 	}
 
@@ -235,7 +260,7 @@
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
 			{#each judgeGroups as judgeGroup, index (judgeGroup.id)}
 				<JudgeGroupComponent
-					isEditingEventSetup={isEditingEventSetup}
+					{isEditingEventSetup}
 					judgeGroup={judgeGroups[index]}
 					bind:selectedItems
 					bind:activeZoneId
@@ -334,7 +359,7 @@
 		}
 
 		:global(&[data-selected-items-count]::after) {
-			@apply absolute top-[-0.75rem] right-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
+			@apply absolute right-[-0.75rem] top-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
 		}
 	}
 </style>
