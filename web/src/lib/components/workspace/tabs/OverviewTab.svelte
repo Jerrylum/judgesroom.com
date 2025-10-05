@@ -17,9 +17,6 @@
 
 	let { isActive }: Props = $props();
 
-	const currentUser = $derived(app.getCurrentUser());
-	const isJudge = $derived(currentUser?.role === 'judge');
-
 	function addTeamInterviewTab() {
 		tabs.addTab(new TeamInterviewRubricTab({ teamId: '' }));
 	}

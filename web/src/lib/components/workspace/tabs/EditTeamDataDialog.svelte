@@ -84,6 +84,11 @@
 	{/if}
 
 	<div class="space-y-4">
+		<!-- Team Info Display -->
+		<div class="rounded-lg bg-gray-50 p-3">
+			<div class="text-sm font-medium text-gray-900">{team.number} - {team.name}</div>
+			<div class="text-sm text-gray-600">{team.school} • {team.grade}</div>
+		</div>
 
 		<!-- Notebook Link -->
 		<div>
@@ -106,7 +111,7 @@
 					bind:checked={editedTeam.excluded} 
 					class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" 
 				/>
-				<span class="text-sm text-gray-700">Exclude this team from judging</span>
+				<span class="text-sm text-gray-700">Exclude this team from judged awards</span>
 			</label>
 			<p class="mt-1 text-xs text-gray-500">If checked, this team will not be considered for judged awards</p>
 		</div>

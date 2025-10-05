@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { app, tabs } from '$lib/app-page.svelte';
+	import { app, dialogs, tabs } from '$lib/app-page.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
+	import EditIcon from '$lib/icon/EditIcon.svelte';
+	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -49,12 +51,17 @@
 			tabs.addTab(new NotebookRubricTab({ teamId }));
 		}
 	}
+
+	// Open team data edit dialog
+	function openEditTeamDataDialog(team: any) {
+		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
+	}
 </script>
 
-<div class="h-full overflow-auto p-6">
+<div class="h-full overflow-auto p-4 sm:p-6">
 	<div class="mx-auto max-w-6xl space-y-6">
 		<!-- Header -->
-		<div class="rounded-lg bg-white p-6 shadow-sm">
+		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>
 			<p class="mb-2 text-sm text-gray-600">
 				<strong>Instructions:</strong> Judges perform a quick scan of all the Engineering Notebooks and divide them into two categories:
@@ -68,8 +75,8 @@
 			<!-- Filter Controls -->
 			{#if isAssignedJudging && currentJudgeGroup}
 				<div>
-					<label class="flex items-center">
-						<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
+					<label class="flex items-start sm:items-center">
+						<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
 						<span class="text-sm text-gray-700">
 							Only show assigned teams for your current judge group ({currentJudgeGroup.name})
 						</span>
@@ -79,7 +86,7 @@
 		</div>
 
 		<!-- Teams List -->
-		<div class="rounded-lg bg-white p-6 shadow-sm">
+		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">
 				Teams ({teamsToShow().length})
 			</h3>
@@ -99,25 +106,32 @@
 						{@const isDeveloped = team.isDevelopedNotebook ?? null}
 
 						<div class="rounded-lg border border-gray-200 p-4">
-							<div class="flex items-start justify-between">
+							<div class="flex flex-col space-y-4 md:flex-row md:items-start md:justify-between md:space-y-0">
 								<div class="flex-1">
-									<div class="mb-2 flex items-center space-x-4">
-										<h4 class="text-lg font-medium text-gray-900">
-											{team.number} - {team.name}
+									<div class="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+										<h4 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-medium text-gray-900">
+											<span>{team.number} - {team.name}</span>
+											{#if team.excluded}
+												<span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Excluded from judged awards</span>
+											{/if}
+											<button
+												onclick={() => openEditTeamDataDialog(team)}
+												class="text-gray-400 hover:text-gray-600 active:text-gray-800"
+												title="Edit team data"
+											>
+												<EditIcon size={14} />
+											</button>
 										</h4>
-										{#if team.excluded}
-											<span class="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800">Excluded</span>
-										{/if}
 									</div>
 
 									<div class="space-y-1 text-sm text-gray-600">
 										<p><strong>School:</strong> {team.school}</p>
 										<p><strong>Grade Level:</strong> {team.grade}</p>
 										<p><strong>Location:</strong> {team.city}, {team.state}, {team.country}</p>
-										<p>
+										<p class="break-all">
 											<strong>Notebook Link:</strong>
 											{#if notebookLink}
-												<a href={notebookLink} target="_blank" class="text-blue-600 underline hover:text-blue-800">
+												<a href={notebookLink} target="_blank" class="text-blue-600 underline hover:text-blue-800 active:text-blue-900">
 													{notebookLink}
 												</a>
 											{:else}
@@ -127,38 +141,38 @@
 									</div>
 								</div>
 
-								<div class="ml-6 flex-shrink-0">
+								<div class="flex-shrink-0 md:ml-6">
 									<div class="mb-2 text-sm font-medium text-gray-700">Notebook Status:</div>
-									<div class="space-y-2">
+									<div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1 md:space-y-0">
 										<button
 											onclick={() => updateNotebookStatus(team.id, true)}
-											class="block w-full rounded-md border px-3 py-2 text-left text-sm {isDeveloped === true
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === true
 												? 'border-green-300 bg-green-50 text-green-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}"
+												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
-											✓ Fully Developed
+											<span class="mr-1">✓</span> Fully Developed
 										</button>
 										<button
 											onclick={() => updateNotebookStatus(team.id, false)}
-											class="block w-full rounded-md border px-3 py-2 text-left text-sm {isDeveloped === false
-												? 'border-gray-300 bg-gray-100 text-gray-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}"
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === false
+												? 'border-yellow-300 bg-yellow-50 text-yellow-700'
+												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
-											⚠ Developing
+											<span class="mr-1">⚠</span> Developing
 										</button>
 										<button
 											onclick={() => updateNotebookStatus(team.id, null)}
-											class="block w-full rounded-md border px-3 py-2 text-left text-sm {isDeveloped === null
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === null
 												? 'border-gray-300 bg-gray-100 text-gray-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}"
+												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
-											○ No Notebook/Not Reviewed
+											<span class="mr-1">○</span> No Notebook/Not Reviewed
 										</button>
 									</div>
 
 									{#if isDeveloped === true}
 										<div class="mt-3">
-											<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full"> Start Notebook Rubric </button>
+											<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full touch-manipulation"> Start Notebook Rubric </button>
 										</div>
 									{/if}
 								</div>

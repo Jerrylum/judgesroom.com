@@ -120,11 +120,11 @@
 	}
 </script>
 
-<div class="mb-4 flex items-center justify-between">
+<div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
 	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics ({teamList.length} teams)</h2>
 	<button
 		onclick={refreshRubricsAndNotes}
-		class="inline-flex items-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
+		class="inline-flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 active:bg-gray-100 sm:w-auto sm:justify-start"
 		aria-label="Refresh teams and rubrics"
 	>
 		<RefreshIcon />
@@ -152,14 +152,17 @@
 		{@const notebookStatus = getNotebookStatus(team.isDevelopedNotebook)}
 		<div class="rounded-lg border border-gray-200 p-4">
 			<!-- Team Header -->
-			<div class="mb-3 flex items-center justify-between">
+			<div class="mb-3 flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
 				<div class="flex items-center space-x-2">
-					<div>
-						<h3 class="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+					<div class="flex-1">
+						<h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold text-gray-900">
 							<span>{team.number} - {team.name}</span>
+							{#if team.excluded}
+								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Excluded from judged awards</span>
+							{/if}
 							<button
 								onclick={() => openEditTeamDataDialog(team)}
-								class="text-gray-400 hover:text-gray-600"
+								class="text-gray-400 hover:text-gray-600 active:text-gray-800"
 								title="Edit team data"
 							>
 								<EditIcon size={16} />
@@ -167,18 +170,15 @@
 						</h3>
 						<p class="text-sm text-gray-600">
 							{team.school} • {team.grade}
-							{#if team.excluded}
-								<span class="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Excluded from judged awards</span>
-							{/if}
 						</p>
 					</div>
 				</div>
-				<div class="text-right">
+				<div class="flex-shrink-0 text-left sm:text-right">
 					<div class="text-sm {notebookStatus.class} font-medium">
 						{notebookStatus.text}
 					</div>
 					{#if team.notebookLink && team.notebookLink.trim() !== ''}
-						<a href={team.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800"> View Notebook </a>
+						<a href={team.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800 active:text-blue-900"> View Notebook </a>
 					{:else}
 						<div class="text-sm text-gray-400">No notebook link</div>
 					{/if}
@@ -186,7 +186,7 @@
 			</div>
 
 			<!-- Rubrics Section -->
-			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				<!-- Engineering Notebook Rubrics -->
 				<div class="rounded-lg p-3">
 					<h4 class="mb-2 font-medium text-gray-900">Engineering Notebook Rubrics</h4>
@@ -195,12 +195,12 @@
 						{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
 							<button
 								onclick={() => openNotebookRubric(team.id, rubric.id)}
-								class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
+								class="rounded-full bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200 active:bg-gray-300"
 							>
 								{getJudgeName(rubric.judgeId)}
 							</button>
 						{/each}
-						<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
+						<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900">
 							+ New Rubric
 						</button>
 					</div>
@@ -214,12 +214,12 @@
 						{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
 							<button
 								onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
-								class="rounded-4xl bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200"
+								class="rounded-full bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200 active:bg-gray-300"
 							>
 								{getJudgeName(rubric.judgeId)}
 							</button>
 						{/each}
-						<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800">
+						<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900">
 							+ New Rubric
 						</button>
 					</div>
