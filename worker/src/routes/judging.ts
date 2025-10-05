@@ -4,6 +4,7 @@ import {
 	AwardNominationSchema,
 	AwardRankingsFullUpdateSchema,
 	EngineeringNotebookRubricSchema,
+	SubmissionCacheSchema,
 	TeamInterviewNoteSchema,
 	TeamInterviewRubricSchema
 } from '@judging.jerryio/protocol/src/rubric';
@@ -11,6 +12,7 @@ import type {
 	AwardNomination,
 	AwardRankingsFullUpdate,
 	EngineeringNotebookRubric,
+	SubmissionCache,
 	TeamInterviewNote,
 	TeamInterviewRubric
 } from '@judging.jerryio/protocol/src/rubric';
@@ -71,6 +73,11 @@ export async function addReviewedTeam(db: DatabaseOrTransaction, judgeGroupId: s
 	return result.length > 0;
 }
 
+export async function getSubmissionCaches(db: DatabaseOrTransaction, judgeGroupId: string): Promise<SubmissionCache[]> {
+	const result = await db.select().from(judgeGroupsSubmissionsCache).where(eq(judgeGroupsSubmissionsCache.judgeGroupId, judgeGroupId));
+	return result;
+}
+
 export async function getFinalAwardNominations(tx: DatabaseOrTransaction): Promise<Record<string, AwardNomination[]>> {
 	const result = await tx.select().from(finalAwardNominations);
 	const rtn = {} as Record<string, AwardNomination[]>;
@@ -104,31 +111,6 @@ export function broadcastFinalAwardNominationsUpdate(
 
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
-		getRubricsAndNotes: w.procedure
-			.input(z.object({ judgeGroupId: z.uuidv4().optional() }))
-			.output(
-				z.array(
-					z.object({
-						judgeGroupId: z.uuidv4(),
-						teamId: z.uuidv4(),
-						judgeId: z.uuidv4(),
-						tiId: z.uuidv4().nullable(),
-						tnId: z.uuidv4().nullable(),
-						enrId: z.uuidv4().nullable()
-					})
-				)
-			)
-			.query(async ({ ctx, input }) => {
-				if (input.judgeGroupId) {
-					return await ctx.db
-						.select()
-						.from(judgeGroupsSubmissionsCache)
-						.where(eq(judgeGroupsSubmissionsCache.judgeGroupId, input.judgeGroupId));
-				} else {
-					return await ctx.db.select().from(judgeGroupsSubmissionsCache);
-				}
-			}),
-
 		completeEngineeringNotebookRubric: w.procedure
 			.input(
 				z.object({
@@ -138,7 +120,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			)
 			.mutation(async ({ ctx, input, session }) => {
 				// insert or update
-				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
 					await tx
 						.insert(engineeringNotebookRubrics)
 						.values(input.submission)
@@ -147,27 +129,35 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 							set: input.submission
 						});
 
-					await tx
-						.insert(judgeGroupsSubmissionsCache)
-						.values({
-							judgeGroupId: input.judgeGroupId,
-							teamId: input.submission.teamId,
-							judgeId: input.submission.judgeId,
-							enrId: input.submission.id,
-							tiId: null,
-							tnId: null
-						})
-						.onConflictDoUpdate({
-							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
-							set: {
+					const submissionCache = (
+						await tx
+							.insert(judgeGroupsSubmissionsCache)
+							.values({
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
-								judgeId: input.submission.judgeId
-							}
-						});
+								judgeId: input.submission.judgeId,
+								enrId: input.submission.id,
+								tiId: null,
+								tnId: null
+							})
+							.onConflictDoUpdate({
+								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+								set: {
+									judgeGroupId: input.judgeGroupId,
+									teamId: input.submission.teamId,
+									judgeId: input.submission.judgeId
+								}
+							})
+							.returning()
+					)[0];
 
-					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+					const isReviewedNewTeam = await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+					return { submissionCache, isReviewedNewTeam };
 				});
+				// Do not wait for the broadcast to complete
+				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
+					client.onSubmissionCacheUpdate.mutation(submissionCache)
+				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
@@ -192,7 +182,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				})
 			)
 			.mutation(async ({ ctx, input, session }) => {
-				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
 					await tx
 						.insert(teamInterviewRubrics)
 						.values(input.submission)
@@ -200,26 +190,34 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 							target: [teamInterviewRubrics.id],
 							set: input.submission
 						});
-					await tx
-						.insert(judgeGroupsSubmissionsCache)
-						.values({
-							judgeGroupId: input.judgeGroupId,
-							teamId: input.submission.teamId,
-							judgeId: input.submission.judgeId,
-							enrId: null,
-							tiId: input.submission.id,
-							tnId: null
-						})
-						.onConflictDoUpdate({
-							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
-							set: {
+					const submissionCache = (
+						await tx
+							.insert(judgeGroupsSubmissionsCache)
+							.values({
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
-								judgeId: input.submission.judgeId
-							}
-						});
-					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+								judgeId: input.submission.judgeId,
+								enrId: null,
+								tiId: input.submission.id,
+								tnId: null
+							})
+							.onConflictDoUpdate({
+								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+								set: {
+									judgeGroupId: input.judgeGroupId,
+									teamId: input.submission.teamId,
+									judgeId: input.submission.judgeId
+								}
+							})
+							.returning()
+					)[0];
+					const isReviewedNewTeam = await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+					return { submissionCache, isReviewedNewTeam };
 				});
+				// Do not wait for the broadcast to complete
+				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
+					client.onSubmissionCacheUpdate.mutation(submissionCache)
+				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
@@ -244,7 +242,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				})
 			)
 			.mutation(async ({ ctx, input, session }) => {
-				const isReviewedNewTeam = await transaction(ctx.db, async (tx) => {
+				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
 					await tx
 						.insert(teamInterviewNotes)
 						.values(input.submission)
@@ -252,26 +250,34 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 							target: [teamInterviewNotes.id],
 							set: input.submission
 						});
-					await tx
-						.insert(judgeGroupsSubmissionsCache)
-						.values({
-							judgeGroupId: input.judgeGroupId,
-							teamId: input.submission.teamId,
-							judgeId: input.submission.judgeId,
-							tiId: input.submission.id,
-							tnId: null,
-							enrId: null
-						})
-						.onConflictDoUpdate({
-							target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
-							set: {
+					const submissionCache = (
+						await tx
+							.insert(judgeGroupsSubmissionsCache)
+							.values({
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
-								judgeId: input.submission.judgeId
-							}
-						});
-					return await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+								judgeId: input.submission.judgeId,
+								enrId: null,
+								tiId: input.submission.id,
+								tnId: null
+							})
+							.onConflictDoUpdate({
+								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
+								set: {
+									judgeGroupId: input.judgeGroupId,
+									teamId: input.submission.teamId,
+									judgeId: input.submission.judgeId
+								}
+							})
+							.returning()
+					)[0];
+					const isReviewedNewTeam = await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
+					return { submissionCache, isReviewedNewTeam };
 				});
+				// Do not wait for the broadcast to complete
+				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
+					client.onSubmissionCacheUpdate.mutation(submissionCache)
+				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
@@ -336,6 +342,22 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 
 		unsubscribeAwardRankings: w.procedure.mutation(async ({ ctx, session }) => {
 			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
+		}),
+
+		subscribeSubmissionCaches: w.procedure
+			.input(z.object({ judgeGroupIds: z.array(z.uuidv4()), exclusive: z.boolean() }))
+			.output(z.array(SubmissionCacheSchema))
+			.mutation(async ({ ctx, input, session }) => {
+				return transaction(ctx.db, async (tx) => {
+					await subscribeJudgeGroupTopic(tx, session.currentClient.clientId, input.judgeGroupIds, 'submissions', input.exclusive);
+					return Promise.all(input.judgeGroupIds.map((judgeGroupId) => getSubmissionCaches(tx, judgeGroupId))).then((submissionCaches) => {
+						return submissionCaches.flat();
+					});
+				});
+			}),
+
+		unsubscribeSubmissionCaches: w.procedure.mutation(async ({ ctx, session }) => {
+			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'submissions');
 		}),
 
 		nominateFinalAward: w.procedure

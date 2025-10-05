@@ -95,7 +95,7 @@
 			await app.wrpcClient.judging.completeTeamInterviewRubric.mutation({
 				judgeGroupId: currentJudgeGroup.id,
 				submission: {
-					id: (tab.rubricId = generateUUID()),
+					id: tab.rubricId || generateUUID(),
 					teamId: tab.teamId,
 					judgeId,
 					rubric: rubricScores,

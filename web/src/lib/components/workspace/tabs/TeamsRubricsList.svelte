@@ -8,8 +8,6 @@
 	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 
-	type RubricsAndNotes = Awaited<ReturnType<typeof app.wrpcClient.judging.getRubricsAndNotes.query>>;
-
 	const teams = $derived(app.getAllTeamInfoAndData());
 
 	interface RubricsAndNotesPerTeam {
@@ -18,7 +16,6 @@
 		teamInterviewNotes: Submission[];
 	}
 
-	let rubricsAndNotes = $state<RubricsAndNotes>([]);
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
@@ -40,31 +37,33 @@
 	const data = $derived.by(() => {
 		const rtn: Record<string, RubricsAndNotesPerTeam> = {};
 
-		for (const rubric of rubricsAndNotes) {
-			const target = rtn[rubric.teamId] || {
+		const submissionCaches = Object.values(subscriptions.allSubmissionCaches);
+
+		for (const sub of submissionCaches) {
+			const target = rtn[sub.teamId] || {
 				engineeringNotebookRubrics: [],
 				teamInterviewRubrics: [],
 				teamInterviewNotes: []
 			};
-			if (rubric.enrId) {
+			if (sub.enrId) {
 				target.engineeringNotebookRubrics.push({
-					id: rubric.enrId,
-					judgeId: rubric.judgeId
+					id: sub.enrId,
+					judgeId: sub.judgeId
 				});
 			}
-			if (rubric.tiId) {
+			if (sub.tiId) {
 				target.teamInterviewRubrics.push({
-					id: rubric.tiId,
-					judgeId: rubric.judgeId
+					id: sub.tiId,
+					judgeId: sub.judgeId
 				});
 			}
-			if (rubric.tnId) {
+			if (sub.tnId) {
 				target.teamInterviewNotes.push({
-					id: rubric.tnId,
-					judgeId: rubric.judgeId
+					id: sub.tnId,
+					judgeId: sub.judgeId
 				});
 			}
-			rtn[rubric.teamId] = target;
+			rtn[sub.teamId] = target;
 		}
 
 		return rtn;
@@ -109,15 +108,7 @@
 		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
 	}
 
-	async function refreshRubricsAndNotes() {
-		const judgeGroupId = app.getCurrentUserJudgeGroup()?.id;
-		try {
-			rubricsAndNotes = await app.wrpcClient.judging.getRubricsAndNotes.query({ judgeGroupId });
-		} catch (error) {
-			console.error('Failed to load rubrics data:', error);
-			app.addErrorNotice('Failed to load rubrics data');
-		}
-	}
+	async function refreshRubricsAndNotes() {}
 </script>
 
 <div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -178,7 +169,9 @@
 						{notebookStatus.text}
 					</div>
 					{#if team.notebookLink && team.notebookLink.trim() !== ''}
-						<a href={team.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800 active:text-blue-900"> View Notebook </a>
+						<a href={team.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800 active:text-blue-900">
+							View Notebook
+						</a>
 					{:else}
 						<div class="text-sm text-gray-400">No notebook link</div>
 					{/if}
@@ -200,7 +193,10 @@
 								{getJudgeName(rubric.judgeId)}
 							</button>
 						{/each}
-						<button onclick={() => openNotebookRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900">
+						<button
+							onclick={() => openNotebookRubric(team.id)}
+							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
+						>
 							+ New Rubric
 						</button>
 					</div>
@@ -219,7 +215,10 @@
 								{getJudgeName(rubric.judgeId)}
 							</button>
 						{/each}
-						<button onclick={() => openTeamInterviewRubric(team.id)} class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900">
+						<button
+							onclick={() => openTeamInterviewRubric(team.id)}
+							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
+						>
 							+ New Rubric
 						</button>
 					</div>

@@ -21,5 +21,6 @@ export const dialogs = new DialogController();
 export const tabs = new TabController();
 export const subscriptions: SubscriptionsStorage = $state({
 	allJudgeGroupsAwardRankings: {},
-	allJudgeGroupsReviewedTeams: {}
+	allJudgeGroupsReviewedTeams: {},
+	allSubmissionCaches: {}
 });

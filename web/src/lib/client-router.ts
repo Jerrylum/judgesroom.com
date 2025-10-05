@@ -10,6 +10,8 @@ import {
 	AwardNominationSchema,
 	AwardRankingsFullUpdateSchema,
 	AwardRankingsPartialUpdateSchema,
+	SubmissionCacheSchema,
+	SubmissionSchema,
 	type AwardRankingsFullUpdate
 } from '@judging.jerryio/protocol/src/rubric';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
@@ -94,6 +96,12 @@ const clientRouter = w.router({
 		}
 
 		reviewedTeams.push(input.teamId);
+	}),
+
+	onSubmissionCacheUpdate: w.procedure.input(SubmissionCacheSchema).mutation(async ({ input }) => {
+		console.log(`📊 Submission cache updated:`, input);
+		const uuid = input.tiId || input.enrId || input.tnId || 'null';
+		subscriptions.allSubmissionCaches[uuid] = input;
 	}),
 
 	onFinalAwardNominationsUpdate: w.procedure

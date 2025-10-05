@@ -2,7 +2,7 @@
 	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
-	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
+	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judging.jerryio/protocol/src/rubric';
 	import type { Tab } from '$lib/tab.svelte';
 
 	// Get tab state
@@ -79,6 +79,33 @@
 			console.log('Unsubscribing from reviewed teams', targetJudgeGroupIds);
 
 			await app.wrpcClient.judging.unsubscribeReviewedTeams.mutation();
+		};
+	});
+
+	$effect(() => {
+		if (!isJudgingReady) return;
+
+		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
+		const targetJudgeGroupIds = currentJudgeGroupId //
+			? [currentJudgeGroupId]
+			: app.getAllJudgeGroups().map((group) => group.id);
+
+		console.log('Subscribing to submission caches', targetJudgeGroupIds);
+
+		app.wrpcClient.judging.subscribeSubmissionCaches.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
+			subscriptions.allSubmissionCaches = data.reduce(
+				(acc, curr) => {
+					acc[curr.tiId ?? curr.enrId ?? curr.tnId ?? 'null'] = curr;
+					return acc;
+				},
+				{} as Record<string, SubmissionCache>
+			);
+		});
+
+		return async () => {
+			console.log('Unsubscribing from submission caches', targetJudgeGroupIds);
+
+			await app.wrpcClient.judging.unsubscribeSubmissionCaches.mutation();
 		};
 	});
 </script>

@@ -8,6 +8,17 @@ export const SubmissionSchema = z.object({
 
 export type Submission = z.infer<typeof SubmissionSchema>;
 
+export const SubmissionCacheSchema = z.object({
+	judgeGroupId: z.uuidv4(),
+	teamId: z.uuidv4(),
+	judgeId: z.uuidv4(),
+	enrId: z.uuidv4().nullable(),
+	tiId: z.uuidv4().nullable(),
+	tnId: z.uuidv4().nullable()
+});
+
+export type SubmissionCache = z.infer<typeof SubmissionCacheSchema>;
+
 export const RankSchema = z.number().min(0).max(5);
 
 export const EngineeringNotebookRubricSchema = z.object({
