@@ -113,7 +113,7 @@
 		<div class="md:col-span-2">
 			<label class="flex items-center">
 				<input type="checkbox" bind:checked={editedTeam.excluded} class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" />
-				<span class="text-sm text-gray-700">Exclude this team from judging</span>
+				<span class="text-sm text-gray-700">Exclude this team from judged awards</span>
 			</label>
 		</div>
 	</div>

@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
+	import { app, dialogs, subscriptions, tabs } from '$lib/app-page.svelte';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
+	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber, type TeamInfoAndData } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
+	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 
 	type RubricsAndNotes = Awaited<ReturnType<typeof app.wrpcClient.judging.getRubricsAndNotes.query>>;
 
@@ -102,6 +104,11 @@
 		tabs.switchToTab(tab.id);
 	}
 
+	// Open team data edit dialog
+	function openEditTeamDataDialog(team: TeamInfoAndData) {
+		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
+	}
+
 	async function refreshRubricsAndNotes() {
 		const judgeGroupId = app.getCurrentUserJudgeGroup()?.id;
 		try {
@@ -146,13 +153,25 @@
 		<div class="rounded-lg border border-gray-200 p-4">
 			<!-- Team Header -->
 			<div class="mb-3 flex items-center justify-between">
-				<div>
-					<h3 class="text-lg font-semibold text-gray-900">
-						{team.number} - {team.name}
-					</h3>
-					<p class="text-sm text-gray-600">
-						{team.school} • {team.grade}
-					</p>
+				<div class="flex items-center space-x-2">
+					<div>
+						<h3 class="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+							<span>{team.number} - {team.name}</span>
+							<button
+								onclick={() => openEditTeamDataDialog(team)}
+								class="text-gray-400 hover:text-gray-600"
+								title="Edit team data"
+							>
+								<EditIcon size={16} />
+							</button>
+						</h3>
+						<p class="text-sm text-gray-600">
+							{team.school} • {team.grade}
+							{#if team.excluded}
+								<span class="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Excluded from judged awards</span>
+							{/if}
+						</p>
+					</div>
 				</div>
 				<div class="text-right">
 					<div class="text-sm {notebookStatus.class} font-medium">
