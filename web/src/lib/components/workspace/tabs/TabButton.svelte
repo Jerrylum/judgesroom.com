@@ -12,14 +12,12 @@
 	let { tab, isActive, onClose, isDragging = false }: Props = $props();
 </script>
 
-<div
-	class="group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors"
-	class:cursor-grab={!isDragging}
-	class:cursor-grabbing={isDragging}
->
+<div class="group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors">
 	<div class="z-30 flex h-7 flex-row items-center">
-		<span class="min-w-30 overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900">{tab.title}</span>
-		{#if tab.closable}
+		<span class="overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900" class:min-w-30={!tab.isPinned}
+			>{tab.title}</span
+		>
+		{#if !tab.isPinned}
 			<div class="relative">
 				<button
 					onmousedown={(e) => {

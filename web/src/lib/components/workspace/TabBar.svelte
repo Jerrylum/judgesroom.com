@@ -69,28 +69,46 @@
 		document.body.style.userSelect = 'none';
 	}
 
+	// Helper function to get pinned tabs and non-pinned tabs separately
+	const pinnedTabs = $derived(allTabs.filter((tab) => tab.isPinned));
+	const nonPinnedTabs = $derived(allTabs.filter((tab) => !tab.isPinned));
+
+	// Helper function to get the index of a tab in the non-pinned tabs array
+	function getNonPinnedTabIndex(tab: Tab): number {
+		return nonPinnedTabs.findIndex((t) => t.id === tab.id);
+	}
+
 	// Custom drag handlers
 	function handleTabMouseDown(e: MouseEvent, tab: Tab, index: number) {
 		if (e.button !== 0) return; // Only handle left mouse button
-
 		e.preventDefault();
+		onSwitchTab(tab.id);
+
+		if (tab.isPinned) return; // Don't allow dragging pinned tabs
 
 		const tabElement = tabElements[tab.id];
 		if (!tabElement) return;
 
-		initializeDragState(tab, index, e.clientX, tabElement);
+		const nonPinnedIndex = getNonPinnedTabIndex(tab);
+		if (nonPinnedIndex === -1) return;
+
+		initializeDragState(tab, nonPinnedIndex, e.clientX, tabElement);
 		setupDragEventListeners();
-		onSwitchTab(tab.id);
 	}
 
 	function handleTabTouchStart(e: TouchEvent, tab: Tab, index: number) {
+		if (tab.isPinned) return; // Don't allow dragging pinned tabs
+
 		e.preventDefault();
 
 		const touch = e.touches[0];
 		const tabElement = tabElements[tab.id];
 		if (!tabElement) return;
 
-		initializeDragState(tab, index, touch.clientX, tabElement);
+		const nonPinnedIndex = getNonPinnedTabIndex(tab);
+		if (nonPinnedIndex === -1) return;
+
+		initializeDragState(tab, nonPinnedIndex, touch.clientX, tabElement);
 		setupDragEventListeners();
 		onSwitchTab(tab.id);
 	}
@@ -120,7 +138,7 @@
 		dragState.tabWidths = [];
 		dragState.tabPositions = [];
 
-		allTabs.forEach((tab, index) => {
+		nonPinnedTabs.forEach((tab, index) => {
 			const element = tabElements[tab.id];
 			if (element) {
 				const rect = element.getBoundingClientRect();
@@ -166,10 +184,10 @@
 	function findInsertPosition(relativeX: number): number {
 		let insertIndex = 0;
 
-		for (let i = 0; i < allTabs.length; i++) {
+		for (let i = 0; i < nonPinnedTabs.length; i++) {
 			if (i === dragState.draggedTabIndex) continue;
 
-			const tab = allTabs[i];
+			const tab = nonPinnedTabs[i];
 			const element = tabElements[tab.id];
 			if (!element) continue;
 
@@ -188,15 +206,15 @@
 			insertIndex = Math.max(0, insertIndex - 1);
 		}
 
-		return Math.max(0, Math.min(insertIndex, allTabs.length - 1));
+		return Math.max(0, Math.min(insertIndex, nonPinnedTabs.length - 1));
 	}
 
 	// Helper function to apply transforms to all tabs
 	function applyTabTransforms() {
 		const movements = calculateTabMovements();
 
-		// Reset all tab transforms first
-		allTabs.forEach((tab, index) => {
+		// Reset all non-pinned tab transforms first (don't touch pinned tabs)
+		nonPinnedTabs.forEach((tab, index) => {
 			const element = tabElements[tab.id];
 			if (element && index !== dragState.draggedTabIndex) {
 				element.style.transform = 'translateX(0px)';
@@ -205,7 +223,7 @@
 
 		// Apply movement transforms
 		movements.forEach(({ index, offsetX }) => {
-			const tab = allTabs[index];
+			const tab = nonPinnedTabs[index];
 			const element = tabElements[tab.id];
 			if (element) {
 				element.style.transform = `translateX(${offsetX}px)`;
@@ -298,9 +316,13 @@
 	// Helper function to reorder tabs
 	function reorderTabsIfNeeded() {
 		if (dragState.insertIndex !== dragState.draggedTabIndex && dragState.insertIndex >= 0) {
-			const newTabs = [...allTabs];
-			const draggedTab = newTabs.splice(dragState.draggedTabIndex, 1)[0];
-			newTabs.splice(dragState.insertIndex, 0, draggedTab);
+			// Create new arrays with pinned tabs at front
+			const newNonPinnedTabs = [...nonPinnedTabs];
+			const draggedTab = newNonPinnedTabs.splice(dragState.draggedTabIndex, 1)[0];
+			newNonPinnedTabs.splice(dragState.insertIndex, 0, draggedTab);
+
+			// Combine pinned and non-pinned tabs with pinned tabs at front
+			const newTabs = [...pinnedTabs, ...newNonPinnedTabs];
 			onReorderTabs(newTabs);
 		}
 	}
@@ -332,10 +354,13 @@
 				<div
 					role="button"
 					tabindex="0"
-					aria-label={`Drag to reorder ${tab.title} tab`}
+					aria-label={tab.isPinned ? `${tab.title} tab (pinned)` : `Drag to reorder ${tab.title} tab`}
 					class="flex-shrink-0"
 					class:transition-transform={!isDragging}
 					class:duration-150={!isDragging}
+					class:cursor-pointer={tab.isPinned && !isDragging}
+					class:cursor-grab={!tab.isPinned && !isDragging}
+					class:cursor-grabbing={!tab.isPinned && isDragging}
 					bind:this={tabElements[tab.id]}
 					onmousedown={(e) => handleTabMouseDown(e, tab, index)}
 					ontouchstart={(e) => handleTabTouchStart(e, tab, index)}

@@ -19,6 +19,8 @@
 	}
 
 	function closeTab(tabId: string) {
+		console.log('closeTab', tabId);
+
 		tabs.closeTab(tabId);
 	}
 

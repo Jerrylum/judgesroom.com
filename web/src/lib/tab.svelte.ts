@@ -15,12 +15,10 @@ import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.
 // Tab System
 // ============================================================================
 
-type BaseTabProps = { isActive: boolean; [key: string]: unknown };
-
 // Base tab interface
 interface BaseTab<C extends Component<ComponentProps<C>>> {
 	readonly id: string;
-	closable: boolean;
+	isPinned: boolean;
 	component: C;
 	props: Omit<ComponentProps<C>, 'isActive'>;
 	get title(): string;
@@ -28,7 +26,7 @@ interface BaseTab<C extends Component<ComponentProps<C>>> {
 
 export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 	readonly id: string;
-	readonly closable = false;
+	readonly isPinned = true;
 	readonly type = 'overview';
 	readonly component = OverviewTabComponent;
 	readonly props = {};
@@ -44,7 +42,7 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 
 export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubricTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'team_interview_rubric';
 	readonly component = TeamInterviewRubricTabComponent;
 	readonly props = { tab: this };
@@ -71,7 +69,7 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 
 export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'notebook_rubric';
 	readonly component = NotebookRubricTabComponent;
 	readonly props = { tab: this };
@@ -98,7 +96,7 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 
 export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'notebook_sorting';
 	readonly component = NotebookSortingTabComponent;
 	readonly props = { tab: this };
@@ -114,7 +112,7 @@ export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComp
 
 export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'award_ranking';
 	readonly component = AwardRankingTabComponent;
 	readonly props = { tab: this };
@@ -130,7 +128,7 @@ export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent>
 
 export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'award_nomination';
 	readonly component = AwardNominationTabComponent;
 	readonly props = { tab: this };
@@ -146,7 +144,7 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 
 export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'final_award_ranking';
 	readonly component = FinalRankingTabComponent;
 	readonly props = { tab: this };
@@ -162,7 +160,7 @@ export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabCompo
 
 export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 	readonly id: string;
-	readonly closable = true;
+	readonly isPinned = false;
 	readonly type = 'award_winner';
 	readonly component = AwardWinnerTabComponent;
 	readonly props = { tab: this };
@@ -243,9 +241,6 @@ export class TabController {
 		const tabIndex = this.tabs.findIndex((tab) => tab.id === tabId);
 		if (tabIndex === -1) return;
 
-		const tab = this.tabs[tabIndex];
-		if (!tab.closable) return;
-
 		// Remove the tab
 		this.tabs.splice(tabIndex, 1);
 
@@ -267,7 +262,7 @@ export class TabController {
 	 * Close all closable tabs
 	 */
 	closeAllTabs(): void {
-		const closableTabs = this.tabs.filter((tab) => tab.closable);
+		const closableTabs = this.tabs.filter((tab) => tab.isPinned);
 		closableTabs.forEach((tab) => this.closeTab(tab.id));
 	}
 
