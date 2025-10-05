@@ -8,8 +8,10 @@
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);
 	const activeTabId = $derived(tabs.activeTab);
+	const activeTab = $derived(activeTabId ? tabs.getTab(activeTabId) : null);
 	const isJudgingReady = $derived(app.isJudgingReady());
 	const currentJudgeGroupId = $derived(app.getCurrentUserJudgeGroup()?.id ?? null);
+	const isViewingAwardNominationTab = $derived(activeTab?.type === 'award_nomination');
 
 	// Tab handlers
 	function switchTab(tabId: string) {
@@ -27,10 +29,11 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
-		const targetJudgeGroupIds = currentJudgeGroupId //
-			? [currentJudgeGroupId]
-			: app.getAllJudgeGroups().map((group) => group.id);
+		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
+		const targetJudgeGroupIds =
+			!currentJudgeGroupId || isViewingAwardNominationTab //
+				? app.getAllJudgeGroups().map((group) => group.id)
+				: [currentJudgeGroupId];
 
 		console.log('Subscribing to award rankings', targetJudgeGroupIds);
 		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {

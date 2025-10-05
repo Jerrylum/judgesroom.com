@@ -5,6 +5,7 @@
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
+	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
 
 	interface Props {
 		title: string;
@@ -20,7 +21,7 @@
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
-	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]);
+	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]) as AwardRankingsFullUpdate | undefined;
 
 	const allExcellenceAwardWinners = $derived(
 		allExcellenceAwardNames.flatMap((awardName) => finalAwardNominations[awardName]?.map((nom) => nom.teamId) ?? [])
@@ -49,41 +50,47 @@
 		<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
 	</div>
 </div>
-<award-rankings-table>
-	<table-header>
-		<team>TEAM NUMBER</team>
-		<scroll-container use:registerScrollContainer class="bg-gray-200">
-			<content>
-				{#each awardRankings.judgedAwards as award}
-					<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">{award}</div>
-				{/each}
-			</content>
-		</scroll-container>
-	</table-header>
-	<table-body>
-		{#each listingTeams as teamId}
-			{@const team = teams[teamId]}
-			<row>
-				<team>{teams[teamId].number}</team>
-				<scroll-container use:registerScrollContainer>
-					<content>
-						{#each awardRankings.judgedAwards as awardName, awardIndex}
-							{@const award = awards[awardName]}
-							{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
-							{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
-							<NominationButtons
-								{award}
-								{team}
-								judgeGroupId={judgeGroup.id}
-								{ranking}
-								{isNominated}
-								{bypassAwardRequirements}
-								showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
-							/>
-						{/each}
-					</content>
-				</scroll-container>
-			</row>
-		{/each}
-	</table-body>
-</award-rankings-table>
+{#if awardRankings}
+	<award-rankings-table>
+		<table-header>
+			<team>TEAM NUMBER</team>
+			<scroll-container use:registerScrollContainer class="bg-gray-200">
+				<content>
+					{#each awardRankings.judgedAwards as award}
+						<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">{award}</div>
+					{/each}
+				</content>
+			</scroll-container>
+		</table-header>
+		<table-body>
+			{#each listingTeams as teamId}
+				{@const team = teams[teamId]}
+				<row>
+					<team>{teams[teamId].number}</team>
+					<scroll-container use:registerScrollContainer>
+						<content>
+							{#each awardRankings.judgedAwards as awardName, awardIndex}
+								{@const award = awards[awardName]}
+								{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
+								{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
+								<NominationButtons
+									{award}
+									{team}
+									judgeGroupId={judgeGroup.id}
+									{ranking}
+									{isNominated}
+									{bypassAwardRequirements}
+									showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
+								/>
+							{/each}
+						</content>
+					</scroll-container>
+				</row>
+			{/each}
+		</table-body>
+	</award-rankings-table>
+{:else}
+	<div class="flex flex-col items-center justify-center">
+		<p class="text-gray-500">No award rankings found</p>
+	</div>
+{/if}
