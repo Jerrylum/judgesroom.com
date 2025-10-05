@@ -6,9 +6,7 @@ export const subscriptions = sqliteTable(
 	'Subscriptions',
 	{
 		id: text('id').notNull(),
-		judgeGroupId: text('judgeGroupId')
-			.references(() => judgeGroups.id, { onDelete: 'cascade' })
-			.notNull(),
+		judgeGroupId: text('judgeGroupId').references(() => judgeGroups.id, { onDelete: 'cascade' }),
 		topic: text('topic').notNull()
 	},
 	(table) => [primaryKey({ columns: [table.id, table.judgeGroupId, table.topic] })]

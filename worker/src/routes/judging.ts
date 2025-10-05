@@ -27,7 +27,7 @@ import {
 import { AwardNameSchema, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
 import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
-import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeJudgeGroupTopic } from './subscriptions';
+import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeTopic } from './subscriptions';
 import { transaction } from '../utils';
 import { getAwards } from './essential';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
@@ -304,7 +304,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			}),
 
 		unsubscribeReviewedTeams: w.procedure.mutation(async ({ ctx, session }) => {
-			return unsubscribeJudgeGroupTopic(ctx.db, session.currentClient.clientId, 'reviewedTeams');
+			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'reviewedTeams');
 		}),
 
 		updateAwardRanking: w.procedure
@@ -335,7 +335,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			}),
 
 		unsubscribeAwardRankings: w.procedure.mutation(async ({ ctx, session }) => {
-			return unsubscribeJudgeGroupTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
+			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
 		}),
 
 		nominateFinalAward: w.procedure

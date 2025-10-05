@@ -1,9 +1,15 @@
 import { eq, and } from 'drizzle-orm';
 import { subscriptions } from '../db/schema';
 import type { DatabaseOrTransaction } from '../server-router';
-import type { AnyRouter, RouterProxy, Session } from '@judging.jerryio/wrpc/server';
+import type { RouterProxy } from '@judging.jerryio/wrpc/server';
 import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import { transaction } from '../utils';
+
+export type ClientSource = { getClient: (clientId: string) => RouterProxy<ClientRouter> };
+
+export async function subscribeTopic(db: DatabaseOrTransaction, clientId: string, topic: string) {
+	await db.insert(subscriptions).values({ id: clientId, topic }).onConflictDoNothing();
+}
 
 export async function subscribeJudgeGroupTopic(
 	db: DatabaseOrTransaction,
@@ -14,7 +20,7 @@ export async function subscribeJudgeGroupTopic(
 ) {
 	await transaction(db, async (tx) => {
 		if (exclusive) {
-			await unsubscribeJudgeGroupTopic(tx, clientId, topic);
+			await unsubscribeTopic(tx, clientId, topic);
 		}
 		for (const judgeGroupId of judgeGroupIds) {
 			await tx.insert(subscriptions).values({ id: clientId, judgeGroupId, topic }).onConflictDoNothing();
@@ -22,11 +28,11 @@ export async function subscribeJudgeGroupTopic(
 	});
 }
 
-export async function unsubscribeJudgeGroupTopic(db: DatabaseOrTransaction, clientId: string, topic: string) {
+export async function unsubscribeTopic(db: DatabaseOrTransaction, clientId: string, topic: string) {
 	await db.delete(subscriptions).where(and(eq(subscriptions.id, clientId), eq(subscriptions.topic, topic)));
 }
 
-export async function unsubscribeJudgeGroupTopics(db: DatabaseOrTransaction, clientId: string) {
+export async function unsubscribeTopics(db: DatabaseOrTransaction, clientId: string) {
 	await db.delete(subscriptions).where(eq(subscriptions.id, clientId));
 }
 
@@ -34,7 +40,7 @@ export async function broadcastJudgeGroupTopic<T>(
 	db: DatabaseOrTransaction,
 	judgeGroupId: string,
 	topic: string,
-	session: Session<AnyRouter>,
+	source: ClientSource,
 	callback: (client: RouterProxy<ClientRouter>) => Promise<T>
 ): Promise<T[]> {
 	const subscribers = await db
@@ -44,7 +50,23 @@ export async function broadcastJudgeGroupTopic<T>(
 
 	return Promise.all(
 		subscribers.map(async (subscriber) => {
-			return callback(session.getClient<ClientRouter>(subscriber.id));
+			return callback(source.getClient(subscriber.id));
+		})
+	);
+}
+
+export async function broadcastTopic<T>(
+	db: DatabaseOrTransaction,
+	topic: string,
+	source: ClientSource,
+	callback: (client: RouterProxy<ClientRouter>) => Promise<T>
+): Promise<T[]> {
+	
+	const subscribers = await db.select().from(subscriptions).where(eq(subscriptions.topic, topic));
+
+	return Promise.all(
+		subscribers.map(async (subscriber) => {
+			return callback(source.getClient(subscriber.id));
 		})
 	);
 }

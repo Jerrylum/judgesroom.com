@@ -6,7 +6,7 @@ import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
 import { broadcastDeviceListUpdate } from './routes/device';
-import { unsubscribeJudgeGroupTopics } from './routes/subscriptions';
+import { unsubscribeTopics } from './routes/subscriptions';
 
 const IntentionSchema = z.object({
 	sessionId: z.uuidv4(),
@@ -120,12 +120,12 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 		if (clientId) {
 			// Do not wait for the unsubscribe to complete
-			unsubscribeJudgeGroupTopics(this.db, clientId);
+			unsubscribeTopics(this.db, clientId);
 		}
 
 		// Broadcast device list update to all devices
 		// Do not wait for the broadcast to complete
-		broadcastDeviceListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler.broadcast());
+		broadcastDeviceListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler);
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {

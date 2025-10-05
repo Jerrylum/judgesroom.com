@@ -58,7 +58,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 
 			// Broadcast client list update to all clients
 			// Do not wait for the broadcast to complete
-			broadcastDeviceListUpdate(ctx.db, ctx.network, session.broadcast<ClientRouter>());
+			broadcastDeviceListUpdate(ctx.db, ctx.network, session);
 
 			return transaction(ctx.db, async (tx) => {
 				return {

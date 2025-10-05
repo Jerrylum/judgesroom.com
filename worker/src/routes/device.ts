@@ -3,9 +3,9 @@ import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineDevices } from '../db/schema';
 import type { Network } from '@judging.jerryio/wrpc/server';
-import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
-import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { eq } from 'drizzle-orm';
+import { broadcastTopic, ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
 
 export async function getDevices(tx: DatabaseOrTransaction, network: Network) {
 	const listOfOfflineDevices = await tx.select().from(offlineDevices);
@@ -29,9 +29,11 @@ export async function kickDevice(tx: DatabaseOrTransaction, network: Network, de
 	}
 }
 
-export function broadcastDeviceListUpdate(tx: DatabaseOrTransaction, network: Network, broadcast: RouterBroadcastProxy<ClientRouter>) {
+export function broadcastDeviceListUpdate(tx: DatabaseOrTransaction, network: Network, source: ClientSource) {
 	getDevices(tx, network).then((devices) => {
-		broadcast.onDeviceListUpdate.mutation(devices);
+		broadcastTopic(tx, 'deviceList', source, (client) => {
+			return client.onDeviceListUpdate.mutation(devices);
+		});
 	});
 }
 
@@ -41,9 +43,18 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 			return getDevices(ctx.db, ctx.network);
 		}),
 
+		subscribeDeviceList: w.procedure.output(z.array(DeviceInfoSchema)).mutation(async ({ ctx, session }) => {
+			await subscribeTopic(ctx.db, session.currentClient.clientId, 'deviceList');
+			return getDevices(ctx.db, ctx.network);
+		}),
+
+		unsubscribeDeviceList: w.procedure.mutation(async ({ ctx, session }) => {
+			await unsubscribeTopic(ctx.db, session.currentClient.clientId, 'deviceList');
+		}),
+
 		kickDevice: w.procedure.input(z.object({ deviceId: z.string() })).mutation(async ({ ctx, input, session }) => {
 			const result = await kickDevice(ctx.db, ctx.network, input.deviceId);
-			broadcastDeviceListUpdate(ctx.db, ctx.network, session.broadcast<ClientRouter>());
+			broadcastDeviceListUpdate(ctx.db, ctx.network, session);
 			return result;
 		})
 	};

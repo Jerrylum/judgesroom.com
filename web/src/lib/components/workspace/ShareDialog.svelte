@@ -1,11 +1,11 @@
 <script lang="ts">
 	import QRCode from 'qrcode';
-	import type { DeviceInfo } from '@judging.jerryio/protocol/src/client';
 	import { app, dialogs } from '$lib/app-page.svelte';
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state('Copy');
@@ -15,28 +15,10 @@
 	const currentUser = $derived(app.getCurrentUser());
 	const sessionInfo = $derived(app.getSessionInfo());
 	const shareableUrl = $derived(app.getSessionUrl());
-
-	// Check if we're disconnected from server
-	function isDisconnectedFromServer(): boolean {
-		return connectionState !== 'connected';
-	}
-
-	// Get current device info
-	function getCurrentDevice(): Readonly<DeviceInfo> | null {
-		if (!sessionInfo) return null;
-		return devices.find((device) => device.deviceId === sessionInfo.deviceId) || null;
-	}
-
-	// Get other devices (excluding current device)
-	function getOtherDevices(): DeviceInfo[] {
-		if (!sessionInfo) return [];
-		return devices.filter((device) => device.deviceId !== sessionInfo.deviceId);
-	}
-
-	// Check if current user is judge advisor
-	function isJudgeAdvisor(): boolean {
-		return currentUser?.role === 'judge_advisor';
-	}
+	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
+	const currentDevice = $derived(sessionInfo ? devices.find((device) => device.deviceId === sessionInfo.deviceId) : null);
+	const otherDevices = $derived(sessionInfo ? devices.filter((device) => device.deviceId !== sessionInfo.deviceId) : []);
+	const isDisconnectedFromServer = $derived(connectionState !== 'connected');
 
 	// Handle kick device
 	async function handleKickDevice(targetDeviceId: string) {
@@ -97,6 +79,16 @@
 	function handleClose() {
 		dialogs.closeDialog();
 	}
+
+	onMount(() => {
+		app.wrpcClient.device.subscribeDeviceList.mutation().then((devices) => {
+			app.handleDeviceListUpdate(devices);
+		});
+	});
+
+	onDestroy(() => {
+		app.wrpcClient.device.unsubscribeDeviceList.mutation();
+	});
 </script>
 
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">
@@ -152,10 +144,10 @@
 			</div>
 
 			<!-- Right Column: Connected Devices -->
-			<div class="flex lg:max-h-140 flex-1 flex-col space-y-4 overflow-hidden">
+			<div class="lg:max-h-140 flex flex-1 flex-col space-y-4 overflow-hidden">
 				<h4 class="text-lg font-medium text-gray-900">Connected Devices</h4>
 
-				{#if isDisconnectedFromServer()}
+				{#if isDisconnectedFromServer}
 					<div class="rounded-lg bg-red-50 p-4">
 						<div class="flex items-center space-x-2 text-red-800">
 							<DenialIcon />
@@ -174,14 +166,14 @@
 					<!-- Current Device Section -->
 					<div class="space-y-3">
 						<h5 class="text-sm font-medium text-gray-700">Current Device</h5>
-						{#if getCurrentDevice()}
+						{#if currentDevice}
 							<div class="flex items-center justify-between rounded-lg bg-blue-50 p-3">
 								<div class="flex items-center space-x-3">
 									<div class="h-2 w-2 rounded-full bg-blue-500"></div>
 									<div>
-										<div class="font-medium text-gray-900">{getCurrentDevice()!.deviceName}</div>
+										<div class="font-medium text-gray-900">{currentDevice.deviceName}</div>
 										<div class="text-xs text-gray-500">
-											Connected {getConnectionDuration(getCurrentDevice()!.connectedAt)} ago
+											Connected {getConnectionDuration(currentDevice.connectedAt)} ago
 										</div>
 									</div>
 								</div>
@@ -190,12 +182,12 @@
 					</div>
 
 					<!-- Other Devices Section -->
-					{#if getOtherDevices().length > 0}
+					{#if otherDevices.length > 0}
 						<div class="flex min-h-0 flex-col space-y-3">
 							<h5 class="text-sm font-medium text-gray-700">Other Devices</h5>
 
 							<div class="min-h-0 space-y-3 overflow-hidden pr-1 lg:overflow-auto">
-								{#each getOtherDevices() as device (device.deviceId)}
+								{#each otherDevices as device (device.deviceId)}
 									<div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
 										<div class="flex items-center space-x-3">
 											{#if device.isOnline}
@@ -210,7 +202,7 @@
 												</div>
 											</div>
 										</div>
-										{#if isJudgeAdvisor()}
+										{#if isJudgeAdvisor}
 											<button
 												onclick={() => handleKickDevice(device.deviceId)}
 												class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
@@ -225,13 +217,6 @@
 							</div>
 						</div>
 					{/if}
-
-					<!-- End Session Button (Judge Advisor Only) -->
-					<!-- {#if isJudgeAdvisor()}
-						<div class="pt-4">
-							<button onclick={handleEndSession} class="danger tiny w-full">End Session</button>
-						</div>
-					{/if} -->
 				{/if}
 			</div>
 		</div>
