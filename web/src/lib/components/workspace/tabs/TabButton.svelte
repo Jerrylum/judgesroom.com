@@ -12,11 +12,9 @@
 	let { tab, isActive, onClose, isDragging = false }: Props = $props();
 </script>
 
-<div class="group relative flex h-8 select-none items-start justify-start px-2.5 text-xs transition-colors">
-	<div class="z-30 flex h-7 flex-row items-center">
-		<span class="overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900" class:min-w-30={!tab.isPinned}
-			>{tab.title}</span
-		>
+<div class="group relative flex h-8 flex-1 select-none items-start justify-start px-2.5 text-xs transition-colors">
+	<div class="z-30 flex h-7 flex-1 flex-row items-center justify-between">
+		<span class="overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900">{tab.title}</span>
 		{#if !tab.isPinned}
 			<div class="relative">
 				<button

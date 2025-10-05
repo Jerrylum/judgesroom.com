@@ -347,7 +347,7 @@
 <!-- Tab Bar -->
 <div class="overflow-hidden bg-slate-200" style="box-shadow: inset 0px -8px 8px rgba(0, 0, 0, 0.025);">
 	<div class="flex px-6">
-		<div bind:this={tabContainer} class="flex space-x-1">
+		<div bind:this={tabContainer} class="flex space-x-1 flex-1">
 			{#each allTabs as tab, index (`${tab.id} ${dragState.isDragging}`)}
 				{@const isDragging = dragState.isDragging && dragState.draggedTabId === tab.id}
 
@@ -355,7 +355,8 @@
 					role="button"
 					tabindex="0"
 					aria-label={tab.isPinned ? `${tab.title} tab (pinned)` : `Drag to reorder ${tab.title} tab`}
-					class="flex-shrink-0"
+					class="flex"
+					class:basis-36={!tab.isPinned}
 					class:transition-transform={!isDragging}
 					class:duration-150={!isDragging}
 					class:cursor-pointer={tab.isPinned && !isDragging}
