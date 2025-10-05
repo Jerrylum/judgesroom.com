@@ -346,7 +346,7 @@
 
 <!-- Tab Bar -->
 <div class="overflow-hidden bg-slate-200" style="box-shadow: inset 0px -8px 8px rgba(0, 0, 0, 0.025);">
-	<div class="flex px-6">
+	<div class="flex px-2 md:px-6">
 		<div bind:this={tabContainer} class="flex space-x-1 flex-1">
 			{#each allTabs as tab, index (`${tab.id} ${dragState.isDragging}`)}
 				{@const isDragging = dragState.isDragging && dragState.draggedTabId === tab.id}

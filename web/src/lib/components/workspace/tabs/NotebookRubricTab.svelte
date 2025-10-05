@@ -151,8 +151,8 @@
 	}
 </script>
 
-<div class="h-full overflow-auto p-6" bind:this={mainScrollContainer}>
-	<div class="mx-auto max-w-5xl space-y-6">
+<div class="h-full overflow-auto p-2 md:p-6" bind:this={mainScrollContainer}>
+	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">

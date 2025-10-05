@@ -78,8 +78,8 @@
 	}
 </script>
 
-<div class="h-full overflow-auto p-6">
-	<div class="mx-auto max-w-5xl space-y-6">
+<div class="h-full overflow-auto p-2 md:p-6">
+	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Event Overview -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<h2 class="text-lg font-medium text-gray-900">Event Overview</h2>
