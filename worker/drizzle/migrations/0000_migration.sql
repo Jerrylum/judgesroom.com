@@ -51,12 +51,14 @@ CREATE TABLE `JudgeGroups` (
 );
 --> statement-breakpoint
 CREATE TABLE `JudgeGroupsAssignedTeams` (
+	`order` integer NOT NULL,
 	`judgeGroupId` text NOT NULL,
 	`teamId` text PRIMARY KEY NOT NULL,
 	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `JudgeGroupsAssignedTeams_order_unique` ON `JudgeGroupsAssignedTeams` (`order`);--> statement-breakpoint
 CREATE INDEX `assignment` ON `JudgeGroupsAssignedTeams` (`judgeGroupId`,`teamId`);--> statement-breakpoint
 CREATE TABLE `JudgeGroupsReviewedTeams` (
 	`judgeGroupId` text NOT NULL,
@@ -106,7 +108,7 @@ CREATE TABLE `OfflineDevices` (
 --> statement-breakpoint
 CREATE TABLE `Subscriptions` (
 	`id` text NOT NULL,
-	`judgeGroupId` text NOT NULL,
+	`judgeGroupId` text,
 	`topic` text NOT NULL,
 	PRIMARY KEY(`id`, `judgeGroupId`, `topic`),
 	FOREIGN KEY (`judgeGroupId`) REFERENCES `JudgeGroups`(`id`) ON UPDATE no action ON DELETE cascade

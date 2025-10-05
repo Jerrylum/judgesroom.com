@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "01b7f33d-ba83-4494-a0e4-2a3089b5b9ac",
+  "id": "1c6dc070-f673-4884-813c-89d2ccae7421",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -375,6 +375,13 @@
     "JudgeGroupsAssignedTeams": {
       "name": "JudgeGroupsAssignedTeams",
       "columns": {
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "judgeGroupId": {
           "name": "judgeGroupId",
           "type": "text",
@@ -391,6 +398,13 @@
         }
       },
       "indexes": {
+        "JudgeGroupsAssignedTeams_order_unique": {
+          "name": "JudgeGroupsAssignedTeams_order_unique",
+          "columns": [
+            "order"
+          ],
+          "isUnique": true
+        },
         "assignment": {
           "name": "assignment",
           "columns": [
@@ -774,7 +788,7 @@
           "name": "judgeGroupId",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "topic": {
