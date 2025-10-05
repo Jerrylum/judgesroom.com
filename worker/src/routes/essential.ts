@@ -44,10 +44,11 @@ export async function getTeamInfos(db: DatabaseOrTransaction, group?: string): P
 
 export async function getJudgeGroups(db: DatabaseOrTransaction): Promise<JudgeGroup[]> {
 	const rows = await db
-		.select({ id: judgeGroups.id, name: judgeGroups.name, teamId: teams.id })
+		.select({ id: judgeGroups.id, name: judgeGroups.name, teamId: teams.id, order: judgeGroupsAssignedTeams.order })
 		.from(judgeGroups)
 		.leftJoin(judgeGroupsAssignedTeams, eq(judgeGroupsAssignedTeams.judgeGroupId, judgeGroups.id))
-		.leftJoin(teams, eq(teams.id, judgeGroupsAssignedTeams.teamId));
+		.leftJoin(teams, eq(teams.id, judgeGroupsAssignedTeams.teamId))
+		.orderBy(judgeGroupsAssignedTeams.order);
 
 	const groupsMap = new Map<string, JudgeGroup>();
 	for (const row of rows) {
@@ -168,10 +169,15 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 		}
 
 		const assignedTeams = values.flatMap((v) => v.assignedTeams.map((t) => ({ judgeGroupId: v.id, teamId: t })));
+		console.log('assignedTeams', assignedTeams);
+		
 		await tx.delete(judgeGroupsAssignedTeams);
 
-		for (const v of assignedTeams) {
-			await tx.insert(judgeGroupsAssignedTeams).values(v);
+		// for (const v of assignedTeams) {
+		// 	await tx.insert(judgeGroupsAssignedTeams).values(v);
+		// }
+		for (let i = 0; i < assignedTeams.length; i++) {
+			await tx.insert(judgeGroupsAssignedTeams).values({ ...assignedTeams[i], order: i });
 		}
 	}
 

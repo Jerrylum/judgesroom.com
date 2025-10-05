@@ -95,11 +95,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 						set: offlineDevice
 					});
 
-				// TODO :broadcast to all listening devices
-				// Do not wait for the broadcast to complete
-				getDevices(ctx.db, ctx.network).then((devices) => {
-					session.broadcast<ClientRouter>().onDeviceListUpdate.mutation(devices);
-				});
+				// No need to broadcast device list update since it is a new session
 
 				return transaction(ctx.db, async (tx) => {
 					await updateEssentialData(tx, input.essentialData);

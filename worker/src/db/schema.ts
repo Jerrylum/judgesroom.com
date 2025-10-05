@@ -67,6 +67,7 @@ export const judgeGroups = sqliteTable('JudgeGroups', {
 export const judgeGroupsAssignedTeams = sqliteTable(
 	'JudgeGroupsAssignedTeams',
 	{
+		order: integer('order').unique().notNull(),
 		judgeGroupId: text('judgeGroupId')
 			.references(() => judgeGroups.id, { onDelete: 'cascade' })
 			.notNull(),
