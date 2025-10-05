@@ -58,12 +58,12 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		console.log('Subscribing to reviewed teams', currentJudgeGroupId);
-
 		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
 		const targetJudgeGroupIds = currentJudgeGroupId //
 			? [currentJudgeGroupId]
 			: app.getAllJudgeGroups().map((group) => group.id);
+
+		console.log('Subscribing to reviewed teams', targetJudgeGroupIds);
 
 		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
