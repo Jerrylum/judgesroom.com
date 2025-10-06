@@ -112,12 +112,17 @@
 					onclick={addNotebookSortingTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-purple-100 p-2">
-						<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" d="M12 3v18" />
-							<path stroke-linecap="round" stroke-linejoin="round" d="M2 12l2 2 4-4" />
-							<path stroke-linecap="round" stroke-linejoin="round" d="M17 9l5 5m-5 0l5-5" />
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M96 128C83.1 128 71.4 135.8 66.4 147.8C61.4 159.8 64.2 173.5 73.4 182.6L256 365.3L256 480C256 488.5 259.4 496.6 265.4 502.6L329.4 566.6C338.6 575.8 352.3 578.5 364.3 573.5C376.3 568.5 384 556.9 384 544L384 365.3L566.6 182.7C575.8 173.5 578.5 159.8 573.5 147.8C568.5 135.8 556.9 128 544 128L96 128z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Notebook Sorting</div>
@@ -129,15 +134,17 @@
 					onclick={addNotebookReviewTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-green-100 p-2">
-						<svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-							/>
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M480 576L192 576C139 576 96 533 96 480L96 160C96 107 139 64 192 64L496 64C522.5 64 544 85.5 544 112L544 400C544 420.9 530.6 438.7 512 445.3L512 512C529.7 512 544 526.3 544 544C544 561.7 529.7 576 512 576L480 576zM192 448C174.3 448 160 462.3 160 480C160 497.7 174.3 512 192 512L448 512L448 448L192 448zM224 216C224 229.3 234.7 240 248 240L424 240C437.3 240 448 229.3 448 216C448 202.7 437.3 192 424 192L248 192C234.7 192 224 202.7 224 216zM248 288C234.7 288 224 298.7 224 312C224 325.3 234.7 336 248 336L424 336C437.3 336 448 325.3 448 312C448 298.7 437.3 288 424 288L248 288z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Notebook Review</div>
@@ -149,15 +156,17 @@
 					onclick={addTeamInterviewTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-blue-100 p-2">
-						<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-							/>
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M416 208C416 305.2 330 384 224 384C197.3 384 171.9 379 148.8 370L67.2 413.2C57.9 418.1 46.5 416.4 39 409C31.5 401.6 29.8 390.1 34.8 380.8L70.4 313.6C46.3 284.2 32 247.6 32 208C32 110.8 118 32 224 32C330 32 416 110.8 416 208zM416 576C321.9 576 243.6 513.9 227.2 432C347.2 430.5 451.5 345.1 463 229.3C546.3 248.5 608 317.6 608 400C608 439.6 593.7 476.2 569.6 505.6L605.2 572.8C610.1 582.1 608.4 593.5 601 601C593.6 608.5 582.1 610.2 572.8 605.2L491.2 562C468.1 571 442.7 576 416 576z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Team Interview</div>
@@ -169,15 +178,17 @@
 					onclick={addAwardRankingTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-yellow-100 p-2">
-						<svg class="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-							/>
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M353.8 118.1L330.2 70.3C326.3 62 314.1 61.7 309.8 70.3L286.2 118.1L233.9 125.6C224.6 127 220.6 138.5 227.5 145.4L265.5 182.4L256.5 234.5C255.1 243.8 264.7 251 273.3 246.7L320.2 221.9L366.8 246.3C375.4 250.6 385.1 243.4 383.6 234.1L374.6 182L412.6 145.4C419.4 138.6 415.5 127.1 406.2 125.6L353.9 118.1zM288 320C261.5 320 240 341.5 240 368L240 528C240 554.5 261.5 576 288 576L352 576C378.5 576 400 554.5 400 528L400 368C400 341.5 378.5 320 352 320L288 320zM80 384C53.5 384 32 405.5 32 432L32 528C32 554.5 53.5 576 80 576L144 576C170.5 576 192 554.5 192 528L192 432C192 405.5 170.5 384 144 384L80 384zM448 496L448 528C448 554.5 469.5 576 496 576L560 576C586.5 576 608 554.5 608 528L608 496C608 469.5 586.5 448 560 448L496 448C469.5 448 448 469.5 448 496z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Award Ranking</div>
@@ -189,10 +200,17 @@
 					onclick={addAwardNominationTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-orange-100 p-2">
-						<svg class="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M584 352C597.3 352 608 362.7 608 376L608 480C608 515.3 579.3 544 544 544L96 544C60.7 544 32 515.3 32 480L32 376C32 362.7 42.7 352 56 352C69.3 352 80 362.7 80 376L80 480C80 488.8 87.2 496 96 496L544 496C552.8 496 560 488.8 560 480L560 376C560 362.7 570.7 352 584 352zM448 96C483.3 96 512 124.7 512 160L512 384C512 419.3 483.3 448 448 448L192 448C156.7 448 128 419.3 128 384L128 160C128 124.7 156.7 96 192 96L448 96zM410.9 180.6C400.2 172.8 385.2 175.2 377.4 185.9L291.8 303.6L265.3 276.2C256.1 266.7 240.9 266.4 231.4 275.6C221.9 284.8 221.6 300 230.8 309.5L277.2 357.5C282.1 362.6 289 365.3 296.1 364.8C303.2 364.3 309.7 360.7 313.9 355L416.2 214.1C424 203.4 421.6 188.4 410.9 180.6z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Award Nomination</div>
@@ -204,10 +222,17 @@
 					onclick={addFinalRankingTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-purple-100 p-2">
-						<svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v7H3v-7zm6-6h4v13H9V7zm6 3h4v10h-4V10z" />
-						</svg>
+					<div class="rounded-full bg-slate-300 p-2">
+						<svg
+							class="h-5 w-5 text-slate-600"
+							fill="currentColor"
+							stroke="currentColor"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 640 640"
+							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+								d="M256 144C256 117.5 277.5 96 304 96L336 96C362.5 96 384 117.5 384 144L384 496C384 522.5 362.5 544 336 544L304 544C277.5 544 256 522.5 256 496L256 144zM64 336C64 309.5 85.5 288 112 288L144 288C170.5 288 192 309.5 192 336L192 496C192 522.5 170.5 544 144 544L112 544C85.5 544 64 522.5 64 496L64 336zM496 160L528 160C554.5 160 576 181.5 576 208L576 496C576 522.5 554.5 544 528 544L496 544C469.5 544 448 522.5 448 496L448 208C448 181.5 469.5 160 496 160z"
+							/></svg
+						>
 					</div>
 					<div>
 						<div class="font-medium">Final Ranking</div>
@@ -219,9 +244,9 @@
 					onclick={addAwardWinnerTab}
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
 				>
-					<div class="rounded-full bg-emerald-100 p-2">
+					<div class="rounded-full bg-slate-300 p-2">
 						<svg
-							class="h-5 w-5 text-emerald-600"
+							class="h-5 w-5 text-slate-600"
 							fill="currentColor"
 							stroke="currentColor"
 							xmlns="http://www.w3.org/2000/svg"

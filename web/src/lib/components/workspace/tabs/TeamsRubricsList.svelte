@@ -113,14 +113,14 @@
 
 <div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
 	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics ({teamList.length} teams)</h2>
-	<button
+	<!-- <button
 		onclick={refreshRubricsAndNotes}
 		class="inline-flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 active:bg-gray-100 sm:w-auto sm:justify-start"
 		aria-label="Refresh teams and rubrics"
 	>
 		<RefreshIcon />
 		<span>Refresh</span>
-	</button>
+	</button> -->
 </div>
 
 {#if isAssignedJudging && currentJudgeGroup}
