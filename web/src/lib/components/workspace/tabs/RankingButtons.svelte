@@ -3,6 +3,7 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
+	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';
 
 	interface Props {
 		awardIndex: number;
@@ -20,7 +21,7 @@
 	let touchTimeout: ReturnType<typeof setTimeout> | null = null;
 	let ranking = $derived(awardRankings.rankings?.[team.id]?.[awardIndex] ?? 0);
 
-	const isMeetNotebookRequirement = $derived(award.requireNotebook ? team.isDevelopedNotebook !== null : true);
+	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
 

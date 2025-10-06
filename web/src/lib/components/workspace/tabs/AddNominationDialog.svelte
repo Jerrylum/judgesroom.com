@@ -2,6 +2,7 @@
 	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';
 
 	interface Props {
 		open: boolean;
@@ -45,7 +46,7 @@
 
 			// Hide teams that don't meet award requirements unless bypassing
 			if (!bypassRequirements) {
-				const meetNotebookReq = award.requireNotebook ? team.isDevelopedNotebook !== null : true;
+				const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true;
 				const meetGradeReq = award.acceptedGrades.includes(team.grade);
 
 				if (!meetNotebookReq || !meetGradeReq) {
@@ -65,7 +66,7 @@
 	let meetRequirements = $derived(() => {
 		if (!selectedTeam || bypassRequirements) return true;
 
-		const meetNotebookReq = award.requireNotebook ? selectedTeam.isDevelopedNotebook !== null : true;
+		const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(selectedTeam.notebookDevelopmentStatus) : true;
 		const meetGradeReq = award.acceptedGrades.includes(selectedTeam.grade);
 
 		return meetNotebookReq && meetGradeReq;
@@ -78,7 +79,7 @@
 		if (!selectedTeam || bypassRequirements || meetRequirementsValue) return [];
 
 		const warnings = [];
-		if (award.requireNotebook && selectedTeam.isDevelopedNotebook === null) {
+		if (award.requireNotebook && !isSubmittedNotebook(selectedTeam.notebookDevelopmentStatus)) {
 			warnings.push('Notebook required');
 		}
 		if (!award.acceptedGrades.includes(selectedTeam.grade)) {

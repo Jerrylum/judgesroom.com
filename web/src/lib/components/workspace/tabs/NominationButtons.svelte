@@ -2,6 +2,7 @@
 	import { app } from '$lib/app-page.svelte';
 	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';
 
 	interface Props {
 		award: Award;
@@ -15,7 +16,7 @@
 
 	let { award, team, judgeGroupId, ranking, isNominated, bypassAwardRequirements, showExcellenceAwardWinners }: Props = $props();
 
-	const isMeetNotebookRequirement = $derived(award.requireNotebook ? team.isDevelopedNotebook !== null : true);
+	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
 

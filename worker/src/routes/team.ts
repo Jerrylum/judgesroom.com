@@ -13,7 +13,7 @@ export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]
 		.select({
 			id: teams.id,
 			notebookLink: teams.notebookLink,
-			isDevelopedNotebook: teams.isDevelopedNotebook,
+			notebookDevelopmentStatus: teams.notebookDevelopmentStatus,
 			excluded: teams.excluded
 		})
 		.from(teams) as Promise<TeamData[]>;

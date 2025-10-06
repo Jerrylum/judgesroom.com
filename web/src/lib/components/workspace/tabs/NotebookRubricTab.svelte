@@ -4,7 +4,7 @@
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
-	import { sortByAssignedTeams, sortByIsDevelopedNotebook, sortByTeamNumber } from '$lib/team.svelte';
+	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
@@ -66,7 +66,7 @@
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
 			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
 		} else {
-			return sortByIsDevelopedNotebook(sortByTeamNumber(Object.values(includedTeams)));
+			return sortByNotebookDevelopmentStatus(sortByTeamNumber(Object.values(includedTeams)));
 		}
 	});
 
@@ -94,10 +94,10 @@
 		try {
 			const selectedTeam = includedTeams[tab.teamId];
 			// If the notebook is developing or not reviewed, mark it as fully developed
-			if (selectedTeam.isDevelopedNotebook !== true) {
+			if (selectedTeam.notebookDevelopmentStatus !== 'fully_developed') {
 				await app.wrpcClient.team.updateTeamData.mutation({
 					...selectedTeam,
-					isDevelopedNotebook: true
+					notebookDevelopmentStatus: 'fully_developed'
 				});
 			}
 
@@ -163,8 +163,8 @@
 				<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full" disabled={isSubmitted}>
 					<option value="">Select a team...</option>
 					{#each teamsToShow() as team (team.id)}
-						{@const isDeveloped = team.isDevelopedNotebook ?? null}
-						{@const statusText = isDeveloped === true ? ' (Fully Developed)' : isDeveloped === false ? ' (Developing)' : ''}
+						{@const devStatus = team.notebookDevelopmentStatus ?? null}
+						{@const statusText = devStatus === 'fully_developed' ? ' (Fully Developed)' : devStatus === 'developing' ? ' (Developing)' : ''}
 						<option value={team.id}>{team.number}{statusText}</option>
 					{/each}
 				</select>
@@ -185,7 +185,7 @@
 			{#if tab.teamId}
 				{@const selectedTeam = includedTeams[tab.teamId]}
 				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
-				{@const isDeveloped = selectedTeam.isDevelopedNotebook ?? null}
+				{@const devStatus = selectedTeam.notebookDevelopmentStatus}
 				<div class="mb-4 rounded-lg bg-gray-50 p-4">
 					<div class=" text-sm text-gray-800">
 						<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -202,7 +202,7 @@
 					</div>
 				</div>
 
-				{#if isDeveloped !== true}
+				{#if devStatus !== 'fully_developed'}
 					<WarningSign title="Developing Notebook">
 						<p>
 							Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will be

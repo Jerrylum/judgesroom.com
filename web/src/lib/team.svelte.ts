@@ -3,7 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { List } from './list.svelte';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
-import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
+import {
+	type TeamInfo,
+	type TeamData,
+	TeamNumberSchema,
+	TeamGroupNameSchema,
+	type NotebookDevelopmentStatus
+} from '@judging.jerryio/protocol/src/team';
 
 export type TeamInfoAndData = TeamInfo & TeamData;
 
@@ -34,11 +40,16 @@ export function createTeamInfo(
 	};
 }
 
-export function createTeamData(id: string, notebookLink: string, isDevelopedNotebook: boolean | null, excluded: boolean): TeamData {
+export function createTeamData(
+	id: string,
+	notebookLink: string,
+	notebookDevelopmentStatus: NotebookDevelopmentStatus,
+	excluded: boolean
+): TeamData {
 	return {
 		id,
 		notebookLink,
-		isDevelopedNotebook,
+		notebookDevelopmentStatus,
 		excluded
 	};
 }
@@ -344,7 +355,7 @@ export function mergeTeamData(
 			team.group || ''
 		);
 
-		const teamData = createTeamData(id, notebookLink, team.isDevelopedNotebook ?? null, team.excluded || false);
+		const teamData = createTeamData(id, notebookLink, team.notebookDevelopmentStatus ?? 'undetermined', team.excluded || false);
 
 		return new EditingTeam(teamInfo, teamData);
 	});
@@ -411,15 +422,17 @@ export function sortByAssignedTeams(
 	return assignedTeamIds.map((id) => includedTeams[id]);
 }
 
-export function sortByIsDevelopedNotebook(teams: TeamInfoAndData[]): TeamInfoAndData[] {
+export function sortByNotebookDevelopmentStatus(teams: TeamInfoAndData[]): TeamInfoAndData[] {
 	return teams.sort((a, b) => {
-		const aIsDeveloped = a.isDevelopedNotebook ?? null;
-		const bIsDeveloped = b.isDevelopedNotebook ?? null;
+		const aIsDeveloped = a.notebookDevelopmentStatus;
+		const bIsDeveloped = b.notebookDevelopmentStatus;
 		if (aIsDeveloped !== bIsDeveloped) {
-			if (aIsDeveloped) return -1;
-			if (bIsDeveloped) return 1;
-			if (aIsDeveloped === false) return -1;
-			if (bIsDeveloped === false) return 1;
+			if (aIsDeveloped === 'fully_developed') return -1;
+			if (bIsDeveloped === 'fully_developed') return 1;
+			if (aIsDeveloped === 'developing') return -1;
+			if (bIsDeveloped === 'developing') return 1;
+			if (aIsDeveloped === 'not_submitted') return -1;
+			if (bIsDeveloped === 'not_submitted') return 1;
 		}
 		return 0;
 	});

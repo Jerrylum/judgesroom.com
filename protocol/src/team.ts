@@ -32,11 +32,19 @@ export const TeamInfoSchema = z.object({
 
 export type TeamInfo = z.infer<typeof TeamInfoSchema>;
 
+export const NotebookDevelopmentStatusSchema = z.enum(['undetermined', 'not_submitted', 'developing', 'fully_developed']);
+
+export type NotebookDevelopmentStatus = z.infer<typeof NotebookDevelopmentStatusSchema>;
+
 export const TeamDataSchema = z.object({
 	id: z.uuidv4(),
 	notebookLink: z.string(),
-	isDevelopedNotebook: z.boolean().nullable(),
+	notebookDevelopmentStatus: NotebookDevelopmentStatusSchema,
 	excluded: z.boolean()
 });
 
 export type TeamData = z.infer<typeof TeamDataSchema>;
+
+export function isSubmittedNotebook(notebookDevelopmentStatus: NotebookDevelopmentStatus): boolean {
+	return notebookDevelopmentStatus === 'fully_developed' || notebookDevelopmentStatus === 'developing';
+}

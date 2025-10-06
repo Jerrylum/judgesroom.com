@@ -7,6 +7,7 @@
 	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
+	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 
 	const teams = $derived(app.getAllTeamInfoAndData());
 
@@ -78,10 +79,10 @@
 	}
 
 	// Get notebook status display
-	function getNotebookStatus(isDevelopedNotebook: boolean | null | undefined) {
-		if (isDevelopedNotebook === true) return { text: 'Fully Developed', class: 'text-green-600' };
-		if (isDevelopedNotebook === false) return { text: 'Developing', class: 'text-yellow-600' };
-		return { text: 'Not Reviewed', class: 'text-gray-600' };
+	function getNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
+		if (notebookDevelopmentStatus === 'fully_developed') return { text: 'Fully Developed', class: 'text-green-600' };
+		if (notebookDevelopmentStatus === 'developing') return { text: 'Developing', class: 'text-yellow-600' };
+		return { text: 'No Notebook/Not Reviewed', class: 'text-gray-600' };
 	}
 
 	// Get judge name by ID
@@ -140,7 +141,7 @@
 	{#each teamList as teamId (teamId)}
 		{@const team = teams[teamId]}
 		{@const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam()}
-		{@const notebookStatus = getNotebookStatus(team.isDevelopedNotebook)}
+		{@const notebookStatus = getNotebookStatus(team.notebookDevelopmentStatus)}
 		<div class="rounded-lg border border-gray-200 p-4">
 			<!-- Team Header -->
 			<div class="mb-3 flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">

@@ -151,7 +151,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'High School',
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
-		isDevelopedNotebook: null,
+		notebookDevelopmentStatus: 'undetermined',
 		excluded: false
 	},
 	{
@@ -166,7 +166,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'Middle School',
 		group: 'Group B',
 		notebookLink: 'https://example.com/notebook',
-		isDevelopedNotebook: null,
+		notebookDevelopmentStatus: 'undetermined',
 		excluded: false
 	},
 	{
@@ -181,7 +181,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'High School',
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
-		isDevelopedNotebook: null,
+		notebookDevelopmentStatus: 'undetermined',
 		excluded: false
 	},
 	{
@@ -196,7 +196,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'Middle School',
 		group: 'Group C',
 		notebookLink: 'https://example.com/notebook',
-		isDevelopedNotebook: null,
+		notebookDevelopmentStatus: 'undetermined',
 		excluded: false
 	}
 ];

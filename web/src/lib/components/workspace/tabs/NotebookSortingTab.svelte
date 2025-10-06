@@ -5,6 +5,7 @@
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
+	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -34,9 +35,9 @@
 	});
 
 	// Function to update notebook development status
-	async function updateNotebookStatus(teamId: string, isDeveloped: boolean | null) {
+	async function updateNotebookStatus(teamId: string, notebookDevelopmentStatus: NotebookDevelopmentStatus) {
 		try {
-			await app.wrpcClient.team.updateTeamData.mutation({ ...includedTeams[teamId], isDevelopedNotebook: isDeveloped });
+			await app.wrpcClient.team.updateTeamData.mutation({ ...includedTeams[teamId], notebookDevelopmentStatus });
 		} catch (error) {
 			app.addErrorNotice('Failed to update notebook status');
 		}
@@ -103,7 +104,7 @@
 				<div class="space-y-4">
 					{#each teamsToShow() as team (team.id)}
 						{@const notebookLink = team.notebookLink || ''}
-						{@const isDeveloped = team.isDevelopedNotebook ?? null}
+						{@const devStatus = team.notebookDevelopmentStatus}
 
 						<div class="rounded-lg border border-gray-200 p-4">
 							<div class="flex flex-col space-y-4 md:flex-row md:items-start md:justify-between md:space-y-0">
@@ -112,7 +113,9 @@
 										<h4 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-medium text-gray-900">
 											<span>{team.number} - {team.name}</span>
 											{#if team.excluded}
-												<span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Excluded from judged awards</span>
+												<span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800"
+													>Excluded from judged awards</span
+												>
 											{/if}
 											<button
 												onclick={() => openEditTeamDataDialog(team)}
@@ -145,24 +148,27 @@
 									<div class="mb-2 text-sm font-medium text-gray-700">Notebook Status:</div>
 									<div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1 md:space-y-0">
 										<button
-											onclick={() => updateNotebookStatus(team.id, true)}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === true
+											onclick={() => updateNotebookStatus(team.id, 'fully_developed')}
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
+											'fully_developed'
 												? 'border-green-300 bg-green-50 text-green-700'
 												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
 											<span class="mr-1">✓</span> Fully Developed
 										</button>
 										<button
-											onclick={() => updateNotebookStatus(team.id, false)}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === false
+											onclick={() => updateNotebookStatus(team.id, 'developing')}
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
+											'developing'
 												? 'border-yellow-300 bg-yellow-50 text-yellow-700'
 												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
 											<span class="mr-1">⚠</span> Developing
 										</button>
 										<button
-											onclick={() => updateNotebookStatus(team.id, null)}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {isDeveloped === null
+											onclick={() => updateNotebookStatus(team.id, 'not_submitted')}
+											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
+											'not_submitted'
 												? 'border-gray-300 bg-gray-100 text-gray-700'
 												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
 										>
@@ -170,9 +176,11 @@
 										</button>
 									</div>
 
-									{#if isDeveloped === true}
+									{#if devStatus === 'fully_developed'}
 										<div class="mt-3">
-											<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full touch-manipulation"> Start Notebook Rubric </button>
+											<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full touch-manipulation">
+												Start Notebook Rubric
+											</button>
 										</div>
 									{/if}
 								</div>

@@ -12,7 +12,7 @@ import {
 	groupTeamsByGroup
 } from './team.svelte';
 import { v4 as uuidv4 } from 'uuid';
-import { type TeamInfo, type TeamData } from '@judging.jerryio/protocol/src/team';
+import { type TeamInfo, type TeamData, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
 
 describe('TeamInfo Class', () => {
@@ -73,7 +73,7 @@ describe('TeamData Class', () => {
 	let teamData: TeamData;
 
 	beforeEach(() => {
-		teamData = createTeamData(uuidv4(), 'https://example.com/notebook', null, false);
+		teamData = createTeamData(uuidv4(), 'https://example.com/notebook', 'undetermined', false);
 	});
 
 	it('should create a TeamData instance with correct properties', () => {
@@ -108,7 +108,7 @@ describe('Team Class', () => {
 			'High School',
 			'123'
 		);
-		teamData = createTeamData(teamInfo.id, 'https://example.com/notebook', null, false);
+		teamData = createTeamData(teamInfo.id, 'https://example.com/notebook', 'undetermined', false);
 		team = new EditingTeam(teamInfo, teamData);
 	});
 
@@ -169,11 +169,11 @@ describe('EditingTeamList Class', () => {
 		teams = [
 			new EditingTeam(
 				createTeamInfo(teamId1, '123A', 'Team A', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamId1, 'https://example.com/notebook-a', null, false)
+				createTeamData(teamId1, 'https://example.com/notebook-a', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamId2, '456B', 'Team B', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
-				createTeamData(teamId2, 'https://example.com/notebook-b', null, false)
+				createTeamData(teamId2, 'https://example.com/notebook-b', 'undetermined', false)
 			)
 		];
 		teamList = new EditingTeamList(teams);
@@ -194,7 +194,7 @@ describe('EditingTeamList Class', () => {
 		const teamId3 = uuidv4();
 		const newTeam = new EditingTeam(
 			createTeamInfo(teamId3, '789C', 'Team C', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
-			createTeamData(teamId3, 'https://example.com/notebook-c', null, false)
+			createTeamData(teamId3, 'https://example.com/notebook-c', 'undetermined', false)
 		);
 
 		teamList.push(newTeam);
@@ -575,7 +575,7 @@ describe('mergeTeamData', () => {
 		expect(result[0].grade).toBe('College');
 		expect(result[0].group).toBe('');
 		expect(result[0].excluded).toBe(false);
-		expect(result[0].data.isDevelopedNotebook).toBe(null);
+		expect(result[0].data.notebookDevelopmentStatus).toBe('undetermined');
 	});
 
 	it('should reuse existing team IDs when existing teams are provided', () => {
@@ -596,7 +596,7 @@ describe('mergeTeamData', () => {
 					'College',
 					'123'
 				),
-				createTeamData(existingTeamId1, 'https://old-notebook.com', true, false)
+				createTeamData(existingTeamId1, 'https://old-notebook.com', 'fully_developed', false)
 			),
 			new EditingTeam(
 				createTeamInfo(
@@ -611,7 +611,7 @@ describe('mergeTeamData', () => {
 					'Elementary School',
 					'456'
 				),
-				createTeamData(existingTeamId2, 'https://old-beta-notebook.com', false, true)
+				createTeamData(existingTeamId2, 'https://old-beta-notebook.com', 'fully_developed', false)
 			)
 		];
 
@@ -665,24 +665,24 @@ describe('mergeTeamData', () => {
 		expect(result[1].notebookLink).toBe('https://example.com/notebook-c');
 	});
 
-	it('should handle isDevelopedNotebook field properly', () => {
+	it('should handle notebookDevelopmentStatus field properly', () => {
 		const csvTeams = [
 			{
 				number: '123A',
 				name: 'Team Alpha',
-				isDevelopedNotebook: true,
+				notebookDevelopmentStatus: 'fully_developed' as NotebookDevelopmentStatus,
 				excluded: false
 			},
 			{
 				number: '456B',
 				name: 'Team Beta',
-				isDevelopedNotebook: false,
+				notebookDevelopmentStatus: 'not_submitted' as NotebookDevelopmentStatus,
 				excluded: true
 			},
 			{
 				number: '789C',
 				name: 'Team Charlie',
-				// isDevelopedNotebook not specified (should default to null)
+				// notebookDevelopmentStatus not specified (should default to 'undetermined')
 				excluded: false
 			}
 		];
@@ -692,11 +692,11 @@ describe('mergeTeamData', () => {
 		const result = mergeTeamData(csvTeams, notebookLinks);
 
 		expect(result).toHaveLength(3);
-		expect(result[0].data.isDevelopedNotebook).toBe(true);
+		expect(result[0].data.notebookDevelopmentStatus).toBe('fully_developed');
 		expect(result[0].excluded).toBe(false);
-		expect(result[1].data.isDevelopedNotebook).toBe(false);
+		expect(result[1].data.notebookDevelopmentStatus).toBe('not_submitted');
 		expect(result[1].excluded).toBe(true);
-		expect(result[2].data.isDevelopedNotebook).toBe(null);
+		expect(result[2].data.notebookDevelopmentStatus).toBe('undetermined');
 		expect(result[2].excluded).toBe(false);
 	});
 
@@ -718,7 +718,7 @@ describe('mergeTeamData', () => {
 					'High School',
 					'123'
 				),
-				createTeamData(existingTeamId1, 'https://existing-notebook-a.com', null, false)
+				createTeamData(existingTeamId1, 'https://existing-notebook-a.com', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(
@@ -733,7 +733,7 @@ describe('mergeTeamData', () => {
 					'College',
 					'789'
 				),
-				createTeamData(existingTeamId3, 'https://existing-notebook-c.com', true, false)
+				createTeamData(existingTeamId3, 'https://existing-notebook-c.com', 'undetermined', false)
 			)
 		];
 
@@ -830,7 +830,7 @@ describe('mergeTeamData', () => {
 				grade: 'High School' as Grade,
 				group: '123',
 				excluded: true,
-				isDevelopedNotebook: true
+				notebookDevelopmentStatus: 'fully_developed' as NotebookDevelopmentStatus
 			}
 		];
 
@@ -861,7 +861,7 @@ describe('mergeTeamData', () => {
 		// Verify all data properties
 		expect(team.data.notebookLink).toBe('https://example.com/notebook-a');
 		expect(team.data.excluded).toBe(true);
-		expect(team.data.isDevelopedNotebook).toBe(true);
+		expect(team.data.notebookDevelopmentStatus).toBe('fully_developed');
 
 		// Verify convenience getters work
 		expect(team.number).toBe('123A');
@@ -890,19 +890,19 @@ describe('groupTeamsByGroup', () => {
 		teams = [
 			new EditingTeam(
 				createTeamInfo(teamIdA, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamIdA, 'https://example.com/notebook-a', null, false)
+				createTeamData(teamIdA, 'https://example.com/notebook-a', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamIdB, '123B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'High School', '123'),
-				createTeamData(teamIdB, 'https://example.com/notebook-b', null, false)
+				createTeamData(teamIdB, 'https://example.com/notebook-b', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamIdC, '456C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'Middle School', '456'),
-				createTeamData(teamIdC, 'https://example.com/notebook-c', null, false)
+				createTeamData(teamIdC, 'https://example.com/notebook-c', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamIdD, '789D', 'Team Delta', 'City D', 'State D', 'Country D', 'TD', 'School D', 'College', ''),
-				createTeamData(teamIdD, 'https://example.com/notebook-d', null, false)
+				createTeamData(teamIdD, 'https://example.com/notebook-d', 'undetermined', false)
 			)
 		];
 	});
@@ -947,15 +947,15 @@ describe('groupTeamsByGroup', () => {
 		const letterTeams = [
 			new EditingTeam(
 				createTeamInfo(appleId, 'APPLE', 'Team Apple', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', 'APPLE'),
-				createTeamData(appleId, 'https://example.com/notebook-apple', null, false)
+				createTeamData(appleId, 'https://example.com/notebook-apple', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(banana1Id, 'BANANA1', 'Team Banana 1', 'City B', 'State B', 'Country B', 'TB1', 'School B', 'High School', 'BANANA'),
-				createTeamData(banana1Id, 'https://example.com/notebook-banana1', null, false)
+				createTeamData(banana1Id, 'https://example.com/notebook-banana1', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(banana2Id, 'BANANA2', 'Team Banana 2', 'City C', 'State C', 'Country C', 'TB2', 'School C', 'High School', 'BANANA'),
-				createTeamData(banana2Id, 'https://example.com/notebook-banana2', null, false)
+				createTeamData(banana2Id, 'https://example.com/notebook-banana2', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(
@@ -970,7 +970,7 @@ describe('groupTeamsByGroup', () => {
 					'Middle School',
 					'CHERRY'
 				),
-				createTeamData(cherry3Id, 'https://example.com/notebook-cherry3', null, false)
+				createTeamData(cherry3Id, 'https://example.com/notebook-cherry3', 'undetermined', false)
 			)
 		];
 
@@ -996,23 +996,23 @@ describe('groupTeamsByGroup', () => {
 		const mixedTeams = [
 			new EditingTeam(
 				createTeamInfo(blrs1Id, 'BLRS1', 'BLRS Team 1', 'City A', 'State A', 'Country A', 'B1', 'School A', 'High School', 'BLRS'),
-				createTeamData(blrs1Id, 'https://example.com/notebook-blrs1', null, false)
+				createTeamData(blrs1Id, 'https://example.com/notebook-blrs1', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(blrs2Id, 'BLRS2', 'BLRS Team 2', 'City B', 'State B', 'Country B', 'B2', 'School B', 'High School', 'BLRS'),
-				createTeamData(blrs2Id, 'https://example.com/notebook-blrs2', null, false)
+				createTeamData(blrs2Id, 'https://example.com/notebook-blrs2', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(team99aId, 'TEAM99A', 'Team 99A', 'City C', 'State C', 'Country C', 'T99A', 'School C', 'Middle School', 'TEAM99'),
-				createTeamData(team99aId, 'https://example.com/notebook-team99a', null, false)
+				createTeamData(team99aId, 'https://example.com/notebook-team99a', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(team99bId, 'TEAM99B', 'Team 99B', 'City D', 'State D', 'Country D', 'T99B', 'School D', 'Middle School', 'TEAM99'),
-				createTeamData(team99bId, 'https://example.com/notebook-team99b', null, false)
+				createTeamData(team99bId, 'https://example.com/notebook-team99b', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(abc123xId, 'ABC123X', 'ABC 123 X', 'City E', 'State E', 'Country E', 'A123X', 'School E', 'College', 'ABC123'),
-				createTeamData(abc123xId, 'https://example.com/notebook-abc123x', null, false)
+				createTeamData(abc123xId, 'https://example.com/notebook-abc123x', 'undetermined', false)
 			)
 		];
 
