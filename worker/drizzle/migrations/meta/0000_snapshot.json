@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1c6dc070-f673-4884-813c-89d2ccae7421",
+  "id": "ca6a8f08-77dd-4d71-a8ac-09c597e90014",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -1076,12 +1076,13 @@
           "autoincrement": false,
           "default": "''"
         },
-        "isDevelopedNotebook": {
-          "name": "isDevelopedNotebook",
-          "type": "integer",
+        "notebookDevelopmentStatus": {
+          "name": "notebookDevelopmentStatus",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'undetermined'"
         },
         "excluded": {
           "name": "excluded",
