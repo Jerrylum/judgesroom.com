@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, tabs } from '$lib/app-page.svelte';
+	import { app, dialogs, tabs } from '$lib/app-page.svelte';
 	import {
 		AwardNominationTab,
 		AwardRankingTab,
@@ -16,6 +16,12 @@
 	}
 
 	let { isActive }: Props = $props();
+
+	const currentUser = $derived(app.getCurrentUser());
+	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
+	const essentialData = $derived(app.getEssentialData());
+	const judgingStep = $derived(essentialData?.judgingStep || 'beginning');
+	const isAwardDeliberationStarted = $derived(judgingStep === 'award_deliberations');
 
 	function addTeamInterviewTab() {
 		tabs.addTab(new TeamInterviewRubricTab({ teamId: '' }));
@@ -76,6 +82,28 @@
 			tabs.addTab(new AwardWinnerTab());
 		}
 	}
+
+	async function startAwardDeliberation() {
+		const confirmed = await dialogs.showConfirmation({
+			title: 'Start Award Deliberation',
+			message: 'This will unlock award deliberation functions for all judges for the last step in the judging process. Rubrics can still be submitted. Please confirm to proceed.',
+			confirmText: 'Start Deliberation',
+			cancelText: 'Cancel',
+			confirmButtonClass: 'primary'
+		});
+
+		if (!confirmed) {
+			return;
+		}
+
+		try {
+			await app.wrpcClient.judging.startAwardDeliberation.mutation();
+			app.addSuccessNotice('Award deliberation started! All judges can now access award deliberation functions.');
+		} catch (error) {
+			console.error('Failed to start award deliberation:', error);
+			app.addErrorNotice('Failed to start award deliberation');
+		}
+	}
 </script>
 
 <div class="h-full overflow-auto p-2 md:p-6">
@@ -110,7 +138,7 @@
 			<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 				<button
 					onclick={addNotebookSortingTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
 						<svg
@@ -132,7 +160,7 @@
 
 				<button
 					onclick={addNotebookReviewTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
 						<svg
@@ -154,7 +182,7 @@
 
 				<button
 					onclick={addTeamInterviewTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
 						<svg
@@ -176,7 +204,7 @@
 
 				<button
 					onclick={addAwardRankingTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
+					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
 						<svg
@@ -196,71 +224,94 @@
 					</div>
 				</button>
 
-				<button
-					onclick={addAwardNominationTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-				>
-					<div class="rounded-full bg-slate-300 p-2">
-						<svg
-							class="h-5 w-5 text-slate-600"
-							fill="currentColor"
-							stroke="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 640 640"
-							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-								d="M584 352C597.3 352 608 362.7 608 376L608 480C608 515.3 579.3 544 544 544L96 544C60.7 544 32 515.3 32 480L32 376C32 362.7 42.7 352 56 352C69.3 352 80 362.7 80 376L80 480C80 488.8 87.2 496 96 496L544 496C552.8 496 560 488.8 560 480L560 376C560 362.7 570.7 352 584 352zM448 96C483.3 96 512 124.7 512 160L512 384C512 419.3 483.3 448 448 448L192 448C156.7 448 128 419.3 128 384L128 160C128 124.7 156.7 96 192 96L448 96zM410.9 180.6C400.2 172.8 385.2 175.2 377.4 185.9L291.8 303.6L265.3 276.2C256.1 266.7 240.9 266.4 231.4 275.6C221.9 284.8 221.6 300 230.8 309.5L277.2 357.5C282.1 362.6 289 365.3 296.1 364.8C303.2 364.3 309.7 360.7 313.9 355L416.2 214.1C424 203.4 421.6 188.4 410.9 180.6z"
-							/></svg
-						>
-					</div>
-					<div>
-						<div class="font-medium">Award Nomination</div>
-						<div class="text-sm text-gray-500">Nominate teams for awards</div>
-					</div>
-				</button>
+				<!-- Award Deliberation Start Button (Judge Advisor Only, Before Deliberation Starts) -->
+				{#if isJudgeAdvisor && !isAwardDeliberationStarted}
+					<button
+						onclick={startAwardDeliberation}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
+					>
+						<div class="rounded-full bg-slate-300 p-2">
+							<svg class="h-5 w-5 text-slate-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"
+								><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+									d="M320 80C377.4 80 424 126.6 424 184C424 241.4 377.4 288 320 288C262.6 288 216 241.4 216 184C216 126.6 262.6 80 320 80zM96 152C135.8 152 168 184.2 168 224C168 263.8 135.8 296 96 296C56.2 296 24 263.8 24 224C24 184.2 56.2 152 96 152zM0 480C0 409.3 57.3 352 128 352C140.8 352 153.2 353.9 164.9 357.4C132 394.2 112 442.8 112 496L112 512C112 523.4 114.4 534.2 118.7 544L32 544C14.3 544 0 529.7 0 512L0 480zM521.3 544C525.6 534.2 528 523.4 528 512L528 496C528 442.8 508 394.2 475.1 357.4C486.8 353.9 499.2 352 512 352C582.7 352 640 409.3 640 480L640 512C640 529.7 625.7 544 608 544L521.3 544zM472 224C472 184.2 504.2 152 544 152C583.8 152 616 184.2 616 224C616 263.8 583.8 296 544 296C504.2 296 472 263.8 472 224zM160 496C160 407.6 231.6 336 320 336C408.4 336 480 407.6 480 496L480 512C480 529.7 465.7 544 448 544L192 544C174.3 544 160 529.7 160 512L160 496z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">Start Award Deliberation</div>
+							<div class="text-sm text-gray-500">Begin the the last step of judging</div>
+						</div>
+					</button>
+				{/if}
 
-				<button
-					onclick={addFinalRankingTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-				>
-					<div class="rounded-full bg-slate-300 p-2">
-						<svg
-							class="h-5 w-5 text-slate-600"
-							fill="currentColor"
-							stroke="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 640 640"
-							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-								d="M256 144C256 117.5 277.5 96 304 96L336 96C362.5 96 384 117.5 384 144L384 496C384 522.5 362.5 544 336 544L304 544C277.5 544 256 522.5 256 496L256 144zM64 336C64 309.5 85.5 288 112 288L144 288C170.5 288 192 309.5 192 336L192 496C192 522.5 170.5 544 144 544L112 544C85.5 544 64 522.5 64 496L64 336zM496 160L528 160C554.5 160 576 181.5 576 208L576 496C576 522.5 554.5 544 528 544L496 544C469.5 544 448 522.5 448 496L448 208C448 181.5 469.5 160 496 160z"
-							/></svg
-						>
-					</div>
-					<div>
-						<div class="font-medium">Final Ranking</div>
-						<div class="text-sm text-gray-500">Final award rankings</div>
-					</div>
-				</button>
+				<!-- Award Functions (Only show when award deliberation has started) -->
+				{#if isAwardDeliberationStarted}
+					<button
+						onclick={addAwardNominationTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
+					>
+						<div class="rounded-full bg-slate-300 p-2">
+							<svg
+								class="h-5 w-5 text-slate-600"
+								fill="currentColor"
+								stroke="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 640 640"
+								><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+									d="M584 352C597.3 352 608 362.7 608 376L608 480C608 515.3 579.3 544 544 544L96 544C60.7 544 32 515.3 32 480L32 376C32 362.7 42.7 352 56 352C69.3 352 80 362.7 80 376L80 480C80 488.8 87.2 496 96 496L544 496C552.8 496 560 488.8 560 480L560 376C560 362.7 570.7 352 584 352zM448 96C483.3 96 512 124.7 512 160L512 384C512 419.3 483.3 448 448 448L192 448C156.7 448 128 419.3 128 384L128 160C128 124.7 156.7 96 192 96L448 96zM410.9 180.6C400.2 172.8 385.2 175.2 377.4 185.9L291.8 303.6L265.3 276.2C256.1 266.7 240.9 266.4 231.4 275.6C221.9 284.8 221.6 300 230.8 309.5L277.2 357.5C282.1 362.6 289 365.3 296.1 364.8C303.2 364.3 309.7 360.7 313.9 355L416.2 214.1C424 203.4 421.6 188.4 410.9 180.6z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">Award Nomination</div>
+							<div class="text-sm text-gray-500">Nominate teams for awards</div>
+						</div>
+					</button>
 
-				<button
-					onclick={addAwardWinnerTab}
-					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50"
-				>
-					<div class="rounded-full bg-slate-300 p-2">
-						<svg
-							class="h-5 w-5 text-slate-600"
-							fill="currentColor"
-							stroke="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 640 640"
-							><!--!Font Awesome Free v7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-								d="M208.3 64L432.3 64C458.8 64 480.4 85.8 479.4 112.2C479.2 117.5 479 122.8 478.7 128L528.3 128C554.4 128 577.4 149.6 575.4 177.8C567.9 281.5 514.9 338.5 457.4 368.3C441.6 376.5 425.5 382.6 410.2 387.1C390 415.7 369 430.8 352.3 438.9L352.3 512L416.3 512C434 512 448.3 526.3 448.3 544C448.3 561.7 434 576 416.3 576L224.3 576C206.6 576 192.3 561.7 192.3 544C192.3 526.3 206.6 512 224.3 512L288.3 512L288.3 438.9C272.3 431.2 252.4 416.9 233 390.6C214.6 385.8 194.6 378.5 175.1 367.5C121 337.2 72.2 280.1 65.2 177.6C63.3 149.5 86.2 127.9 112.3 127.9L161.9 127.9C161.6 122.7 161.4 117.5 161.2 112.1C160.2 85.6 181.8 63.9 208.3 63.9zM165.5 176L113.1 176C119.3 260.7 158.2 303.1 198.3 325.6C183.9 288.3 172 239.6 165.5 176zM444 320.8C484.5 297 521.1 254.7 527.3 176L475 176C468.8 236.9 457.6 284.2 444 320.8z"
-							/></svg
-						>
-					</div>
-					<div>
-						<div class="font-medium">Award Winners</div>
-						<div class="text-sm text-gray-500">View and manage award winners</div>
-					</div>
-				</button>
+					<button
+						onclick={addFinalRankingTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
+					>
+						<div class="rounded-full bg-slate-300 p-2">
+							<svg
+								class="h-5 w-5 text-slate-600"
+								fill="currentColor"
+								stroke="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 640 640"
+								><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+									d="M256 144C256 117.5 277.5 96 304 96L336 96C362.5 96 384 117.5 384 144L384 496C384 522.5 362.5 544 336 544L304 544C277.5 544 256 522.5 256 496L256 144zM64 336C64 309.5 85.5 288 112 288L144 288C170.5 288 192 309.5 192 336L192 496C192 522.5 170.5 544 144 544L112 544C85.5 544 64 522.5 64 496L64 336zM496 160L528 160C554.5 160 576 181.5 576 208L576 496C576 522.5 554.5 544 528 544L496 544C469.5 544 448 522.5 448 496L448 208C448 181.5 469.5 160 496 160z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">Final Ranking</div>
+							<div class="text-sm text-gray-500">Final award rankings</div>
+						</div>
+					</button>
+
+					<button
+						onclick={addAwardWinnerTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
+					>
+						<div class="rounded-full bg-slate-300 p-2">
+							<svg
+								class="h-5 w-5 text-slate-600"
+								fill="currentColor"
+								stroke="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 640 640"
+								><!--!Font Awesome Free v7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+									d="M208.3 64L432.3 64C458.8 64 480.4 85.8 479.4 112.2C479.2 117.5 479 122.8 478.7 128L528.3 128C554.4 128 577.4 149.6 575.4 177.8C567.9 281.5 514.9 338.5 457.4 368.3C441.6 376.5 425.5 382.6 410.2 387.1C390 415.7 369 430.8 352.3 438.9L352.3 512L416.3 512C434 512 448.3 526.3 448.3 544C448.3 561.7 434 576 416.3 576L224.3 576C206.6 576 192.3 561.7 192.3 544C192.3 526.3 206.6 512 224.3 512L288.3 512L288.3 438.9C272.3 431.2 252.4 416.9 233 390.6C214.6 385.8 194.6 378.5 175.1 367.5C121 337.2 72.2 280.1 65.2 177.6C63.3 149.5 86.2 127.9 112.3 127.9L161.9 127.9C161.6 122.7 161.4 117.5 161.2 112.1C160.2 85.6 181.8 63.9 208.3 63.9zM165.5 176L113.1 176C119.3 260.7 158.2 303.1 198.3 325.6C183.9 288.3 172 239.6 165.5 176zM444 320.8C484.5 297 521.1 254.7 527.3 176L475 176C468.8 236.9 457.6 284.2 444 320.8z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">Award Winners</div>
+							<div class="text-sm text-gray-500">View and manage award winners</div>
+						</div>
+					</button>
+				{/if}
 			</div>
 		</div>
 		<!-- Teams List with Rubric Submissions -->

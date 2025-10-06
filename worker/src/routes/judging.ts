@@ -24,7 +24,8 @@ import {
 	judgeGroupsReviewedTeams,
 	judgeGroupsSubmissionsCache,
 	teamInterviewNotes,
-	teamInterviewRubrics
+	teamInterviewRubrics,
+	metadata
 } from '../db/schema';
 import { AwardNameSchema, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
@@ -414,6 +415,14 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 
 				// Do not wait for the broadcast to complete
 				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
-			})
+			}),
+
+		startAwardDeliberation: w.procedure.mutation(async ({ ctx, session }) => {
+			// Update the judging step to 'award_deliberations' in the event metadata
+			await ctx.db.update(metadata).set({ judgingStep: 'award_deliberations' });
+
+			// Do not wait for the broadcast to complete
+			session.broadcast<ClientRouter>().onAwardDeliberationStarted.mutation();
+		})
 	};
 }

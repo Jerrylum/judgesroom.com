@@ -3,7 +3,7 @@ import { initWRPC } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
-import { app, subscriptions } from './app-page.svelte';
+import { app, subscriptions, tabs } from './app-page.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import {
@@ -16,6 +16,7 @@ import {
 } from '@judging.jerryio/protocol/src/rubric';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { JoiningKitSchema } from '@judging.jerryio/worker/src/routes/handshake';
+import { AwardNominationTab } from './tab.svelte';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
@@ -110,7 +111,21 @@ const clientRouter = w.router({
 			console.log(`📊 Final award nominations updated:`, input);
 
 			app.handleFinalAwardNominationsUpdate(input.awardName, input.nominations);
-		})
+		}),
+
+	/**
+	 * Server triggers when award deliberation starts
+	 */
+	onAwardDeliberationStarted: w.procedure.mutation(async () => {
+		console.log(`🏆 Award deliberation started - opening award nomination tab`);
+
+		const essData = app.getEssentialData();
+		if (!essData) {
+			throw new Error('CRITICAL: Essential data not found');
+		}
+
+		app.handleEssentialDataUpdate({ ...essData, judgingStep: 'award_deliberations' });
+	})
 });
 
 export { clientRouter };
