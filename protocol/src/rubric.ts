@@ -27,7 +27,8 @@ export const EngineeringNotebookRubricSchema = z.object({
 	judgeId: z.uuidv4(),
 	rubric: z.array(RankSchema),
 	notes: z.string(),
-	innovateAwardNotes: z.string()
+	innovateAwardNotes: z.string(),
+	timestamp: z.number()
 });
 
 export type EngineeringNotebookRubric = z.infer<typeof EngineeringNotebookRubricSchema>;
@@ -37,7 +38,8 @@ export const TeamInterviewRubricSchema = z.object({
 	teamId: z.uuidv4(),
 	judgeId: z.uuidv4(),
 	rubric: z.array(RankSchema),
-	notes: z.string()
+	notes: z.string(),
+	timestamp: z.number()
 });
 
 export type TeamInterviewRubric = z.infer<typeof TeamInterviewRubricSchema>;
@@ -46,7 +48,8 @@ export const TeamInterviewNoteSchema = z.object({
 	id: z.uuidv4(),
 	teamId: z.uuidv4(),
 	judgeId: z.uuidv4(),
-	rows: z.array(z.string())
+	rows: z.array(z.string()),
+	timestamp: z.number()
 });
 
 export type TeamInterviewNote = z.infer<typeof TeamInterviewNoteSchema>;

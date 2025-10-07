@@ -137,6 +137,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
 								judgeId: input.submission.judgeId,
+								timestamp: input.submission.timestamp,
 								enrId: input.submission.id,
 								tiId: null,
 								tnId: null
@@ -146,7 +147,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								set: {
 									judgeGroupId: input.judgeGroupId,
 									teamId: input.submission.teamId,
-									judgeId: input.submission.judgeId
+									judgeId: input.submission.judgeId,
+									timestamp: input.submission.timestamp
 								}
 							})
 							.returning()
@@ -198,6 +200,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
 								judgeId: input.submission.judgeId,
+								timestamp: input.submission.timestamp,
 								enrId: null,
 								tiId: input.submission.id,
 								tnId: null
@@ -207,7 +210,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								set: {
 									judgeGroupId: input.judgeGroupId,
 									teamId: input.submission.teamId,
-									judgeId: input.submission.judgeId
+									judgeId: input.submission.judgeId,
+									timestamp: input.submission.timestamp
 								}
 							})
 							.returning()
@@ -258,6 +262,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								judgeGroupId: input.judgeGroupId,
 								teamId: input.submission.teamId,
 								judgeId: input.submission.judgeId,
+								timestamp: input.submission.timestamp,
 								enrId: null,
 								tiId: input.submission.id,
 								tnId: null
@@ -267,7 +272,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								set: {
 									judgeGroupId: input.judgeGroupId,
 									teamId: input.submission.teamId,
-									judgeId: input.submission.judgeId
+									judgeId: input.submission.judgeId,
+									timestamp: input.submission.timestamp
 								}
 							})
 							.returning()

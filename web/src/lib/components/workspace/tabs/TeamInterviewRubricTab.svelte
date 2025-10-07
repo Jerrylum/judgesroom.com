@@ -32,6 +32,7 @@
 	let judgeId = $state<string | null>(null);
 	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
+	let timestamp = $state(0);
 
 	async function loadRubric() {
 		if (!tab.rubricId) return;
@@ -41,6 +42,7 @@
 			judgeId = existingRubric.judgeId;
 			rubricScores = existingRubric.rubric as number[];
 			notes = existingRubric.notes;
+			timestamp = existingRubric.timestamp;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
 			app.addErrorNotice('Failed to load existing rubric');
@@ -102,7 +104,8 @@
 					teamId: tab.teamId,
 					judgeId,
 					rubric: rubricScores,
-					notes
+					notes,
+					timestamp: (timestamp = Date.now())
 				}
 			});
 
@@ -202,6 +205,12 @@
 							class="text-blue-500 hover:text-blue-600">Switch to Judge</button
 						>
 					</p>
+				{/if}
+				<!-- Submission Timestamp -->
+				{#if tab.rubricId}
+					<div class="text-sm text-gray-700">
+						<p><strong>Submitted at:</strong> {new Date(timestamp).toLocaleString('en-us')}</p>
+					</div>
 				{/if}
 			</div>
 		</div>

@@ -102,7 +102,8 @@ export const engineeringNotebookRubrics = sqliteTable(
 			.notNull(),
 		rubric: text('rubric', { mode: 'json' }).notNull(),
 		notes: text('notes').notNull(),
-		innovateAwardNotes: text('innovateAwardNotes').notNull()
+		innovateAwardNotes: text('innovateAwardNotes').notNull(),
+		timestamp: integer('timestamp').notNull()
 	},
 	(table) => [
 		index('engineering_notebook_rubrics_teamId').on(table.teamId),
@@ -121,7 +122,8 @@ export const teamInterviewRubrics = sqliteTable(
 			.references(() => judges.id, { onDelete: 'cascade' })
 			.notNull(),
 		rubric: text('rubric', { mode: 'json' }).notNull(),
-		notes: text('notes').notNull()
+		notes: text('notes').notNull(),
+		timestamp: integer('timestamp').notNull()
 	},
 	(table) => [index('team_interview_rubrics_teamId').on(table.teamId), index('team_interview_rubrics_judgeId').on(table.judgeId)]
 );
@@ -136,7 +138,8 @@ export const teamInterviewNotes = sqliteTable(
 		judgeId: text('judgeId')
 			.references(() => judges.id, { onDelete: 'cascade' })
 			.notNull(),
-		rows: text('rows', { mode: 'json' }).notNull()
+		rows: text('rows', { mode: 'json' }).notNull(),
+		timestamp: integer('timestamp').notNull()
 	},
 	(table) => [index('team_interview_notes_teamId').on(table.teamId), index('team_interview_notes_judgeId').on(table.judgeId)]
 );
@@ -153,6 +156,7 @@ export const judgeGroupsSubmissionsCache = sqliteTable(
 		judgeId: text('judgeId')
 			.references(() => judges.id, { onDelete: 'cascade' })
 			.notNull(),
+		timestamp: integer('timestamp').notNull(),
 		enrId: text('enrId').references(() => engineeringNotebookRubrics.id, { onDelete: 'cascade' }),
 		tiId: text('tiId').references(() => teamInterviewRubrics.id, { onDelete: 'cascade' }),
 		tnId: text('tnId').references(() => teamInterviewNotes.id, { onDelete: 'cascade' })
