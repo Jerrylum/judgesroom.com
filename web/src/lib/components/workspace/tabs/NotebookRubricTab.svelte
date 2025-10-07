@@ -101,11 +101,13 @@
 				});
 			}
 
+			tab.rubricId = tab.rubricId || generateUUID();
+
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
 				judgeGroupId: currentJudgeGroup.id,
 				submission: {
-					id: tab.rubricId || generateUUID(),
+					id: tab.rubricId,
 					teamId: tab.teamId,
 					judgeId,
 					rubric: rubricScores,
