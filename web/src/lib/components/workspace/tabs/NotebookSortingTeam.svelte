@@ -32,12 +32,7 @@
 
 	// Function to open notebook rubric for a team
 	function openNotebookRubric() {
-		const existingTab = tabs.findTab('notebook_rubric');
-		if (existingTab) {
-			tabs.switchToTab(existingTab.id);
-		} else {
-			tabs.addTab(new NotebookRubricTab({ teamId: team.id }));
-		}
+		tabs.addOrReuseTab(new NotebookRubricTab({ teamId: team.id }));
 	}
 
 	// Open team data edit dialog

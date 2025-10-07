@@ -24,63 +24,31 @@
 	const isAwardDeliberationStarted = $derived(judgingStep === 'award_deliberations');
 
 	function addTeamInterviewTab() {
-		tabs.addTab(new TeamInterviewRubricTab({ teamId: '' }));
+		tabs.addOrReuseTab(new TeamInterviewRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookReviewTab() {
-		tabs.addTab(new NotebookRubricTab({ teamId: '' }));
+		tabs.addOrReuseTab(new NotebookRubricTab({ teamId: '' }));
 	}
 
 	function addNotebookSortingTab() {
-		tabs.addTab(new NotebookSortingTab());
+		tabs.addOrReuseTab(new NotebookSortingTab());
 	}
 
 	function addAwardNominationTab() {
-		// Check if an award nomination tab already exists
-		const existingTab = tabs.findTab('award_nomination');
-		if (existingTab) {
-			// Switch to the existing tab instead of creating a new one
-			tabs.switchToTab(existingTab.id);
-		} else {
-			// Create a new tab if none exists
-			tabs.addTab(new AwardNominationTab());
-		}
+		tabs.addOrReuseTab(new AwardNominationTab());
 	}
 
 	function addAwardRankingTab() {
-		// Check if an award ranking tab already exists
-		const existingTab = tabs.findTab('award_ranking');
-		if (existingTab) {
-			// Switch to the existing tab instead of creating a new one
-			tabs.switchToTab(existingTab.id);
-		} else {
-			// Create a new tab if none exists
-			tabs.addTab(new AwardRankingTab());
-		}
+		tabs.addOrReuseTab(new AwardRankingTab());
 	}
 
 	function addFinalRankingTab() {
-		// Check if a final ranking tab already exists
-		const existingTab = tabs.findTab('final_award_ranking');
-		if (existingTab) {
-			// Switch to the existing tab instead of creating a new one
-			tabs.switchToTab(existingTab.id);
-		} else {
-			// Create a new tab if none exists
-			tabs.addTab(new FinalAwardRankingTab());
-		}
+		tabs.addOrReuseTab(new FinalAwardRankingTab());
 	}
 
 	function addAwardWinnerTab() {
-		// Check if an award winner tab already exists
-		const existingTab = tabs.findTab('award_winner');
-		if (existingTab) {
-			// Switch to the existing tab instead of creating a new one
-			tabs.switchToTab(existingTab.id);
-		} else {
-			// Create a new tab if none exists
-			tabs.addTab(new AwardWinnerTab());
-		}
+		tabs.addOrReuseTab(new AwardWinnerTab());
 	}
 
 	async function startAwardDeliberation() {

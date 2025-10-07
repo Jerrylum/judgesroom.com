@@ -1,4 +1,4 @@
-import type { Component, ComponentProps, SvelteComponent } from 'svelte';
+import type { Component, ComponentProps } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { generateUUID } from './utils.svelte';
 import { app } from './app-page.svelte';
@@ -22,6 +22,7 @@ interface BaseTab<C extends Component<ComponentProps<C>>> {
 	component: C;
 	props: Omit<ComponentProps<C>, 'isActive'>;
 	get title(): string;
+	get hash(): string;
 }
 
 export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
@@ -33,6 +34,10 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 
 	get title() {
 		return 'Overview';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
 	}
 
 	constructor() {
@@ -54,6 +59,10 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 		return team ? `${team.number} Team Interview` : 'Team Interview';
 	}
 
+	get hash() {
+		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
+	}
+
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 
@@ -62,7 +71,7 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 			this.teamId = ''; // Will be set when rubric loads
 		} else {
 			this.teamId = params.teamId;
-			this.rubricId = null;
+			this.rubricId = null; // Will be set after the rubric is saved
 		}
 	}
 }
@@ -81,6 +90,10 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 		return team ? `${team.number} Notebook Review` : 'Notebook Review';
 	}
 
+	get hash() {
+		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
+	}
+
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 
@@ -89,7 +102,7 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 			this.teamId = ''; // Will be set when rubric loads
 		} else {
 			this.teamId = params.teamId;
-			this.rubricId = null;
+			this.rubricId = null; // Will be set after the rubric is saved
 		}
 	}
 }
@@ -103,6 +116,10 @@ export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComp
 
 	get title() {
 		return 'Notebook Sorting';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
 	}
 
 	constructor() {
@@ -121,6 +138,10 @@ export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent>
 		return 'Award Ranking';
 	}
 
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -135,6 +156,10 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 
 	get title() {
 		return 'Award Nomination';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
 	}
 
 	constructor() {
@@ -153,6 +178,10 @@ export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabCompo
 		return 'Final Ranking';
 	}
 
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -167,6 +196,10 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 
 	get title() {
 		return 'Award Winner';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
 	}
 
 	constructor() {
@@ -210,10 +243,6 @@ export class TabController {
 		return this.tabs.length > 1;
 	}
 
-	private generateId(): string {
-		return `tab-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-	}
-
 	/**
 	 * Add a tab
 	 */
@@ -221,6 +250,15 @@ export class TabController {
 		this.tabs.push(tab);
 		this.switchToTab(tab.id);
 		return tab.id;
+	}
+
+	addOrReuseTab(tab: Tab): void {
+		const existingTab = this.findTab(tab);
+		if (existingTab) {
+			this.switchToTab(existingTab.id);
+		} else {
+			this.addTab(tab);
+		}
 	}
 
 	/**
@@ -233,7 +271,6 @@ export class TabController {
 			this.notifyTabChange(tabId);
 		}
 	}
-
 	/**
 	 * Close a tab
 	 */
@@ -269,8 +306,8 @@ export class TabController {
 	/**
 	 * Find tab by component and optional properties
 	 */
-	findTab(tabType: Tab['type']): Tab | null {
-		return this.tabs.find((tab) => tab.type === tabType) || null;
+	findTab(targetTab: Tab): Tab | null {
+		return this.tabs.find((tab) => tab.hash === targetTab.hash) || null;
 	}
 
 	/**
@@ -285,19 +322,6 @@ export class TabController {
 	 */
 	getTab(tabId: string): Tab | null {
 		return this.tabs.find((tab) => tab.id === tabId) || null;
-	}
-
-	/**
-	 * Register for tab change notifications
-	 */
-	onTabChange(handler: (tabId: string | null) => void): () => void {
-		const id = this.generateId();
-		this.tabChangeHandlers.set(id, handler);
-
-		// Return unsubscribe function
-		return () => {
-			this.tabChangeHandlers.delete(id);
-		};
 	}
 
 	/**

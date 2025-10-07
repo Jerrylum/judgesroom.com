@@ -93,23 +93,19 @@
 	// Open notebook rubric for a team
 	function openNotebookRubric(teamId: string, rubricId?: string) {
 		const tab = rubricId ? new NotebookRubricTab({ rubricId }) : new NotebookRubricTab({ teamId });
-		tabs.addTab(tab);
-		tabs.switchToTab(tab.id);
+		tabs.addOrReuseTab(tab);
 	}
 
 	// Open team interview rubric for a team
 	function openTeamInterviewRubric(teamId: string, rubricId?: string) {
 		const tab = rubricId ? new TeamInterviewRubricTab({ rubricId }) : new TeamInterviewRubricTab({ teamId });
-		tabs.addTab(tab);
-		tabs.switchToTab(tab.id);
+		tabs.addOrReuseTab(tab);
 	}
 
 	// Open team data edit dialog
 	function openEditTeamDataDialog(team: TeamInfoAndData) {
 		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
 	}
-
-	async function refreshRubricsAndNotes() {}
 </script>
 
 <div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
