@@ -4,7 +4,7 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 
 	interface Props {
-		team: TeamInfoAndData;
+		team: Readonly<TeamInfoAndData>;
 	}
 
 	let { team }: Props = $props();
@@ -55,10 +55,6 @@
 				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 				excluded: editedTeam.excluded
 			});
-
-			// Apply changes to the local team object for immediate UI update
-			team.notebookLink = editedTeam.notebookLink.trim();
-			team.excluded = editedTeam.excluded;
 
 			app.addSuccessNotice('Team data updated successfully!');
 			validationError = '';
