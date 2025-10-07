@@ -121,7 +121,7 @@
 	{#if devStatus === 'fully_developed'}
 		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full">
 			{#if isSubmitted}
-				Start Rubric (You Submitted)
+				(You Submitted)
 			{:else}
 				Start Rubric
 			{/if}

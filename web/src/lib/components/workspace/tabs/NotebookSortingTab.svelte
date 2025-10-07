@@ -32,7 +32,7 @@
 	let showOnlyAssignedTeams = $state(true);
 
 	// Get teams to display based on filter
-	const teamsToShow = $derived(() => {
+	const teamsToShow = $derived.by(() => {
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
 			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
 		} else {
@@ -40,10 +40,33 @@
 		}
 	});
 
+	// Calculate progress metrics
+	const progressMetrics = $derived.by(() => {
+		// 1. Teams scanned (status is not 'undetermined') / total teams showing
+		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
+		const totalTeams = teamsToShow.length;
+
+		// 2. Teams with submitted notebook rubrics / teams with fully developed notebooks
+		const fullyDevelopedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
+		const fullyDevelopedCount = fullyDevelopedTeams.length;
+
+		const teamsWithSubmittedRubrics = fullyDevelopedTeams.filter((team) => {
+			return Object.values(subscriptions.allSubmissionCaches).some((sub) => sub.enrId && sub.teamId === team.id);
+		}).length;
+
+		// 3. Teams current judge finished / teams with fully developed notebooks
+		const currentJudgeFinishedCount = fullyDevelopedTeams.filter((team) => submittedNotebookRubricsOfCurrentJudge.includes(team.id)).length;
+
+		return {
+			scanned: { count: scannedTeams, total: totalTeams },
+			withRubrics: { count: teamsWithSubmittedRubrics, total: fullyDevelopedCount },
+			currentJudgeFinished: { count: currentJudgeFinishedCount, total: fullyDevelopedCount }
+		};
+	});
 </script>
 
 <div class="h-full overflow-auto p-4 sm:p-6">
-	<div class="mx-auto max-w-6xl space-y-6">
+	<div class="mx-auto max-w-5xl space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>
@@ -72,10 +95,49 @@
 		<!-- Teams List -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">
-				Teams ({teamsToShow().length})
+				Teams ({teamsToShow.length})
 			</h3>
 
-			{#if teamsToShow().length === 0}
+			<div class="mb-4">
+				<!-- Progress Indicators -->
+				<div class="grid gap-4 sm:grid-cols-3">
+					<div class="rounded-lg bg-gray-50 p-3">
+						<div class="text-sm font-medium text-gray-900">Teams Scanned</div>
+						<div class="text-lg font-semibold text-gray-700">
+							{progressMetrics.scanned.count} / {progressMetrics.scanned.total}
+						</div>
+						<div class="text-xs text-gray-600">
+							{progressMetrics.scanned.total > 0 ? Math.round((progressMetrics.scanned.count / progressMetrics.scanned.total) * 100) : 0}%
+						</div>
+					</div>
+
+					<div class="rounded-lg bg-gray-50 p-3">
+						<div class="text-sm font-medium text-gray-900">Teams with Rubrics</div>
+						<div class="text-lg font-semibold text-gray-700">
+							{progressMetrics.withRubrics.count} / {progressMetrics.withRubrics.total}
+						</div>
+						<div class="text-xs text-gray-600">
+							{progressMetrics.withRubrics.total > 0
+								? Math.round((progressMetrics.withRubrics.count / progressMetrics.withRubrics.total) * 100)
+								: 0}%
+						</div>
+					</div>
+
+					<div class="rounded-lg bg-gray-50 p-3">
+						<div class="text-sm font-medium text-gray-900">Your Progress</div>
+						<div class="text-lg font-semibold text-gray-700">
+							{progressMetrics.currentJudgeFinished.count} / {progressMetrics.currentJudgeFinished.total}
+						</div>
+						<div class="text-xs text-gray-600">
+							{progressMetrics.currentJudgeFinished.total > 0
+								? Math.round((progressMetrics.currentJudgeFinished.count / progressMetrics.currentJudgeFinished.total) * 100)
+								: 0}%
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{#if teamsToShow.length === 0}
 				<div class="py-8 text-center text-gray-500">
 					{#if isAssignedJudging && showOnlyAssignedTeams}
 						No teams are assigned to your judge group.
@@ -85,7 +147,7 @@
 				</div>
 			{:else}
 				<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{#each teamsToShow() as team (team.id)}
+					{#each teamsToShow as team (team.id)}
 						<NotebookSortingTeam {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
 					{/each}
 				</div>
