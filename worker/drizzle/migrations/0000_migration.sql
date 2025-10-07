@@ -27,6 +27,7 @@ CREATE TABLE `EngineeringNotebookRubrics` (
 	`rubric` text NOT NULL,
 	`notes` text NOT NULL,
 	`innovateAwardNotes` text NOT NULL,
+	`timestamp` integer NOT NULL,
 	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -72,6 +73,7 @@ CREATE TABLE `JudgeGroupsSubmissionsCache` (
 	`judgeGroupId` text NOT NULL,
 	`teamId` text NOT NULL,
 	`judgeId` text NOT NULL,
+	`timestamp` integer NOT NULL,
 	`enrId` text,
 	`tiId` text,
 	`tnId` text,
@@ -119,6 +121,7 @@ CREATE TABLE `TeamInterviewNotes` (
 	`teamId` text NOT NULL,
 	`judgeId` text NOT NULL,
 	`rows` text NOT NULL,
+	`timestamp` integer NOT NULL,
 	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -131,6 +134,7 @@ CREATE TABLE `TeamInterviewRubrics` (
 	`judgeId` text NOT NULL,
 	`rubric` text NOT NULL,
 	`notes` text NOT NULL,
+	`timestamp` integer NOT NULL,
 	FOREIGN KEY (`teamId`) REFERENCES `Teams`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`judgeId`) REFERENCES `Judges`(`id`) ON UPDATE no action ON DELETE cascade
 );

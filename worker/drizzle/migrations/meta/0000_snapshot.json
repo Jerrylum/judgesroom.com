@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ca6a8f08-77dd-4d71-a8ac-09c597e90014",
+  "id": "e138bbab-5386-4ccc-9e81-2f1654045cd1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -200,6 +200,13 @@
         "innovateAwardNotes": {
           "name": "innovateAwardNotes",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -525,6 +532,13 @@
         "judgeId": {
           "name": "judgeId",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -858,6 +872,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -942,6 +963,13 @@
         "notes": {
           "name": "notes",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
