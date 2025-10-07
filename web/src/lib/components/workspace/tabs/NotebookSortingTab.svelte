@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { app, dialogs, tabs } from '$lib/app-page.svelte';
+	import { app, subscriptions } from '$lib/app-page.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
-	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
-	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+	import NotebookSortingTeam from './NotebookSortingTeam.svelte';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -20,7 +17,16 @@
 	// Check if the event uses assigned judging method
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 
+	const currentJudge = $derived(app.getCurrentUserJudge());
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
+
+	const submittedNotebookRubricsOfCurrentJudge = $derived(
+		currentJudge
+			? Object.values(subscriptions.allSubmissionCaches)
+					.filter((sub) => sub.enrId && sub.judgeId === currentJudge.id)
+					.map((sub) => sub.teamId)
+			: []
+	);
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
@@ -34,29 +40,6 @@
 		}
 	});
 
-	// Function to update notebook development status
-	async function updateNotebookStatus(teamId: string, notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		try {
-			await app.wrpcClient.team.updateTeamData.mutation({ ...includedTeams[teamId], notebookDevelopmentStatus });
-		} catch (error) {
-			app.addErrorNotice('Failed to update notebook status');
-		}
-	}
-
-	// Function to open notebook rubric for a team
-	function openNotebookRubric(teamId: string) {
-		const existingTab = tabs.findTab('notebook_rubric');
-		if (existingTab) {
-			tabs.switchToTab(existingTab.id);
-		} else {
-			tabs.addTab(new NotebookRubricTab({ teamId }));
-		}
-	}
-
-	// Open team data edit dialog
-	function openEditTeamDataDialog(team: any) {
-		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
-	}
 </script>
 
 <div class="h-full overflow-auto p-4 sm:p-6">
@@ -101,91 +84,9 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="space-y-4">
+				<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{#each teamsToShow() as team (team.id)}
-						{@const notebookLink = team.notebookLink || ''}
-						{@const devStatus = team.notebookDevelopmentStatus}
-
-						<div class="rounded-lg border border-gray-200 p-4">
-							<div class="flex flex-col space-y-4 md:flex-row md:items-start md:justify-between md:space-y-0">
-								<div class="flex-1">
-									<div class="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-										<h4 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-medium text-gray-900">
-											<span>{team.number} - {team.name}</span>
-											{#if team.excluded}
-												<span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800"
-													>Excluded from judged awards</span
-												>
-											{/if}
-											<button
-												onclick={() => openEditTeamDataDialog(team)}
-												class="text-gray-400 hover:text-gray-600 active:text-gray-800"
-												title="Edit team data"
-											>
-												<EditIcon size={14} />
-											</button>
-										</h4>
-									</div>
-
-									<div class="space-y-1 text-sm text-gray-600">
-										<p><strong>School:</strong> {team.school}</p>
-										<p><strong>Grade Level:</strong> {team.grade}</p>
-										<p><strong>Location:</strong> {team.city}, {team.state}, {team.country}</p>
-										<p class="break-all">
-											<strong>Notebook Link:</strong>
-											{#if notebookLink}
-												<a href={notebookLink} target="_blank" class="text-blue-600 underline hover:text-blue-800 active:text-blue-900">
-													{notebookLink}
-												</a>
-											{:else}
-												<span class="text-gray-400">(Not provided)</span>
-											{/if}
-										</p>
-									</div>
-								</div>
-
-								<div class="flex-shrink-0 md:ml-6">
-									<div class="mb-2 text-sm font-medium text-gray-700">Notebook Status:</div>
-									<div class="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1 md:space-y-0">
-										<button
-											onclick={() => updateNotebookStatus(team.id, 'fully_developed')}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
-											'fully_developed'
-												? 'border-green-300 bg-green-50 text-green-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
-										>
-											<span class="mr-1">✓</span> Fully Developed
-										</button>
-										<button
-											onclick={() => updateNotebookStatus(team.id, 'developing')}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
-											'developing'
-												? 'border-yellow-300 bg-yellow-50 text-yellow-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
-										>
-											<span class="mr-1">⚠</span> Developing
-										</button>
-										<button
-											onclick={() => updateNotebookStatus(team.id, 'not_submitted')}
-											class="flex items-center justify-center rounded-md border px-3 py-2 text-center text-sm transition-colors {devStatus ===
-											'not_submitted'
-												? 'border-gray-300 bg-gray-100 text-gray-700'
-												: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100'}"
-										>
-											<span class="mr-1">○</span> No Notebook/Not Reviewed
-										</button>
-									</div>
-
-									{#if devStatus === 'fully_developed'}
-										<div class="mt-3">
-											<button onclick={() => openNotebookRubric(team.id)} class="primary tiny w-full touch-manipulation">
-												Start Notebook Rubric
-											</button>
-										</div>
-									{/if}
-								</div>
-							</div>
-						</div>
+						<NotebookSortingTeam {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
 					{/each}
 				</div>
 			{/if}
