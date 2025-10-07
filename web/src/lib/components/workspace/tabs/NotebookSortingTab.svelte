@@ -112,7 +112,7 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-sm font-medium text-gray-900">Teams with Rubrics</div>
+						<div class="text-sm font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.withRubrics.count} / {progressMetrics.withRubrics.total}
 						</div>

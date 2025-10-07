@@ -106,18 +106,40 @@
 	function openEditTeamDataDialog(team: TeamInfoAndData) {
 		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
 	}
+
+	// Calculate progress metrics
+	const progressMetrics = $derived.by(() => {
+		const teamsToShow = teamList.map((teamId) => teams[teamId]).filter((team) => team);
+
+		// 1. Teams scanned (status is not 'undetermined') / total teams showing
+		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
+		const totalTeams = teamsToShow.length;
+
+		// 2. Teams with submitted notebook rubrics / teams with fully developed notebooks
+		const fullyDevelopedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
+		const fullyDevelopedCount = fullyDevelopedTeams.length;
+
+		const teamsWithSubmittedRubrics = teamsToShow.filter((team) => {
+			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
+			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
+		});
+		const teamsWithRubricsCount = teamsWithSubmittedRubrics.length;
+
+		const fullyDevelopedWithRubrics = fullyDevelopedTeams.filter((team) => {
+			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
+			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
+		}).length;
+
+		return {
+			scanned: { count: scannedTeams, total: totalTeams },
+			fullyDevelopedWithRubrics: { count: fullyDevelopedWithRubrics, total: fullyDevelopedCount },
+			allTeamsWithRubrics: { count: teamsWithRubricsCount, total: totalTeams }
+		};
+	});
 </script>
 
 <div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics ({teamList.length} teams)</h2>
-	<!-- <button
-		onclick={refreshRubricsAndNotes}
-		class="inline-flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 active:bg-gray-100 sm:w-auto sm:justify-start"
-		aria-label="Refresh teams and rubrics"
-	>
-		<RefreshIcon />
-		<span>Refresh</span>
-	</button> -->
+	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
 </div>
 
 {#if isAssignedJudging && currentJudgeGroup}
@@ -132,6 +154,45 @@
 		</label>
 	</div>
 {/if}
+
+<!-- Progress Indicators -->
+<div class="mb-4">
+	<div class="grid gap-4 sm:grid-cols-3">
+		<div class="rounded-lg bg-gray-50 p-3">
+			<div class="text-sm font-medium text-gray-900">Teams Scanned</div>
+			<div class="text-lg font-semibold text-gray-700">
+				{progressMetrics.scanned.count} / {progressMetrics.scanned.total}
+			</div>
+			<div class="text-xs text-gray-600">
+				{progressMetrics.scanned.total > 0 ? Math.round((progressMetrics.scanned.count / progressMetrics.scanned.total) * 100) : 0}%
+			</div>
+		</div>
+
+		<div class="rounded-lg bg-gray-50 p-3">
+			<div class="text-sm font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+			<div class="text-lg font-semibold text-gray-700">
+				{progressMetrics.fullyDevelopedWithRubrics.count} / {progressMetrics.fullyDevelopedWithRubrics.total}
+			</div>
+			<div class="text-xs text-gray-600">
+				{progressMetrics.fullyDevelopedWithRubrics.total > 0
+					? Math.round((progressMetrics.fullyDevelopedWithRubrics.count / progressMetrics.fullyDevelopedWithRubrics.total) * 100)
+					: 0}%
+			</div>
+		</div>
+
+		<div class="rounded-lg bg-gray-50 p-3">
+			<div class="text-sm font-medium text-gray-900">Teams Interviewed</div>
+			<div class="text-lg font-semibold text-gray-700">
+				{progressMetrics.allTeamsWithRubrics.count} / {progressMetrics.allTeamsWithRubrics.total}
+			</div>
+			<div class="text-xs text-gray-600">
+				{progressMetrics.allTeamsWithRubrics.total > 0
+					? Math.round((progressMetrics.allTeamsWithRubrics.count / progressMetrics.allTeamsWithRubrics.total) * 100)
+					: 0}%
+			</div>
+		</div>
+	</div>
+</div>
 
 <div class="space-y-4">
 	{#each teamList as teamId (teamId)}
