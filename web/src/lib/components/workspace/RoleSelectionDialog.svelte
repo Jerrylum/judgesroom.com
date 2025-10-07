@@ -78,7 +78,7 @@
 		<!-- Title -->
 		<div class="flex flex-col">
 			<div class="flex items-center justify-between">
-				<h3 class="text-lg font-semibold text-gray-900">Switch Role</h3>
+				<h3 id="dialog-title" class="text-lg font-semibold text-gray-900">Switch Role</h3>
 				<button
 					onclick={handleClose}
 					class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"

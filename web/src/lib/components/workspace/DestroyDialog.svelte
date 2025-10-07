@@ -36,7 +36,7 @@
 <Dialog open={true} onClose={handleCancel}>
 	<div class="space-y-6">
 		<div>
-			<h3 class="text-lg font-semibold text-gray-900">Destroy Judging Data</h3>
+			<h3 id="dialog-title" class="text-lg font-semibold text-gray-900">Destroy Judging Data</h3>
 			<p class="mt-2 text-sm text-gray-600">
 				Prior to the award ceremony, the Judge Advisor should secure the Judges' Room and destroy all judging materials. These items are not
 				to be given to the Event Partner for destruction.

@@ -74,7 +74,7 @@
 </script>
 
 <Dialog open={true} onClose={handleCancel} innerContainerClass="max-w-lg">
-	<h3 class="mb-4 text-lg font-semibold text-gray-900">Edit Team Data: {team.number}</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">Edit Team Data: {team.number}</h3>
 
 	<!-- Validation Error Message -->
 	{#if validationError}

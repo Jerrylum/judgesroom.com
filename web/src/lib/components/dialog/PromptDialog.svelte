@@ -29,8 +29,8 @@
 		dialogs.closeDialog(null);
 	}
 
-	// Handle Enter key for confirmation (but not if shift is pressed)
-	function handleKeydown(event: KeyboardEvent) {
+	// Handle Enter key for confirmation in the input field
+	function handleInputKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
 			handleConfirm();
@@ -38,15 +38,13 @@
 	}
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
 <Dialog open={true} onClose={handleCancel} innerContainerClass="max-w-md">
 	<!-- Title -->
-	<h3 class="mb-4 text-lg font-semibold text-gray-900">{dialog.title}</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">{dialog.title}</h3>
 
 	<!-- Message -->
 	{#if dialog.message}
-		<p class="mb-4 text-sm text-gray-600">{dialog.message}</p>
+		<p id="dialog-message" class="mb-4 text-sm text-gray-600">{dialog.message}</p>
 	{/if}
 
 	<!-- Input -->
@@ -57,6 +55,8 @@
 			type={dialog.inputType || 'text'}
 			placeholder={dialog.placeholder || ''}
 			class="classic block w-full"
+			aria-describedby={dialog.message ? 'dialog-message' : undefined}
+			onkeydown={handleInputKeydown}
 		/>
 	</div>
 

@@ -16,30 +16,25 @@
 	function handleCancel() {
 		dialogs.closeDialog(false);
 	}
-
-	// Handle Enter key for confirmation
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			handleConfirm();
-		}
-	}
 </script>
-
-<svelte:window on:keydown={handleKeydown} />
 
 <Dialog open={true} onClose={handleCancel} innerContainerClass="max-w-md">
 	<!-- Title -->
-	<h3 class="mb-4 text-lg font-semibold text-gray-900">{dialog.title}</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">{dialog.title}</h3>
 
 	<!-- Message -->
-	<p class="mb-6 text-sm text-gray-600">{dialog.message}</p>
+	<p id="dialog-message" class="mb-6 text-sm text-gray-600">{dialog.message}</p>
 
 	<!-- Buttons -->
 	<div class="flex justify-end space-x-3">
 		<button onclick={handleCancel} class={dialog.cancelButtonClass || 'cancel'}>
 			{dialog.cancelText || 'Cancel'}
 		</button>
-		<button onclick={handleConfirm} class={dialog.confirmButtonClass || 'primary'}>
+		<button 
+			onclick={handleConfirm} 
+			class={dialog.confirmButtonClass || 'primary'}
+			onkeydown={(e) => e.key === 'Enter' && handleConfirm()}
+		>
 			{dialog.confirmText || 'Confirm'}
 		</button>
 	</div>

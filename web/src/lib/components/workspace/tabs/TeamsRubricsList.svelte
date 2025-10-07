@@ -193,6 +193,7 @@
 						<button
 							onclick={() => openNotebookRubric(team.id)}
 							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
+							title="New Notebook Rubric"
 						>
 							+ New Rubric
 						</button>
@@ -215,6 +216,7 @@
 						<button
 							onclick={() => openTeamInterviewRubric(team.id)}
 							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
+							title="New Team Interview Rubric"
 						>
 							+ New Rubric
 						</button>

@@ -118,7 +118,7 @@
 </script>
 
 <Dialog open={true} onClose={handleCancel}>
-	<h3 class="mb-4 text-lg font-semibold text-gray-900">Add Custom Award</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">Add Custom Award</h3>
 
 	{#if customAwardError}
 		<div class="mb-4 rounded border border-red-400 bg-red-100 p-3 text-red-700">
