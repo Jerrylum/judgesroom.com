@@ -238,7 +238,8 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfo 
 			school: row.School || '',
 			grade: mapGradeToGradeLevel(row.Grade || ''),
 			notebookLink: '',
-			excluded: false,
+			notebookDevelopmentStatus: undefined,
+			excluded: undefined,
 			group: groupName
 		};
 

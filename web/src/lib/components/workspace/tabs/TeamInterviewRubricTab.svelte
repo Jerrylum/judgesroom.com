@@ -1,4 +1,5 @@
 <script lang="ts">
+	import QRCode from 'qrcode';
 	import './rubric.css';
 	import { app, tabs, subscriptions, dialogs } from '$lib/app-page.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
@@ -34,6 +35,8 @@
 	let notes = $state('');
 	let timestamp = $state(0);
 
+	let qrCodeDataUrl = $state<string | null>(null);
+
 	async function loadRubric() {
 		if (!tab.rubricId) return;
 		try {
@@ -57,6 +60,26 @@
 	$effect(() => {
 		if (!isSubmitted) {
 			judgeId = currentJudge?.id ?? null;
+		}
+	});
+
+	$effect(() => {
+		if (tab.teamId) {
+			(async () => {
+				const notebookLink = includedTeams[tab.teamId].notebookLink;
+				if (notebookLink === '') {
+					qrCodeDataUrl = null;
+					return;
+				}
+				qrCodeDataUrl = await QRCode.toDataURL(notebookLink, {
+					margin: 2,
+					color: {
+						dark: '#000000',
+						light: '#FFFFFF'
+					},
+					errorCorrectionLevel: 'M'
+				});
+			})();
 		}
 	});
 
@@ -179,12 +202,25 @@
 
 			{#if tab.teamId}
 				{@const selectedTeam = includedTeams[tab.teamId]}
-				<div class="mb-4 rounded-lg bg-gray-50 p-4">
+				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
+				<div class="mb-4 flex flex-row justify-between gap-2 rounded-lg bg-gray-50 p-4">
 					<div class=" text-sm text-gray-800">
 						<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
 						<p><strong>School:</strong> {selectedTeam.school}</p>
 						<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
+						<p>
+							<strong>Notebook Link:</strong>
+							{#if notebookLink === '(Not provided)'}
+								{notebookLink}
+							{:else}
+								<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
+							{/if}
+						</p>
 					</div>
+
+					{#if qrCodeDataUrl}
+						<img src={qrCodeDataUrl} alt="QR Code for engineering notebook" class="h-48 w-48 rounded max-sm:hidden" />
+					{/if}
 				</div>
 
 				{#if selectedTeam.excluded}
