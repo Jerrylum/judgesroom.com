@@ -11,7 +11,7 @@
 
 	let { rubricScores = $bindable(), notes = $bindable(), isSubmitted, showValidationErrors }: Props = $props();
 
-	const { registerScrollContainer } = scrollSync();
+	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -23,6 +23,10 @@
 	});
 </script>
 
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
+	<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
+	<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+</div>
 <rubric-table>
 	<rubric-header>
 		<criteria class="max-w-42 min-w-42 bg-gray-400">CRITERIA</criteria>

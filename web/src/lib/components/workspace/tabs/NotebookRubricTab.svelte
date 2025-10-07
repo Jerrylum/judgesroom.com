@@ -266,11 +266,11 @@
 
 			<div class="mt-6 flex justify-center gap-4">
 				{#if isSubmitted}
-					<button onclick={editRubric} class="secondary"> Edit Rubric </button>
-					<button onclick={closeRubric} class="secondary"> Close Rubric </button>
-					<button onclick={newRubric} class="primary"> New Rubric </button>
+					<button onclick={editRubric} class="secondary">Edit Rubric</button>
+					<button onclick={closeRubric} class="secondary">Close Rubric</button>
+					<button onclick={newRubric} class="primary">New Rubric</button>
 				{:else}
-					<button onclick={saveRubric} class="primary" disabled={!judgeId}> Submit Rubric </button>
+					<button onclick={saveRubric} class="primary" disabled={!judgeId}>Submit Rubric</button>
 				{/if}
 			</div>
 		</div>

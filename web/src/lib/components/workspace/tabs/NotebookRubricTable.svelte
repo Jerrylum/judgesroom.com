@@ -18,7 +18,8 @@
 		showValidationErrors
 	}: Props = $props();
 
-	const { registerScrollContainer } = scrollSync();
+	const { registerScrollContainer: rsc1, scrollLeft: sl1, scrollRight: sr1 } = scrollSync();
+	const { registerScrollContainer: rsc2, scrollLeft: sl2, scrollRight: sr2 } = scrollSync();
 
 	// Calculate total score
 	const totalScore = $derived.by(() => {
@@ -30,13 +31,17 @@
 	});
 </script>
 
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
+	<button class="lightweight tiny" onclick={sl1}>Scroll Left</button>
+	<button class="lightweight tiny" onclick={sr1}>Scroll Right</button>
+</div>
 <rubric-table>
 	<rubric-header>
 		<div class="max-w-42 min-w-42 flex flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
 			<div class="border-b-3 flex-1 flex-grow bg-gray-200">CRITERIA</div>
 			<div class="pb-1 pt-1 leading-none">ENGINEERING DESIGN PROCESS</div>
 		</div>
-		<scroll-container use:registerScrollContainer>
+		<scroll-container use:rsc1>
 			<content class="min-w-120 flex-col! gap-2 bg-gray-200">
 				<div class="p-0! pt-1 text-center text-base font-bold">PROFICIENCY LEVEL</div>
 				<div class="border-0! p-0! flex text-center">
@@ -67,7 +72,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">IDENTIFY THE PROBLEM / DESIGN GOAL(S)</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						Clearly <u>identifies</u> the problem / design goal(s) <u>in detail at the start of each design process cycle</u>. This can
@@ -92,7 +97,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">BRAINSTORM SOLUTIONS</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						<u>Explores several different solutions</u> with explanation. Citations are provided for ideas that came from outside sources such
@@ -114,7 +119,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">SELECT BEST SOLUTION</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						<u
@@ -138,7 +143,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">BUILD AND PROGRAM THE SOLUTION</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						Records the steps the team took to build and program the solution. Includes
@@ -165,7 +170,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">ORIGINAL TESTING OF SOLUTIONS</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						<u>Records all the steps</u> to test the solution, including test results. Testing methodology is clearly explained, and the
@@ -189,7 +194,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">REPEAT DESIGN PROCESS</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc1>
 				<content class="min-w-120">
 					<div>
 						Shows that the <u>design process is repeated multiple times</u> to work towards a design goal. This includes a clear definition and
@@ -223,8 +228,12 @@
 		</row>
 	</rubric-body>
 </rubric-table>
-<!--  -->
-<rubric-table class="mt-6">
+<!-- Second rubric table -->
+<div class="mt-6 flex flex-row items-center justify-end gap-2 text-sm md:hidden!">
+	<button class="lightweight tiny" onclick={sl2}>Scroll Left</button>
+	<button class="lightweight tiny" onclick={sr2}>Scroll Right</button>
+</div>
+<rubric-table class="mt-2 md:mt-6">
 	<rubric-header>
 		<div class="max-h-42 flex min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
 			Engineering Notebook Rubric (Page 2 of 2)
@@ -234,7 +243,7 @@
 		<criteria class="max-w-42 min-w-42 bg-gray-400">
 			<p class="text-sm font-bold">ENGINEERING NOTEBOOK FORMAT AND CONTENT</p>
 		</criteria>
-		<scroll-container use:registerScrollContainer class="flex items-stretch bg-gray-200">
+		<scroll-container use:rsc2 class="flex items-stretch bg-gray-200">
 			<content class="min-w-120 flex-col! gap-2">
 				<div class="border-0! p-0! flex text-center">
 					<div class="flex flex-1 flex-col justify-center border-r">
@@ -263,7 +272,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">INDEPENDENT INQUIRY</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc2>
 				<content class="min-w-120">
 					<div>
 						Team shows evidence of independent inquiry <u>from the beginning stages</u> of their design process. Notebook documents whether the
@@ -291,7 +300,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">USABILITY & COMPLETENESS</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc2>
 				<content class="min-w-120">
 					<div>
 						<u>Records the entire design and development process</u> with enough clarity and detail that the reader could recreate the project’s
@@ -319,7 +328,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">ORIGINALITY & QUALITY</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc2>
 				<content class="min-w-120">
 					<div>
 						Content is kept to relevant information and all content not original to the team longer than a paragraph is located in
@@ -349,7 +358,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">ORGANIZATION / READABILITY</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc2>
 				<content class="min-w-120">
 					<div>
 						Entries are logged in a table of contents. There is an overall organization to the document that makes it easy to reference,
@@ -382,7 +391,7 @@
 			<criteria class="max-w-42 min-w-42">
 				<p class="text-sm font-bold">RECORD OF TEAM & PROJECT MANAGEMENT</p>
 			</criteria>
-			<scroll-container use:registerScrollContainer>
+			<scroll-container use:rsc2>
 				<content class="min-w-120">
 					<div>
 						Provides a <u>complete record of team and project assignments;</u> contains team meeting notes including goals, decisions, and building/programming
