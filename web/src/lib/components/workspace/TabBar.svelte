@@ -296,6 +296,8 @@
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('touchmove', handleTouchMove);
 		document.removeEventListener('touchend', handleTouchEnd);
+
+		document.body.style.userSelect = '';
 	}
 
 	// Helper function to reset drag state
