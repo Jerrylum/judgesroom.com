@@ -35,10 +35,7 @@
 
 	function handleSwitchRole() {
 		closeMenu();
-		dialogs.showCustom(RoleSelectionDialog, {
-			props: {},
-			maxWidth: 'max-w-4xl'
-		});
+		dialogs.showCustom(RoleSelectionDialog, { props: {} });
 	}
 
 	async function handleLeaveSession() {
@@ -152,7 +149,7 @@
 	{#if isOpen}
 		<div
 			bind:this={menuRef}
-			class="absolute top-full right-0 z-50 mt-1 w-56 rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+			class="absolute right-0 top-full z-50 mt-1 w-56 rounded-md border border-gray-200 bg-white py-1 shadow-lg"
 			role="menu"
 			aria-orientation="vertical"
 			aria-labelledby="menu-button"

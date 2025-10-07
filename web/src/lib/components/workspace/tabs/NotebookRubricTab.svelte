@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './rubric.css';
-	import { app, tabs, subscriptions } from '$lib/app-page.svelte';
+	import { app, tabs, subscriptions, dialogs } from '$lib/app-page.svelte';
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
@@ -8,6 +8,7 @@
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
+	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -151,6 +152,10 @@
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
+
+	function switchToJudge() {
+		dialogs.showCustom(RoleSelectionDialog, { props: {} });
+	}
 </script>
 
 <div class="h-full overflow-auto p-2 md:p-6" bind:this={mainScrollContainer}>
@@ -224,7 +229,12 @@
 				{#if judgeId}
 					<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
 				{:else}
-					<p>(Please switch to a judge in order to submit the rubric)</p>
+					<p>
+						(Please switch to a judge in order to submit the rubric){' '}<button
+							onclick={switchToJudge}
+							class="text-blue-500 hover:text-blue-600">Switch to Judge</button
+						>
+					</p>
 				{/if}
 			</div>
 		</div>

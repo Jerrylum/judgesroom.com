@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './rubric.css';
-	import { app, tabs, subscriptions } from '$lib/app-page.svelte';
+	import { app, tabs, subscriptions, dialogs } from '$lib/app-page.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
@@ -8,6 +8,7 @@
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
+	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -92,7 +93,7 @@
 
 		try {
 			tab.rubricId = tab.rubricId || generateUUID();
-			
+
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeTeamInterviewRubric.mutation({
 				judgeGroupId: currentJudgeGroup.id,
@@ -139,6 +140,10 @@
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
+
+	function switchToJudge() {
+		dialogs.showCustom(RoleSelectionDialog, { props: {} });
+	}
 </script>
 
 <div class="h-full overflow-auto p-2 md:p-6" bind:this={mainScrollContainer}>
@@ -149,7 +154,7 @@
 
 			<div class="mb-4">
 				<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-				<select id="team-select" bind:value={tab.teamId} class="classic mt-1 mb-2 block w-full" disabled={isSubmitted}>
+				<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full" disabled={isSubmitted}>
 					<option value="">Select a team...</option>
 					{#each teamsToShow() as team (team.id)}
 						<option value={team.id}>{team.number} - {team.name}</option>
@@ -191,7 +196,12 @@
 				{#if judgeId}
 					<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
 				{:else}
-					<p>(Please switch to a judge in order to submit the rubric)</p>
+					<p>
+						(Please switch to a judge in order to submit the rubric){' '}<button
+							onclick={switchToJudge}
+							class="text-blue-500 hover:text-blue-600">Switch to Judge</button
+						>
+					</p>
 				{/if}
 			</div>
 		</div>
@@ -223,8 +233,9 @@
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
 				<p class="mb-4 text-sm text-gray-600">
-					Rate this team for specific awards based on your team interview by clicking on the boxes below. Indicate how strong a candidate this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group -
-					all judges see updates in real-time without having to refresh the page.
+					Rate this team for specific awards based on your team interview by clicking on the boxes below. Indicate how strong a candidate
+					this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all
+					judges see updates in real-time without having to refresh the page.
 				</p>
 				<AwardRankingTable
 					title=""
