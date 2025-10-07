@@ -5,6 +5,7 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
+	import QRCodeButton from './QRCodeButton.svelte';
 
 	interface Props {
 		team: TeamInfoAndData;
@@ -24,12 +25,6 @@
 		}
 	}
 
-	// Function to truncate long text
-	function truncateText(text: string, maxLength: number = 40): string {
-		if (text.length <= maxLength) return text;
-		return text.substring(0, maxLength) + '...';
-	}
-
 	// Function to open notebook rubric for a team
 	function openNotebookRubric() {
 		tabs.addOrReuseTab(new NotebookRubricTab({ teamId: team.id }));
@@ -42,7 +37,7 @@
 </script>
 
 <div
-	class="relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-sm"
+	class="min-h-51 relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
 	class:border-green-500={devStatus === 'fully_developed'}
 	class:border-yellow-500={devStatus === 'developing'}
 	class:border-gray-500={devStatus === 'not_submitted'}
@@ -65,16 +60,17 @@
 	</div>
 
 	<!-- Notebook Link -->
-	<div class="mb-2">
+	<div class="mb-2 flex flex-row items-center justify-between gap-1">
 		{#if team.notebookLink}
 			<a
 				href={team.notebookLink}
 				target="_blank"
-				class="block text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+				class="block overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
 				title={team.notebookLink}
 			>
-				{truncateText(team.notebookLink.replace(/^https?:\/\//, ''), 30)}
+				{team.notebookLink.replace(/^https?:\/\//, '')}
 			</a>
+			<QRCodeButton link={team.notebookLink} />
 		{:else}
 			<span class="block text-xs text-gray-400">No notebook link</span>
 		{/if}
