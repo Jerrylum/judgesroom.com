@@ -134,6 +134,13 @@ export class EditingTeam {
 		this.data.notebookLink = value;
 	}
 
+	get notebookDevelopmentStatus() {
+		return this.data.notebookDevelopmentStatus;
+	}
+	set notebookDevelopmentStatus(value: NotebookDevelopmentStatus) {
+		this.data.notebookDevelopmentStatus = value;
+	}
+
 	get excluded() {
 		return this.data.excluded;
 	}
@@ -335,10 +342,11 @@ export function mergeTeamData(
 	notebookLinks: Record<string, string>,
 	existingTeams: EditingTeam[] = []
 ): EditingTeam[] {
-	const existingTeamMap = new SvelteMap(existingTeams.map((team) => [team.number, team.id]));
+	const existingTeamMap = new SvelteMap(existingTeams.map((team) => [team.number, team]));
 
 	return csvTeams.map((team) => {
-		const id = existingTeamMap.get(team.number!) || uuidv4(); // reuse existing team id if it exists
+		const existingTeam = existingTeamMap.get(team.number!);
+		const id = existingTeam?.id || uuidv4(); // reuse existing team id if it exists
 		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
 		const notebookLink = notebookLinks[teamNumber] || '';
 
@@ -355,7 +363,12 @@ export function mergeTeamData(
 			team.group || ''
 		);
 
-		const teamData = createTeamData(id, notebookLink, team.notebookDevelopmentStatus ?? 'undetermined', team.excluded || false);
+		const teamData = createTeamData(
+			id,
+			notebookLink,
+			team.notebookDevelopmentStatus ?? existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
+			team.excluded ?? existingTeam?.excluded ?? false
+		);
 
 		return new EditingTeam(teamInfo, teamData);
 	});
