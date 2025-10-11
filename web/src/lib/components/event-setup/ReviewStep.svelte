@@ -2,12 +2,12 @@
 	import { separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
 	import type { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam, groupTeamsByGroup } from '$lib/team.svelte';
-	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import type { Program } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
-		selectedCompetitionType: CompetitionType;
+		selectedProgram: Program;
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: EditingTeam[];
 		awardOptions: AwardOptions[];
@@ -21,7 +21,7 @@
 	}
 
 	let {
-		selectedCompetitionType,
+		selectedProgram,
 		selectedEventGradeLevel,
 		teams,
 		awardOptions,
@@ -44,7 +44,7 @@
 		<div class="rounded-lg bg-gray-50 p-4">
 			<h3 class="mb-2 font-medium text-gray-900">Competition Details</h3>
 			<p class="text-sm text-gray-600">
-				Type: <span class="font-medium">{selectedCompetitionType}</span>
+				Type: <span class="font-medium">{selectedProgram}</span>
 			</p>
 			<p class="text-sm text-gray-600">
 				Grade Level: <span class="font-medium">{selectedEventGradeLevel}</span>

@@ -2,7 +2,7 @@
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
 	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
-	import { isExcellenceAward, type AwardType, type CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward, type AwardType, type Program } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import FixedAwardOptions from './FixedAwardOptions.svelte';
@@ -11,7 +11,7 @@
 	import { tick, untrack } from 'svelte';
 
 	interface Props {
-		selectedCompetitionType: CompetitionType;
+		selectedProgram: Program;
 		selectedEventGradeLevel: EventGradeLevel;
 		allAwardOptions: AwardOptions[];
 		onNext: () => void;
@@ -20,9 +20,9 @@
 
 	type DropEvent = CustomEvent<{ items: AwardOptions[] }>;
 
-	let { selectedCompetitionType, selectedEventGradeLevel, allAwardOptions = $bindable(), onNext, onPrev }: Props = $props();
+	let { selectedProgram, selectedEventGradeLevel, allAwardOptions = $bindable(), onNext, onPrev }: Props = $props();
 
-	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
+	const gradeOptions = $derived(getEventGradeLevelOptions(selectedProgram));
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 
 	let excellenceAward = $state<AwardOptions[]>([]);
@@ -37,7 +37,7 @@
 		let using = allAwardOptions;
 
 		if (using.length === 0) {
-			using = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
+			using = getOfficialAwardOptionsList(selectedProgram, possibleGrades);
 		}
 
 		untrack(() => {
@@ -116,7 +116,7 @@
 		const result = await dialogs.showCustom(CustomAwardDialog, {
 			props: {
 				existingAwards: [...allAwardOptions],
-				selectedCompetitionType,
+				selectedProgram,
 				possibleGrades
 			}
 		});

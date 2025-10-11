@@ -2,15 +2,15 @@
 	import { dialogs } from '$lib/app-page.svelte';
 	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { type CompetitionType, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
+	import { type Program, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
 
 	interface Props {
 		existingAwards: AwardOptions[];
-		selectedCompetitionType: CompetitionType;
+		selectedProgram: Program;
 		possibleGrades: Grade[];
 	}
 
-	let { existingAwards, selectedCompetitionType, possibleGrades }: Props = $props();
+	let { existingAwards, selectedProgram, possibleGrades }: Props = $props();
 
 	// Custom award form
 	let customAwardName = $state('');
@@ -96,7 +96,7 @@
 		if (canSubmitCustomAward()) {
 			const customAward = createCustomAwardOptions(
 				customAwardName,
-				selectedCompetitionType,
+				selectedProgram,
 				customAwardType,
 				customAwardGrades,
 				customAwardWinners,

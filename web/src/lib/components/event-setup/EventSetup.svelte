@@ -9,7 +9,7 @@
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { EditingTeam } from '$lib/team.svelte';
-	import type { CompetitionType } from '@judging.jerryio/protocol/src/award';
+	import type { Program } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
@@ -22,7 +22,7 @@
 
 	// Event setup state
 	let eventName: string = $state('My Event');
-	let selectedCompetitionType: CompetitionType = $state('V5RC');
+	let selectedProgram: Program = $state('V5RC');
 	let selectedEventGradeLevel: EventGradeLevel = $state('Blended');
 
 	// Award state - will be managed by the AwardSelectionStep
@@ -52,14 +52,14 @@
 			isEditingEventSetup = true;
 			// Load event info
 			eventName = eventSetup.eventName;
-			selectedCompetitionType = eventSetup.competitionType;
+			selectedProgram = eventSetup.program;
 			selectedEventGradeLevel = eventSetup.eventGradeLevel;
 
 			// Load awards
-			const gradeOptions = getEventGradeLevelOptions(selectedCompetitionType);
+			const gradeOptions = getEventGradeLevelOptions(selectedProgram);
 			const possibleGrades = gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? [];
-			const officialAwardOptions = getOfficialAwardOptionsList(selectedCompetitionType, possibleGrades);
-			awardOptions = restoreAwardOptions(eventSetup.awards, officialAwardOptions, selectedCompetitionType);
+			const officialAwardOptions = getOfficialAwardOptionsList(selectedProgram, possibleGrades);
+			awardOptions = restoreAwardOptions(eventSetup.awards, officialAwardOptions, selectedProgram);
 
 			// Load teams
 			teams = eventSetup.teamInfos.map((teamWithData) => {
@@ -132,7 +132,7 @@
 			// Create the event setup object
 			const essentialData = {
 				eventName,
-				competitionType: selectedCompetitionType,
+				program: selectedProgram,
 				eventGradeLevel: selectedEventGradeLevel,
 				judgingMethod,
 				judgingStep,
@@ -219,7 +219,7 @@
 		{#if currentStep === 1}
 			<CompetitionSetupStep
 				bind:eventName
-				bind:selectedCompetitionType
+				bind:selectedProgram
 				bind:selectedEventGradeLevel
 				onResetAwards={resetAwards}
 				onNext={nextStep}
@@ -228,7 +228,7 @@
 			/>
 		{:else if currentStep === 2}
 			<AwardSelectionStep
-				{selectedCompetitionType}
+				{selectedProgram}
 				{selectedEventGradeLevel}
 				bind:allAwardOptions={awardOptions}
 				onNext={nextStep}
@@ -249,7 +249,7 @@
 			/>
 		{:else if currentStep === 5}
 			<ReviewStep
-				{selectedCompetitionType}
+				{selectedProgram}
 				{selectedEventGradeLevel}
 				{teams}
 				{awardOptions}

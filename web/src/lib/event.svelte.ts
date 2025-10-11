@@ -1,4 +1,4 @@
-import type { CompetitionType, Grade } from '@judging.jerryio/protocol/src/award';
+import type { Program, Grade } from '@judging.jerryio/protocol/src/award';
 import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 
 export interface EventGradeLevelOptions {
@@ -7,8 +7,8 @@ export interface EventGradeLevelOptions {
 	grades: Grade[];
 }
 
-export function getEventGradeLevelOptions(competitionType: CompetitionType): EventGradeLevelOptions[] {
-	switch (competitionType) {
+export function getEventGradeLevelOptions(program: Program): EventGradeLevelOptions[] {
+	switch (program) {
 		case 'VIQRC':
 			return [
 				{

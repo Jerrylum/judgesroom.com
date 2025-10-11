@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-export const CompetitionTypeSchema = z.enum(['VURC', 'V5RC', 'VIQRC']);
-export type CompetitionType = z.infer<typeof CompetitionTypeSchema>;
+export const ProgramSchema = z.enum(['VURC', 'V5RC', 'VIQRC']);
+export type Program = z.infer<typeof ProgramSchema>;
 
 export const AwardTypeSchema = z.enum(['performance', 'judged', 'volunteer_nominated']);
 export type AwardType = z.infer<typeof AwardTypeSchema>;

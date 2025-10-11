@@ -1,19 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { CompetitionTypeSchema, AwardTypeSchema, GradeSchema, AwardNameSchema, AwardSchema, type Award } from './award';
+import { ProgramSchema, AwardTypeSchema, GradeSchema, AwardNameSchema, AwardSchema, type Award } from './award';
 
 describe('Awards Schema Validation', () => {
-	describe('CompetitionTypeSchema', () => {
-		it('should validate valid competition types', () => {
+	describe('ProgramSchema', () => {
+		it('should validate valid programs', () => {
 			const validTypes = ['VURC', 'V5RC', 'VIQRC'];
 			validTypes.forEach((type) => {
-				expect(() => CompetitionTypeSchema.parse(type)).not.toThrow();
+				expect(() => ProgramSchema.parse(type)).not.toThrow();
 			});
 		});
 
-		it('should reject invalid competition types', () => {
+		it('should reject invalid programs', () => {
 			const invalidTypes = ['', 'VRC', 'VEXU', 'invalid', 'vurc', 'v5rc'];
 			invalidTypes.forEach((type) => {
-				expect(() => CompetitionTypeSchema.parse(type)).toThrow();
+				expect(() => ProgramSchema.parse(type)).toThrow();
 			});
 		});
 	});

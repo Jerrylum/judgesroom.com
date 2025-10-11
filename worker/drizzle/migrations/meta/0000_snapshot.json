@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e138bbab-5386-4ccc-9e81-2f1654045cd1",
+  "id": "dc393cb3-2f51-4072-a174-9d33b38f8aee",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -722,8 +722,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "competitionType": {
-          "name": "competitionType",
+        "program": {
+          "name": "program",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

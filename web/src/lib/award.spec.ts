@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AwardOptions, getOfficialAwardOptionsList, createCustomAwardOptions } from './award.svelte';
-import { AwardSchema, type CompetitionType, type Grade } from '@judging.jerryio/protocol/src/award';
+import { AwardSchema, type Program, type Grade } from '@judging.jerryio/protocol/src/award';
 
 describe('AwardOptions Class', () => {
 	let awardOptions: AwardOptions;
@@ -20,7 +20,7 @@ describe('AwardOptions Class', () => {
 
 	it('should create AwardOptions instance with correct properties', () => {
 		expect(awardOptions.name).toBe('Test Award');
-		expect(awardOptions.possibleCompetitionTypes).toEqual(['V5RC', 'VURC']);
+		expect(awardOptions.possiblePrograms).toEqual(['V5RC', 'VURC']);
 		expect(awardOptions.possibleTypes).toEqual(['judged', 'performance']);
 		expect(awardOptions.selectedType).toBe('judged'); // First type in possibleTypes
 		expect(awardOptions.acceptedGrades).toEqual(['High School', 'College']);
@@ -100,7 +100,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to V5RC and High School
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('V5RC');
+				expect(award.possiblePrograms).toContain('V5RC');
 				expect(award.acceptedGrades).toContain('High School');
 			});
 
@@ -121,7 +121,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to V5RC and Middle School
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('V5RC');
+				expect(award.possiblePrograms).toContain('V5RC');
 				expect(award.acceptedGrades).toContain('Middle School');
 			});
 
@@ -140,7 +140,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to V5RC and College
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('V5RC');
+				expect(award.possiblePrograms).toContain('V5RC');
 				expect(award.acceptedGrades).toContain('College');
 			});
 
@@ -172,7 +172,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to VIQRC and Elementary School
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('VIQRC');
+				expect(award.possiblePrograms).toContain('VIQRC');
 				expect(award.acceptedGrades).toContain('Elementary School');
 			});
 
@@ -192,7 +192,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to VIQRC and Middle School
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('VIQRC');
+				expect(award.possiblePrograms).toContain('VIQRC');
 				expect(award.acceptedGrades).toContain('Middle School');
 			});
 
@@ -228,7 +228,7 @@ describe('getOfficialAwardOptionsList', () => {
 
 			// Check that all awards are applicable to VURC and College
 			awards.forEach((award) => {
-				expect(award.possibleCompetitionTypes).toContain('VURC');
+				expect(award.possiblePrograms).toContain('VURC');
 				expect(award.acceptedGrades).toContain('College');
 			});
 
@@ -349,7 +349,7 @@ describe('createCustomAwardOptions', () => {
 		const customAward = createCustomAwardOptions('My Custom Award', 'V5RC', 'judged', ['High School', 'College'], 3, true);
 
 		expect(customAward.name).toBe('My Custom Award');
-		expect(customAward.possibleCompetitionTypes).toEqual(['V5RC']);
+		expect(customAward.possiblePrograms).toEqual(['V5RC']);
 		expect(customAward.possibleTypes).toEqual(['judged']);
 		expect(customAward.selectedType).toBe('judged');
 		expect(customAward.acceptedGrades).toEqual(['High School', 'College']);
@@ -363,7 +363,7 @@ describe('createCustomAwardOptions', () => {
 		const customAward = createCustomAwardOptions('Custom Performance Award', 'VIQRC', 'performance', ['Elementary School'], 5, false);
 
 		expect(customAward.name).toBe('Custom Performance Award');
-		expect(customAward.possibleCompetitionTypes).toEqual(['VIQRC']);
+		expect(customAward.possiblePrograms).toEqual(['VIQRC']);
 		expect(customAward.selectedType).toBe('performance');
 		expect(customAward.acceptedGrades).toEqual(['Elementary School']);
 		expect(customAward.possibleWinners).toBe(5);
@@ -376,7 +376,7 @@ describe('createCustomAwardOptions', () => {
 		const customAward = createCustomAwardOptions('Custom Volunteer Award', 'VURC', 'volunteer_nominated', ['College'], 1, false);
 
 		expect(customAward.name).toBe('Custom Volunteer Award');
-		expect(customAward.possibleCompetitionTypes).toEqual(['VURC']);
+		expect(customAward.possiblePrograms).toEqual(['VURC']);
 		expect(customAward.selectedType).toBe('volunteer_nominated');
 		expect(customAward.acceptedGrades).toEqual(['College']);
 		expect(customAward.possibleWinners).toBe(1);
@@ -417,16 +417,16 @@ describe('Integration Tests', () => {
 		expect(() => AwardSchema.parse(award)).not.toThrow();
 	});
 
-	it('should handle all competition types correctly', () => {
-		const competitionTypes: CompetitionType[] = ['V5RC', 'VIQRC', 'VURC'];
+	it('should handle all programs correctly', () => {
+		const programs: Program[] = ['V5RC', 'VIQRC', 'VURC'];
 		const grades: Grade[] = ['Elementary School', 'Middle School', 'High School', 'College'];
 
-		competitionTypes.forEach((compType) => {
+		programs.forEach((compType) => {
 			grades.forEach((grade) => {
 				const awards = getOfficialAwardOptionsList(compType, [grade]);
 
 				awards.forEach((award) => {
-					expect(award.possibleCompetitionTypes).toContain(compType);
+					expect(award.possiblePrograms).toContain(compType);
 					expect(award.acceptedGrades).toContain(grade);
 
 					const generatedAward = award.generateAward();

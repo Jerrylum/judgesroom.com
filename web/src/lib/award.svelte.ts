@@ -1,4 +1,4 @@
-import { type CompetitionType, type AwardType, type Grade, type Award, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
+import { type Program, type AwardType, type Grade, type Award, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
 import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
@@ -6,7 +6,7 @@ import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 export class AwardOptions {
 	public readonly id: string;
 	public name: string = $state('');
-	public possibleCompetitionTypes: CompetitionType[];
+	public possiblePrograms: Program[];
 	public possibleTypes: AwardType[] = $state([]);
 	public selectedType: AwardType = $state('performance');
 	public acceptedGrades: Grade[] = $state([]);
@@ -17,7 +17,7 @@ export class AwardOptions {
 
 	constructor(
 		name: string,
-		possibleCompetitionTypes: CompetitionType[],
+		possiblePrograms: Program[],
 		possibleTypes: AwardType[],
 		acceptedGrades: Grade[],
 		possibleWinners: number,
@@ -27,7 +27,7 @@ export class AwardOptions {
 	) {
 		this.id = generateUUID();
 		this.name = name;
-		this.possibleCompetitionTypes = possibleCompetitionTypes;
+		this.possiblePrograms = possiblePrograms;
 		this.possibleTypes = possibleTypes;
 		this.selectedType = possibleTypes[0];
 		this.acceptedGrades = acceptedGrades;
@@ -60,7 +60,7 @@ export class AwardOptions {
  *   Award, Amaze Award, Build Award, Create Award, Judges Award, Inspire Award,
  *   Sportsmanship Award, Energy Award.
  */
-export function getOfficialAwardOptionsList(competitionType: CompetitionType, possibleGrades: Grade[]): AwardOptions[] {
+export function getOfficialAwardOptionsList(program: Program, possibleGrades: Grade[]): AwardOptions[] {
 	return [
 		new AwardOptions(
 			'Tournament Champions',
@@ -262,7 +262,7 @@ export function getOfficialAwardOptionsList(competitionType: CompetitionType, po
 		)
 	].filter(
 		(a) =>
-			a.possibleCompetitionTypes.includes(competitionType) &&
+			a.possiblePrograms.includes(program) &&
 			a.acceptedGrades.some((g) => possibleGrades.includes(g)) &&
 			!(possibleGrades.length === 1 && a.acceptedGrades.length === 1)
 	);
@@ -270,13 +270,13 @@ export function getOfficialAwardOptionsList(competitionType: CompetitionType, po
 
 export function createCustomAwardOptions(
 	name: string,
-	competitionType: CompetitionType,
+	program: Program,
 	type: AwardType,
 	acceptedGrades: Grade[],
 	possibleWinners: number,
 	requireNotebook: boolean
 ): AwardOptions {
-	return new AwardOptions(name, [competitionType], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
+	return new AwardOptions(name, [program], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
 }
 
 export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
@@ -296,7 +296,7 @@ export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
  *
  * @param awards - Array of existing Award objects that were previously selected/configured
  * @param officialAwards - Array of official AwardOptions templates available for the competition
- * @param competitionType - The type of competition (affects custom award creation)
+ * @param program - The type of competition (affects custom award creation)
  *
  * @returns Array of AwardOptions with:
  *   - Official awards marked as selected with updated winner counts and notebook requirements
@@ -304,7 +304,7 @@ export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
  *   - Unselected official awards preserved for potential selection
  *   - Order preserved when the original award selection maintained official award ordering
  */
-export function restoreAwardOptions(awards: Award[], officialAwards: AwardOptions[], competitionType: CompetitionType): AwardOptions[] {
+export function restoreAwardOptions(awards: Award[], officialAwards: AwardOptions[], program: Program): AwardOptions[] {
 	const rtn: AwardOptions[] = [];
 
 	const v = awards.map((o) => o.name);
@@ -328,7 +328,7 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 
 			while (awards[i].name !== y[k]) {
 				const a = awards[i++];
-				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+				rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
 			}
 
 			const o = officialAwards[j++];
@@ -347,7 +347,7 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 		}
 		while (i < awards.length) {
 			const a = awards[i++];
-			rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+			rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
 		}
 	} else {
 		for (let i = 0; i < awards.length; i++) {
@@ -359,7 +359,7 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 				o.isSelected = true;
 				rtn.push(o);
 			} else {
-				rtn.push(createCustomAwardOptions(a.name, competitionType, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+				rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
 			}
 		}
 		for (let j = 0; j < officialAwards.length; j++) {

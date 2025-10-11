@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AwardSchema } from './award';
-import { CompetitionTypeSchema } from './award';
+import { ProgramSchema } from './award';
 import { TeamInfoSchema } from './team';
 import { JudgingMethodSchema, JudgingStepSchema } from './judging';
 import { JudgeGroupSchema } from './judging';
@@ -16,7 +16,7 @@ export const EventNameSchema = z
 
 export const EssentialDataSchema = z.object({
 	eventName: EventNameSchema,
-	competitionType: CompetitionTypeSchema,
+	program: ProgramSchema,
 	eventGradeLevel: EventGradeLevelSchema,
 	judgingMethod: JudgingMethodSchema,
 	judgingStep: JudgingStepSchema,

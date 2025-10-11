@@ -96,7 +96,7 @@ CREATE TABLE `Judges` (
 --> statement-breakpoint
 CREATE TABLE `Metadata` (
 	`eventName` text NOT NULL,
-	`competitionType` text NOT NULL,
+	`program` text NOT NULL,
 	`eventGradeLevel` text NOT NULL,
 	`judgingMethod` text NOT NULL,
 	`judgingStep` text NOT NULL

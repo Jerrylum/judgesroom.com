@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
-	import { type CompetitionType, CompetitionTypeSchema } from '@judging.jerryio/protocol/src/award';
+	import { type Program, ProgramSchema } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 
 	interface Props {
 		eventName: string;
-		selectedCompetitionType: CompetitionType;
+		selectedProgram: Program;
 		selectedEventGradeLevel: EventGradeLevel;
 		onResetAwards: () => void;
 		onNext: () => void;
@@ -15,7 +15,7 @@
 
 	let {
 		eventName = $bindable(),
-		selectedCompetitionType = $bindable(),
+		selectedProgram = $bindable(),
 		selectedEventGradeLevel = $bindable(),
 		onResetAwards,
 		onNext,
@@ -24,10 +24,10 @@
 	}: Props = $props();
 
 	const originalSelectedEventGradeLevel = selectedEventGradeLevel;
-	const originalSelectedCompetitionType = selectedCompetitionType;
+	const originalSelectedProgram = selectedProgram;
 
-	// Computed grade options based on competition type
-	const gradeOptions = $derived(getEventGradeLevelOptions(selectedCompetitionType));
+	// Computed grade options based on program
+	const gradeOptions = $derived(getEventGradeLevelOptions(selectedProgram));
 
 	// Validation
 	const isEventNameValid = $derived(eventName.trim().length > 0);
@@ -38,14 +38,14 @@
 
 	function handleNext() {
 		if (canProceed) {
-			if (originalSelectedEventGradeLevel !== selectedEventGradeLevel || originalSelectedCompetitionType !== selectedCompetitionType) {
+			if (originalSelectedEventGradeLevel !== selectedEventGradeLevel || originalSelectedProgram !== selectedProgram) {
 				onResetAwards();
 			}
 			onNext();
 		}
 	}
 
-	// Reset grade level when competition type changes
+	// Reset grade level when program changes
 	$effect(() => {
 		if (!gradeOptions.some((option) => option.value === selectedEventGradeLevel)) {
 			selectedEventGradeLevel = gradeOptions[gradeOptions.length - 1].value;
@@ -78,9 +78,9 @@
 	</div>
 
 	<div>
-		<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Competition Type </label>
-		<select id="competition-type" bind:value={selectedCompetitionType} class="classic block w-full">
-			{#each CompetitionTypeSchema.options as type (type)}
+		<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Program </label>
+		<select id="competition-type" bind:value={selectedProgram} class="classic block w-full">
+			{#each ProgramSchema.options as type (type)}
 				<option value={type}>{type}</option>
 			{/each}
 		</select>

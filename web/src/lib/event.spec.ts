@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { type CompetitionType } from '@judging.jerryio/protocol/src/award';
+import { type Program } from '@judging.jerryio/protocol/src/award';
 import { EventGradeLevelSchema, EventNameSchema, EssentialDataSchema, type EssentialData } from '@judging.jerryio/protocol/src/event';
 import { uuidv4 } from '@judging.jerryio/protocol/src/utils';
 import { getEventGradeLevelOptions } from './event.svelte';
@@ -68,16 +68,16 @@ describe('Event Grade Level Options', () => {
 	});
 
 	describe('Edge Cases', () => {
-		it('should return empty array for invalid competition type', () => {
-			const options = getEventGradeLevelOptions('InvalidType' as CompetitionType);
+		it('should return empty array for invalid program', () => {
+			const options = getEventGradeLevelOptions('InvalidType' as Program);
 
 			expect(options).toEqual([]);
 		});
 
-		it('should handle all defined competition types', () => {
-			const competitionTypes: CompetitionType[] = ['VIQRC', 'V5RC', 'VURC'];
+		it('should handle all defined programs', () => {
+			const programs: Program[] = ['VIQRC', 'V5RC', 'VURC'];
 
-			competitionTypes.forEach((type) => {
+			programs.forEach((type) => {
 				const options = getEventGradeLevelOptions(type);
 				expect(Array.isArray(options)).toBe(true);
 				expect(options.length).toBeGreaterThan(0);
@@ -87,9 +87,9 @@ describe('Event Grade Level Options', () => {
 
 	describe('Grade Level Consistency', () => {
 		it('should return valid EventGradeLevel values', () => {
-			const allCompetitionTypes: CompetitionType[] = ['VIQRC', 'V5RC', 'VURC'];
+			const allPrograms: Program[] = ['VIQRC', 'V5RC', 'VURC'];
 
-			allCompetitionTypes.forEach((type) => {
+			allPrograms.forEach((type) => {
 				const options = getEventGradeLevelOptions(type);
 				options.forEach((option) => {
 					expect(() => EventGradeLevelSchema.parse(option.value)).not.toThrow();
@@ -97,7 +97,7 @@ describe('Event Grade Level Options', () => {
 			});
 		});
 
-		it('should include all possible grade levels across all competition types', () => {
+		it('should include all possible grade levels across all programs', () => {
 			const allOptions = [
 				...getEventGradeLevelOptions('VIQRC'),
 				...getEventGradeLevelOptions('V5RC'),
@@ -114,9 +114,9 @@ describe('Event Grade Level Options', () => {
 		});
 
 		it('should have consistent labeling', () => {
-			const allCompetitionTypes: CompetitionType[] = ['VIQRC', 'V5RC', 'VURC'];
+			const allPrograms: Program[] = ['VIQRC', 'V5RC', 'VURC'];
 
-			allCompetitionTypes.forEach((type) => {
+			allPrograms.forEach((type) => {
 				const options = getEventGradeLevelOptions(type);
 				options.forEach((option) => {
 					expect(option.label).toBeTruthy();
@@ -144,9 +144,9 @@ describe('Event Grade Level Options', () => {
 		});
 
 		it('should have single grades for non-blended options', () => {
-			const allCompetitionTypes: CompetitionType[] = ['VIQRC', 'V5RC', 'VURC'];
+			const allPrograms: Program[] = ['VIQRC', 'V5RC', 'VURC'];
 
-			allCompetitionTypes.forEach((type) => {
+			allPrograms.forEach((type) => {
 				const options = getEventGradeLevelOptions(type);
 				options.forEach((option) => {
 					if (option.value !== 'Blended') {
@@ -172,7 +172,7 @@ describe('Integration Tests', () => {
 		// Create a complete event setup using the selected grade level
 		const eventSetup: EssentialData = {
 			eventName: 'Regional Championship',
-			competitionType: 'V5RC',
+			program: 'V5RC',
 			eventGradeLevel: selectedGradeLevel!.value,
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',
@@ -235,7 +235,7 @@ describe('Integration Tests', () => {
 
 		const eventSetup: EssentialData = {
 			eventName: 'A',
-			competitionType: 'VIQRC',
+			program: 'VIQRC',
 			eventGradeLevel: blendedOption!.value,
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',

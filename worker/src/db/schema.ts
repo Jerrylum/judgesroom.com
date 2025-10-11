@@ -20,7 +20,7 @@ export const offlineDevices = sqliteTable('OfflineDevices', {
 
 export const metadata = sqliteTable('Metadata', {
 	eventName: text('eventName').notNull(),
-	competitionType: text('competitionType', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
+	program: text('program', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),
 	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
 	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull()

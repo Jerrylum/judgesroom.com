@@ -208,7 +208,7 @@ export async function seedTestDatabase(context: ServerContext) {
 	// Insert one metadata row so essential data queries work
 	await context.db.insert(metadata).values({
 		eventName: 'Test Event',
-		competitionType: 'VIQRC',
+		program: 'VIQRC',
 		eventGradeLevel: 'MS Only',
 		judgingMethod: 'assigned',
 		judgingStep: 'beginning'
