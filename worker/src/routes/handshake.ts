@@ -37,7 +37,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 		joinJudgesRoom: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
 			const hasExistingEssentialData = await hasEssentialData(ctx.db);
 			if (!hasExistingEssentialData) {
-				throw new WRPCError('Session not found');
+				throw new WRPCError('Judges\' Room not found');
 			}
 
 			const offlineDevice = {
@@ -76,7 +76,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				// return false if has essential data
 				const hasExistingEssentialData = await hasEssentialData(ctx.db);
 				if (hasExistingEssentialData) {
-					return { success: false, message: 'Session already exists' };
+					return { success: false, message: 'Judges\' Room already exists' };
 				}
 
 				const offlineDevice = {
@@ -94,7 +94,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 						set: offlineDevice
 					});
 
-				// No need to broadcast device list update since it is a new session
+				// No need to broadcast device list update since it is a new Judges\' Room
 
 				return transaction(ctx.db, async (tx) => {
 					await updateEssentialData(tx, input.essentialData);
@@ -103,14 +103,14 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 
 					await Promise.all(input.judges.map((judge) => upsertJudge(tx, judge)));
 
-					return { success: true, message: 'Session created' };
+					return { success: true, message: 'Judges\' Room created' };
 				});
 			}),
 
 		destroyJudgesRoom: w.procedure.mutation(async ({ ctx }) => {
 			await ctx.network.destroy();
 
-			return { success: true, message: 'Session destroyed' };
+			return { success: true, message: 'Judges\' Room destroyed' };
 		})
 	};
 }

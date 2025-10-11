@@ -47,7 +47,7 @@ describe('WRPCClientManager', () => {
 	beforeEach(() => {
 		mockCreateOptions = vi.fn().mockReturnValue({
 			wsUrl: 'ws://localhost:8080/ws',
-			roomId: 'test-session',
+			roomId: 'test-room',
 			clientId: 'test-client',
 			deviceName: 'Test Device'
 		});
@@ -99,7 +99,7 @@ describe('WRPCClientManager', () => {
 		it('should pass correct options to client factory', () => {
 			const expectedOptions = {
 				wsUrl: 'ws://localhost:8080/ws',
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device',
@@ -244,7 +244,7 @@ describe('WRPCClientManager', () => {
 			const onConnectionStateChangeSpy = vi.fn();
 			const optionsWithCallback = vi.fn().mockReturnValue({
 				wsUrl: 'ws://localhost:8080/ws',
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device',
@@ -265,7 +265,7 @@ describe('WRPCClientManager', () => {
 			const onConnectionStateChangeSpy = vi.fn();
 			const optionsWithCallback = vi.fn().mockReturnValue({
 				wsUrl: 'ws://localhost:8080/ws',
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device',
@@ -292,7 +292,7 @@ describe('WRPCClientManager', () => {
 		});
 
 		it('should handle dynamic options', () => {
-			let roomId = 'session-1';
+			let roomId = 'room-1';
 			vi.mocked(mockCreateOptions).mockImplementation(() => ({
 				wsUrl: 'ws://localhost:8080/ws',
 				roomId,
@@ -306,21 +306,21 @@ describe('WRPCClientManager', () => {
 			}));
 
 			const [wsClient1] = clientManager.getClient();
-			expect((wsClient1 as any).options.roomId).toBe('session-1');
+			expect((wsClient1 as any).options.roomId).toBe('room-1');
 
-			// Change session and reset
-			roomId = 'session-2';
+			// Change room and reset
+			roomId = 'room-2';
 			clientManager.resetClient();
 
 			const [wsClient2] = clientManager.getClient();
-			expect((wsClient2 as any).options.roomId).toBe('session-2');
+			expect((wsClient2 as any).options.roomId).toBe('room-2');
 		});
 
 		it('should handle multiple client managers independently', () => {
 			const manager2 = new WRPCClientManager(
 				() => ({
 					wsUrl: 'ws://other:8080/ws',
-					roomId: 'test-session',
+					roomId: 'test-room',
 					clientId: 'test-client',
 					deviceId: 'test-device',
 					deviceName: 'Test Device',
@@ -355,7 +355,7 @@ describe('createClientManager', () => {
 	it('should create WRPCClientManager instance', () => {
 		const mockCreateOptions = () => ({
 			wsUrl: 'ws://localhost:8080/ws',
-			roomId: 'test-session',
+			roomId: 'test-room',
 			clientId: 'test-client',
 			deviceId: 'test-device',
 			deviceName: 'Test Device',

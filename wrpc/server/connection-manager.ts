@@ -51,7 +51,7 @@ export class WebSocketConnectionManager implements Network {
 		}
 
 		if (this.serverData.roomId === null) {
-			throw new Error('Session ID not set');
+			throw new Error('Room ID not set');
 		}
 
 		return this.serverData.roomId;
@@ -66,7 +66,7 @@ export class WebSocketConnectionManager implements Network {
 		}
 
 		if (this.serverData.roomId !== null && this.serverData.roomId !== roomId) {
-			throw new Error('CRITICAL: Session ID mismatch');
+			throw new Error('CRITICAL: Room ID mismatch');
 		}
 		this.serverData.roomId = roomId;
 
@@ -296,7 +296,7 @@ export class WebSocketConnectionManager implements Network {
 	 */
 	async destroy() {
 		for (const client of this.serverData.clients) {
-			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.ROOM_DESTROYED, 'Session destroyed');
+			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.ROOM_DESTROYED, 'Room destroyed');
 		}
 
 		this.serverData = { roomId: null, clients: [] };

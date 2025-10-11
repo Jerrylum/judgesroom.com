@@ -21,12 +21,12 @@ describe('Server-side Session', () => {
 			destroy: vi.fn()
 		};
 
-		session = createServerSideSession(mockNetwork, 'test-session-id', 'test-client-id', 'test-device-id', 'Test Device');
+		session = createServerSideSession(mockNetwork, 'test-room-id', 'test-client-id', 'test-device-id', 'Test Device');
 	});
 
 	describe('session metadata', () => {
 		it('should have correct roomId', () => {
-			expect(session.roomId).toBe('test-session-id');
+			expect(session.roomId).toBe('test-room-id');
 		});
 
 		it('should have correct currentClient metadata', () => {

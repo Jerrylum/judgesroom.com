@@ -26,7 +26,7 @@ describe('createWRPCClient', () => {
 	beforeEach(() => {
 		clientOptions = {
 			wsUrl: 'ws://localhost:8080/ws',
-			roomId: 'test-session',
+			roomId: 'test-room',
 			clientId: 'test-client',
 			deviceId: 'test-device',
 			deviceName: 'Test Device',

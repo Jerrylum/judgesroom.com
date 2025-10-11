@@ -154,7 +154,7 @@ export default {
 			}
 			const { roomId } = intention;
 
-			// Create a `DurableObjectId` for the WebSocket session
+			// Create a `DurableObjectId` for the WebSocket
 			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
 
 			// Create a stub to open a communication channel with the Durable Object instance

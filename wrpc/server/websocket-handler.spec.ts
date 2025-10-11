@@ -76,7 +76,7 @@ describe('WebSocket Handler', () => {
 		it('should handle new connection with connection options', async () => {
 			const mockWs = new MockWebSocket();
 			const connectionOpts = {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device'
@@ -96,7 +96,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('test-client', mockWs);
 
 			await wsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device'
@@ -319,7 +319,7 @@ describe('WebSocket Handler', () => {
 			const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
 			await wsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device'
@@ -366,7 +366,7 @@ describe('WebSocket Handler', () => {
 
 			// Add connection first
 			await wsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device'
@@ -442,7 +442,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('test-client', mockWs);
 
 			await contextWsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device'
@@ -486,7 +486,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('admin-client', mockWs);
 
 			await contextWsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'admin-client',
 				deviceId: 'test-device',
 				deviceName: 'Admin Device'
@@ -529,7 +529,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('user-client', mockWs);
 
 			await contextWsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'user-client',
 				deviceId: 'test-device',
 				deviceName: 'User Device'
@@ -571,7 +571,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('context-client', mockWs);
 
 			await contextWsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'context-client',
 				deviceId: 'test-device',
 				deviceName: 'Context Device'
@@ -610,7 +610,7 @@ describe('WebSocket Handler', () => {
 			mockWebSockets.set('empty-context-client', mockWs);
 
 			await contextWsHandler.handleConnection(mockWs as any, {
-				roomId: 'test-session',
+				roomId: 'test-room',
 				clientId: 'empty-context-client',
 				deviceId: 'test-device',
 				deviceName: 'Empty Context Device'
