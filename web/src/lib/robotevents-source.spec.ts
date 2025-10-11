@@ -8,7 +8,8 @@ import {
 	filterRankingsByDivision,
 	getExcellenceAwardTeamEligibility,
 	filterRankingsOrRecordsBySubset,
-	getRobotEventsClient
+	getRobotEventsClient,
+	getEventDivisionRankings
 } from './robotevents-source';
 
 describe('RobotEventsSource', () => {
@@ -31,35 +32,67 @@ describe('RobotEventsSource', () => {
 		const evt = resultEvt.data;
 		const evtId = evt.id;
 
-		const allDivsAllGradesAllJoinedTeams = await getEventJoinedTeams(client, evtId);
-		expect(allDivsAllGradesAllJoinedTeams.map((team) => team.id)).toMatchSnapshot();
+		const allDivsAllGradesJoinedTeams = await getEventJoinedTeams(client, evtId);
+		expect(allDivsAllGradesJoinedTeams.map((team) => team.id)).toMatchSnapshot();
 
 		// Ordered by rank, also the teams "at the event"/"present" according to RECF Guide to Judging
 		const allDivsAllGradesAllRankings = await getEventRankings(evt);
 		expect(allDivsAllGradesAllRankings).toMatchSnapshot();
 
 		// Ordered by overall score, teams that do not play skills are not included
-		const allDivsAllGradesAllTeamsOverallSkills = await getEventSkills(evt);
-		expect(allDivsAllGradesAllTeamsOverallSkills).toMatchSnapshot();
+		const allDivsAllGradesOverallSkills = await getEventSkills(client, evtId);
+		expect(allDivsAllGradesOverallSkills).toMatchSnapshot();
 
 		// Let's say all teams from division 1 are target
-		const allDiv1Rankings = filterRankingsByDivision(allDivsAllGradesAllRankings, 1);
-		expect(allDiv1Rankings).toMatchSnapshot();
+		const div1AllGradesRankings = filterRankingsByDivision(allDivsAllGradesAllRankings, 1);
+		expect(div1AllGradesRankings).toMatchSnapshot();
 
 		// Let's say all teams from middle school are target
-		const allMiddleSchoolTeams = filterTeamsByGrade(allDivsAllGradesAllJoinedTeams, 'Middle School');
+		const allMiddleSchoolTeams = filterTeamsByGrade(allDivsAllGradesJoinedTeams, 'Middle School');
 		expect(allMiddleSchoolTeams.length).toMatchSnapshot();
 
-		const allDiv1MiddleSchoolRankings = filterRankingsOrRecordsBySubset(allDiv1Rankings, allMiddleSchoolTeams);
-		expect(allDiv1MiddleSchoolRankings).toMatchSnapshot();
+		const div1MiddleSchoolRankings = filterRankingsOrRecordsBySubset(div1AllGradesRankings, allMiddleSchoolTeams);
+		expect(div1MiddleSchoolRankings).toMatchSnapshot();
 
-		const allDiv1MiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesAllTeamsOverallSkills, allMiddleSchoolTeams);
-		expect(allDiv1MiddleSchoolOverallSkills).toMatchSnapshot();
+		const allMiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesOverallSkills, allMiddleSchoolTeams);
+		expect(allMiddleSchoolOverallSkills).toMatchSnapshot();
 
-		const result = getExcellenceAwardTeamEligibility(allDiv1MiddleSchoolRankings, allDiv1MiddleSchoolOverallSkills);
+		const result = getExcellenceAwardTeamEligibility(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills);
 		expect(result).toMatchSnapshot();
 
 		// console.log(result);
 		// console.log(result.length);
+	});
+
+	it('should get the correct event data with 1 division using getEventDivisionRankings', async () => {
+		const resultEvt = await client.events.getBySKU('RE-VIQRC-24-8288'); // 58288
+
+		if (!resultEvt.data) throw new Error('Event not found');
+		const evt = resultEvt.data;
+		const evtId = evt.id;
+
+		const allDivsAllGradesJoinedTeams = await getEventJoinedTeams(client, evtId);
+		expect(allDivsAllGradesJoinedTeams.map((team) => team.id)).toMatchSnapshot();
+
+		// Let's say all teams from division 1 are target
+		const div1AllGradesRankings = await getEventDivisionRankings(client, evtId, 1);
+		expect(div1AllGradesRankings).toMatchSnapshot();
+
+		// Ordered by overall score, teams that do not play skills are not included
+		const allDivsAllGradesOverallSkills = await getEventSkills(client, evtId);
+		expect(allDivsAllGradesOverallSkills).toMatchSnapshot();
+
+		// Let's say all teams from middle school are target
+		const allMiddleSchoolTeams = filterTeamsByGrade(allDivsAllGradesJoinedTeams, 'Middle School');
+		expect(allMiddleSchoolTeams.length).toMatchSnapshot();
+
+		const div1MiddleSchoolRankings = filterRankingsOrRecordsBySubset(div1AllGradesRankings, allMiddleSchoolTeams);
+		expect(div1MiddleSchoolRankings).toMatchSnapshot();
+
+		const allMiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesOverallSkills, allMiddleSchoolTeams);
+		expect(allMiddleSchoolOverallSkills).toMatchSnapshot();
+
+		const result = getExcellenceAwardTeamEligibility(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills);
+		expect(result).toMatchSnapshot();
 	});
 });

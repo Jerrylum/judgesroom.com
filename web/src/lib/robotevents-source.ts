@@ -1,3 +1,4 @@
+import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import { Client, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
 
 // This is a public token
@@ -9,13 +10,24 @@ export function getRobotEventsClient(): RobotEventsClient {
 	});
 }
 
+/**
+ * Get the joined teams in the event
+ *
+ * Joined teams are teams that are in the team list on the event page on RobotEvents.
+ * Sometimes, people call them "registered teams".
+ *
+ * In our implementation, we don't filter out teams using "registered" because this
+ * "registered" is used to filter teams that paid registration fee on RobotEvents
+ * this season. If this function is used for an event in a previous season with
+ * teams that are not registered in the current season, the results will be
+ * incorrect.
+ *
+ * @param client The RobotEvents client
+ * @param evtId
+ * @returns The joined teams in the event
+ */
 export async function getEventJoinedTeams(client: RobotEventsClient, evtId: number): Promise<Team[]> {
-	// "RegisteredTeams" or "JoinedTeams" mean teams that are in the team list
-	// Here, we still have "registered" set to undefined
-	// Because this "registered" is used to filter teams that paid registration fee on RobotEvents this season
-
 	// Both are identical
-
 	// const result = await evt.teams({ registered: undefined });
 	const result = await client.teams.search({ 'event[]': [evtId], registered: undefined });
 	return result.data ?? [];
@@ -23,10 +35,26 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
 
 export interface TeamQualRanking {
 	teamId: number;
+	teamNumber: string;
 	divisionId: number;
 	rank: number;
 }
 
+/**
+ * Get the rankings of all teams in the event, in all divisions
+ *
+ * If the events have multiple divisions, the rankings of all teams in all divisions are returned
+ *
+ * For example, if the event has 2 divisions:
+ * - Division 1 Rank 1: Team 1
+ * - Division 2 Rank 1: Team 3
+ * - Division 1 Rank 2: Team 2
+ * - Division 2 Rank 2: Team 4
+ * ...
+ *
+ * @param evt The event
+ * @returns The rankings of all teams in the event, ordered by rank, from the first place to the last place
+ */
 export async function getEventRankings(evt: Event): Promise<TeamQualRanking[]> {
 	const rtn = [] as TeamQualRanking[];
 	for (const division of evt.divisions ?? []) {
@@ -36,37 +64,90 @@ export async function getEventRankings(evt: Event): Promise<TeamQualRanking[]> {
 		const result = await evt.rankings(dId);
 		for (const ranking of result.data ?? []) {
 			const teamId = ranking.team?.id;
+			const teamNumber = ranking.team?.name;
 			const divisionId = division.id;
 			const rank = ranking.rank;
-			if (!teamId || !divisionId || !rank) continue;
-			rtn.push({ teamId, divisionId, rank });
+			if (!teamId || !teamNumber || !divisionId || !rank) continue;
+			rtn.push({ teamId, teamNumber, divisionId, rank });
 		}
+	}
+	return rtn.sort((a, b) => a.rank - b.rank);
+}
+
+/**
+ * Get the rankings of all teams in the division
+ *
+ * @param client The RobotEvents client
+ * @param evtId The event ID
+ * @param divisionId The division ID
+ * @returns The rankings of all teams in the division, ordered by rank, from the first place to the last place
+ */
+export async function getEventDivisionRankings(client: RobotEventsClient, evtId: number, divisionId: number): Promise<TeamQualRanking[]> {
+	const result = await client.api.PaginatedGET('/events/{id}/divisions/{div}/rankings', {
+		params: {
+			path: {
+				id: evtId,
+				div: divisionId
+			}
+		}
+	});
+
+	if (result.error) throw new Error('Failed to get event division rankings from RobotEvents');
+
+	const rtn = [] as TeamQualRanking[];
+	for (const ranking of result.data) {
+		const teamId = ranking.team?.id;
+		const teamName = ranking.team?.name;
+		const rank = ranking.rank;
+		if (!teamId || !teamName || !rank) continue;
+		rtn.push({ teamId, teamNumber: teamName, divisionId, rank });
 	}
 	return rtn.sort((a, b) => a.rank - b.rank);
 }
 
 export interface TeamSkillsRecord {
 	teamId: number;
+	teamNumber: string;
 	rank: number;
 	driverScore: number;
 	programmingScore: number;
 	overallScore: number;
 }
 
-export async function getEventSkills(evt: Event): Promise<TeamSkillsRecord[]> {
-	const resultSkills = await evt.skills();
-	if (!resultSkills.data) return [];
+/**
+ * Get the skills records of all teams in the event, in all divisions
+ *
+ * @param client The RobotEvents client
+ * @param evtId The event ID
+ * @returns The skills records of all teams in the event, ordered by rank, from the first place to the last place
+ */
+export async function getEventSkills(client: RobotEventsClient, evtId: number): Promise<TeamSkillsRecord[]> {
+	const resultSkills = await client.api.PaginatedGET('/events/{id}/skills', {
+		params: {
+			path: {
+				id: evtId
+			}
+		}
+	});
 
-	const skills = resultSkills.data;
+	if (resultSkills.error) throw new Error('Failed to get event skills from RobotEvents');
 
-	const validSkills = skills
+	const validSkills = resultSkills.data
 		.map((skill) => {
 			const teamId = skill.team?.id;
+			const teamNumber = skill.team?.name;
 			const rank = skill.rank;
 			const score = skill.score;
 			const type = skill.type;
-			if (teamId === undefined || rank === undefined || score === undefined || (type !== 'programming' && type !== 'driver')) return null;
-			return { teamId, rank, score, type };
+			if (
+				teamId === undefined ||
+				teamNumber === undefined ||
+				rank === undefined ||
+				score === undefined ||
+				(type !== 'programming' && type !== 'driver')
+			)
+				return null;
+			return { teamId, teamNumber, rank, score, type };
 		})
 		.filter((skill) => skill !== null);
 
@@ -76,7 +157,14 @@ export async function getEventSkills(evt: Event): Promise<TeamSkillsRecord[]> {
 			const driverScore = skills.filter((skill) => skill.type === 'driver').reduce((acc, skill) => acc + skill.score, 0);
 			const programmingScore = skills.filter((skill) => skill.type === 'programming').reduce((acc, skill) => acc + skill.score, 0);
 			const overallScore = driverScore + programmingScore;
-			return { teamId: skills[0].teamId, rank: skills[0].rank, driverScore, programmingScore, overallScore };
+			return {
+				teamId: skills[0].teamId,
+				teamNumber: skills[0].teamNumber,
+				rank: skills[0].rank,
+				driverScore,
+				programmingScore,
+				overallScore
+			};
 		})
 		.filter((skill) => skill !== null)
 		.sort((a, b) => a.rank - b.rank);
@@ -91,13 +179,17 @@ export function filterRankingsByDivision(rankings: TeamQualRanking[], divisionId
 }
 
 export function filterRankingsOrRecordsBySubset<T extends TeamQualRanking | TeamSkillsRecord>(targets: T[], subset: Team[]): T[] {
-	const subsetIds = subset.map((team) => team.id);
-	return targets.filter((target) => subsetIds.includes(target.teamId));
+	const subsetIds = new Set(subset.map((team) => team.id));
+	return targets.filter((target) => subsetIds.has(target.teamId));
 }
 
 export interface ExcellenceAwardTeamEligibilityCriterion {
 	result: 'eligible' | 'ineligible' | 'no data';
-	no: number; // a.k.a "rank", calculated by index, starts from 1
+	// "no" stands for "number", calculated by index, starts from 1
+	// Here, the "no" is unique, so it can be used to determine the eligibility
+	// This is different from the "ranking" showing on RobotEvents
+	// In some scenarios, the ranking of two teams are the same if their skills overall scores are the same
+	no: number;
 	score: number;
 }
 
@@ -164,3 +256,9 @@ export function getExcellenceAwardTeamEligibility(
 	}
 	return rtn;
 }
+
+// export function getEventExcellenceAwardTeamEligibility(
+// 	client: RobotEventsClient,
+// 	evtId: number,
+// 	teamInfo: TeamInfo[]
+// ): ExcellenceAwardTeamEligibility[] {}
