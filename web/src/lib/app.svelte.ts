@@ -13,7 +13,7 @@ import type { Award } from '@judging.jerryio/protocol/src/award';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
-import { generateUUID, getDeviceNameFromUserAgent, parseSessionUrl, processTeamDataArray } from './utils.svelte';
+import { generateUUID, getDeviceNameFromUserAgent, parseJudgesRoomUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
@@ -113,27 +113,27 @@ export class App {
 		this.isDevelopment = isDevelopment;
 		this.clientManager = createClientManager(this.createClientOptions.bind(this), clientRouter);
 
-		this.loadSessionFromStorage();
+		this.loadPermitFromStorage();
 		this.loadUserFromStorage();
 	}
 
 	// ============================================================================
-	// Session Management
+	// Session, Judges' Room, Permit
 	// ============================================================================
 
 	private async joinJudgesRoom(): Promise<void> {
 		if (!this.hasPermit()) {
-			throw new Error('CRITICAL: No session info');
+			throw new Error('CRITICAL: No permit');
 		}
 
 		if (this.getConnectionState() === 'connected') {
-			throw new Error('CRITICAL: already connected to a session');
+			throw new Error('CRITICAL: already connected to a Judges\' Room');
 		}
 
 		// Just to be safe, reset the client manager
 		this.clientManager.resetClient();
 
-		// Join the session, this will call createWRPCClient
+		// Join the Judges' Room, this will call createWRPCClient
 		const starterKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
 		this.handleEventSetupUpdate(starterKit);
 
@@ -154,48 +154,48 @@ export class App {
 	}
 
 	/**
-	 * Join a session from URL
+	 * Join a Judges' Room from URL
 	 */
 	async joinJudgesRoomFromUrl(url: string): Promise<void> {
 		try {
 			if (this.hasPermit()) {
-				throw new Error('CRITICAL: already in a session');
+				throw new Error('CRITICAL: already in a Judges\' Room');
 			}
 
-			const roomId = parseSessionUrl(url);
+			const roomId = parseJudgesRoomUrl(url);
 			if (!roomId) {
-				throw new Error('Invalid session URL');
+				throw new Error('Invalid Judges\' Room URL');
 			}
 
 			this.permit = this.createNewPermit(roomId);
-			this.saveSessionToStorage();
+			this.savePermitToStorage();
 
 			await this.joinJudgesRoom();
 		} catch (error) {
-			this.addErrorNotice(`Failed to join session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(`Failed to join Judges\' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
 	}
 
 	/**
-	 * Get session info
+	 * Get permit
 	 */
 	getPermit(): Readonly<Permit> | null {
 		return this.permit ? $state.snapshot(this.permit) : null;
 	}
 
 	/**
-	 * Get session URL for sharing
+	 * Get Judges' Room URL for sharing
 	 */
-	getSessionUrl(): string {
+	getJudgesRoomUrl(): string {
 		if (!this.permit?.roomId) {
-			throw new Error('No active session');
+			throw new Error('CRITICAL: No active Judges\' Room');
 		}
 		return `${window.location.origin}${window.location.pathname}#${this.permit.roomId}`;
 	}
 
 	/**
-	 * Create a new session
+	 * Create a new Judges' Room
 	 */
 	async createJudgesRoom(): Promise<void> {
 		try {
@@ -203,7 +203,7 @@ export class App {
 			this.clientManager.resetClient();
 
 			// Clear storage
-			this.clearSessionFromStorage();
+			this.clearPermitFromStorage();
 			this.clearUserFromStorage();
 
 			const roomId = generateUUID();
@@ -219,29 +219,29 @@ export class App {
 				judges: [...this.allJudges]
 			});
 			if (response.success) {
-				this.saveSessionToStorage();
+				this.savePermitToStorage();
 			} else {
 				this.permit = null;
-				this.clearSessionFromStorage();
+				this.clearPermitFromStorage();
 				throw new Error(response.message);
 			}
 		} catch (error) {
 			this.permit = null;
-			this.clearSessionFromStorage();
-			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.clearPermitFromStorage();
+			this.addErrorNotice(`Failed to create Judges' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
 	}
 
 	/**
-	 * Check if the session is joined, it doesn't mean we are connected to the server
+	 * Check if the Judges' Room is joined, it doesn't mean we are connected to the server
 	 */
-	isSessionJoined(): boolean {
+	isJudgesRoomJoined(): boolean {
 		return this.permit !== null && this.essentialData !== null;
 	}
 
 	/**
-	 * Check if the session is joined and the user is selected, we can now go to the workspace
+	 * Check if the Judges' Room is joined and the user is selected, we can now go to the workspace
 	 */
 	isJudgingReady(): boolean {
 		return this.permit !== null && this.essentialData !== null && this.getCurrentUser() !== null;
@@ -252,40 +252,43 @@ export class App {
 	}
 
 	/**
-	 * Leave current session
+	 * Leave current Judges' Room
 	 */
-	async leaveSession(): Promise<void> {
-		// Clear session data
+	async leaveJudgesRoom(): Promise<void> {
+		// Clear local Judges' Room data
 		this.permit = null;
-		this.essentialData = null;
-		this.allJudges = [];
 		this.currentUser = null;
-		// no client-held session id field to clear
+		this.essentialData = null;
+		this.allTeamData = {};
+		this.allJudges = [];
+		this.allDevices = [];
+		this.allFinalAwardNominations = {};
+		// no client-held room id field to clear
 		this.clientManager.resetClient();
 
 		// Clear storage
-		this.clearSessionFromStorage();
+		this.clearPermitFromStorage();
 		this.clearUserFromStorage();
 	}
 
 	/**
-	 * Destroy all session data (for admin)
+	 * Destroy all Judges' Room data (for admin)
 	 */
-	async destroySessionData(): Promise<void> {
-		await this.wrpcClient.handshake.destroySession.mutation();
-		this.leaveSession();
+	async destroyJudgesRoomData(): Promise<void> {
+		await this.wrpcClient.handshake.destroyJudgesRoom.mutation();
+		this.leaveJudgesRoom();
 	}
 
 	/**
-	 * Reconnect to stored session
+	 * Reconnect to stored Judges' Room
 	 */
-	async reconnectStoredSession(): Promise<void> {
+	async joinJudgesRoomWithStoredPermit(): Promise<void> {
 		try {
 			await this.joinJudgesRoom();
 		} catch (error) {
-			// Do not clear session from storage, the user might be able to connect to the session again
-			// this.clearSessionFromStorage();
-			this.addErrorNotice(`Failed to reconnect to session: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			// Do not clear permit from storage, the user might be able to connect to the Judges' Room again
+			// this.clearPermitFromStorage();
+			this.addErrorNotice(`Failed to reconnect to Judges\' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
 		}
 	}
@@ -402,7 +405,7 @@ export class App {
 	}
 
 	/**
-	 * Kick a client from session
+	 * Kick a client from Judges' Room
 	 */
 	async kickDevice(deviceId: string): Promise<void> {
 		try {
@@ -623,7 +626,7 @@ export class App {
 			: 'wss://judging.jerryio.workers.dev/ws'; // Production Cloudflare Worker
 
 		if (this.permit === null) {
-			throw new Error('CRITICAL: No session info');
+			throw new Error('CRITICAL: No permit');
 		}
 
 		return {
@@ -636,13 +639,13 @@ export class App {
 			onOpen: () => {},
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
-					this.leaveSession();
-					this.addErrorNotice('You have been kicked from the session');
+					this.leaveJudgesRoom();
+					this.addErrorNotice('You have been kicked from the Judges\' Room');
 
 					AppUI.appPhase = 'choose_action';
 				} else if (code === ConnectionCloseCode.SESSION_DESTROYED) {
-					this.leaveSession();
-					this.addErrorNotice('The session has been destroyed');
+					this.leaveJudgesRoom();
+					this.addErrorNotice('The Judges\' Room has been destroyed');
 
 					AppUI.appPhase = 'choose_action';
 				}
@@ -667,7 +670,7 @@ export class App {
 		return { roomId, deviceId, deviceName, createdAt: Date.now() };
 	}
 
-	private loadSessionFromStorage(): Permit | null {
+	private loadPermitFromStorage(): Permit | null {
 		const stored = this.storage.load<Permit>('permit');
 		if (stored) {
 			this.permit = stored;
@@ -676,13 +679,13 @@ export class App {
 		return null;
 	}
 
-	private saveSessionToStorage(): void {
+	private savePermitToStorage(): void {
 		if (this.permit) {
 			this.storage.save('permit', this.permit);
 		}
 	}
 
-	private clearSessionFromStorage(): void {
+	private clearPermitFromStorage(): void {
 		this.storage.remove('permit');
 	}
 

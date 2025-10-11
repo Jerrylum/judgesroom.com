@@ -88,8 +88,8 @@ describe('ServerRouter', () => {
 			expect(result.success).toBe(false);
 		});
 
-		it('destroySession returns success', async () => {
-			const resolver = serverRouter.handshake.destroySession._def._resolver!;
+		it('destroyJudgesRoom returns success', async () => {
+			const resolver = serverRouter.handshake.destroyJudgesRoom._def._resolver!;
 			const result = await resolver({ input: undefined, session, ctx: context });
 			expect(result.success).toBe(true);
 		});

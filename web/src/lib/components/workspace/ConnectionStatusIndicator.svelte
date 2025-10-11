@@ -3,7 +3,7 @@
 	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
-	let isSessionJoined = $derived(app.isSessionJoined());
+	let isJudgesRoomJoined = $derived(app.isJudgesRoomJoined());
 
 	function getStatusColor(state: ConnectionState): string {
 		switch (state) {
@@ -22,7 +22,7 @@
 	}
 
 	function getStatusText(state: ConnectionState): string {
-		if (!isSessionJoined) {
+		if (!isJudgesRoomJoined) {
 			return 'Offline Mode';
 		}
 

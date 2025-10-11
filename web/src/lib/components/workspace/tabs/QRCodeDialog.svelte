@@ -35,7 +35,7 @@
 		</div>
 
 		<div class="flex justify-center">
-			<img src={qrCodeDataUrl} alt="QR Code for session link" class="h-48 w-48 rounded" />
+			<img src={qrCodeDataUrl} alt="QR Code for Judges' Room link" class="h-48 w-48 rounded" />
 		</div>
 	</div>
 </Dialog>

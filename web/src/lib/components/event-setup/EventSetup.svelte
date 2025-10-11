@@ -117,8 +117,8 @@
 	}
 
 	function cancelSetup() {
-		// Only allow cancel if user is in session
-		if (app.isSessionJoined()) {
+		// Only allow cancel if user is in Judges' Room
+		if (app.isJudgesRoomJoined()) {
 			AppUI.appPhase = 'workspace';
 		}
 	}
@@ -146,7 +146,7 @@
 			} satisfies EssentialData;
 
 			// Redirect based on whether user is judging ready
-			if (app.isSessionJoined()) {
+			if (app.isJudgesRoomJoined()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
 				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
 
@@ -165,7 +165,7 @@
 				app.handleAllJudgesUpdate(judges);
 
 				await app.createJudgesRoom();
-				// For Judge Advisor who created the session, auto-select role and show share dialog
+				// For Judge Advisor who created the Judges' Room, auto-select role and show share dialog
 				await app.selectUser({ role: 'judge_advisor' });
 
 				AppUI.appPhase = 'workspace';
@@ -224,7 +224,7 @@
 				onResetAwards={resetAwards}
 				onNext={nextStep}
 				onCancel={cancelSetup}
-				isSessionJoined={app.isSessionJoined()}
+				isJudgesRoomJoined={app.isJudgesRoomJoined()}
 			/>
 		{:else if currentStep === 2}
 			<AwardSelectionStep
@@ -259,7 +259,7 @@
 				onPrev={prevStep}
 				onComplete={completeSetup}
 				onCancel={cancelSetup}
-				isSessionJoined={app.isSessionJoined()}
+				isJudgesRoomJoined={app.isJudgesRoomJoined()}
 			/>
 		{/if}
 	</div>

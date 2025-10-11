@@ -7,7 +7,7 @@
 
 	let { errorMessage = $bindable() }: Props = $props();
 
-	let sessionUrl = $state('');
+	let judgesRoomUrl = $state('');
 
 	function clearError() {
 		errorMessage = '';
@@ -18,17 +18,17 @@
 	}
 
 	async function handleJoinJudgesRoom() {
-		if (!sessionUrl.trim()) {
-			errorMessage = 'Please enter a session URL';
+		if (!judgesRoomUrl.trim()) {
+			errorMessage = 'Please enter a Judges\' Room URL';
 			return;
 		}
 
 		try {
 			// Stay in joining state - App will request sync automatically when connected
 			// UI will update via reactive app.hasAppData() when sync completes
-			AppUI.appPhase = 'joining_session';
-			await app.leaveSession();
-			await app.joinJudgesRoomFromUrl(sessionUrl);
+			AppUI.appPhase = 'joining_judges_room';
+			await app.leaveJudgesRoom();
+			await app.joinJudgesRoomFromUrl(judgesRoomUrl);
 		} catch (error) {
 			console.error('Error joining Judges\' Room:', error);
 			AppUI.appPhase = 'choose_action';
@@ -37,7 +37,7 @@
 </script>
 
 <div class="flex flex-1 flex-col items-center justify-center p-8 text-black">
-	<h1 class="mb-8 text-center text-4xl font-bold drop-shadow-lg md:text-5xl">VEX Judging System</h1>
+	<h1 class="mb-8 text-center text-4xl font-bold drop-shadow-lg md:text-5xl">JudgesRoom.com</h1>
 
 	{#if errorMessage}
 		<div class="mb-8 flex w-full max-w-2xl items-center gap-4 rounded-lg border-2 border-red-600 bg-red-500/90 p-4" role="alert">
@@ -60,18 +60,18 @@
 		</div>
 
 		<div class="rounded-2xl bg-white/95 p-8 shadow-lg backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:transform">
-			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-slate-600">🔗 Join Session</h2>
-			<p class="mb-6 leading-relaxed text-gray-700">Join an existing judging session using a link from your judge advisor.</p>
+			<h2 class="mb-4 flex items-center gap-2 text-2xl font-bold text-slate-600">🔗 Join Judges' Room</h2>
+			<p class="mb-6 leading-relaxed text-gray-700">Join an existing Judges' Room using a link from your judge advisor.</p>
 			<div class="mb-6 space-y-4">
-				<input type="text" bind:value={sessionUrl} placeholder="Paste session URL here..." class="classic w-full" />
-				<button onclick={handleJoinJudgesRoom} class="primary w-full">Join Session</button>
+				<input type="text" bind:value={judgesRoomUrl} placeholder="Paste Judges' Room URL here..." class="classic w-full" />
+				<button onclick={handleJoinJudgesRoom} class="primary w-full">Join Judges' Room</button>
 			</div>
 			<div class="rounded-lg bg-gray-50 p-4 text-sm">
-				<p class="mb-2 font-semibold text-gray-800">How to get a session link:</p>
+				<p class="mb-2 font-semibold text-gray-800">How to get a Judges' Room link:</p>
 				<ol class="list-inside list-decimal space-y-1 text-gray-600">
-					<li>Ask your judge advisor for the session link</li>
+					<li>Ask your judge advisor for the Judges' Room link</li>
 					<li>They can share it via QR code or copy/paste</li>
-					<li>Paste the link above and click "Join Session"</li>
+					<li>Paste the link above and click "Join Judges' Room"</li>
 				</ol>
 			</div>
 		</div>

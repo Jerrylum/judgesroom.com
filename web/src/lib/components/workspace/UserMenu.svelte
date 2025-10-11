@@ -25,7 +25,7 @@
 		isOpen = false;
 	}
 
-	function handleShareSession() {
+	function handleShareJudgesRoom() {
 		closeMenu();
 		dialogs.showCustom(ShareDialog, {
 			props: {},
@@ -38,19 +38,19 @@
 		dialogs.showCustom(RoleSelectionDialog, { props: {} });
 	}
 
-	async function handleLeaveSession() {
+	async function handleLeaveJudgesRoom() {
 		closeMenu();
 
 		const confirmed = await dialogs.showConfirmation({
-			title: 'Leave Session',
-			message: 'Are you sure you want to leave the session? You will lose connection to other judges.',
-			confirmText: 'Leave Session',
+			title: 'Leave Judges\' Room',
+			message: 'Are you sure you want to leave the Judges\' Room? You will lose connection to other judges.',
+			confirmText: 'Leave Judges\' Room',
 			cancelText: 'Cancel',
 			confirmButtonClass: 'danger'
 		});
 
 		if (confirmed) {
-			app.leaveSession();
+			app.leaveJudgesRoom();
 			AppUI.appPhase = 'choose_action';
 		}
 	}
@@ -154,12 +154,12 @@
 			aria-orientation="vertical"
 			aria-labelledby="menu-button"
 		>
-			<!-- Share Session -->
-			<button onclick={handleShareSession} class="menu-item" role="menuitem">
+			<!-- Share Judges' Room -->
+			<button onclick={handleShareJudgesRoom} class="menu-item" role="menuitem">
 				<span class="mr-3">
 					<ShareIcon />
 				</span>
-				<span>Share Session</span>
+				<span>Share Judges' Room</span>
 			</button>
 
 			<!-- Switch Role -->
@@ -170,12 +170,12 @@
 				<span>Switch Role</span>
 			</button>
 
-			<!-- Leave Session -->
-			<button onclick={handleLeaveSession} class="menu-item danger" role="menuitem">
+			<!-- Leave Judges' Room -->
+			<button onclick={handleLeaveJudgesRoom} class="menu-item danger" role="menuitem">
 				<span class="mr-3">
 					<LeaveDoorIcon />
 				</span>
-				<span>Leave Session</span>
+				<span>Leave Judges' Room</span>
 			</button>
 
 			<!-- Divider -->

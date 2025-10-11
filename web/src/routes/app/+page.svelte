@@ -10,7 +10,7 @@
 	import JoiningJudgesRoom from '$lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
-	import { parseSessionUrl } from '$lib/utils.svelte';
+	import { parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
 
 	// App state persistence error message
@@ -40,58 +40,58 @@
 
 	onMount(async () => {
 		const hash = window.location.hash;
-		// If there is a hash, it means we are trying to join a session from a URL
+		// If there is a hash, it means we are trying to join a Judges' Room from a URL
 		if (hash) {
-			// Parse the session URL from the hash
-			const result = parseSessionUrl(window.location.href);
+			// Parse the Judges' Room URL from the hash
+			const result = parseJudgesRoomUrl(window.location.href);
 			const existingPermit = app.getPermit();
-			// If the session URL is different from the existing session,
-			// leave the current session and join the new one
+			// If the Judges' Room URL is different from the existing Judges' Room,
+			// leave the current Judges' Room and join the new one
 			if (existingPermit?.roomId !== result) {
-				await handleSessionFromUrl();
+				await handleJudgesRoomUrl();
 				return;
 			}
 		}
 
-		// In other cases, check if we can rejoin a stored session
-		// The stored session should be the loaded when the app is loaded
+		// In other cases, check if we can rejoin a stored permit
+		// The stored permit should be the loaded when the app is loaded
 		const existingPermit = app.getPermit();
 		if (existingPermit) {
-			await rejoinStoredSession();
+			await useStoredPermit();
 			return;
 		}
 
-		// If we have no session, show the choose action page
+		// If we have no permit, show the choose action page
 		AppUI.appPhase = 'choose_action';
 	});
 
-	async function handleSessionFromUrl() {
+	async function handleJudgesRoomUrl() {
 		try {
-			await app.leaveSession();
+			await app.leaveJudgesRoom();
 			await app.joinJudgesRoomFromUrl(window.location.href);
 
 			// Clear URL hash for security using SvelteKit navigation
 			replaceState('/app', {});
 
 			// Wait for sync to complete
-			AppUI.appPhase = 'joining_session';
+			AppUI.appPhase = 'joining_judges_room';
 		} catch (error) {
 			console.error('Error joining Judges\' Room from URL:', error);
-			errorMessage = `Failed to join session: ${error}`;
+			errorMessage = `Failed to join Judges' Room: ${error}`;
 			AppUI.appPhase = 'choose_action';
 		}
 	}
 
-	async function rejoinStoredSession() {
+	async function useStoredPermit() {
 		try {
-			await app.reconnectStoredSession();
+			await app.joinJudgesRoomWithStoredPermit();
 
-			AppUI.appPhase = 'joining_session';
+			AppUI.appPhase = 'joining_judges_room';
 		} catch (error) {
-			// Session in storage but couldn't reconnect, show choice
+			// Permit in storage but couldn't be used, show choice
 			// TODO: handle this case
-			console.error('Error rejoining stored session:', error);
-			errorMessage = `Failed to rejoin session: ${error}`;
+			console.error('Error rejoining stored permit:', error);
+			errorMessage = `Failed to rejoin Judges' Room: ${error}`;
 			AppUI.appPhase = 'choose_action';
 		}
 	}
@@ -109,7 +109,7 @@
 		<Loading />
 	{:else if AppUI.appPhase === 'choose_action'}
 		<ChooseAction {errorMessage} />
-	{:else if AppUI.appPhase === 'joining_session'}
+	{:else if AppUI.appPhase === 'joining_judges_room'}
 		<JoiningJudgesRoom />
 	{:else if AppUI.appPhase === 'event_setup'}
 		<EventSetup />

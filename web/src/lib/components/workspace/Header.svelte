@@ -4,10 +4,10 @@
 	import UserMenu from './UserMenu.svelte';
 
 	interface Props {
-		// onClickShareSession: () => void;
+		// onClickShareJudgesRoom: () => void;
 	}
 
-	// let { onClickShareSession: onShareSession }: Props = $props();
+	// let { onClickShareJudgesRoom: onShareJudgesRoom }: Props = $props();
 
 	const currentUser = $derived(app.getCurrentUser());
 
@@ -27,7 +27,7 @@
 		<div class="flex items-center space-x-4">
 			<div>
 				<h1 class="text-xl font-semibold text-gray-900">
-					{app.getEventName() || 'Judging Session'}
+					{app.getEventName() || 'Judging Judges\' Room'}
 				</h1>
 				<div class="flex items-center space-x-2 text-sm text-gray-500">
 					{#if currentUser?.role === 'judge_advisor'}

@@ -27,7 +27,7 @@ const w = initWRPC.createClient<ServerRouter>();
  */
 const clientRouter = w.router({
 	/**
-	 * Server pushes event setup updates to client (this is just like joining the session again)
+	 * Server pushes event setup updates to client (this is just like joining the judges' room again)
 	 */
 	onEventSetupUpdate: w.procedure.input(JoiningKitSchema).mutation(async ({ input }) => {
 		console.log(`📊 Event setup updated:`, input);

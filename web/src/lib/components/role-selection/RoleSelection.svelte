@@ -66,7 +66,7 @@
 		}
 	});
 
-	// Handle disconnection, kicked, or session ended scenarios
+	// Handle disconnection, kicked, or Judges' Room destroyed scenarios
 	$effect(() => {
 		// If we lose connection or have errors, redirect to choose action
 		if (connectionState === 'error' || connectionState === 'offline') {
@@ -80,7 +80,7 @@
 		<div class="space-y-6">
 			<div class="text-center">
 				<h2 class="text-2xl font-semibold text-gray-900">Select Your Role</h2>
-				<p class="mt-2 text-gray-600">Choose your identity to start participating in the judging session.</p>
+				<p class="mt-2 text-gray-600">Choose your identity to start participating in the Judges' Room.</p>
 
 				{#if connectionState !== 'offline'}
 					<div class="mt-2 text-sm">
@@ -99,11 +99,11 @@
 
 			{#if !app.hasEssentialData()}
 				<div class="text-center text-gray-500">
-					<p>Loading session data...</p>
+					<p>Loading Judges' Room data...</p>
 				</div>
 			{:else if connectionState === 'connecting' || connectionState === 'reconnecting'}
 				<div class="rounded-lg bg-yellow-50 p-4 text-center text-yellow-700">
-					<p>Connecting to session...</p>
+					<p>Connecting to Judges' Room...</p>
 				</div>
 			{:else}
 				<div class="space-y-6">
@@ -145,7 +145,7 @@
 								/>
 								<div>
 									<div class="font-medium text-gray-900">Judge Advisor</div>
-									<div class="text-sm text-gray-500">Manage the judging session and oversee judges</div>
+									<div class="text-sm text-gray-500">Manage the Judges' Room and oversee judges</div>
 								</div>
 							</label>
 						</div>
@@ -268,7 +268,7 @@
 							<div class="rounded-lg border bg-slate-50 p-4 text-center">
 								<h4 class="font-medium text-gray-900">Judge Advisor</h4>
 								<p class="mt-2 text-sm text-gray-600">
-									As a Judge Advisor, you can manage the judging session, oversee all judges, and access all judging data.
+									As a Judge Advisor, you can manage the Judges' Room, oversee all judges, and access all judging data.
 								</p>
 								<div class="mt-4">
 									<button
@@ -285,7 +285,7 @@
 			{/if}
 
 			<div class="text-center text-sm text-gray-500">
-				<p>You can change your role at any time during the session.</p>
+				<p>You can change your role at any time.</p>
 			</div>
 		</div>
 	</div>

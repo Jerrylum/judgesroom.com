@@ -68,12 +68,12 @@ export function debounce<T extends (...args: Parameters<T>) => void>(func: T, wa
 	};
 }
 
-export function parseSessionUrl(url: string): string | null {
+export function parseJudgesRoomUrl(url: string): string | null {
 	try {
 		const hash = new SvelteURL(url).hash.substring(1);
 		return z.uuidv4().parse(hash);
 	} catch (error) {
-		console.error('Failed to parse session URL:', error);
+		console.error('Failed to parse Judges\' Room URL:', error);
 		return null;
 	}
 }

@@ -87,15 +87,15 @@
 					<CloseIcon size={24} />
 				</button>
 			</div>
-			<p class="text-sm text-gray-600">Choose your new identity for the judging session.</p>
+			<p class="text-sm text-gray-600">Choose your new identity for the Judges' Room.</p>
 		</div>
 		{#if !app.hasEssentialData()}
 			<div class="text-center text-gray-500">
-				<p>Loading session data...</p>
+				<p>Loading Judges' Room data...</p>
 			</div>
 		{:else if connectionState === 'connecting' || connectionState === 'reconnecting'}
 			<div class="rounded-lg bg-yellow-50 p-4">
-				<p class="text-sm text-yellow-700">Connecting to session...</p>
+				<p class="text-sm text-yellow-700">Connecting to Judges' Room...</p>
 			</div>
 		{:else if connectionState === 'error'}
 			<div class="rounded-lg bg-red-50 p-4">
@@ -141,7 +141,7 @@
 							/>
 							<div>
 								<div class="font-medium text-gray-900">Judge Advisor</div>
-								<div class="text-sm text-gray-500">Manage the judging session and oversee judges</div>
+								<div class="text-sm text-gray-500">Manage the Judges' Room and oversee judges</div>
 							</div>
 						</label>
 					</div>
@@ -254,7 +254,7 @@
 						<div class="rounded-lg border bg-slate-50 p-4">
 							<h4 class="font-medium text-gray-900">Judge Advisor</h4>
 							<p class="mt-2 text-sm text-gray-600">
-								As a Judge Advisor, you can manage the judging session, oversee all judges, and access all judging data.
+								As a Judge Advisor, you can manage the Judges' Room, oversee all judges, and access all judging data.
 							</p>
 						</div>
 						<div class="flex justify-end">
