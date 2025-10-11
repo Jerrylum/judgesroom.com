@@ -55,15 +55,15 @@ describe('EditingJudgeGroup', () => {
 		mockTeams = [
 			new EditingTeam(
 				createTeamInfo(teamId1, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamId1, 'https://example.com/notebook-a', false, false)
+				createTeamData(teamId1, 'https://example.com/notebook-a', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamId2, '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
-				createTeamData(teamId2, 'https://example.com/notebook-b', false, false)
+				createTeamData(teamId2, 'https://example.com/notebook-b', 'undetermined', false)
 			),
 			new EditingTeam(
 				createTeamInfo(teamId3, '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
-				createTeamData(teamId3, 'https://example.com/notebook-c', false, false)
+				createTeamData(teamId3, 'https://example.com/notebook-c', 'undetermined', false)
 			)
 		];
 	});
@@ -229,7 +229,7 @@ describe('randomlyAssignTeamsToGroups', () => {
 					'High School',
 					`${100 + i}`
 				),
-				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, false, false)
+				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, 'undetermined', false)
 			);
 		});
 
@@ -395,7 +395,7 @@ describe('Integration Tests', () => {
 					'High School',
 					`${100 + i}`
 				),
-				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, false, false)
+				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, 'undetermined', false)
 			);
 		});
 
@@ -433,7 +433,7 @@ describe('Integration Tests', () => {
 		const soloTeamId = uuidv4();
 		const singleTeam = new EditingTeam(
 			createTeamInfo(soloTeamId, '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
-			createTeamData(soloTeamId, 'https://example.com/notebook', false, false)
+			createTeamData(soloTeamId, 'https://example.com/notebook', 'undetermined', false)
 		);
 
 		randomlyAssignTeamsToGroups([singleTeam], [singleGroup]);

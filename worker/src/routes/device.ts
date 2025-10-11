@@ -5,7 +5,7 @@ import { offlineDevices } from '../db/schema';
 import type { Network } from '@judging.jerryio/wrpc/server';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { eq } from 'drizzle-orm';
-import { broadcastTopic, ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
+import { broadcastTopic, type ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
 
 export async function getDevices(tx: DatabaseOrTransaction, network: Network) {
 	const listOfOfflineDevices = await tx.select().from(offlineDevices);
