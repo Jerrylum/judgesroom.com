@@ -1,8 +1,43 @@
+import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import { Client, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
 
 // This is a public token
 const ROBOTEVENTS_TOKEN = `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiMTdmMzZkZTUyOGI1ODE4YzMzMWY0YTM4YWE3MGYyMjNkYzdlNTY0OWQxMWFjZmZkNGFiZmU1NDM4NWYwYmQzMmUzNzIyY2RjODAyMjU5ZWQiLCJpYXQiOjE3NjAwMzA1NjMuMzA1MzkzOSwibmJmIjoxNzYwMDMwNTYzLjMwNTM5NjEsImV4cCI6MjcwNjcxNTM2My4yOTYyNzYxLCJzdWIiOiIxNTIwNzAiLCJzY29wZXMiOltdfQ.fU2Yb5sGBwWWQuXSPxTM7U0hPqr02hVUJnFiQBhlxGX3s6vwIiD9g7SBMH1Wmyhpwqw4a-9pmYYrFQV6tMX4MY2Aq7jUvieyTm5Jj763ybV_du_5lPQRMhCjpsJnWJ1YEMszqaKsUBleahlOOtdIjmSz3c3v6eEC-52rmrKNNf2Oke1vlufaCxjYl42MZxg8EFSKr2KK8_6FQ9jI8loXx9I51KV927Na3exdca09t80qqfFtsTo9BLja7YYw7WAuVozM9fZWe39zc0R2W9VpJO8LYVsNCF72J2SzGmoj5mkpFd1L2cxCWSeAw3qHSxdwsYRwf5WS25bu5qlA_z9mpGzFW-hYhDLTdkLLiwRUTCr7MUEiKvZmi8O8qb1J1od_Mh6oyesrW11QYoXze1BCgt-aExgn70_shiCGxMfZMIV32CzEFxE32YnqZx5eMrTgTqrVjsZ9EvQ-oyCkxYUUwhyy_JZDeywKs-aZU9uhG2-D8LYvDgemTAZMzcn0groFYgG23OVYFfCkrRDsji5D8Jna7Tvm5ogFz6J2GhJ8kCfpSYrmBI6dYcs34XDFcBJO9tPtiG8aURzVHlB8WpukqIBU7a04UqaYi5yWl9_G6Y51phuy64KFKor3jB08b-Pg66P5eN6yqRPRXXwy5flXjCVPe2Xxw3GERUBdbgLDxDw`;
+
+export type TeamLike = { number: string };
+
+export interface TeamQualRanking {
+	teamNumber: string;
+	divisionId: number;
+	rank: number;
+}
+
+export interface TeamSkillsRecord {
+	teamNumber: string;
+	rank: number;
+	driverScore: number;
+	programmingScore: number;
+	overallScore: number;
+}
+
+export interface ExcellenceAwardTeamEligibilityCriterion {
+	result: 'eligible' | 'ineligible' | 'no data';
+	// "no" stands for "number", calculated by index, starts from 1
+	// Here, the "no" is unique, so it can be used to determine the eligibility
+	// This is different from the "ranking" showing on RobotEvents
+	// In some scenarios, the ranking of two teams are the same if their skills overall scores are the same
+	no: number;
+	score: number;
+}
+
+export interface ExcellenceAwardTeamEligibility {
+	teamNumber: string;
+	isEligible: boolean;
+	qualRanking: ExcellenceAwardTeamEligibilityCriterion;
+	overallSkills: ExcellenceAwardTeamEligibilityCriterion;
+	autoSkills: ExcellenceAwardTeamEligibilityCriterion;
+}
 
 export function getRobotEventsClient(): RobotEventsClient {
 	return Client({
@@ -33,13 +68,6 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
 	return result.data ?? [];
 }
 
-export interface TeamQualRanking {
-	teamId: number;
-	teamNumber: string;
-	divisionId: number;
-	rank: number;
-}
-
 /**
  * Get the rankings of all teams in the event, in all divisions
  *
@@ -63,12 +91,11 @@ export async function getEventRankings(evt: Event): Promise<TeamQualRanking[]> {
 
 		const result = await evt.rankings(dId);
 		for (const ranking of result.data ?? []) {
-			const teamId = ranking.team?.id;
 			const teamNumber = ranking.team?.name;
 			const divisionId = division.id;
 			const rank = ranking.rank;
-			if (!teamId || !teamNumber || !divisionId || !rank) continue;
-			rtn.push({ teamId, teamNumber, divisionId, rank });
+			if (!teamNumber || !divisionId || !rank) continue;
+			rtn.push({ teamNumber, divisionId, rank });
 		}
 	}
 	return rtn.sort((a, b) => a.rank - b.rank);
@@ -100,18 +127,9 @@ export async function getEventDivisionRankings(client: RobotEventsClient, evtId:
 		const teamName = ranking.team?.name;
 		const rank = ranking.rank;
 		if (!teamId || !teamName || !rank) continue;
-		rtn.push({ teamId, teamNumber: teamName, divisionId, rank });
+		rtn.push({ teamNumber: teamName, divisionId, rank });
 	}
 	return rtn.sort((a, b) => a.rank - b.rank);
-}
-
-export interface TeamSkillsRecord {
-	teamId: number;
-	teamNumber: string;
-	rank: number;
-	driverScore: number;
-	programmingScore: number;
-	overallScore: number;
 }
 
 /**
@@ -178,27 +196,9 @@ export function filterRankingsByDivision(rankings: TeamQualRanking[], divisionId
 	return rankings.filter((ranking) => ranking.divisionId === divisionId);
 }
 
-export function filterRankingsOrRecordsBySubset<T extends TeamQualRanking | TeamSkillsRecord>(targets: T[], subset: Team[]): T[] {
-	const subsetIds = new Set(subset.map((team) => team.id));
-	return targets.filter((target) => subsetIds.has(target.teamId));
-}
-
-export interface ExcellenceAwardTeamEligibilityCriterion {
-	result: 'eligible' | 'ineligible' | 'no data';
-	// "no" stands for "number", calculated by index, starts from 1
-	// Here, the "no" is unique, so it can be used to determine the eligibility
-	// This is different from the "ranking" showing on RobotEvents
-	// In some scenarios, the ranking of two teams are the same if their skills overall scores are the same
-	no: number;
-	score: number;
-}
-
-export interface ExcellenceAwardTeamEligibility {
-	teamId: number;
-	isEligible: boolean;
-	qualRanking: ExcellenceAwardTeamEligibilityCriterion;
-	overallSkills: ExcellenceAwardTeamEligibilityCriterion;
-	autoSkills: ExcellenceAwardTeamEligibilityCriterion;
+export function filterRankingsOrRecordsBySubset<T extends TeamQualRanking | TeamSkillsRecord>(targets: T[], subset: TeamLike[]): T[] {
+	const subsetIds = new Set(subset.map((team) => team.number));
+	return targets.filter((target) => subsetIds.has(target.teamNumber));
 }
 
 export function getExcellenceAwardTeamEligibility(
@@ -215,10 +215,10 @@ export function getExcellenceAwardTeamEligibility(
 	const rtn = [] as ExcellenceAwardTeamEligibility[];
 	for (let qualRankingIndex = 0; qualRankingIndex < rankings.length; qualRankingIndex++) {
 		const qualRanking = rankings[qualRankingIndex];
-		const teamId = qualRanking.teamId;
+		const teamNumber = qualRanking.teamNumber;
 
-		const overallSkillsIndex = overallSkills.findIndex((s) => s.teamId === teamId);
-		const autoSkillsIndex = autoSkills.findIndex((s) => s.teamId === teamId);
+		const overallSkillsIndex = overallSkills.findIndex((s) => s.teamNumber === teamNumber);
+		const autoSkillsIndex = autoSkills.findIndex((s) => s.teamNumber === teamNumber);
 
 		const qualRankingNo = qualRankingIndex + 1;
 		const qualRankingEligibility: ExcellenceAwardTeamEligibilityCriterion = {
@@ -244,7 +244,7 @@ export function getExcellenceAwardTeamEligibility(
 		};
 
 		rtn.push({
-			teamId,
+			teamNumber,
 			isEligible:
 				qualRankingEligibility.result === 'eligible' &&
 				overallSkillsEligibility.result === 'eligible' &&
