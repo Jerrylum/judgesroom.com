@@ -58,9 +58,9 @@ describe('Client-side Session', () => {
 			vi.mocked(mockWsClient.query).mockResolvedValue('multi result');
 
 			const serverProxy = session.getServer();
-			const result = await (serverProxy as any).handshake.createSession.query({ foo: 'bar' });
+			const result = await (serverProxy as any).handshake.createJudgesRoom.query({ foo: 'bar' });
 
-			expect(mockWsClient.query).toHaveBeenCalledWith('handshake.createSession', { foo: 'bar' });
+			expect(mockWsClient.query).toHaveBeenCalledWith('handshake.createJudgesRoom', { foo: 'bar' });
 			expect(result).toBe('multi result');
 		});
 
@@ -68,9 +68,9 @@ describe('Client-side Session', () => {
 			vi.mocked(mockWsClient.mutation).mockResolvedValue('multi mutation');
 
 			const serverProxy = session.getServer();
-			const result = await (serverProxy as any).handshake.createSession.mutation({ a: 1 });
+			const result = await (serverProxy as any).handshake.createJudgesRoom.mutation({ a: 1 });
 
-			expect(mockWsClient.mutation).toHaveBeenCalledWith('handshake.createSession', { a: 1 });
+			expect(mockWsClient.mutation).toHaveBeenCalledWith('handshake.createJudgesRoom', { a: 1 });
 			expect(result).toBe('multi mutation');
 		});
 	});

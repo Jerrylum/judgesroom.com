@@ -111,7 +111,7 @@ export class App {
 	// Session Management
 	// ============================================================================
 
-	private async joinSession(): Promise<void> {
+	private async joinJudgesRoom(): Promise<void> {
 		if (!this.hasSessionInfo()) {
 			throw new Error('CRITICAL: No session info');
 		}
@@ -124,7 +124,7 @@ export class App {
 		this.clientManager.resetClient();
 
 		// Join the session, this will call createWRPCClient
-		const starterKit = await this.wrpcClient.handshake.joinSession.mutation();
+		const starterKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
 		this.handleEventSetupUpdate(starterKit);
 
 		// Load user from storage
@@ -146,7 +146,7 @@ export class App {
 	/**
 	 * Join a session from URL
 	 */
-	async joinSessionFromUrl(url: string): Promise<void> {
+	async joinJudgesRoomFromUrl(url: string): Promise<void> {
 		try {
 			if (this.hasSessionInfo()) {
 				throw new Error('CRITICAL: already in a session');
@@ -160,7 +160,7 @@ export class App {
 			this.sessionInfo = this.createNewSessionInfo(sessionId);
 			this.saveSessionToStorage();
 
-			await this.joinSession();
+			await this.joinJudgesRoom();
 		} catch (error) {
 			this.addErrorNotice(`Failed to join session: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
@@ -187,7 +187,7 @@ export class App {
 	/**
 	 * Create a new session
 	 */
-	async createSession(): Promise<void> {
+	async createJudgesRoom(): Promise<void> {
 		try {
 			this.currentUser = null;
 			this.clientManager.resetClient();
@@ -203,7 +203,7 @@ export class App {
 				throw new Error('CRITICAL: No essential data');
 			}
 
-			const response = await this.wrpcClient.handshake.createSession.mutation({
+			const response = await this.wrpcClient.handshake.createJudgesRoom.mutation({
 				essentialData: this.essentialData,
 				teamData: [...Object.values(this.allTeamData)],
 				judges: [...this.allJudges]
@@ -271,7 +271,7 @@ export class App {
 	 */
 	async reconnectStoredSession(): Promise<void> {
 		try {
-			await this.joinSession();
+			await this.joinJudgesRoom();
 		} catch (error) {
 			// Do not clear session from storage, the user might be able to connect to the session again
 			// this.clearSessionFromStorage();

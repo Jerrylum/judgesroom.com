@@ -124,14 +124,14 @@ describe('Server-side Session', () => {
 			vi.mocked(mockNetwork.sendToClient).mockResolvedValue(mockResponse);
 
 			const clientProxy = session.getClient('target-client-id');
-			const result = await (clientProxy as any).handshake.createSession.query({ ok: true });
+			const result = await (clientProxy as any).handshake.createJudgesRoom.query({ ok: true });
 
 			expect(mockNetwork.sendToClient).toHaveBeenCalledWith(
 				'target-client-id',
 				expect.objectContaining({
 					kind: 'request',
 					type: 'query',
-					path: 'handshake.createSession',
+					path: 'handshake.createJudgesRoom',
 					input: { ok: true },
 					id: expect.any(String)
 				})
@@ -181,13 +181,13 @@ describe('Server-side Session', () => {
 			vi.mocked(mockNetwork.broadcast).mockResolvedValue(mockResponses);
 
 			const broadcastProxy = session.broadcast();
-			const results = await (broadcastProxy as any).handshake.createSession.mutation({ a: 1 });
+			const results = await (broadcastProxy as any).handshake.createJudgesRoom.mutation({ a: 1 });
 
 			expect(mockNetwork.broadcast).toHaveBeenCalledWith(
 				expect.objectContaining({
 					kind: 'request',
 					type: 'mutation',
-					path: 'handshake.createSession',
+					path: 'handshake.createJudgesRoom',
 					input: { a: 1 },
 					id: expect.any(String)
 				})

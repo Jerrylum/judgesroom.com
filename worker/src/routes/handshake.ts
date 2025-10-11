@@ -34,7 +34,7 @@ export type JoiningKit = z.infer<typeof JoiningKitSchema>;
 
 export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
-		joinSession: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
+		joinJudgesRoom: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
 			const hasExistingEssentialData = await hasEssentialData(ctx.db);
 			if (!hasExistingEssentialData) {
 				throw new WRPCError('Session not found');
@@ -69,7 +69,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 			});
 		}),
 
-		createSession: w.procedure
+		createJudgesRoom: w.procedure
 			.input(StarterKitSchema)
 			.output(z.object({ success: z.boolean(), message: z.string() }))
 			.mutation(async ({ ctx, input, session }) => {

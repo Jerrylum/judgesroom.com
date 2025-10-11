@@ -17,7 +17,7 @@
 		AppUI.appPhase = 'event_setup';
 	}
 
-	async function handleJoinSession() {
+	async function handleJoinJudgesRoom() {
 		if (!sessionUrl.trim()) {
 			errorMessage = 'Please enter a session URL';
 			return;
@@ -28,9 +28,9 @@
 			// UI will update via reactive app.hasAppData() when sync completes
 			AppUI.appPhase = 'joining_session';
 			await app.leaveSession();
-			await app.joinSessionFromUrl(sessionUrl);
+			await app.joinJudgesRoomFromUrl(sessionUrl);
 		} catch (error) {
-			console.error('Error joining session:', error);
+			console.error('Error joining Judges\' Room:', error);
 			AppUI.appPhase = 'choose_action';
 		}
 	}
@@ -64,7 +64,7 @@
 			<p class="mb-6 leading-relaxed text-gray-700">Join an existing judging session using a link from your judge advisor.</p>
 			<div class="mb-6 space-y-4">
 				<input type="text" bind:value={sessionUrl} placeholder="Paste session URL here..." class="classic w-full" />
-				<button onclick={handleJoinSession} class="primary w-full">Join Session</button>
+				<button onclick={handleJoinJudgesRoom} class="primary w-full">Join Session</button>
 			</div>
 			<div class="rounded-lg bg-gray-50 p-4 text-sm">
 				<p class="mb-2 font-semibold text-gray-800">How to get a session link:</p>

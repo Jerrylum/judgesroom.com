@@ -164,7 +164,7 @@
 				app.handleAllTeamDataUpdate(teams.map((team) => team.data));
 				app.handleAllJudgesUpdate(judges);
 
-				await app.createSession();
+				await app.createJudgesRoom();
 				// For Judge Advisor who created the session, auto-select role and show share dialog
 				await app.selectUser({ role: 'judge_advisor' });
 

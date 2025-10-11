@@ -7,7 +7,7 @@
 	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';
 	import Loading from '$lib/components/loading/Loading.svelte';
 	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
-	import JoiningSession from '$lib/components/joining-session/JoiningSession.svelte';
+	import JoiningJudgesRoom from '$lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
 	import { parseSessionUrl } from '$lib/utils.svelte';
@@ -68,7 +68,7 @@
 	async function handleSessionFromUrl() {
 		try {
 			await app.leaveSession();
-			await app.joinSessionFromUrl(window.location.href);
+			await app.joinJudgesRoomFromUrl(window.location.href);
 
 			// Clear URL hash for security using SvelteKit navigation
 			replaceState('/app', {});
@@ -76,7 +76,7 @@
 			// Wait for sync to complete
 			AppUI.appPhase = 'joining_session';
 		} catch (error) {
-			console.error('Error joining session from URL:', error);
+			console.error('Error joining Judges\' Room from URL:', error);
 			errorMessage = `Failed to join session: ${error}`;
 			AppUI.appPhase = 'choose_action';
 		}
@@ -110,7 +110,7 @@
 	{:else if AppUI.appPhase === 'choose_action'}
 		<ChooseAction {errorMessage} />
 	{:else if AppUI.appPhase === 'joining_session'}
-		<JoiningSession />
+		<JoiningJudgesRoom />
 	{:else if AppUI.appPhase === 'event_setup'}
 		<EventSetup />
 	{:else if AppUI.appPhase === 'role_selection'}

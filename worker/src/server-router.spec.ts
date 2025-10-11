@@ -73,17 +73,17 @@ describe('ServerRouter', () => {
 	});
 
 	describe('handshake router', () => {
-		it('joinSession returns starter kit', async () => {
-			const resolver = serverRouter.handshake.joinSession._def._resolver!;
+		it('joinJudgesRoom returns starter kit', async () => {
+			const resolver = serverRouter.handshake.joinJudgesRoom._def._resolver!;
 			const result = await resolver({ input: undefined, session, ctx: context });
 			expect(result.essentialData.eventName).toBe('Test Event');
 			expect(Array.isArray(result.teamData)).toBe(true);
 			expect(Array.isArray(result.judges)).toBe(true);
 		});
 
-		it('createSession returns already exists when metadata present', async () => {
-			const resolver = serverRouter.handshake.createSession._def._resolver!;
-			const starter = await serverRouter.handshake.joinSession._def._resolver!({ input: undefined, session, ctx: context });
+		it('createJudgesRoom returns already exists when metadata present', async () => {
+			const resolver = serverRouter.handshake.createJudgesRoom._def._resolver!;
+			const starter = await serverRouter.handshake.joinJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
 			const result = await resolver({ input: starter, session, ctx: context });
 			expect(result.success).toBe(false);
 		});
@@ -162,8 +162,8 @@ describe('ServerRouter', () => {
 
 	// describe('client router', () => {
 	// 	it('getClients and kickClient (offline)', async () => {
-	// 		// Ensure there is at least one offline client by joining session
-	// 		await serverRouter.handshake.joinSession._def._resolver!({ input: undefined, session, ctx: context });
+	// 		// Ensure there is at least one offline client by joining Judges' Room
+	// 		await serverRouter.handshake.joinJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
 	// 		const getResolver = serverRouter.client.getClients._def._resolver!;
 	// 		const clients = await getResolver({ input: undefined, session, ctx: context });
 	// 		expect(clients.length).toBeGreaterThan(0);
@@ -174,8 +174,8 @@ describe('ServerRouter', () => {
 	// });
 	describe('device router', () => {
 		it('getDevices and kickDevice (offline)', async () => {
-			// Ensure there is at least one offline device by joining session
-			await serverRouter.handshake.joinSession._def._resolver!({ input: undefined, session, ctx: context });
+			// Ensure there is at least one offline device by joining Judges' Room
+			await serverRouter.handshake.joinJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
 			const getResolver = serverRouter.device.getDevices._def._resolver!;
 			const devices = await getResolver({ input: undefined, session, ctx: context });
 			expect(devices.length).toBeGreaterThan(0);
