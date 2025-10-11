@@ -3,7 +3,6 @@ import { getEssentialData, hasEssentialData, updateEssentialData } from './essen
 import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
-import { type ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
 import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';

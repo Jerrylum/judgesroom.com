@@ -1,0 +1,1111 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 1`] = `
+[
+  102496,
+  104028,
+  175243,
+  175244,
+  129461,
+  129462,
+  144269,
+  144279,
+  151768,
+  154595,
+  162534,
+  182306,
+  103059,
+  105118,
+  136715,
+  136716,
+  160887,
+  62270,
+  79721,
+  181990,
+  126531,
+  126532,
+  175104,
+  175105,
+  154977,
+  162994,
+  167515,
+  167516,
+  178753,
+  178754,
+  172145,
+  172146,
+  180856,
+  181591,
+  181592,
+  163783,
+  163901,
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 2`] = `
+[
+  {
+    "divisionId": 1,
+    "rank": 1,
+    "teamId": 160887,
+  },
+  {
+    "divisionId": 1,
+    "rank": 2,
+    "teamId": 103059,
+  },
+  {
+    "divisionId": 1,
+    "rank": 3,
+    "teamId": 105118,
+  },
+  {
+    "divisionId": 1,
+    "rank": 4,
+    "teamId": 62270,
+  },
+  {
+    "divisionId": 1,
+    "rank": 5,
+    "teamId": 175243,
+  },
+  {
+    "divisionId": 1,
+    "rank": 6,
+    "teamId": 172146,
+  },
+  {
+    "divisionId": 1,
+    "rank": 7,
+    "teamId": 129461,
+  },
+  {
+    "divisionId": 1,
+    "rank": 8,
+    "teamId": 104028,
+  },
+  {
+    "divisionId": 1,
+    "rank": 9,
+    "teamId": 126531,
+  },
+  {
+    "divisionId": 1,
+    "rank": 10,
+    "teamId": 129462,
+  },
+  {
+    "divisionId": 1,
+    "rank": 11,
+    "teamId": 126532,
+  },
+  {
+    "divisionId": 1,
+    "rank": 12,
+    "teamId": 180856,
+  },
+  {
+    "divisionId": 1,
+    "rank": 13,
+    "teamId": 181592,
+  },
+  {
+    "divisionId": 1,
+    "rank": 14,
+    "teamId": 79721,
+  },
+  {
+    "divisionId": 1,
+    "rank": 15,
+    "teamId": 136715,
+  },
+  {
+    "divisionId": 1,
+    "rank": 16,
+    "teamId": 178754,
+  },
+  {
+    "divisionId": 1,
+    "rank": 17,
+    "teamId": 136716,
+  },
+  {
+    "divisionId": 1,
+    "rank": 18,
+    "teamId": 102496,
+  },
+  {
+    "divisionId": 1,
+    "rank": 19,
+    "teamId": 181591,
+  },
+  {
+    "divisionId": 1,
+    "rank": 20,
+    "teamId": 172145,
+  },
+  {
+    "divisionId": 1,
+    "rank": 21,
+    "teamId": 175244,
+  },
+  {
+    "divisionId": 1,
+    "rank": 22,
+    "teamId": 182306,
+  },
+  {
+    "divisionId": 1,
+    "rank": 23,
+    "teamId": 167515,
+  },
+  {
+    "divisionId": 1,
+    "rank": 24,
+    "teamId": 163901,
+  },
+  {
+    "divisionId": 1,
+    "rank": 25,
+    "teamId": 175105,
+  },
+  {
+    "divisionId": 1,
+    "rank": 26,
+    "teamId": 178753,
+  },
+  {
+    "divisionId": 1,
+    "rank": 27,
+    "teamId": 181990,
+  },
+  {
+    "divisionId": 1,
+    "rank": 28,
+    "teamId": 167516,
+  },
+  {
+    "divisionId": 1,
+    "rank": 29,
+    "teamId": 163783,
+  },
+  {
+    "divisionId": 1,
+    "rank": 30,
+    "teamId": 175104,
+  },
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 3`] = `
+[
+  {
+    "driverScore": 100,
+    "overallScore": 200,
+    "programmingScore": 100,
+    "rank": 1,
+    "teamId": 105118,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 113,
+    "programmingScore": 13,
+    "rank": 2,
+    "teamId": 160887,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 105,
+    "programmingScore": 5,
+    "rank": 3,
+    "teamId": 175243,
+  },
+  {
+    "driverScore": 64,
+    "overallScore": 104,
+    "programmingScore": 40,
+    "rank": 4,
+    "teamId": 163901,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 100,
+    "programmingScore": 0,
+    "rank": 5,
+    "teamId": 103059,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 89,
+    "programmingScore": 1,
+    "rank": 6,
+    "teamId": 126532,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 88,
+    "programmingScore": 0,
+    "rank": 7,
+    "teamId": 126531,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 88,
+    "programmingScore": 0,
+    "rank": 8,
+    "teamId": 62270,
+  },
+  {
+    "driverScore": 76,
+    "overallScore": 76,
+    "programmingScore": 0,
+    "rank": 9,
+    "teamId": 175244,
+  },
+  {
+    "driverScore": 64,
+    "overallScore": 64,
+    "programmingScore": 0,
+    "rank": 10,
+    "teamId": 129461,
+  },
+  {
+    "driverScore": 64,
+    "overallScore": 64,
+    "programmingScore": 0,
+    "rank": 11,
+    "teamId": 175105,
+  },
+  {
+    "driverScore": 52,
+    "overallScore": 52,
+    "programmingScore": 0,
+    "rank": 12,
+    "teamId": 79721,
+  },
+  {
+    "driverScore": 43,
+    "overallScore": 43,
+    "programmingScore": 0,
+    "rank": 13,
+    "teamId": 104028,
+  },
+  {
+    "driverScore": 33,
+    "overallScore": 33,
+    "programmingScore": 0,
+    "rank": 14,
+    "teamId": 181592,
+  },
+  {
+    "driverScore": 26,
+    "overallScore": 31,
+    "programmingScore": 5,
+    "rank": 15,
+    "teamId": 181990,
+  },
+  {
+    "driverScore": 26,
+    "overallScore": 26,
+    "programmingScore": 0,
+    "rank": 16,
+    "teamId": 129462,
+  },
+  {
+    "driverScore": 18,
+    "overallScore": 18,
+    "programmingScore": 0,
+    "rank": 17,
+    "teamId": 167515,
+  },
+  {
+    "driverScore": 18,
+    "overallScore": 18,
+    "programmingScore": 0,
+    "rank": 18,
+    "teamId": 102496,
+  },
+  {
+    "driverScore": 18,
+    "overallScore": 18,
+    "programmingScore": 0,
+    "rank": 19,
+    "teamId": 163783,
+  },
+  {
+    "driverScore": 5,
+    "overallScore": 5,
+    "programmingScore": 0,
+    "rank": 20,
+    "teamId": 182306,
+  },
+  {
+    "driverScore": 5,
+    "overallScore": 5,
+    "programmingScore": 0,
+    "rank": 21,
+    "teamId": 178754,
+  },
+  {
+    "driverScore": 1,
+    "overallScore": 1,
+    "programmingScore": 0,
+    "rank": 22,
+    "teamId": 136716,
+  },
+  {
+    "driverScore": 0,
+    "overallScore": 0,
+    "programmingScore": 0,
+    "rank": 23,
+    "teamId": 167516,
+  },
+  {
+    "driverScore": 0,
+    "overallScore": 0,
+    "programmingScore": 0,
+    "rank": 24,
+    "teamId": 136715,
+  },
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 4`] = `
+[
+  {
+    "divisionId": 1,
+    "rank": 1,
+    "teamId": 160887,
+  },
+  {
+    "divisionId": 1,
+    "rank": 2,
+    "teamId": 103059,
+  },
+  {
+    "divisionId": 1,
+    "rank": 3,
+    "teamId": 105118,
+  },
+  {
+    "divisionId": 1,
+    "rank": 4,
+    "teamId": 62270,
+  },
+  {
+    "divisionId": 1,
+    "rank": 5,
+    "teamId": 175243,
+  },
+  {
+    "divisionId": 1,
+    "rank": 6,
+    "teamId": 172146,
+  },
+  {
+    "divisionId": 1,
+    "rank": 7,
+    "teamId": 129461,
+  },
+  {
+    "divisionId": 1,
+    "rank": 8,
+    "teamId": 104028,
+  },
+  {
+    "divisionId": 1,
+    "rank": 9,
+    "teamId": 126531,
+  },
+  {
+    "divisionId": 1,
+    "rank": 10,
+    "teamId": 129462,
+  },
+  {
+    "divisionId": 1,
+    "rank": 11,
+    "teamId": 126532,
+  },
+  {
+    "divisionId": 1,
+    "rank": 12,
+    "teamId": 180856,
+  },
+  {
+    "divisionId": 1,
+    "rank": 13,
+    "teamId": 181592,
+  },
+  {
+    "divisionId": 1,
+    "rank": 14,
+    "teamId": 79721,
+  },
+  {
+    "divisionId": 1,
+    "rank": 15,
+    "teamId": 136715,
+  },
+  {
+    "divisionId": 1,
+    "rank": 16,
+    "teamId": 178754,
+  },
+  {
+    "divisionId": 1,
+    "rank": 17,
+    "teamId": 136716,
+  },
+  {
+    "divisionId": 1,
+    "rank": 18,
+    "teamId": 102496,
+  },
+  {
+    "divisionId": 1,
+    "rank": 19,
+    "teamId": 181591,
+  },
+  {
+    "divisionId": 1,
+    "rank": 20,
+    "teamId": 172145,
+  },
+  {
+    "divisionId": 1,
+    "rank": 21,
+    "teamId": 175244,
+  },
+  {
+    "divisionId": 1,
+    "rank": 22,
+    "teamId": 182306,
+  },
+  {
+    "divisionId": 1,
+    "rank": 23,
+    "teamId": 167515,
+  },
+  {
+    "divisionId": 1,
+    "rank": 24,
+    "teamId": 163901,
+  },
+  {
+    "divisionId": 1,
+    "rank": 25,
+    "teamId": 175105,
+  },
+  {
+    "divisionId": 1,
+    "rank": 26,
+    "teamId": 178753,
+  },
+  {
+    "divisionId": 1,
+    "rank": 27,
+    "teamId": 181990,
+  },
+  {
+    "divisionId": 1,
+    "rank": 28,
+    "teamId": 167516,
+  },
+  {
+    "divisionId": 1,
+    "rank": 29,
+    "teamId": 163783,
+  },
+  {
+    "divisionId": 1,
+    "rank": 30,
+    "teamId": 175104,
+  },
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 5`] = `21`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 6`] = `
+[
+  {
+    "divisionId": 1,
+    "rank": 1,
+    "teamId": 160887,
+  },
+  {
+    "divisionId": 1,
+    "rank": 2,
+    "teamId": 103059,
+  },
+  {
+    "divisionId": 1,
+    "rank": 3,
+    "teamId": 105118,
+  },
+  {
+    "divisionId": 1,
+    "rank": 4,
+    "teamId": 62270,
+  },
+  {
+    "divisionId": 1,
+    "rank": 5,
+    "teamId": 175243,
+  },
+  {
+    "divisionId": 1,
+    "rank": 9,
+    "teamId": 126531,
+  },
+  {
+    "divisionId": 1,
+    "rank": 11,
+    "teamId": 126532,
+  },
+  {
+    "divisionId": 1,
+    "rank": 12,
+    "teamId": 180856,
+  },
+  {
+    "divisionId": 1,
+    "rank": 14,
+    "teamId": 79721,
+  },
+  {
+    "divisionId": 1,
+    "rank": 16,
+    "teamId": 178754,
+  },
+  {
+    "divisionId": 1,
+    "rank": 21,
+    "teamId": 175244,
+  },
+  {
+    "divisionId": 1,
+    "rank": 22,
+    "teamId": 182306,
+  },
+  {
+    "divisionId": 1,
+    "rank": 23,
+    "teamId": 167515,
+  },
+  {
+    "divisionId": 1,
+    "rank": 24,
+    "teamId": 163901,
+  },
+  {
+    "divisionId": 1,
+    "rank": 25,
+    "teamId": 175105,
+  },
+  {
+    "divisionId": 1,
+    "rank": 26,
+    "teamId": 178753,
+  },
+  {
+    "divisionId": 1,
+    "rank": 28,
+    "teamId": 167516,
+  },
+  {
+    "divisionId": 1,
+    "rank": 29,
+    "teamId": 163783,
+  },
+  {
+    "divisionId": 1,
+    "rank": 30,
+    "teamId": 175104,
+  },
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 7`] = `
+[
+  {
+    "driverScore": 100,
+    "overallScore": 200,
+    "programmingScore": 100,
+    "rank": 1,
+    "teamId": 105118,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 113,
+    "programmingScore": 13,
+    "rank": 2,
+    "teamId": 160887,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 105,
+    "programmingScore": 5,
+    "rank": 3,
+    "teamId": 175243,
+  },
+  {
+    "driverScore": 64,
+    "overallScore": 104,
+    "programmingScore": 40,
+    "rank": 4,
+    "teamId": 163901,
+  },
+  {
+    "driverScore": 100,
+    "overallScore": 100,
+    "programmingScore": 0,
+    "rank": 5,
+    "teamId": 103059,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 89,
+    "programmingScore": 1,
+    "rank": 6,
+    "teamId": 126532,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 88,
+    "programmingScore": 0,
+    "rank": 7,
+    "teamId": 126531,
+  },
+  {
+    "driverScore": 88,
+    "overallScore": 88,
+    "programmingScore": 0,
+    "rank": 8,
+    "teamId": 62270,
+  },
+  {
+    "driverScore": 76,
+    "overallScore": 76,
+    "programmingScore": 0,
+    "rank": 9,
+    "teamId": 175244,
+  },
+  {
+    "driverScore": 64,
+    "overallScore": 64,
+    "programmingScore": 0,
+    "rank": 11,
+    "teamId": 175105,
+  },
+  {
+    "driverScore": 52,
+    "overallScore": 52,
+    "programmingScore": 0,
+    "rank": 12,
+    "teamId": 79721,
+  },
+  {
+    "driverScore": 18,
+    "overallScore": 18,
+    "programmingScore": 0,
+    "rank": 17,
+    "teamId": 167515,
+  },
+  {
+    "driverScore": 18,
+    "overallScore": 18,
+    "programmingScore": 0,
+    "rank": 19,
+    "teamId": 163783,
+  },
+  {
+    "driverScore": 5,
+    "overallScore": 5,
+    "programmingScore": 0,
+    "rank": 20,
+    "teamId": 182306,
+  },
+  {
+    "driverScore": 5,
+    "overallScore": 5,
+    "programmingScore": 0,
+    "rank": 21,
+    "teamId": 178754,
+  },
+  {
+    "driverScore": 0,
+    "overallScore": 0,
+    "programmingScore": 0,
+    "rank": 23,
+    "teamId": 167516,
+  },
+]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division 8`] = `
+[
+  {
+    "autoSkills": {
+      "no": 3,
+      "result": "eligible",
+      "score": 13,
+    },
+    "isEligible": true,
+    "overallSkills": {
+      "no": 2,
+      "result": "eligible",
+      "score": 113,
+    },
+    "qualRanking": {
+      "no": 1,
+      "result": "eligible",
+      "score": 1,
+    },
+    "teamId": 160887,
+  },
+  {
+    "autoSkills": {
+      "no": 6,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 5,
+      "result": "eligible",
+      "score": 100,
+    },
+    "qualRanking": {
+      "no": 2,
+      "result": "eligible",
+      "score": 2,
+    },
+    "teamId": 103059,
+  },
+  {
+    "autoSkills": {
+      "no": 1,
+      "result": "eligible",
+      "score": 100,
+    },
+    "isEligible": true,
+    "overallSkills": {
+      "no": 1,
+      "result": "eligible",
+      "score": 200,
+    },
+    "qualRanking": {
+      "no": 3,
+      "result": "eligible",
+      "score": 3,
+    },
+    "teamId": 105118,
+  },
+  {
+    "autoSkills": {
+      "no": 8,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 8,
+      "result": "ineligible",
+      "score": 88,
+    },
+    "qualRanking": {
+      "no": 4,
+      "result": "eligible",
+      "score": 4,
+    },
+    "teamId": 62270,
+  },
+  {
+    "autoSkills": {
+      "no": 4,
+      "result": "eligible",
+      "score": 5,
+    },
+    "isEligible": true,
+    "overallSkills": {
+      "no": 3,
+      "result": "eligible",
+      "score": 105,
+    },
+    "qualRanking": {
+      "no": 5,
+      "result": "eligible",
+      "score": 5,
+    },
+    "teamId": 175243,
+  },
+  {
+    "autoSkills": {
+      "no": 7,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 7,
+      "result": "eligible",
+      "score": 88,
+    },
+    "qualRanking": {
+      "no": 6,
+      "result": "eligible",
+      "score": 6,
+    },
+    "teamId": 126531,
+  },
+  {
+    "autoSkills": {
+      "no": 5,
+      "result": "eligible",
+      "score": 1,
+    },
+    "isEligible": true,
+    "overallSkills": {
+      "no": 6,
+      "result": "eligible",
+      "score": 89,
+    },
+    "qualRanking": {
+      "no": 7,
+      "result": "eligible",
+      "score": 7,
+    },
+    "teamId": 126532,
+  },
+  {
+    "autoSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": -1,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": 0,
+    },
+    "qualRanking": {
+      "no": 8,
+      "result": "eligible",
+      "score": 8,
+    },
+    "teamId": 180856,
+  },
+  {
+    "autoSkills": {
+      "no": 11,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 11,
+      "result": "ineligible",
+      "score": 52,
+    },
+    "qualRanking": {
+      "no": 9,
+      "result": "eligible",
+      "score": 9,
+    },
+    "teamId": 79721,
+  },
+  {
+    "autoSkills": {
+      "no": 15,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 15,
+      "result": "ineligible",
+      "score": 5,
+    },
+    "qualRanking": {
+      "no": 10,
+      "result": "ineligible",
+      "score": 10,
+    },
+    "teamId": 178754,
+  },
+  {
+    "autoSkills": {
+      "no": 9,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 9,
+      "result": "ineligible",
+      "score": 76,
+    },
+    "qualRanking": {
+      "no": 11,
+      "result": "ineligible",
+      "score": 11,
+    },
+    "teamId": 175244,
+  },
+  {
+    "autoSkills": {
+      "no": 14,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 14,
+      "result": "ineligible",
+      "score": 5,
+    },
+    "qualRanking": {
+      "no": 12,
+      "result": "ineligible",
+      "score": 12,
+    },
+    "teamId": 182306,
+  },
+  {
+    "autoSkills": {
+      "no": 12,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 12,
+      "result": "ineligible",
+      "score": 18,
+    },
+    "qualRanking": {
+      "no": 13,
+      "result": "ineligible",
+      "score": 13,
+    },
+    "teamId": 167515,
+  },
+  {
+    "autoSkills": {
+      "no": 2,
+      "result": "eligible",
+      "score": 40,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 4,
+      "result": "eligible",
+      "score": 104,
+    },
+    "qualRanking": {
+      "no": 14,
+      "result": "ineligible",
+      "score": 14,
+    },
+    "teamId": 163901,
+  },
+  {
+    "autoSkills": {
+      "no": 10,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 10,
+      "result": "ineligible",
+      "score": 64,
+    },
+    "qualRanking": {
+      "no": 15,
+      "result": "ineligible",
+      "score": 15,
+    },
+    "teamId": 175105,
+  },
+  {
+    "autoSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": -1,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": 0,
+    },
+    "qualRanking": {
+      "no": 16,
+      "result": "ineligible",
+      "score": 16,
+    },
+    "teamId": 178753,
+  },
+  {
+    "autoSkills": {
+      "no": 16,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 16,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "qualRanking": {
+      "no": 17,
+      "result": "ineligible",
+      "score": 17,
+    },
+    "teamId": 167516,
+  },
+  {
+    "autoSkills": {
+      "no": 13,
+      "result": "ineligible",
+      "score": 0,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 13,
+      "result": "ineligible",
+      "score": 18,
+    },
+    "qualRanking": {
+      "no": 18,
+      "result": "ineligible",
+      "score": 18,
+    },
+    "teamId": 163783,
+  },
+  {
+    "autoSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": -1,
+    },
+    "isEligible": false,
+    "overallSkills": {
+      "no": 0,
+      "result": "no data",
+      "score": 0,
+    },
+    "qualRanking": {
+      "no": 19,
+      "result": "ineligible",
+      "score": 19,
+    },
+    "teamId": 175104,
+  },
+]
+`;

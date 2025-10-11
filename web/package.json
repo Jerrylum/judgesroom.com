@@ -52,6 +52,7 @@
 		"events": "^3.3.0",
 		"papaparse": "^5.5.3",
 		"qrcode": "^1.5.4",
+		"robotevents": "^6.0.4",
 		"svelte-dnd-action": "^0.9.64",
 		"zod": "^4.0.15"
 	}

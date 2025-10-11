@@ -36,7 +36,6 @@
 		"@judging.jerryio/web": "workspace:*",
 		"@judging.jerryio/wrpc": "workspace:*",
 		"drizzle-orm": "^0.44.4",
-		"robotevents": "^6.0.4",
 		"zod": "^4.0.15"
 	}
 }

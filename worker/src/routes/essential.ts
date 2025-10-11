@@ -3,7 +3,7 @@ import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { awards, judgeGroups, judgeGroupsAssignedTeams, metadata, teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import type { Award, AwardType } from '@judging.jerryio/protocol/src/award';
-import { eq, getTableColumns, inArray, not, sql, SQL } from 'drizzle-orm';
+import { eq, getTableColumns, sql, SQL } from 'drizzle-orm';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
