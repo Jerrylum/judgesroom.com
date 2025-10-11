@@ -296,7 +296,7 @@ export class WebSocketConnectionManager implements Network {
 	 */
 	async destroy() {
 		for (const client of this.serverData.clients) {
-			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.SESSION_DESTROYED, 'Session destroyed');
+			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.ROOM_DESTROYED, 'Session destroyed');
 		}
 
 		this.serverData = { roomId: null, clients: [] };

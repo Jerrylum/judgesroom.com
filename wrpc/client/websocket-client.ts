@@ -19,7 +19,7 @@ export type ConnectionState = z.infer<typeof ConnectionStateSchema>;
 export enum ConnectionCloseCode {
 	NORMAL = 1000,
 	KICKED = 3000,
-	SESSION_DESTROYED = 3001
+	ROOM_DESTROYED = 3001
 }
 
 /**
@@ -243,7 +243,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			this.connectionState = 'offline';
 		} else if (event.code === ConnectionCloseCode.KICKED) {
 			this.connectionState = 'offline';
-		} else if (event.code === ConnectionCloseCode.SESSION_DESTROYED) {
+		} else if (event.code === ConnectionCloseCode.ROOM_DESTROYED) {
 			this.connectionState = 'offline';
 		} else if (this.reconnectAttempts < this.maxReconnectAttempts) {
 			this.connectionState = 'reconnecting';

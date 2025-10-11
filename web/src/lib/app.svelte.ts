@@ -643,7 +643,7 @@ export class App {
 					this.addErrorNotice('You have been kicked from the Judges\' Room');
 
 					AppUI.appPhase = 'choose_action';
-				} else if (code === ConnectionCloseCode.SESSION_DESTROYED) {
+				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
 					this.leaveJudgesRoom();
 					this.addErrorNotice('The Judges\' Room has been destroyed');
 
