@@ -29,7 +29,8 @@ export default ts.config(
 		files: ['**/*.ts'],
 		languageOptions: {
 			parserOptions: {
-				projectService: true
+				projectService: true,
+				tsconfigRootDir: __dirname
 			}
 		}
 	}
