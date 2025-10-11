@@ -44,10 +44,10 @@
 		if (hash) {
 			// Parse the session URL from the hash
 			const result = parseSessionUrl(window.location.href);
-			const existingSessionInfo = app.getSessionInfo();
+			const existingPermit = app.getPermit();
 			// If the session URL is different from the existing session,
 			// leave the current session and join the new one
-			if (existingSessionInfo?.roomId !== result) {
+			if (existingPermit?.roomId !== result) {
 				await handleSessionFromUrl();
 				return;
 			}
@@ -55,8 +55,8 @@
 
 		// In other cases, check if we can rejoin a stored session
 		// The stored session should be the loaded when the app is loaded
-		const existingSessionInfo = app.getSessionInfo();
-		if (existingSessionInfo) {
+		const existingPermit = app.getPermit();
+		if (existingPermit) {
 			await rejoinStoredSession();
 			return;
 		}

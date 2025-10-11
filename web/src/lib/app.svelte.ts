@@ -83,21 +83,21 @@ export class AppStorage {
 	}
 }
 
-export const SessionInfoSchema = z.object({
+export const PermitSchema = z.object({
 	roomId: z.uuidv4(),
 	createdAt: z.number().int().positive(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(100)
 });
 
-export type SessionInfo = z.infer<typeof SessionInfoSchema>;
+export type Permit = z.infer<typeof PermitSchema>;
 
 export class App {
 	private readonly storage: AppStorage;
 	private readonly isDevelopment: boolean;
 	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
 	private connectionState: ConnectionState = $state('offline');
-	private sessionInfo: SessionInfo | null = $state(null);
+	private permit: Permit | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
 	private allTeamData: Record<string, TeamData> = $state({});
@@ -122,7 +122,7 @@ export class App {
 	// ============================================================================
 
 	private async joinJudgesRoom(): Promise<void> {
-		if (!this.hasSessionInfo()) {
+		if (!this.hasPermit()) {
 			throw new Error('CRITICAL: No session info');
 		}
 
@@ -158,7 +158,7 @@ export class App {
 	 */
 	async joinJudgesRoomFromUrl(url: string): Promise<void> {
 		try {
-			if (this.hasSessionInfo()) {
+			if (this.hasPermit()) {
 				throw new Error('CRITICAL: already in a session');
 			}
 
@@ -167,7 +167,7 @@ export class App {
 				throw new Error('Invalid session URL');
 			}
 
-			this.sessionInfo = this.createNewSessionInfo(roomId);
+			this.permit = this.createNewPermit(roomId);
 			this.saveSessionToStorage();
 
 			await this.joinJudgesRoom();
@@ -180,18 +180,18 @@ export class App {
 	/**
 	 * Get session info
 	 */
-	getSessionInfo(): Readonly<SessionInfo> | null {
-		return this.sessionInfo ? $state.snapshot(this.sessionInfo) : null;
+	getPermit(): Readonly<Permit> | null {
+		return this.permit ? $state.snapshot(this.permit) : null;
 	}
 
 	/**
 	 * Get session URL for sharing
 	 */
 	getSessionUrl(): string {
-		if (!this.sessionInfo?.roomId) {
+		if (!this.permit?.roomId) {
 			throw new Error('No active session');
 		}
-		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.roomId}`;
+		return `${window.location.origin}${window.location.pathname}#${this.permit.roomId}`;
 	}
 
 	/**
@@ -207,7 +207,7 @@ export class App {
 			this.clearUserFromStorage();
 
 			const roomId = generateUUID();
-			this.sessionInfo = this.createNewSessionInfo(roomId);
+			this.permit = this.createNewPermit(roomId);
 
 			if (!this.essentialData) {
 				throw new Error('CRITICAL: No essential data');
@@ -221,12 +221,12 @@ export class App {
 			if (response.success) {
 				this.saveSessionToStorage();
 			} else {
-				this.sessionInfo = null;
+				this.permit = null;
 				this.clearSessionFromStorage();
 				throw new Error(response.message);
 			}
 		} catch (error) {
-			this.sessionInfo = null;
+			this.permit = null;
 			this.clearSessionFromStorage();
 			this.addErrorNotice(`Failed to create session: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			throw error;
@@ -237,18 +237,18 @@ export class App {
 	 * Check if the session is joined, it doesn't mean we are connected to the server
 	 */
 	isSessionJoined(): boolean {
-		return this.sessionInfo !== null && this.essentialData !== null;
+		return this.permit !== null && this.essentialData !== null;
 	}
 
 	/**
 	 * Check if the session is joined and the user is selected, we can now go to the workspace
 	 */
 	isJudgingReady(): boolean {
-		return this.sessionInfo !== null && this.essentialData !== null && this.getCurrentUser() !== null;
+		return this.permit !== null && this.essentialData !== null && this.getCurrentUser() !== null;
 	}
 
-	hasSessionInfo(): boolean {
-		return this.sessionInfo !== null;
+	hasPermit(): boolean {
+		return this.permit !== null;
 	}
 
 	/**
@@ -256,7 +256,7 @@ export class App {
 	 */
 	async leaveSession(): Promise<void> {
 		// Clear session data
-		this.sessionInfo = null;
+		this.permit = null;
 		this.essentialData = null;
 		this.allJudges = [];
 		this.currentUser = null;
@@ -622,16 +622,16 @@ export class App {
 			? `ws://${window.location.hostname}:8787/ws` // Local development server
 			: 'wss://judging.jerryio.workers.dev/ws'; // Production Cloudflare Worker
 
-		if (this.sessionInfo === null) {
+		if (this.permit === null) {
 			throw new Error('CRITICAL: No session info');
 		}
 
 		return {
 			wsUrl,
 			clientId: generateUUID(),
-			roomId: this.sessionInfo.roomId,
-			deviceId: this.sessionInfo.deviceId,
-			deviceName: this.sessionInfo.deviceName,
+			roomId: this.permit.roomId,
+			deviceId: this.permit.deviceId,
+			deviceName: this.permit.deviceName,
 			onContext: async () => ({}),
 			onOpen: () => {},
 			onClosed: (code, reason) => {
@@ -661,29 +661,29 @@ export class App {
 		this.clearUserFromStorage();
 	}
 
-	private createNewSessionInfo(roomId: string): SessionInfo {
+	private createNewPermit(roomId: string): Permit {
 		const deviceId = generateUUID();
 		const deviceName = getDeviceNameFromUserAgent();
 		return { roomId, deviceId, deviceName, createdAt: Date.now() };
 	}
 
-	private loadSessionFromStorage(): SessionInfo | null {
-		const stored = this.storage.load<SessionInfo>('sessionInfo');
+	private loadSessionFromStorage(): Permit | null {
+		const stored = this.storage.load<Permit>('permit');
 		if (stored) {
-			this.sessionInfo = stored;
+			this.permit = stored;
 			return stored;
 		}
 		return null;
 	}
 
 	private saveSessionToStorage(): void {
-		if (this.sessionInfo) {
-			this.storage.save('sessionInfo', this.sessionInfo);
+		if (this.permit) {
+			this.storage.save('permit', this.permit);
 		}
 	}
 
 	private clearSessionFromStorage(): void {
-		this.storage.remove('sessionInfo');
+		this.storage.remove('permit');
 	}
 
 	private loadUserFromStorage(): User | null {

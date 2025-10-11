@@ -13,11 +13,11 @@
 	const devices = $derived(app.getDevices());
 	const connectionState = $derived(app.getConnectionState());
 	const currentUser = $derived(app.getCurrentUser());
-	const sessionInfo = $derived(app.getSessionInfo());
+	const permit = $derived(app.getPermit());
 	const shareableUrl = $derived(app.getSessionUrl());
 	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
-	const currentDevice = $derived(sessionInfo ? devices.find((device) => device.deviceId === sessionInfo.deviceId) : null);
-	const otherDevices = $derived(sessionInfo ? devices.filter((device) => device.deviceId !== sessionInfo.deviceId) : []);
+	const currentDevice = $derived(permit ? devices.find((device) => device.deviceId === permit.deviceId) : null);
+	const otherDevices = $derived(permit ? devices.filter((device) => device.deviceId !== permit.deviceId) : []);
 	const isDisconnectedFromServer = $derived(connectionState !== 'connected');
 
 	// Handle kick device
