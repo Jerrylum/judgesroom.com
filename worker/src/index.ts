@@ -9,7 +9,7 @@ import { broadcastDeviceListUpdate } from './routes/device';
 import { unsubscribeTopics } from './routes/subscriptions';
 
 const IntentionSchema = z.object({
-	sessionId: z.uuidv4(),
+	roomId: z.uuidv4(),
 	clientId: z.uuidv4(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),
@@ -21,7 +21,7 @@ type Intention = z.infer<typeof IntentionSchema>;
 function parseIntention(request: Request): Intention | null {
 	const url = new URL(request.url);
 	const result = IntentionSchema.safeParse({
-		sessionId: url.searchParams.get('sessionId'),
+		roomId: url.searchParams.get('roomId'),
 		clientId: url.searchParams.get('clientId'),
 		deviceId: url.searchParams.get('deviceId'),
 		deviceName: url.searchParams.get('deviceName'),
@@ -76,7 +76,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		if (!intention) {
 			return new Response('Invalid request', { status: 400 });
 		}
-		const { sessionId, clientId, deviceId, deviceName } = intention;
+		const { roomId, clientId, deviceId, deviceName } = intention;
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
@@ -98,7 +98,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		this.ctx.acceptWebSocket(server, [clientId]);
 
 		// Set up connection with the WebSocket handler (now async for storage)
-		await this.wsHandler.handleConnection(server, { sessionId, clientId, deviceId, deviceName });
+		await this.wsHandler.handleConnection(server, { roomId, clientId, deviceId, deviceName });
 
 		// We do not broadcast device list update here, it will be done when the device sends a join request
 
@@ -152,10 +152,10 @@ export default {
 			if (!intention) {
 				return new Response('Invalid request', { status: 400 });
 			}
-			const { sessionId } = intention;
+			const { roomId } = intention;
 
 			// Create a `DurableObjectId` for the WebSocket session
-			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(sessionId);
+			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
 
 			// Create a stub to open a communication channel with the Durable Object instance
 			const stub = env.WEBSOCKET_HIBERNATION_SERVER.get(id);

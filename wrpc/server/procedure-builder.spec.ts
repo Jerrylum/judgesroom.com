@@ -10,7 +10,7 @@ describe('Procedure Builder', () => {
 
 	beforeEach(() => {
 		mockSession = {
-			sessionId: 'test-session',
+			roomId: 'test-session',
 			currentClient: {
 				clientId: 'test-client',
 				deviceName: 'Test Device'

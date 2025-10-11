@@ -7,12 +7,3 @@ export const DeviceInfoSchema = z.object({
 	isOnline: z.boolean()
 });
 export type DeviceInfo = z.infer<typeof DeviceInfoSchema>;
-
-export const SessionInfoSchema = z.object({
-	sessionId: z.uuidv4(),
-	createdAt: z.number().int().positive(),
-	deviceId: z.uuidv4(),
-	deviceName: z.string().min(1).max(100)
-});
-
-export type SessionInfo = z.infer<typeof SessionInfoSchema>;

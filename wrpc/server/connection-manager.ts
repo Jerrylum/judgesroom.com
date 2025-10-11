@@ -8,7 +8,7 @@ import { ConnectionCloseCode } from '../client';
  * Server data stored in Durable Object storage
  */
 interface ServerData {
-	sessionId: string | null;
+	roomId: string | null;
 	// This is the list of clients that are "likely"connected to the server
 	// However, it is not guaranteed that the client is actually connected to the server
 	// because the client may have disconnected and the server may not have removed the client from the list
@@ -21,7 +21,7 @@ interface ServerData {
  */
 export class WebSocketConnectionManager implements Network {
 	private opts: WebSocketHandlerOptions<AnyRouter>;
-	private serverData: ServerData = { sessionId: null, clients: [] };
+	private serverData: ServerData = { roomId: null, clients: [] };
 	private isLoaded = false;
 	private pendingRequests = new Map<
 		string,
@@ -45,30 +45,30 @@ export class WebSocketConnectionManager implements Network {
 		this.serverData.clients = this.serverData.clients.filter((c) => this.opts.getWebSocket(c.clientId) !== null);
 	}
 
-	getSessionId(): string {
+	getRoomId(): string {
 		if (!this.isRunning()) {
 			throw new Error('Connection manager not initialized');
 		}
 
-		if (this.serverData.sessionId === null) {
+		if (this.serverData.roomId === null) {
 			throw new Error('Session ID not set');
 		}
 
-		return this.serverData.sessionId;
+		return this.serverData.roomId;
 	}
 
 	/**
 	 * Add a WebSocket connection with hibernation support
 	 */
-	async addConnection(ws: WebSocket, sessionId: string, clientId: string, deviceId: string, deviceName: string) {
+	async addConnection(ws: WebSocket, roomId: string, clientId: string, deviceId: string, deviceName: string) {
 		if (!this.isRunning()) {
 			throw new Error('CRITICAL: Connection manager not initialized');
 		}
 
-		if (this.serverData.sessionId !== null && this.serverData.sessionId !== sessionId) {
+		if (this.serverData.roomId !== null && this.serverData.roomId !== roomId) {
 			throw new Error('CRITICAL: Session ID mismatch');
 		}
-		this.serverData.sessionId = sessionId;
+		this.serverData.roomId = roomId;
 
 		// Check if client already exists
 		const existingClient = this.serverData.clients.find((c) => c.clientId === clientId);
@@ -277,7 +277,7 @@ export class WebSocketConnectionManager implements Network {
 	 * Load data from Durable Object storage
 	 */
 	private async load() {
-		this.serverData = ((await this.opts.loadData()) || { sessionId: null, clients: [] }) as ServerData;
+		this.serverData = ((await this.opts.loadData()) || { roomId: null, clients: [] }) as ServerData;
 		this.isLoaded = true;
 	}
 
@@ -299,7 +299,7 @@ export class WebSocketConnectionManager implements Network {
 			this.opts.getWebSocket(client.clientId)?.close(ConnectionCloseCode.SESSION_DESTROYED, 'Session destroyed');
 		}
 
-		this.serverData = { sessionId: null, clients: [] };
+		this.serverData = { roomId: null, clients: [] };
 		this.isLoaded = false;
 		await this.opts.destroy();
 	}

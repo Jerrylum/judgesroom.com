@@ -44,7 +44,7 @@ export type InferRouterContext<TRouter extends AnyRouter> = TRouter['_def']['_co
 // Client types
 export type CreateClientOptions = {
 	wsUrl: string;
-	sessionId?: string;
+	roomId?: string;
 	clientId?: string;
 	deviceName?: string;
 };

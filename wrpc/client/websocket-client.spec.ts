@@ -75,7 +75,7 @@ describe('WebsocketClient', () => {
 	beforeEach(() => {
 		clientOptions = {
 			wsUrl: 'ws://localhost:8080/ws',
-			sessionId: 'test-session',
+			roomId: 'test-session',
 			clientId: 'test-client',
 			deviceId: 'test-device',
 			deviceName: 'Test Device',
@@ -121,7 +121,7 @@ describe('WebsocketClient', () => {
 
 			// Check that WebSocket was created with correct URL
 			expect(MockWebSocket).toHaveBeenCalledWith(
-				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
+				'ws://localhost:8080/ws?roomId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
 			);
 
 			// Clean up the pending request
@@ -131,7 +131,7 @@ describe('WebsocketClient', () => {
 		it('should handle connection without optional parameters', async () => {
 			const minimalOptions: ClientOptions<AnyRouter> = {
 				wsUrl: 'ws://localhost:8080/ws',
-				sessionId: 'test-session',
+				roomId: 'test-session',
 				clientId: 'test-client',
 				deviceId: 'test-device',
 				deviceName: 'Test Device',
@@ -147,7 +147,7 @@ describe('WebsocketClient', () => {
 			await new Promise((resolve) => setTimeout(resolve, 10));
 
 			expect(MockWebSocket).toHaveBeenCalledWith(
-				'ws://localhost:8080/ws?sessionId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
+				'ws://localhost:8080/ws?roomId=test-session&clientId=test-client&deviceId=test-device&deviceName=Test+Device&action=join'
 			);
 
 			minimalClient.disconnect();
@@ -841,7 +841,7 @@ describe('WebsocketClient', () => {
 			// Create context-aware client options
 			contextOptions = {
 				wsUrl: 'ws://localhost:8080/ws',
-				sessionId: 'context-session',
+				roomId: 'context-session',
 				clientId: 'context-client',
 				deviceId: 'context-device',
 				deviceName: 'Context Test Device',

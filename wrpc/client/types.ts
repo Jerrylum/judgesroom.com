@@ -11,7 +11,7 @@ export type WRPCClient<TRouter extends AnyRouter> = RouterProxy<TRouter>;
 
 export interface ClientOptions<TRouter extends AnyRouter> {
 	wsUrl: string;
-	sessionId: string;
+	roomId: string;
 	clientId: string;
 	deviceId: string;
 	deviceName?: string;

@@ -6,7 +6,7 @@ import type { WebsocketClient } from './websocket-client';
  */
 export function createClientSideSession<TServerRouter extends AnyRouter, TClientRouter extends AnyRouter>(
 	wsClient: WebsocketClient<TClientRouter>,
-	sessionId: string,
+	roomId: string,
 	clientId: string,
 	deviceId: string,
 	deviceName: string
@@ -36,7 +36,7 @@ export function createClientSideSession<TServerRouter extends AnyRouter, TClient
 			throw new Error('broadcast() cannot be called from client-side session. Clients cannot broadcast to other clients.');
 		},
 		getServer: () => createServerProxy(),
-		sessionId,
+		roomId,
 		currentClient: {
 			clientId,
 			deviceId,

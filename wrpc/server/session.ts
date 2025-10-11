@@ -31,7 +31,7 @@ export interface Session<TServerRouter extends AnyRouter> {
 	/**
 	 * Current session metadata
 	 */
-	readonly sessionId: string;
+	readonly roomId: string;
 
 	/**
 	 * Current client metadata
@@ -48,7 +48,7 @@ export interface Session<TServerRouter extends AnyRouter> {
  */
 export type SessionFactory<TServerRouter extends AnyRouter> = (
 	connectionManager: Network,
-	sessionId: string,
+	roomId: string,
 	clientId: string,
 	deviceName?: string
 ) => Session<TServerRouter>;
@@ -97,7 +97,7 @@ export function createClientProxy<TClientRouter extends AnyRouter>(
  */
 export function createServerSideSession(
 	connectionManager: Network,
-	sessionId: string,
+	roomId: string,
 	clientId: string,
 	deviceId: string,
 	deviceName: string
@@ -108,7 +108,7 @@ export function createServerSideSession(
 		getServer: () => {
 			throw new Error('getServer() cannot be called from server-side session. Server procedures should be called directly.');
 		},
-		sessionId,
+		roomId,
 		currentClient: {
 			clientId,
 			deviceId,

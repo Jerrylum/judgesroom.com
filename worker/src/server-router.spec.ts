@@ -32,7 +32,7 @@ describe('ServerRouter', () => {
 			getServer: () => {
 				throw new Error('getServer() cannot be called from server-side session');
 			},
-			sessionId: 'test-session',
+			roomId: 'test-session',
 			currentClient: {
 				clientId: 'test-client',
 				deviceId: 'test-device',

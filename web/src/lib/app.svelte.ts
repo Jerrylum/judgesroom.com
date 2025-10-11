@@ -6,7 +6,7 @@ import {
 	type WRPCClientManager
 } from '@judging.jerryio/wrpc/client';
 import type { Judge, JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import type { DeviceInfo, SessionInfo } from '@judging.jerryio/protocol/src/client';
+import type { DeviceInfo } from '@judging.jerryio/protocol/src/client';
 import type { EssentialData } from '@judging.jerryio/protocol/src/event';
 import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
 import type { Award } from '@judging.jerryio/protocol/src/award';
@@ -18,6 +18,7 @@ import { AppUI } from './app-page.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 import type { JoiningKit } from '@judging.jerryio/worker/src/routes/handshake';
+import z from 'zod';
 
 export interface Notice {
 	id: string;
@@ -81,6 +82,15 @@ export class AppStorage {
 		}
 	}
 }
+
+export const SessionInfoSchema = z.object({
+	roomId: z.uuidv4(),
+	createdAt: z.number().int().positive(),
+	deviceId: z.uuidv4(),
+	deviceName: z.string().min(1).max(100)
+});
+
+export type SessionInfo = z.infer<typeof SessionInfoSchema>;
 
 export class App {
 	private readonly storage: AppStorage;
@@ -152,12 +162,12 @@ export class App {
 				throw new Error('CRITICAL: already in a session');
 			}
 
-			const sessionId = parseSessionUrl(url);
-			if (!sessionId) {
+			const roomId = parseSessionUrl(url);
+			if (!roomId) {
 				throw new Error('Invalid session URL');
 			}
 
-			this.sessionInfo = this.createNewSessionInfo(sessionId);
+			this.sessionInfo = this.createNewSessionInfo(roomId);
 			this.saveSessionToStorage();
 
 			await this.joinJudgesRoom();
@@ -178,10 +188,10 @@ export class App {
 	 * Get session URL for sharing
 	 */
 	getSessionUrl(): string {
-		if (!this.sessionInfo?.sessionId) {
+		if (!this.sessionInfo?.roomId) {
 			throw new Error('No active session');
 		}
-		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.sessionId}`;
+		return `${window.location.origin}${window.location.pathname}#${this.sessionInfo.roomId}`;
 	}
 
 	/**
@@ -196,8 +206,8 @@ export class App {
 			this.clearSessionFromStorage();
 			this.clearUserFromStorage();
 
-			const sessionId = generateUUID();
-			this.sessionInfo = this.createNewSessionInfo(sessionId);
+			const roomId = generateUUID();
+			this.sessionInfo = this.createNewSessionInfo(roomId);
 
 			if (!this.essentialData) {
 				throw new Error('CRITICAL: No essential data');
@@ -619,7 +629,7 @@ export class App {
 		return {
 			wsUrl,
 			clientId: generateUUID(),
-			sessionId: this.sessionInfo.sessionId,
+			roomId: this.sessionInfo.roomId,
 			deviceId: this.sessionInfo.deviceId,
 			deviceName: this.sessionInfo.deviceName,
 			onContext: async () => ({}),
@@ -651,10 +661,10 @@ export class App {
 		this.clearUserFromStorage();
 	}
 
-	private createNewSessionInfo(sessionId: string): SessionInfo {
+	private createNewSessionInfo(roomId: string): SessionInfo {
 		const deviceId = generateUUID();
 		const deviceName = getDeviceNameFromUserAgent();
-		return { sessionId, deviceId, deviceName, createdAt: Date.now() };
+		return { roomId, deviceId, deviceName, createdAt: Date.now() };
 	}
 
 	private loadSessionFromStorage(): SessionInfo | null {

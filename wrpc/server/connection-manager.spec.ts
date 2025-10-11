@@ -22,7 +22,7 @@ describe('WebSocketConnectionManager', () => {
 
 		mockOptions = {
 			router: {} as AnyRouter,
-			loadData: vi.fn().mockResolvedValue({ sessionId: null, clients: [] }),
+			loadData: vi.fn().mockResolvedValue({ roomId: null, clients: [] }),
 			saveData: vi.fn().mockResolvedValue(undefined),
 			destroy: vi.fn().mockResolvedValue(undefined),
 			getWebSocket: vi.fn().mockImplementation((clientId: string) => {
@@ -53,7 +53,7 @@ describe('WebSocketConnectionManager', () => {
 
 		it('should load existing data on initialization', async () => {
 			const existingData = {
-				sessionId: null,
+				roomId: null,
 				clients: [
 					{
 						clientId: 'client1',
@@ -103,17 +103,17 @@ describe('WebSocketConnectionManager', () => {
 				).rejects.toThrow('Session ID mismatch');
 			});
 
-			it('getSessionId should throw before first connection and return after', async () => {
+			it('getRoomId should throw before first connection and return after', async () => {
 				const newManager = new WebSocketConnectionManager(mockOptions);
 				await newManager.initialize();
 
-				expect(() => newManager.getSessionId()).toThrow('Session ID not set');
+				expect(() => newManager.getRoomId()).toThrow('Session ID not set');
 
 				const mockWs = new MockWebSocket();
 				mockWebSockets.set('clientA', mockWs);
 				await newManager.addConnection(mockWs as unknown as WebSocket, 'abc-session', 'clientA', 'deviceA', 'A');
 
-				expect(newManager.getSessionId()).toBe('abc-session');
+				expect(newManager.getRoomId()).toBe('abc-session');
 			});
 		});
 

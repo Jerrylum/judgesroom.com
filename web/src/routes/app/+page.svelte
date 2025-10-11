@@ -47,7 +47,7 @@
 			const existingSessionInfo = app.getSessionInfo();
 			// If the session URL is different from the existing session,
 			// leave the current session and join the new one
-			if (existingSessionInfo?.sessionId !== result) {
+			if (existingSessionInfo?.roomId !== result) {
 				await handleSessionFromUrl();
 				return;
 			}

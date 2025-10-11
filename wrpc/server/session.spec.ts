@@ -25,8 +25,8 @@ describe('Server-side Session', () => {
 	});
 
 	describe('session metadata', () => {
-		it('should have correct sessionId', () => {
-			expect(session.sessionId).toBe('test-session-id');
+		it('should have correct roomId', () => {
+			expect(session.roomId).toBe('test-session-id');
 		});
 
 		it('should have correct currentClient metadata', () => {
