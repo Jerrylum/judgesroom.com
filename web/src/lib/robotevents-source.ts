@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import type { Award, Program } from '@judging.jerryio/protocol/src/award';
-import { Client, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
+import { Client, type Division, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
 import { getEventGradeLevelOptions } from './event.svelte';
@@ -44,6 +44,11 @@ export interface ExcellenceAwardTeamEligibility {
 	autoSkills: ExcellenceAwardTeamEligibilityCriterion;
 }
 
+export interface DivisionInfo {
+	id: number;
+	name: string;
+}
+
 export interface RobotEventsImportedData {
 	robotEventsSku: string;
 	robotEventsEventId: number;
@@ -52,6 +57,7 @@ export interface RobotEventsImportedData {
 	eventGradeLevel: EventGradeLevel;
 	teamInfos: TeamInfo[];
 	awardsOptions: AwardOptions[];
+	divisionInfos: DivisionInfo[];
 }
 
 export function getRobotEventsClient(): RobotEventsClient {
@@ -354,7 +360,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 	const gradeOptions = getEventGradeLevelOptions(program);
 	const possibleGrades = gradeOptions.find((g) => g.value === eventGradeLevel)?.grades ?? [];
 
-	const throwError = (team: Team) => {
+	const throwTeamError = (team: Team) => {
 		throw new Error(`Unable to get team info from RobotEvents for team ${team.number} because it is missing required fields`);
 	};
 
@@ -369,7 +375,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 				country: team.location?.country ?? '(Not Provided)',
 				shortName: team.team_name ?? '(Not Provided)',
 				school: team.organization ?? '(Not Provided)',
-				grade: team.grade ?? throwError(team),
+				grade: team.grade ?? throwTeamError(team),
 				group: extractGroupFromTeamNumber(team.number),
 				notebookLink: '',
 				notebookDevelopmentStatus: 'undetermined',
@@ -383,6 +389,17 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 
 	const awardsOptions = getOfficialAwardOptionsList(program, possibleGrades).filter((a) => awards.some((b) => b.title?.includes(a.name)));
 
+	const throwDivisionError = (division: Division) => {
+		throw new Error(`Unable to get division info from RobotEvents for division ${division.id} because it is missing required fields`);
+	};
+
+	const divisionInfos = evt.divisions?.map((division) => ({
+		id: division.id ?? throwDivisionError(division),
+		name: division.name ?? throwDivisionError(division),
+	})) ?? [];
+
+	if (divisionInfos.length === 0) throw new Error('No divisions found in RobotEvents');
+
 	return {
 		robotEventsSku,
 		robotEventsEventId,
@@ -390,6 +407,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 		program,
 		eventGradeLevel,
 		teamInfos,
-		awardsOptions
+		awardsOptions,
+		divisionInfos
 	} satisfies RobotEventsImportedData;
 }

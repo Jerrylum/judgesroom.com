@@ -58,6 +58,12 @@ exports[`RobotEventsSource > should get correct event data using importFromRobot
       "name": "Energy Award",
     },
   ],
+  "divisionInfos": [
+    {
+      "id": 1,
+      "name": "Division 1",
+    },
+  ],
   "eventGradeLevel": "Blended",
   "eventName": "2025 JSTEA Hong Kong Open Robotics Tournament - VIQRC",
   "program": "VIQRC",
