@@ -118,7 +118,7 @@
 	<TabBar {allTabs} {activeTabId} onSwitchTab={switchTab} onCloseTab={closeTab} onReorderTabs={reorderTabs} />
 
 	<!-- Main Content -->
-	<main class="flex-1 overflow-hidden shadow-lg">
+	<main class="flex-1 overflow-hidden">
 		{#each allTabs as tab (tab.id)}
 			<div class="h-full w-full" class:hidden={activeTabId !== tab.id}>
 				<tab.component isActive={activeTabId === tab.id} {...(tab as Record<string, any>).props} />

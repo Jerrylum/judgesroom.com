@@ -75,7 +75,7 @@
 		</div>
 	{:else}
 		<div class="absolute -left-2 -right-2 top-0 z-20 h-8">
-			<div class="absolute left-2 right-2 top-0 h-7 rounded-md group-hover:bg-slate-300"></div>
+			<div class="absolute left-2 right-2 top-0 h-7 rounded-md group-hover:bg-zinc-300"></div>
 		</div>
 	{/if}
 </div>

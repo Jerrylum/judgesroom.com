@@ -186,81 +186,93 @@
 	});
 </script>
 
-<div class="mx-auto max-w-6xl space-y-6 p-6">
-	<!-- Step Indicator -->
-	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
-		<div class="flex items-center">
-			{#each Array(totalSteps) as _, i (i)}
-				<div class="flex items-center">
-					<div
-						class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
-						class:bg-slate-900={i + 1 <= currentStep}
-						class:text-white={i + 1 <= currentStep}
-						class:bg-gray-200={i + 1 > currentStep}
-						class:text-gray-500={i + 1 > currentStep}
-					>
-						{i + 1}
-					</div>
-					{#if i < totalSteps - 1}
+<div class="h-full overflow-auto p-2 md:p-6 bg-slate-100">
+	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
+		<!-- Step Indicator -->
+		<div class="mb-8 flex items-center justify-between">
+			<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
+			<div class="flex items-center">
+				{#each Array(totalSteps) as _, i (i)}
+					<div class="flex items-center">
 						<div
-							class="mx-2 h-0.5 w-12 transition-colors"
-							class:bg-slate-900={i + 1 < currentStep}
-							class:bg-gray-200={i + 1 >= currentStep}
-						></div>
-					{/if}
-				</div>
-			{/each}
+							class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
+							class:bg-slate-900={i + 1 <= currentStep}
+							class:text-white={i + 1 <= currentStep}
+							class:bg-gray-200={i + 1 > currentStep}
+							class:text-gray-500={i + 1 > currentStep}
+						>
+							{i + 1}
+						</div>
+						{#if i < totalSteps - 1}
+							<div
+								class="mx-2 h-0.5 w-12 transition-colors"
+								class:bg-slate-900={i + 1 < currentStep}
+								class:bg-gray-200={i + 1 >= currentStep}
+							></div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		</div>
+
+		<!-- Step Content -->
+		<div class="rounded-lg bg-white p-6 shadow-sm">
+			{#if currentStep === 1}
+				<CompetitionSetupStep
+					bind:eventName
+					bind:selectedProgram
+					bind:selectedEventGradeLevel
+					onResetAwards={resetAwards}
+					onNext={nextStep}
+					onCancel={cancelSetup}
+					isJudgesRoomJoined={app.isJudgesRoomJoined()}
+				/>
+			{:else if currentStep === 2}
+				<AwardSelectionStep
+					{selectedProgram}
+					{selectedEventGradeLevel}
+					bind:allAwardOptions={awardOptions}
+					onNext={nextStep}
+					onPrev={prevStep}
+				/>
+			{:else if currentStep === 3}
+				<TeamImportStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
+			{:else if currentStep === 4}
+				<JudgeSetupStep
+					{isEditingEventSetup}
+					{teams}
+					bind:judgingMethod
+					bind:judgeGroups
+					bind:judges
+					bind:unassignedTeams
+					onNext={nextStep}
+					onPrev={prevStep}
+				/>
+			{:else if currentStep === 5}
+				<ReviewStep
+					{selectedProgram}
+					{selectedEventGradeLevel}
+					{teams}
+					{awardOptions}
+					{judgingMethod}
+					{judgeGroups}
+					{judges}
+					onPrev={prevStep}
+					onComplete={completeSetup}
+					onCancel={cancelSetup}
+					isJudgesRoomJoined={app.isJudgesRoomJoined()}
+				/>
+			{/if}
 		</div>
 	</div>
-
-	<!-- Step Content -->
-	<div class="rounded-lg bg-white p-6 shadow-lg">
-		{#if currentStep === 1}
-			<CompetitionSetupStep
-				bind:eventName
-				bind:selectedProgram
-				bind:selectedEventGradeLevel
-				onResetAwards={resetAwards}
-				onNext={nextStep}
-				onCancel={cancelSetup}
-				isJudgesRoomJoined={app.isJudgesRoomJoined()}
-			/>
-		{:else if currentStep === 2}
-			<AwardSelectionStep
-				{selectedProgram}
-				{selectedEventGradeLevel}
-				bind:allAwardOptions={awardOptions}
-				onNext={nextStep}
-				onPrev={prevStep}
-			/>
-		{:else if currentStep === 3}
-			<TeamImportStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
-		{:else if currentStep === 4}
-			<JudgeSetupStep
-				{isEditingEventSetup}
-				{teams}
-				bind:judgingMethod
-				bind:judgeGroups
-				bind:judges
-				bind:unassignedTeams
-				onNext={nextStep}
-				onPrev={prevStep}
-			/>
-		{:else if currentStep === 5}
-			<ReviewStep
-				{selectedProgram}
-				{selectedEventGradeLevel}
-				{teams}
-				{awardOptions}
-				{judgingMethod}
-				{judgeGroups}
-				{judges}
-				onPrev={prevStep}
-				onComplete={completeSetup}
-				onCancel={cancelSetup}
-				isJudgesRoomJoined={app.isJudgesRoomJoined()}
-			/>
-		{/if}
-	</div>
 </div>
+
+<style lang="postcss">
+	@reference 'tailwindcss';
+
+	:global {
+		body {
+			@apply bg-slate-100;
+		}
+	}
+</style>

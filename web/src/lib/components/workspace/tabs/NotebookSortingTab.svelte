@@ -65,8 +65,8 @@
 	});
 </script>
 
-<div class="h-full overflow-auto p-4 sm:p-6">
-	<div class="mx-auto max-w-5xl space-y-6">
+<div class="h-full overflow-auto p-2 md:p-6">
+	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>

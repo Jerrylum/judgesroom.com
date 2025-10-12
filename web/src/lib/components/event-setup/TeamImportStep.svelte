@@ -295,9 +295,9 @@
 				</div>
 
 				<!-- Summary -->
-				<div class="rounded-lg bg-blue-50 p-4">
-					<h4 class="mb-2 font-medium text-blue-900">Import Summary</h4>
-					<div class="space-y-1 text-sm text-blue-800">
+				<div class="rounded-lg bg-slate-50 p-4">
+					<h4 class="mb-2 font-medium text-slate-900">Import Summary</h4>
+					<div class="space-y-1 text-sm text-slate-800">
 						<p>Total Teams: {teams.length}</p>
 						<p>Active Teams: {teams.filter((t) => !t.excluded).length}</p>
 						<p>Excluded Teams: {teams.filter((t) => t.excluded).length}</p>

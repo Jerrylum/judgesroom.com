@@ -1,22 +1,13 @@
 import { z } from 'zod';
 import { initWRPC } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
-import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
 import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
-import { app, subscriptions, tabs } from './app-page.svelte';
+import { app, subscriptions } from './app-page.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
-import {
-	AwardNominationSchema,
-	AwardRankingsFullUpdateSchema,
-	AwardRankingsPartialUpdateSchema,
-	SubmissionCacheSchema,
-	SubmissionSchema,
-	type AwardRankingsFullUpdate
-} from '@judging.jerryio/protocol/src/rubric';
+import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judging.jerryio/protocol/src/rubric';
 import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
 import { JoiningKitSchema } from '@judging.jerryio/worker/src/routes/handshake';
-import { AwardNominationTab } from './tab.svelte';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();
