@@ -1,5 +1,184 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`RobotEventsSource > should get correct event data using importFromRobotEvents 1`] = `
+{
+  "awardsOptions": [
+    {
+      "name": "Teamwork Champion Award",
+    },
+    {
+      "name": "Teamwork 3rd Place Award",
+    },
+    {
+      "name": "Robot Skills Champion",
+    },
+    {
+      "name": "Robot Skills 2nd Place",
+    },
+    {
+      "name": "Robot Skills 3rd Place",
+    },
+    {
+      "name": "Excellence Award",
+    },
+    {
+      "name": "Excellence Award - Middle School",
+    },
+    {
+      "name": "Excellence Award - Elementary School",
+    },
+    {
+      "name": "Design Award",
+    },
+    {
+      "name": "Innovate Award",
+    },
+    {
+      "name": "Create Award",
+    },
+    {
+      "name": "Think Award",
+    },
+    {
+      "name": "Amaze Award",
+    },
+    {
+      "name": "Build Award",
+    },
+    {
+      "name": "Judges Award",
+    },
+    {
+      "name": "Inspire Award",
+    },
+    {
+      "name": "Sportsmanship Award",
+    },
+    {
+      "name": "Energy Award",
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "2025 JSTEA Hong Kong Open Robotics Tournament - VIQRC",
+  "program": "VIQRC",
+  "robotEventsEventId": 58288,
+  "robotEventsSku": "RE-VIQRC-24-8288",
+  "teamInfos": [
+    {
+      "number": "2706A",
+    },
+    {
+      "number": "2706C",
+    },
+    {
+      "number": "2706E",
+    },
+    {
+      "number": "2706F",
+    },
+    {
+      "number": "3415A",
+    },
+    {
+      "number": "3415B",
+    },
+    {
+      "number": "3708A",
+    },
+    {
+      "number": "3708B",
+    },
+    {
+      "number": "3708C",
+    },
+    {
+      "number": "3708D",
+    },
+    {
+      "number": "3708E",
+    },
+    {
+      "number": "4206A",
+    },
+    {
+      "number": "4815A",
+    },
+    {
+      "number": "4815B",
+    },
+    {
+      "number": "5354A",
+    },
+    {
+      "number": "5354B",
+    },
+    {
+      "number": "6626A",
+    },
+    {
+      "number": "10863A",
+    },
+    {
+      "number": "10863B",
+    },
+    {
+      "number": "10863D",
+    },
+    {
+      "number": "13205A",
+    },
+    {
+      "number": "13205B",
+    },
+    {
+      "number": "13520A",
+    },
+    {
+      "number": "13520B",
+    },
+    {
+      "number": "16481A",
+    },
+    {
+      "number": "16481B",
+    },
+    {
+      "number": "20230A",
+    },
+    {
+      "number": "20230B",
+    },
+    {
+      "number": "20230C",
+    },
+    {
+      "number": "20230D",
+    },
+    {
+      "number": "21119A",
+    },
+    {
+      "number": "21119B",
+    },
+    {
+      "number": "21169E",
+    },
+    {
+      "number": "26054A",
+    },
+    {
+      "number": "26054B",
+    },
+    {
+      "number": "70909C",
+    },
+    {
+      "number": "70909S",
+    },
+  ],
+}
+`;
+
 exports[`RobotEventsSource > should get the correct event data with 1 division 1`] = `
 [
   102496,
@@ -1148,6 +1327,374 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
     "teamNumber": "13520A",
   },
 ]
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility 1`] = `
+{
+  "Excellence Award - Middle School": [
+    {
+      "autoSkills": {
+        "no": 3,
+        "result": "eligible",
+        "score": 13,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 2,
+        "result": "eligible",
+        "score": 113,
+      },
+      "qualRanking": {
+        "no": 1,
+        "result": "eligible",
+        "score": 1,
+      },
+      "teamNumber": "6626A",
+    },
+    {
+      "autoSkills": {
+        "no": 6,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 5,
+        "result": "eligible",
+        "score": 100,
+      },
+      "qualRanking": {
+        "no": 2,
+        "result": "eligible",
+        "score": 2,
+      },
+      "teamNumber": "4815A",
+    },
+    {
+      "autoSkills": {
+        "no": 1,
+        "result": "eligible",
+        "score": 100,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 1,
+        "result": "eligible",
+        "score": 200,
+      },
+      "qualRanking": {
+        "no": 3,
+        "result": "eligible",
+        "score": 3,
+      },
+      "teamNumber": "4815B",
+    },
+    {
+      "autoSkills": {
+        "no": 8,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 8,
+        "result": "ineligible",
+        "score": 88,
+      },
+      "qualRanking": {
+        "no": 4,
+        "result": "eligible",
+        "score": 4,
+      },
+      "teamNumber": "10863A",
+    },
+    {
+      "autoSkills": {
+        "no": 4,
+        "result": "eligible",
+        "score": 5,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 3,
+        "result": "eligible",
+        "score": 105,
+      },
+      "qualRanking": {
+        "no": 5,
+        "result": "eligible",
+        "score": 5,
+      },
+      "teamNumber": "2706E",
+    },
+    {
+      "autoSkills": {
+        "no": 7,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 7,
+        "result": "eligible",
+        "score": 88,
+      },
+      "qualRanking": {
+        "no": 6,
+        "result": "eligible",
+        "score": 6,
+      },
+      "teamNumber": "13205A",
+    },
+    {
+      "autoSkills": {
+        "no": 5,
+        "result": "eligible",
+        "score": 1,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 6,
+        "result": "eligible",
+        "score": 89,
+      },
+      "qualRanking": {
+        "no": 7,
+        "result": "eligible",
+        "score": 7,
+      },
+      "teamNumber": "13205B",
+    },
+    {
+      "autoSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": -1,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 8,
+        "result": "eligible",
+        "score": 8,
+      },
+      "teamNumber": "21169E",
+    },
+    {
+      "autoSkills": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 52,
+      },
+      "qualRanking": {
+        "no": 9,
+        "result": "eligible",
+        "score": 9,
+      },
+      "teamNumber": "10863B",
+    },
+    {
+      "autoSkills": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 5,
+      },
+      "qualRanking": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 10,
+      },
+      "teamNumber": "20230D",
+    },
+    {
+      "autoSkills": {
+        "no": 9,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 9,
+        "result": "ineligible",
+        "score": 76,
+      },
+      "qualRanking": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 11,
+      },
+      "teamNumber": "2706F",
+    },
+    {
+      "autoSkills": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 5,
+      },
+      "qualRanking": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 12,
+      },
+      "teamNumber": "4206A",
+    },
+    {
+      "autoSkills": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "qualRanking": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 13,
+      },
+      "teamNumber": "20230A",
+    },
+    {
+      "autoSkills": {
+        "no": 2,
+        "result": "eligible",
+        "score": 40,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 4,
+        "result": "eligible",
+        "score": 104,
+      },
+      "qualRanking": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 14,
+      },
+      "teamNumber": "70909S",
+    },
+    {
+      "autoSkills": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 64,
+      },
+      "qualRanking": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 15,
+      },
+      "teamNumber": "13520B",
+    },
+    {
+      "autoSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": -1,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 16,
+      },
+      "teamNumber": "20230C",
+    },
+    {
+      "autoSkills": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 17,
+        "result": "ineligible",
+        "score": 17,
+      },
+      "teamNumber": "20230B",
+    },
+    {
+      "autoSkills": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "qualRanking": {
+        "no": 18,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "teamNumber": "70909C",
+    },
+    {
+      "autoSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": -1,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 19,
+        "result": "ineligible",
+        "score": 19,
+      },
+      "teamNumber": "13520A",
+    },
+  ],
+}
 `;
 
 exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionRankings 1`] = `

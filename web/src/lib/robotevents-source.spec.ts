@@ -9,7 +9,9 @@ import {
 	getExcellenceAwardTeamEligibility,
 	filterRankingsOrRecordsBySubset,
 	getRobotEventsClient,
-	getEventDivisionRankings
+	getEventDivisionRankings,
+	importFromRobotEvents,
+	getEventDivisionExcellenceAwardTeamEligibility
 } from './robotevents-source';
 
 describe('RobotEventsSource', () => {
@@ -96,11 +98,32 @@ describe('RobotEventsSource', () => {
 		expect(result).toMatchSnapshot();
 	});
 
-	// it('should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility', async () => {
-	// 	const resultEvt = await client.events.getBySKU('RE-VIQRC-24-8288'); // 58288
+	it('should get correct event data using importFromRobotEvents', async () => {
+		const result = await importFromRobotEvents(client, 'RE-VIQRC-24-8288');
 
-	// 	if (!resultEvt.data) throw new Error('Event not found');
-	// 	const evt = resultEvt.data;
-	// 	const evtId = evt.id;
-	// });
+		expect({
+			robotEventsSku: result.robotEventsSku,
+			robotEventsEventId: result.robotEventsEventId,
+			eventName: result.eventName,
+			program: result.program,
+			eventGradeLevel: result.eventGradeLevel,
+			teamInfos: result.teamInfos.map((team) => ({ number: team.number })),
+			awardsOptions: result.awardsOptions.map((award) => ({ name: award.name }))
+		}).toMatchSnapshot();
+	});
+
+	it('should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility', async () => {
+		const imported = await importFromRobotEvents(client, 'RE-VIQRC-24-8288');
+
+		const middleSchoolAwards = imported.awardsOptions.filter((award) => award.name === 'Excellence Award - Middle School');
+
+		const result = await getEventDivisionExcellenceAwardTeamEligibility(
+			client,
+			imported.robotEventsEventId,
+			1,
+			imported.teamInfos,
+			middleSchoolAwards.map((award) => award.generateAward())
+		);
+		expect(result).toMatchSnapshot();
+	});
 });

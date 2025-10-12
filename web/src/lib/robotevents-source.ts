@@ -1,7 +1,11 @@
-import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+import { v4 as uuidv4 } from 'uuid';
+import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
-import type { Program } from '@judging.jerryio/protocol/src/award';
+import type { Award, Program } from '@judging.jerryio/protocol/src/award';
 import { Client, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
+import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
+import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
+import { getEventGradeLevelOptions } from './event.svelte';
 
 // This is a public token
 const ROBOTEVENTS_TOKEN = `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiMTdmMzZkZTUyOGI1ODE4YzMzMWY0YTM4YWE3MGYyMjNkYzdlNTY0OWQxMWFjZmZkNGFiZmU1NDM4NWYwYmQzMmUzNzIyY2RjODAyMjU5ZWQiLCJpYXQiOjE3NjAwMzA1NjMuMzA1MzkzOSwibmJmIjoxNzYwMDMwNTYzLjMwNTM5NjEsImV4cCI6MjcwNjcxNTM2My4yOTYyNzYxLCJzdWIiOiIxNTIwNzAiLCJzY29wZXMiOltdfQ.fU2Yb5sGBwWWQuXSPxTM7U0hPqr02hVUJnFiQBhlxGX3s6vwIiD9g7SBMH1Wmyhpwqw4a-9pmYYrFQV6tMX4MY2Aq7jUvieyTm5Jj763ybV_du_5lPQRMhCjpsJnWJ1YEMszqaKsUBleahlOOtdIjmSz3c3v6eEC-52rmrKNNf2Oke1vlufaCxjYl42MZxg8EFSKr2KK8_6FQ9jI8loXx9I51KV927Na3exdca09t80qqfFtsTo9BLja7YYw7WAuVozM9fZWe39zc0R2W9VpJO8LYVsNCF72J2SzGmoj5mkpFd1L2cxCWSeAw3qHSxdwsYRwf5WS25bu5qlA_z9mpGzFW-hYhDLTdkLLiwRUTCr7MUEiKvZmi8O8qb1J1od_Mh6oyesrW11QYoXze1BCgt-aExgn70_shiCGxMfZMIV32CzEFxE32YnqZx5eMrTgTqrVjsZ9EvQ-oyCkxYUUwhyy_JZDeywKs-aZU9uhG2-D8LYvDgemTAZMzcn0groFYgG23OVYFfCkrRDsji5D8Jna7Tvm5ogFz6J2GhJ8kCfpSYrmBI6dYcs34XDFcBJO9tPtiG8aURzVHlB8WpukqIBU7a04UqaYi5yWl9_G6Y51phuy64KFKor3jB08b-Pg66P5eN6yqRPRXXwy5flXjCVPe2Xxw3GERUBdbgLDxDw`;
@@ -38,6 +42,16 @@ export interface ExcellenceAwardTeamEligibility {
 	qualRanking: ExcellenceAwardTeamEligibilityCriterion;
 	overallSkills: ExcellenceAwardTeamEligibilityCriterion;
 	autoSkills: ExcellenceAwardTeamEligibilityCriterion;
+}
+
+export interface RobotEventsImportedData {
+	robotEventsSku: string;
+	robotEventsEventId: number;
+	eventName: string;
+	program: Program;
+	eventGradeLevel: EventGradeLevel;
+	teamInfos: TeamInfo[];
+	awardsOptions: AwardOptions[];
 }
 
 export function getRobotEventsClient(): RobotEventsClient {
@@ -193,6 +207,10 @@ export function filterTeamsByGrade(teams: Team[], grade: Grade): Team[] {
 	return teams.filter((team) => team.grade === grade);
 }
 
+export function filterTeamsByGrades(teams: TeamInfo[], grades: Grade[]): TeamInfo[] {
+	return teams.filter((team) => grades.includes(team.grade));
+}
+
 export function filterRankingsByDivision(rankings: TeamQualRanking[], divisionId: number): TeamQualRanking[] {
 	return rankings.filter((ranking) => ranking.divisionId === divisionId);
 }
@@ -258,15 +276,6 @@ export function getExcellenceAwardTeamEligibility(
 	return rtn;
 }
 
-export function filterTeamsByEventGradeLevel(teams: TeamInfo[], eventGradeLevel: EventGradeLevel): TeamInfo[] {
-	if (eventGradeLevel === 'ES Only') return teams.filter((team) => team.grade === 'Elementary School');
-	if (eventGradeLevel === 'MS Only') return teams.filter((team) => team.grade === 'Middle School');
-	if (eventGradeLevel === 'HS Only') return teams.filter((team) => team.grade === 'High School');
-	if (eventGradeLevel === 'College Only') return teams.filter((team) => team.grade === 'College');
-
-	return teams; // Blended
-}
-
 /**
  * Get the excellence award team eligibility for a division
  *
@@ -278,27 +287,32 @@ export function filterTeamsByEventGradeLevel(teams: TeamInfo[], eventGradeLevel:
  * @param client The RobotEvents client
  * @param evtId The event ID
  * @param divisionId The division ID
- * @param eventGradeLevel The event grade level
- * @param teamInfo The team info, must be the superset of the teams in the division
+ * @param teamInfo The team info, must be the superset of the teams in the division,
+ * @param excellenceAwards The excellence awards to get the team eligibility for
  * @returns The excellence award team eligibility
  */
 export async function getEventDivisionExcellenceAwardTeamEligibility(
 	client: RobotEventsClient,
 	evtId: number,
 	divisionId: number,
-	eventGradeLevel: EventGradeLevel,
-	teamInfo: TeamInfo[]
-): Promise<ExcellenceAwardTeamEligibility[]> {
+	teamInfo: TeamInfo[],
+	excellenceAwards: Award[]
+): Promise<Record<string, ExcellenceAwardTeamEligibility[]>> {
 	const allGradesRankings = await getEventDivisionRankings(client, evtId, divisionId);
 	const allGradesOverallSkills = await getEventSkills(client, evtId);
 
-	const allTargetGradesTeams = filterTeamsByEventGradeLevel(teamInfo, eventGradeLevel);
+	const rtn = {} as Record<string, ExcellenceAwardTeamEligibility[]>;
+	for (const award of excellenceAwards) {
+		const allTargetGradesTeams = filterTeamsByGrades(teamInfo, award.acceptedGrades);
 
-	const allTargetGradesRankings = filterRankingsOrRecordsBySubset(allGradesRankings, allTargetGradesTeams);
+		const allTargetGradesRankings = filterRankingsOrRecordsBySubset(allGradesRankings, allTargetGradesTeams);
 
-	const allTargetGradesOverallSkills = filterRankingsOrRecordsBySubset(allGradesOverallSkills, allTargetGradesTeams);
+		const allTargetGradesOverallSkills = filterRankingsOrRecordsBySubset(allGradesOverallSkills, allTargetGradesTeams);
 
-	return getExcellenceAwardTeamEligibility(allTargetGradesRankings, allTargetGradesOverallSkills);
+		rtn[award.name] = getExcellenceAwardTeamEligibility(allTargetGradesRankings, allTargetGradesOverallSkills);
+	}
+	
+	return rtn;
 }
 
 export function convertProgramIdToProgram(programId: number): Program {
@@ -322,23 +336,60 @@ export function getEventGradeLevel(teams: Team[]): EventGradeLevel {
 	return 'Blended';
 }
 
-export async function temp(client: RobotEventsClient, evtSku: string) {
+export async function importFromRobotEvents(client: RobotEventsClient, evtSku: string): Promise<RobotEventsImportedData> {
 	const resultEvt = await client.events.getBySKU(evtSku);
 	if (!resultEvt.data) throw new Error('Event not found');
 
 	const evt = resultEvt.data;
-	const evtId = evt.id;
+	const robotEventsSku = evt.sku;
+	const robotEventsEventId = evt.id;
 
 	const eventName = evt.name;
 	const program = convertProgramIdToProgram(evt.program.id);
 
-	const teams = await getEventJoinedTeams(client, evtId);
+	const teams = await getEventJoinedTeams(client, robotEventsEventId);
 
 	const eventGradeLevel = getEventGradeLevel(teams);
 
-	// const teamInfo = teams.map((team) => ({
-	// 	id:
-	// 	number: team.name,
-	// 	grade: team.grade
-	// }));
+	const gradeOptions = getEventGradeLevelOptions(program);
+	const possibleGrades = gradeOptions.find((g) => g.value === eventGradeLevel)?.grades ?? [];
+
+	const throwError = (team: Team) => {
+		throw new Error(`Unable to get team info from RobotEvents for team ${team.number} because it is missing required fields`);
+	};
+
+	const teamInfos = teams.map(
+		(team) =>
+			({
+				id: uuidv4(),
+				number: team.number,
+				name: team.team_name ?? '(Not Provided)',
+				city: team.location?.city ?? '(Not Provided)',
+				state: team.location?.region ?? '',
+				country: team.location?.country ?? '(Not Provided)',
+				shortName: team.team_name ?? '(Not Provided)',
+				school: team.organization ?? '(Not Provided)',
+				grade: team.grade ?? throwError(team),
+				group: extractGroupFromTeamNumber(team.number),
+				notebookLink: '',
+				notebookDevelopmentStatus: 'undetermined',
+				absent: false
+			}) satisfies TeamInfoAndData
+	);
+
+	const resultAwards = await evt.awards();
+	if (resultAwards.error) throw new Error('Failed to get awards from RobotEvents');
+	const awards = resultAwards.data ?? [];
+
+	const awardsOptions = getOfficialAwardOptionsList(program, possibleGrades).filter((a) => awards.some((b) => b.title?.includes(a.name)));
+
+	return {
+		robotEventsSku,
+		robotEventsEventId,
+		eventName,
+		program,
+		eventGradeLevel,
+		teamInfos,
+		awardsOptions
+	} satisfies RobotEventsImportedData;
 }
