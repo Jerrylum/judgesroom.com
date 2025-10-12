@@ -276,7 +276,6 @@ export class App {
 	 */
 	async destroyJudgesRoomData(): Promise<void> {
 		await this.wrpcClient.handshake.destroyJudgesRoom.mutation();
-		this.leaveJudgesRoom();
 	}
 
 	/**

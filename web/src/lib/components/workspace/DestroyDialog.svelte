@@ -14,13 +14,9 @@
 		try {
 			isDestroying = true;
 
-			// Destroy all app data
-			app.destroyJudgesRoomData();
-
-			// Close dialog destroyJudgesRoomDataPhase = 'begin';
+			await app.destroyJudgesRoomData(); // It will throw error
 		} catch (error) {
-			console.error('Failed to destroy data:', error);
-			app.addErrorNotice('CRITICAL: Failed to destroy data');
+			dialogs.closeDialog(true);
 		} finally {
 			isDestroying = false;
 		}
