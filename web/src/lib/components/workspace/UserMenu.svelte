@@ -51,7 +51,7 @@
 
 		if (confirmed) {
 			app.leaveJudgesRoom();
-			AppUI.appPhase = 'choose_action';
+			AppUI.appPhase = 'begin';
 		}
 	}
 

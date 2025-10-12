@@ -6,7 +6,7 @@
 	import Workspace from '$lib/components/workspace/Workspace.svelte';
 	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';
 	import Loading from '$lib/components/loading/Loading.svelte';
-	import ChooseAction from '$lib/components/choose-action/ChooseAction.svelte';
+	import Begin from '$lib/components/begin/Begin.svelte';
 	import JoiningJudgesRoom from '$lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
@@ -62,7 +62,7 @@
 		}
 
 		// If we have no permit, show the choose action page
-		AppUI.appPhase = 'choose_action';
+		AppUI.appPhase = 'begin';
 	});
 
 	async function handleJudgesRoomUrl() {
@@ -78,7 +78,7 @@
 		} catch (error) {
 			console.error('Error joining Judges\' Room from URL:', error);
 			errorMessage = `Failed to join Judges' Room: ${error}`;
-			AppUI.appPhase = 'choose_action';
+			AppUI.appPhase = 'begin';
 		}
 	}
 
@@ -92,7 +92,7 @@
 			// TODO: handle this case
 			console.error('Error rejoining stored permit:', error);
 			errorMessage = `Failed to rejoin Judges' Room: ${error}`;
-			AppUI.appPhase = 'choose_action';
+			AppUI.appPhase = 'begin';
 		}
 	}
 
@@ -107,8 +107,8 @@
 <div class="min-h-screen">
 	{#if AppUI.appPhase === 'loading'}
 		<Loading />
-	{:else if AppUI.appPhase === 'choose_action'}
-		<ChooseAction {errorMessage} />
+	{:else if AppUI.appPhase === 'begin'}
+		<Begin {errorMessage} />
 	{:else if AppUI.appPhase === 'joining_judges_room'}
 		<JoiningJudgesRoom />
 	{:else if AppUI.appPhase === 'event_setup'}

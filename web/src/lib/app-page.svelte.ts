@@ -7,7 +7,7 @@ import type { SubscriptionsStorage } from './subscriptions.svelte';
 // App State
 // ============================================================================
 
-export type AppPhase = 'loading' | 'choose_action' | 'event_setup' | 'judges_room_setup' | 'joining_judges_room' | 'role_selection' | 'workspace';
+export type AppPhase = 'loading' | 'begin' | 'event_setup' | 'judges_room_setup' | 'joining_judges_room' | 'role_selection' | 'workspace';
 export interface AppUIState {
 	appPhase: AppPhase;
 }

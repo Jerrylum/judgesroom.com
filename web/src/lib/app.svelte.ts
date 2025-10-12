@@ -642,12 +642,12 @@ export class App {
 					this.leaveJudgesRoom();
 					this.addErrorNotice('You have been kicked from the Judges\' Room');
 
-					AppUI.appPhase = 'choose_action';
+					AppUI.appPhase = 'begin';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
 					this.leaveJudgesRoom();
 					this.addErrorNotice('The Judges\' Room has been destroyed');
 
-					AppUI.appPhase = 'choose_action';
+					AppUI.appPhase = 'begin';
 				}
 			},
 			onConnectionStateChange: (state) => {

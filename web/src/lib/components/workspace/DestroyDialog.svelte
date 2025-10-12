@@ -17,7 +17,7 @@
 			// Destroy all app data
 			app.destroyJudgesRoomData();
 
-			// Close dialog destroyJudgesRoomDataPhase = 'choose_action';
+			// Close dialog destroyJudgesRoomDataPhase = 'begin';
 		} catch (error) {
 			console.error('Failed to destroy data:', error);
 			app.addErrorNotice('CRITICAL: Failed to destroy data');

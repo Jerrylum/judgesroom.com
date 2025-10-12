@@ -70,7 +70,7 @@
 	$effect(() => {
 		// If we lose connection or have errors, redirect to choose action
 		if (connectionState === 'error' || connectionState === 'offline') {
-			AppUI.appPhase = 'choose_action';
+			AppUI.appPhase = 'begin';
 		}
 	});
 </script>

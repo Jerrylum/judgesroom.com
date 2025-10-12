@@ -31,7 +31,7 @@
 			await app.joinJudgesRoomFromUrl(judgesRoomUrl);
 		} catch (error) {
 			console.error("Error joining Judges' Room:", error);
-			AppUI.appPhase = 'choose_action';
+			AppUI.appPhase = 'begin';
 		}
 	}
 </script>
