@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "dc393cb3-2f51-4072-a174-9d33b38f8aee",
+  "id": "08c67ee1-440f-4a80-a2a6-0b70b1c6f67b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -1112,8 +1112,8 @@
           "autoincrement": false,
           "default": "'undetermined'"
         },
-        "excluded": {
-          "name": "excluded",
+        "absent": {
+          "name": "absent",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,

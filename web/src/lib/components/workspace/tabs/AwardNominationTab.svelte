@@ -12,7 +12,7 @@
 	let { tab, isActive }: Props = $props();
 
 	// Filter states
-	let showExcludedTeams = $state(false); // Default checked
+	let showAbsentTeams = $state(false); // Default checked
 	let bypassAwardRequirements = $state(false);
 
 	const judgeGroups = $derived(app.getAllJudgeGroupsInMap());
@@ -35,10 +35,10 @@
 				<label class="flex items-center">
 					<input
 						type="checkbox"
-						bind:checked={showExcludedTeams}
+						bind:checked={showAbsentTeams}
 						class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="text-sm text-gray-700">Show excluded teams</span>
+					<span class="text-sm text-gray-700">Show absent teams</span>
 				</label>
 
 				<label class="flex items-center">
@@ -55,7 +55,7 @@
 		{#each Object.keys(judgeGroups) as judgeGroupId}
 			{@const judgeGroup = judgeGroups[judgeGroupId]}
 			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<AwardNominationTable title={judgeGroup.name} {judgeGroup} {showExcludedTeams} {bypassAwardRequirements} />
+				<AwardNominationTable title={judgeGroup.name} {judgeGroup} {showAbsentTeams} {bypassAwardRequirements} />
 			</div>
 		{/each}
 	</div>

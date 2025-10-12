@@ -8,7 +8,7 @@
 	interface Props {
 		title: string;
 		judgeGroup: JudgeGroup;
-		showingTeams: { targetTeams: string[] } | { showExcludedTeams: boolean };
+		showingTeams: { targetTeams: string[] } | { showAbsentTeams: boolean };
 		bypassAwardRequirements: boolean;
 	}
 
@@ -30,8 +30,8 @@
 		const uniqueTeams = new Set(allTeams);
 		const teamIds = Array.from(uniqueTeams);
 
-		// Filter by excluded teams if showExcludedTeams is false
-		const filteredTeams = showingTeams.showExcludedTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.excluded);
+		// Filter by absent teams if showAbsentTeams is false
+		const filteredTeams = showingTeams.showAbsentTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.absent);
 
 		return sortByTeamNumberInMap(filteredTeams, teams);
 	});

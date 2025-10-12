@@ -223,9 +223,9 @@
 					{/if}
 				</div>
 
-				{#if selectedTeam.excluded}
-					<WarningSign title="Excluded Team">
-						<p>This team has been marked as excluded. They are not eligible for any Judged Awards.</p>
+				{#if selectedTeam.absent}
+					<WarningSign title="Absent Team">
+						<p>This team has been marked as absent. They are not eligible for any Judged Awards.</p>
 					</WarningSign>
 				{/if}
 			{/if}

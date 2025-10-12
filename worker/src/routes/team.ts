@@ -14,7 +14,7 @@ export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]
 			id: teams.id,
 			notebookLink: teams.notebookLink,
 			notebookDevelopmentStatus: teams.notebookDevelopmentStatus,
-			excluded: teams.excluded
+			absent: teams.absent
 		})
 		.from(teams) as Promise<TeamData[]>;
 }

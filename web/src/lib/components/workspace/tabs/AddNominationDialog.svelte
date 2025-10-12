@@ -8,23 +8,23 @@
 		open: boolean;
 		award: Award;
 		allTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>;
-		excludedTeamIds: Set<string>;
+		absentTeamIds: Set<string>;
 		onClose: () => void;
-		onConfirm: (teamId: string, showExcluded: boolean, bypassRequirements: boolean) => void;
+		onConfirm: (teamId: string, showAbsent: boolean, bypassRequirements: boolean) => void;
 	}
 
-	let { open, award, allTeams, excludedTeamIds, onClose, onConfirm }: Props = $props();
+	let { open, award, allTeams, absentTeamIds, onClose, onConfirm }: Props = $props();
 
 	// Dialog state
 	let selectedTeamId = $state('');
-	let showExcludedTeams = $state(false);
+	let showAbsentTeams = $state(false);
 	let bypassRequirements = $state(false);
 
 	// Reset form when dialog opens
 	$effect(() => {
 		if (open) {
 			selectedTeamId = '';
-			showExcludedTeams = false;
+			showAbsentTeams = false;
 			bypassRequirements = false;
 		}
 	});
@@ -35,12 +35,12 @@
 
 		return teams.filter(([teamId, team]) => {
 			// Always hide already nominated teams
-			if (excludedTeamIds.has(teamId)) {
+			if (absentTeamIds.has(teamId)) {
 				return false;
 			}
 
-			// Hide excluded teams unless "Show excluded teams" is checked
-			if (team.excluded && !showExcludedTeams) {
+			// Hide absent teams unless "Show absent teams" is checked
+			if (team.absent && !showAbsentTeams) {
 				return false;
 			}
 
@@ -97,7 +97,7 @@
 
 	function handleConfirm() {
 		if (selectedTeamId) {
-			onConfirm(selectedTeamId, showExcludedTeams, bypassRequirements);
+			onConfirm(selectedTeamId, showAbsentTeams, bypassRequirements);
 		}
 	}
 
@@ -151,8 +151,8 @@
 	<!-- Checkboxes -->
 	<div class="mb-6 space-y-3">
 		<label class="flex items-center">
-			<input type="checkbox" bind:checked={showExcludedTeams} class="mr-2" />
-			<span class="text-sm text-gray-700">Show excluded teams</span>
+			<input type="checkbox" bind:checked={showAbsentTeams} class="mr-2" />
+			<span class="text-sm text-gray-700">Show absent teams</span>
 		</label>
 
 		<label class="flex items-center">

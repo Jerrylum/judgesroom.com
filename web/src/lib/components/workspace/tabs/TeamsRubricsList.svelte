@@ -206,8 +206,8 @@
 					<div class="flex-1">
 						<h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold text-gray-900">
 							<span>{team.number} - {team.name}</span>
-							{#if team.excluded}
-								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Excluded from judged awards</span>
+							{#if team.absent}
+								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Absent from judged awards</span>
 							{/if}
 							<button
 								onclick={() => openEditTeamDataDialog(team)}

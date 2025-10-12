@@ -152,7 +152,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
 		notebookDevelopmentStatus: 'undetermined',
-		excluded: false
+		absent: false
 	},
 	{
 		id: '550e8400-e29b-41d4-a716-446655440002',
@@ -167,7 +167,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		group: 'Group B',
 		notebookLink: 'https://example.com/notebook',
 		notebookDevelopmentStatus: 'undetermined',
-		excluded: false
+		absent: false
 	},
 	{
 		id: '550e8400-e29b-41d4-a716-446655440003',
@@ -182,7 +182,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
 		notebookDevelopmentStatus: 'undetermined',
-		excluded: false
+		absent: false
 	},
 	{
 		id: '550e8400-e29b-41d4-a716-446655440004',
@@ -197,7 +197,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		group: 'Group C',
 		notebookLink: 'https://example.com/notebook',
 		notebookDevelopmentStatus: 'undetermined',
-		excluded: false
+		absent: false
 	}
 ];
 

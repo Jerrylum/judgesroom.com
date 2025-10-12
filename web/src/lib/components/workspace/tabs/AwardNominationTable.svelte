@@ -10,11 +10,11 @@
 	interface Props {
 		title: string;
 		judgeGroup: JudgeGroup;
-		showExcludedTeams: boolean;
+		showAbsentTeams: boolean;
 		bypassAwardRequirements: boolean;
 	}
 
-	let { title, judgeGroup, showExcludedTeams, bypassAwardRequirements }: Props = $props();
+	let { title, judgeGroup, showAbsentTeams, bypassAwardRequirements }: Props = $props();
 
 	const allExcellenceAwardNames = Object.keys(ExcellenceAwardNameSchema.enum) as ExcellenceAwardName[];
 
@@ -34,8 +34,8 @@
 		const uniqueTeams = new Set(allTeams);
 		const teamIds = Array.from(uniqueTeams);
 
-		// Filter by excluded teams if showExcludedTeams is false
-		const filteredTeams = showExcludedTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.excluded);
+		// Filter by absent teams if showAbsentTeams is false
+		const filteredTeams = showAbsentTeams ? teamIds : teamIds.filter((teamId) => !teams[teamId]?.absent);
 
 		return sortByTeamNumberInMap(filteredTeams, teams);
 	});

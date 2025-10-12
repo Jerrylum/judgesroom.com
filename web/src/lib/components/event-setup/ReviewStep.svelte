@@ -50,7 +50,7 @@
 				Grade Level: <span class="font-medium">{selectedEventGradeLevel}</span>
 			</p>
 			<p class="text-sm text-gray-600">
-				Teams: <span class="font-medium">{teams.filter((t) => !t.excluded).length}</span> active
+				Teams: <span class="font-medium">{teams.filter((t) => !t.absent).length}</span> active
 			</p>
 			<p class="text-sm text-gray-600">
 				Team Groups: <span class="font-medium">{Object.keys(groupTeamsByGroup(teams)).length}</span>

@@ -17,7 +17,7 @@
 		school: team.school,
 		grade: team.grade,
 		notebookLink: team.notebookLink,
-		excluded: team.excluded,
+		absent: team.absent,
 		city: team.city,
 		state: team.state,
 		country: team.country,
@@ -52,7 +52,7 @@
 		team.school = editedTeam.school;
 		team.grade = editedTeam.grade;
 		team.notebookLink = editedTeam.notebookLink;
-		team.excluded = editedTeam.excluded;
+		team.absent = editedTeam.absent;
 		team.city = editedTeam.city;
 		team.state = editedTeam.state;
 		team.country = editedTeam.country;
@@ -112,7 +112,7 @@
 
 		<div class="md:col-span-2">
 			<label class="flex items-center">
-				<input type="checkbox" bind:checked={editedTeam.excluded} class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" />
+				<input type="checkbox" bind:checked={editedTeam.absent} class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" />
 				<span class="text-sm text-gray-700">Exclude this team from judged awards</span>
 			</label>
 		</div>

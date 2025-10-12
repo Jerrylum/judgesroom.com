@@ -48,7 +48,7 @@
 
 	// If teams are updated
 	$effect(() => {
-		const allIncludedTeams = new EditingTeamList(teamsProp.filter((team) => !team.excluded));
+		const allIncludedTeams = new EditingTeamList(teamsProp.filter((team) => !team.absent));
 		const ignoredTeams = new EditingTeamList([...allIncludedTeams]);
 
 		untrack(() => {
@@ -65,7 +65,7 @@
 				ignoredTeams.removeById(team.id);
 			});
 
-			unassignedTeams = unassignedTeams.concat([...ignoredTeams]).filter((team) => !team.excluded);
+			unassignedTeams = unassignedTeams.concat([...ignoredTeams]).filter((team) => !team.absent);
 		});
 	});
 
@@ -182,7 +182,7 @@
 
 	function randomlyAssignTeams() {
 		randomlyAssignTeamsToGroups(
-			teamsProp.filter((team) => !team.excluded),
+			teamsProp.filter((team) => !team.absent),
 			judgeGroups
 		);
 		// Clear unassigned teams since they've been assigned
@@ -193,7 +193,7 @@
 		if (judgingMethod === 'walk_in') {
 			return judgeGroups.length > 0;
 		} else {
-			// For assigned method, all non-excluded teams must be assigned
+			// For assigned method, all non-absent teams must be assigned
 			const totalActiveTeams = unassignedTeams.length;
 
 			console.log('totalActiveTeams', totalActiveTeams);

@@ -53,8 +53,8 @@
 			>
 				<EditIcon size={16} />
 			</button>
-			{#if team.excluded}
-				<span class="text-xs text-red-600" title="Excluded from judged awards">⚠</span>
+			{#if team.absent}
+				<span class="text-xs text-red-600" title="Absent from judged awards">⚠</span>
 			{/if}
 		</div>
 	</div>

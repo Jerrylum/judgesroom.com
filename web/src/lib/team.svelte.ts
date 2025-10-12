@@ -44,13 +44,13 @@ export function createTeamData(
 	id: string,
 	notebookLink: string,
 	notebookDevelopmentStatus: NotebookDevelopmentStatus,
-	excluded: boolean
+	absent: boolean
 ): TeamData {
 	return {
 		id,
 		notebookLink,
 		notebookDevelopmentStatus,
-		excluded
+		absent
 	};
 }
 
@@ -141,11 +141,11 @@ export class EditingTeam {
 		this.data.notebookDevelopmentStatus = value;
 	}
 
-	get excluded() {
-		return this.data.excluded;
+	get absent() {
+		return this.data.absent;
 	}
-	set excluded(value: boolean) {
-		this.data.excluded = value;
+	set absent(value: boolean) {
+		this.data.absent = value;
 	}
 }
 
@@ -239,7 +239,7 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfo 
 			grade: mapGradeToGradeLevel(row.Grade || ''),
 			notebookLink: '',
 			notebookDevelopmentStatus: undefined,
-			excluded: undefined,
+			absent: undefined,
 			group: groupName
 		};
 
@@ -368,7 +368,7 @@ export function mergeTeamData(
 			id,
 			notebookLink,
 			team.notebookDevelopmentStatus ?? existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
-			team.excluded ?? existingTeam?.excluded ?? false
+			team.absent ?? existingTeam?.absent ?? false
 		);
 
 		return new EditingTeam(teamInfo, teamData);

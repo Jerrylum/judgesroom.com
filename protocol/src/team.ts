@@ -40,7 +40,7 @@ export const TeamDataSchema = z.object({
 	id: z.uuidv4(),
 	notebookLink: z.string(),
 	notebookDevelopmentStatus: NotebookDevelopmentStatusSchema,
-	excluded: z.boolean()
+	absent: z.boolean()
 });
 
 export type TeamData = z.infer<typeof TeamDataSchema>;

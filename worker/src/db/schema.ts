@@ -58,7 +58,7 @@ export const teams = sqliteTable(
 		})
 			.notNull()
 			.default('undetermined'),
-		excluded: integer('excluded', { mode: 'boolean' }).notNull().default(false)
+		absent: integer('absent', { mode: 'boolean' }).notNull().default(false)
 	},
 	(table) => [uniqueIndex('teams_number').on(table.number), index('teams_group').on(table.group)]
 );

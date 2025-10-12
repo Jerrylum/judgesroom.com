@@ -98,7 +98,7 @@ describe('Teams Schema Validation', () => {
 				id: '550e8400-e29b-41d4-a716-446655440000',
 				notebookLink: 'https://example.com/notebook',
 				notebookDevelopmentStatus: 'undetermined',
-				excluded: false
+				absent: false
 			};
 
 			expect(() => TeamDataSchema.parse(validData)).not.toThrow();
@@ -109,7 +109,7 @@ describe('Teams Schema Validation', () => {
 				id: '6ba7b810-9dad-41d1-80b4-00c04fd430c8',
 				notebookLink: '',
 				notebookDevelopmentStatus: 'undetermined',
-				excluded: true
+				absent: true
 			};
 
 			expect(() => TeamDataSchema.parse(validData)).not.toThrow();

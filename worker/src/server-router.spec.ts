@@ -138,9 +138,9 @@ describe('ServerRouter', () => {
 			const before = await getResolver({ input: undefined, session, ctx: context });
 			expect(before).toHaveLength(4);
 			const team = before[0];
-			await updateResolver({ input: { ...team, excluded: true }, session, ctx: context });
+			await updateResolver({ input: { ...team, absent: true }, session, ctx: context });
 			const after = await getTeamData(context.db);
-			expect(after.find((t) => t.id === team.id)?.excluded).toBe(true);
+			expect(after.find((t) => t.id === team.id)?.absent).toBe(true);
 		});
 	});
 

@@ -78,15 +78,15 @@ describe('TeamData Class', () => {
 
 	it('should create a TeamData instance with correct properties', () => {
 		expect(teamData.notebookLink).toBe('https://example.com/notebook');
-		expect(teamData.excluded).toBe(false);
+		expect(teamData.absent).toBe(false);
 	});
 
 	it('should allow modification of properties', () => {
 		teamData.notebookLink = 'https://example.com/new-notebook';
-		teamData.excluded = true;
+		teamData.absent = true;
 
 		expect(teamData.notebookLink).toBe('https://example.com/new-notebook');
-		expect(teamData.excluded).toBe(true);
+		expect(teamData.absent).toBe(true);
 	});
 });
 
@@ -132,7 +132,7 @@ describe('Team Class', () => {
 
 	it('should provide convenience getters for team data', () => {
 		expect(team.notebookLink).toBe('https://example.com/notebook');
-		expect(team.excluded).toBe(false);
+		expect(team.absent).toBe(false);
 	});
 
 	it('should allow modification through convenience setters', () => {
@@ -140,13 +140,13 @@ describe('Team Class', () => {
 		team.city = 'Updated City';
 		team.grade = 'College';
 		team.notebookLink = 'https://example.com/new-notebook';
-		team.excluded = true;
+		team.absent = true;
 
 		expect(team.name).toBe('Updated Team');
 		expect(team.city).toBe('Updated City');
 		expect(team.grade).toBe('College');
 		expect(team.notebookLink).toBe('https://example.com/new-notebook');
-		expect(team.excluded).toBe(true);
+		expect(team.absent).toBe(true);
 
 		// Verify changes are reflected in the team's internal state
 		expect(team.info.name).toBe('Updated Team');
@@ -498,7 +498,7 @@ describe('mergeTeamData', () => {
 				school: 'Alpha School',
 				grade: 'High School' as Grade,
 				group: '123',
-				excluded: false
+				absent: false
 			},
 			{
 				number: '456B',
@@ -510,7 +510,7 @@ describe('mergeTeamData', () => {
 				school: 'Beta School',
 				grade: 'Middle School' as Grade,
 				group: '456',
-				excluded: false
+				absent: false
 			}
 		];
 
@@ -525,11 +525,11 @@ describe('mergeTeamData', () => {
 		expect(result[0].number).toBe('123A');
 		expect(result[0].name).toBe('Team Alpha');
 		expect(result[0].notebookLink).toBe('https://example.com/notebook-a');
-		expect(result[0].excluded).toBe(false);
+		expect(result[0].absent).toBe(false);
 		expect(result[1].number).toBe('456B');
 		expect(result[1].name).toBe('Team Beta');
 		expect(result[1].notebookLink).toBe('https://example.com/notebook-b');
-		expect(result[1].excluded).toBe(false);
+		expect(result[1].absent).toBe(false);
 	});
 
 	it('should handle missing notebook links', () => {
@@ -544,7 +544,7 @@ describe('mergeTeamData', () => {
 				school: 'Alpha School',
 				grade: 'High School' as Grade,
 				group: '123',
-				excluded: false
+				absent: false
 			}
 		];
 
@@ -574,7 +574,7 @@ describe('mergeTeamData', () => {
 		expect(result[0].city).toBe('');
 		expect(result[0].grade).toBe('College');
 		expect(result[0].group).toBe('');
-		expect(result[0].excluded).toBe(false);
+		expect(result[0].absent).toBe(false);
 		expect(result[0].data.notebookDevelopmentStatus).toBe('undetermined');
 	});
 
@@ -626,7 +626,7 @@ describe('mergeTeamData', () => {
 				school: 'New Alpha School',
 				grade: 'High School' as Grade,
 				group: '123',
-				excluded: false
+				absent: false
 			},
 			{
 				number: '789C',
@@ -638,7 +638,7 @@ describe('mergeTeamData', () => {
 				school: 'Charlie School',
 				grade: 'Middle School' as Grade,
 				group: '789',
-				excluded: false
+				absent: false
 			}
 		];
 
@@ -671,19 +671,19 @@ describe('mergeTeamData', () => {
 				number: '123A',
 				name: 'Team Alpha',
 				notebookDevelopmentStatus: 'fully_developed' as NotebookDevelopmentStatus,
-				excluded: false
+				absent: false
 			},
 			{
 				number: '456B',
 				name: 'Team Beta',
 				notebookDevelopmentStatus: 'not_submitted' as NotebookDevelopmentStatus,
-				excluded: true
+				absent: true
 			},
 			{
 				number: '789C',
 				name: 'Team Charlie',
 				// notebookDevelopmentStatus not specified (should default to 'undetermined')
-				excluded: false
+				absent: false
 			}
 		];
 
@@ -693,11 +693,11 @@ describe('mergeTeamData', () => {
 
 		expect(result).toHaveLength(3);
 		expect(result[0].data.notebookDevelopmentStatus).toBe('fully_developed');
-		expect(result[0].excluded).toBe(false);
+		expect(result[0].absent).toBe(false);
 		expect(result[1].data.notebookDevelopmentStatus).toBe('not_submitted');
-		expect(result[1].excluded).toBe(true);
+		expect(result[1].absent).toBe(true);
 		expect(result[2].data.notebookDevelopmentStatus).toBe('undetermined');
-		expect(result[2].excluded).toBe(false);
+		expect(result[2].absent).toBe(false);
 	});
 
 	it('should handle mixed existing and new teams correctly', () => {
@@ -829,7 +829,7 @@ describe('mergeTeamData', () => {
 				school: 'Alpha School',
 				grade: 'High School' as Grade,
 				group: '123',
-				excluded: true,
+				absent: true,
 				notebookDevelopmentStatus: 'fully_developed' as NotebookDevelopmentStatus
 			}
 		];
@@ -860,14 +860,14 @@ describe('mergeTeamData', () => {
 
 		// Verify all data properties
 		expect(team.data.notebookLink).toBe('https://example.com/notebook-a');
-		expect(team.data.excluded).toBe(true);
+		expect(team.data.absent).toBe(true);
 		expect(team.data.notebookDevelopmentStatus).toBe('fully_developed');
 
 		// Verify convenience getters work
 		expect(team.number).toBe('123A');
 		expect(team.name).toBe('Team Alpha');
 		expect(team.notebookLink).toBe('https://example.com/notebook-a');
-		expect(team.excluded).toBe(true);
+		expect(team.absent).toBe(true);
 	});
 
 	it('should handle empty arrays gracefully', () => {

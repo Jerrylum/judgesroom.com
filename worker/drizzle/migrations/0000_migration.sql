@@ -154,7 +154,7 @@ CREATE TABLE `Teams` (
 	`group_` text NOT NULL,
 	`notebookLink` text DEFAULT '' NOT NULL,
 	`notebookDevelopmentStatus` text DEFAULT 'undetermined' NOT NULL,
-	`excluded` integer DEFAULT false NOT NULL
+	`absent` integer DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `teams_number` ON `Teams` (`number`);--> statement-breakpoint

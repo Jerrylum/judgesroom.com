@@ -78,7 +78,7 @@
 				const teamData = allTeamData[teamWithData.id] || {
 					id: teamWithData.id,
 					notebookLink: '',
-					excluded: false
+					absent: false
 				};
 				return new EditingTeam(teamInfo, teamData);
 			});
@@ -100,7 +100,7 @@
 			judges = [...allJudges];
 
 			// Update unassigned teams
-			unassignedTeams = teams.filter((team) => !team.excluded && !assignedTeams.includes(team));
+			unassignedTeams = teams.filter((team) => !team.absent && !assignedTeams.includes(team));
 		}
 	}
 

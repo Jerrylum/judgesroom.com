@@ -12,7 +12,7 @@
 	// Clone the team data for editing
 	let editedTeam = $state({
 		notebookLink: team.notebookLink || '',
-		excluded: team.excluded || false
+		absent: team.absent || false
 	});
 
 	// Validation states
@@ -53,7 +53,7 @@
 				id: team.id,
 				notebookLink: editedTeam.notebookLink.trim(),
 				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
-				excluded: editedTeam.excluded
+				absent: editedTeam.absent
 			});
 
 			app.addSuccessNotice('Team data updated successfully!');
@@ -104,7 +104,7 @@
 			<label class="flex items-center">
 				<input 
 					type="checkbox" 
-					bind:checked={editedTeam.excluded} 
+					bind:checked={editedTeam.absent} 
 					class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" 
 				/>
 				<span class="text-sm text-gray-700">Exclude this team from judged awards</span>

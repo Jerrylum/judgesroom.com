@@ -12,14 +12,14 @@
 
 	let { team = $bindable(), onEdit, showGrade = true }: Props = $props();
 
-	function toggleExcluded() {
-		team.excluded = !team.excluded;
+	function toggleAbsent() {
+		team.absent = !team.absent;
 	}
 </script>
 
 <div
 	class="team-info min-h-19 cursor-move rounded bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-	class:opacity-50={team.excluded}
+	class:opacity-50={team.absent}
 >
 	<div class="flex items-start justify-between">
 		<div class="flex-1">
@@ -42,13 +42,13 @@
 				<EditIcon size={20} />
 			</button>
 			<button
-				onclick={toggleExcluded}
+				onclick={toggleAbsent}
 				class="text-xs"
-				class:text-red-600={team.excluded}
-				class:text-gray-600={!team.excluded}
-				title={team.excluded ? 'Include team' : 'Exclude team'}
+				class:text-red-600={team.absent}
+				class:text-gray-600={!team.absent}
+				title={team.absent ? 'Include team' : 'Exclude team'}
 			>
-				{#if team.excluded}
+				{#if team.absent}
 					<CloseIcon size={20} />
 				{:else}
 					<CheckIcon size={20} />

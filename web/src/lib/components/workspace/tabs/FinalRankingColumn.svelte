@@ -88,13 +88,13 @@
 		showAddDialog = false;
 	}
 
-	function handleDialogConfirm(teamId: string, showExcluded: boolean, bypassRequirements: boolean) {
+	function handleDialogConfirm(teamId: string, showAbsent: boolean, bypassRequirements: boolean) {
 		onAddNomination?.(award.name, teamId);
 		showAddDialog = false;
 	}
 
-	// Get excluded team IDs (already nominated)
-	let excludedTeamIds = $derived(new Set(editing.map((nom) => nom.teamId)));
+	// Get absent team IDs (already nominated)
+	let absentTeamIds = $derived(new Set(editing.map((nom) => nom.teamId)));
 </script>
 
 <div class="flex min-w-40 max-w-40 flex-col gap-1">
@@ -159,7 +159,7 @@
 	open={showAddDialog}
 	{award}
 	{allTeams}
-	{excludedTeamIds}
+	{absentTeamIds}
 	onClose={handleDialogClose}
 	onConfirm={handleDialogConfirm}
 />

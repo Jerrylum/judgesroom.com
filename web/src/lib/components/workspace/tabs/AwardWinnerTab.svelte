@@ -44,8 +44,8 @@
 	}
 
 	function getAvailableTeams(nominations: AwardNomination[], pos: number) {
-		const excludedTeamIds = nominations.slice(0, pos).map((nom) => nom.teamId);
-		return allSortedTeams.filter((team) => !excludedTeamIds.includes(team.id));
+		const absentTeamIds = nominations.slice(0, pos).map((nom) => nom.teamId);
+		return allSortedTeams.filter((team) => !absentTeamIds.includes(team.id));
 	}
 
 	// Get team display name
