@@ -75,7 +75,7 @@
 				<div class="rounded-lg bg-gray-50 p-4 text-sm">
 					<p class="mb-2 font-semibold text-gray-800">How to get a Judges' Room link:</p>
 					<ol class="list-inside list-decimal space-y-1 text-gray-600">
-						<li>Ask your judge advisor for the Judges' Room link</li>
+						<li>Ask your judge advisor for the invite link</li>
 						<li>They can share it via QR code or copy/paste</li>
 						<li>Paste the link above and click "Join"</li>
 					</ol>
