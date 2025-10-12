@@ -95,4 +95,12 @@ describe('RobotEventsSource', () => {
 		const result = getExcellenceAwardTeamEligibility(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills);
 		expect(result).toMatchSnapshot();
 	});
+
+	// it('should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility', async () => {
+	// 	const resultEvt = await client.events.getBySKU('RE-VIQRC-24-8288'); // 58288
+
+	// 	if (!resultEvt.data) throw new Error('Event not found');
+	// 	const evt = resultEvt.data;
+	// 	const evtId = evt.id;
+	// });
 });
