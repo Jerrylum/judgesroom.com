@@ -55,7 +55,7 @@ export interface RobotEventsImportedData {
 	eventName: string;
 	program: Program;
 	eventGradeLevel: EventGradeLevel;
-	teamInfos: TeamInfo[];
+	teamInfos: TeamInfoAndData[];
 	awardsOptions: AwardOptions[];
 	divisionInfos: DivisionInfo[];
 }

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import CompetitionSetupStep from './CompetitionSetupStep.svelte';
+	import CompetitionSetupStepV2 from './CompetitionSetupStepV2.svelte';
 	import AwardSelectionStep from './AwardSelectionStep.svelte';
-	import TeamImportStep from './TeamImportStep.svelte';
-	import JudgeSetupStep from './JudgeSetupStep.svelte';
-	import ReviewStep from './ReviewStep.svelte';
+	import TeamGroupsStep from './TeamGroupsStep.svelte';
+	import JudgeSetupStepV2 from './JudgeSetupStepV2.svelte';
+	import ReviewStepV2 from './ReviewStepV2.svelte';
 	import { onMount } from 'svelte';
 	import { app, AppUI } from '$lib/app-page.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
-	import { EditingTeam } from '$lib/team.svelte';
+	import { type TeamInfoAndData } from '$lib/team.svelte';
 	import type { Program } from '@judging.jerryio/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
@@ -29,14 +29,14 @@
 	let awardOptions: AwardOptions[] = $state([]);
 
 	// Teams
-	let teams: EditingTeam[] = $state([]);
+	let teams: TeamInfoAndData[] = $state([]);
 
 	// Judging
 	let judgingMethod: JudgingMethod = $state('assigned');
 	let judgingStep: JudgingStep = $state('beginning');
 	let judgeGroups: EditingJudgeGroup[] = $state([]);
 	let judges: Judge[] = $state([]);
-	let unassignedTeams: EditingTeam[] = $state([]);
+	let unassignedTeams: TeamInfoAndData[] = $state([]);
 
 	let originalJudges = app.getAllJudges();
 
@@ -63,7 +63,13 @@
 
 			// Load teams
 			teams = eventSetup.teamInfos.map((teamWithData) => {
-				const teamInfo = {
+				const teamData = allTeamData[teamWithData.id] || {
+					id: teamWithData.id,
+					notebookLink: '',
+					notebookDevelopmentStatus: 'undetermined' as const,
+					absent: false
+				};
+				return {
 					id: teamWithData.id,
 					number: teamWithData.number,
 					name: teamWithData.name,
@@ -73,26 +79,64 @@
 					shortName: teamWithData.shortName,
 					school: teamWithData.school,
 					grade: teamWithData.grade,
-					group: teamWithData.group
-				};
-				const teamData = allTeamData[teamWithData.id] || {
-					id: teamWithData.id,
-					notebookLink: '',
-					absent: false
-				};
-				return new EditingTeam(teamInfo, teamData);
+					group: teamWithData.group,
+					notebookLink: teamData.notebookLink,
+					notebookDevelopmentStatus: teamData.notebookDevelopmentStatus,
+					absent: teamData.absent
+				} satisfies TeamInfoAndData;
 			});
 
 			// Load judging setup
-			const assignedTeams: EditingTeam[] = [];
+			const assignedTeamIds = new Set<string>();
 
 			judgingMethod = eventSetup.judgingMethod;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
 				Object.assign(judgeGroup, { id: group.id });
-				judgeGroup.assignedTeams = group.assignedTeams.map((id) => teams.find((t) => t.id === id)!).filter(Boolean);
-				assignedTeams.push(...judgeGroup.assignedTeams);
+				
+				// Convert TeamInfoAndData to EditingTeam for compatibility
+				judgeGroup.assignedTeams = group.assignedTeams.map((id) => {
+					const teamInfo = teams.find((t) => t.id === id);
+					if (!teamInfo) return null;
+					assignedTeamIds.add(id);
+					
+					return {
+						id: teamInfo.id,
+						info: {
+							id: teamInfo.id,
+							number: teamInfo.number,
+							name: teamInfo.name,
+							city: teamInfo.city,
+							state: teamInfo.state,
+							country: teamInfo.country,
+							shortName: teamInfo.shortName,
+							school: teamInfo.school,
+							grade: teamInfo.grade,
+							group: teamInfo.group
+						},
+						data: {
+							id: teamInfo.id,
+							notebookLink: teamInfo.notebookLink,
+							notebookDevelopmentStatus: teamInfo.notebookDevelopmentStatus,
+							absent: teamInfo.absent
+						},
+						// Add getters to match EditingTeam interface
+						get number() { return this.info.number; },
+						get name() { return this.info.name; },
+						get city() { return this.info.city; },
+						get state() { return this.info.state; },
+						get country() { return this.info.country; },
+						get shortName() { return this.info.shortName; },
+						get school() { return this.info.school; },
+						get grade() { return this.info.grade; },
+						get group() { return this.info.group; },
+						get notebookLink() { return this.data.notebookLink; },
+						get notebookDevelopmentStatus() { return this.data.notebookDevelopmentStatus; },
+						get absent() { return this.data.absent; }
+					} as any; // Type assertion needed due to complex EditingTeam structure
+				}).filter(Boolean);
+				
 				return judgeGroup;
 			});
 
@@ -100,7 +144,7 @@
 			judges = [...allJudges];
 
 			// Update unassigned teams
-			unassignedTeams = teams.filter((team) => !team.absent && !assignedTeams.includes(team));
+			unassignedTeams = teams.filter((team) => !team.absent && !assignedTeamIds.has(team.id));
 		}
 	}
 
@@ -136,7 +180,18 @@
 				eventGradeLevel: selectedEventGradeLevel,
 				judgingMethod,
 				judgingStep,
-				teamInfos: teams.map((team) => ({ ...team.info, data: team.data })),
+				teamInfos: teams.map((team) => ({
+					id: team.id,
+					number: team.number,
+					name: team.name,
+					city: team.city,
+					state: team.state,
+					country: team.country,
+					shortName: team.shortName,
+					school: team.school,
+					grade: team.grade,
+					group: team.group
+				})),
 				judgeGroups: judgeGroups.map((group) => ({
 					id: group.id,
 					name: group.name,
@@ -148,7 +203,12 @@
 			// Redirect based on whether user is judging ready
 			if (app.isJudgesRoomJoined()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
-				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => team.data));
+				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => ({
+					id: team.id,
+					notebookLink: team.notebookLink,
+					notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+					absent: team.absent
+				})));
 
 				// Just in case: keep judges that are created during the event setup
 				const currentJudges = app.getAllJudges();
@@ -161,7 +221,12 @@
 				AppUI.appPhase = 'workspace';
 			} else {
 				app.handleEssentialDataUpdate(essentialData);
-				app.handleAllTeamDataUpdate(teams.map((team) => team.data));
+				app.handleAllTeamDataUpdate(teams.map((team) => ({
+					id: team.id,
+					notebookLink: team.notebookLink,
+					notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+					absent: team.absent
+				})));
 				app.handleAllJudgesUpdate(judges);
 
 				await app.createJudgesRoom();
@@ -218,10 +283,11 @@
 		<!-- Step Content -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			{#if currentStep === 1}
-				<CompetitionSetupStep
+				<CompetitionSetupStepV2
 					bind:eventName
 					bind:selectedProgram
 					bind:selectedEventGradeLevel
+					bind:teams
 					onResetAwards={resetAwards}
 					onNext={nextStep}
 					onCancel={cancelSetup}
@@ -236,9 +302,9 @@
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 3}
-				<TeamImportStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
+				<TeamGroupsStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
 			{:else if currentStep === 4}
-				<JudgeSetupStep
+				<JudgeSetupStepV2
 					{isEditingEventSetup}
 					{teams}
 					bind:judgingMethod
@@ -249,7 +315,7 @@
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 5}
-				<ReviewStep
+				<ReviewStepV2
 					{selectedProgram}
 					{selectedEventGradeLevel}
 					{teams}

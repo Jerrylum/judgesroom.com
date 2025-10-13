@@ -389,6 +389,26 @@ export function groupTeamsByGroup(teams: EditingTeam[]): Record<string, EditingT
 	return groups;
 }
 
+export class EditingTeamListV2 extends List<TeamInfoAndData, 'id'> {
+	constructor(initialItems: TeamInfoAndData[] = []) {
+		super('id', initialItems);
+	}
+}
+
+export function groupTeamsByGroupV2(teamList: TeamInfoAndData[]): Record<string, TeamInfoAndData[]> {
+	const groups: Record<string, TeamInfoAndData[]> = {};
+
+	teamList.forEach((team) => {
+		const groupName = team.group || 'Ungrouped';
+		if (!groups[groupName]) {
+			groups[groupName] = [];
+		}
+		groups[groupName].push(team);
+	});
+
+	return groups;
+}
+
 export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
 	return teams.sort((a, b) => {
 		const aIsStartWithDigit = /[0-9]/.test(a.number);

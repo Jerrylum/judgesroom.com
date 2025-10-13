@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "08c67ee1-440f-4a80-a2a6-0b70b1c6f67b",
+  "id": "d7cc7726-af11-4682-951e-9d2e5f1cf12f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -715,6 +715,20 @@
     "Metadata": {
       "name": "Metadata",
       "columns": {
+        "robotEventsSku": {
+          "name": "robotEventsSku",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "robotEventsEventId": {
+          "name": "robotEventsEventId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "eventName": {
           "name": "eventName",
           "type": "text",

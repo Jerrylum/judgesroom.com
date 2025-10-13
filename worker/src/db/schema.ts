@@ -19,6 +19,9 @@ export const offlineDevices = sqliteTable('OfflineDevices', {
 });
 
 export const metadata = sqliteTable('Metadata', {
+	robotEventsSku: text('robotEventsSku'), // nullable, for example: RE-VIQRC-24-8288
+	robotEventsEventId: integer('robotEventsEventId'), // nullable, for example: 58288
+	divisionId: integer('divisionId'), // nullable, for example: 1
 	eventName: text('eventName').notNull(),
 	program: text('program', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),

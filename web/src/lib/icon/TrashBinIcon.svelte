@@ -1,4 +1,12 @@
-<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<script lang="ts">
+	interface Props {
+		class?: string;
+	}
+
+	let { class: className }: Props = $props();
+</script>
+
+<svg class={`h-4 w-4 ${className}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 	<path
 		stroke-linecap="round"
 		stroke-linejoin="round"

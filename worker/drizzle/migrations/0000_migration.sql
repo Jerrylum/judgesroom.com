@@ -95,6 +95,8 @@ CREATE TABLE `Judges` (
 );
 --> statement-breakpoint
 CREATE TABLE `Metadata` (
+	`robotEventsSku` text,
+	`robotEventsEventId` integer,
 	`eventName` text NOT NULL,
 	`program` text NOT NULL,
 	`eventGradeLevel` text NOT NULL,
