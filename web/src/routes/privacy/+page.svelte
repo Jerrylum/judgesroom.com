@@ -47,7 +47,7 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Why We Collect Data</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							The anonymous usage data we collect through Google Analytics serves specific purposes to improve the application.
+							The anonymous usage data we collect through Google Analytics to improve the application.
 							Understanding usage patterns helps us identify and fix performance bottlenecks, ensuring optimal performance during critical
 							judging periods. Anonymous metrics guide us in developing features that benefit the judging community and help us monitor
 							application stability to ensure consistent service when judge advisors need it most.
@@ -64,7 +64,7 @@
 
 						<p class="mb-4 leading-relaxed text-gray-700">
 							When you use judgesroom.com, you upload information about your event and create judging materials during the competition
-							process. We store and process this data to provide the judging functionality:
+							process. We store and process such data to provide the judging functionality:
 						</p>
 						<ul class="mb-4 ml-4 list-inside list-disc space-y-2 text-gray-700">
 							<li><strong>Event Information:</strong> Event name, competition structure, award lists, and team lists</li>
@@ -114,7 +114,7 @@
 						</div>
 
 						<div class="mb-6">
-							<h3 class="mb-3 text-xl font-semibold">Room Security</h3>
+							<h3 class="mb-3 text-xl font-semibold">Confidentiality</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
 								Judges' rooms are protected by a unique room ID. Anyone who has access to the room ID can access all data and judging
 								materials in the judges' room. To protect your privacy and maintain the confidentiality of judging material, judges and
