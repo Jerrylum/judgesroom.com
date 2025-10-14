@@ -1,22 +1,21 @@
 <script lang="ts">
-	import TeamGroupV2 from './TeamGroupV2.svelte';
-	import { EditingTeamListV2, type TeamInfoAndData, groupTeamsByGroupV2 } from '$lib/team.svelte';
+	import TeamGroup from './TeamGroup.svelte';
+	import { EditingTeamList, type TeamInfoAndData, groupTeamsByGroup } from '$lib/team.svelte';
 	
 	interface Props {
-		isEditingEventSetup: boolean;
 		teams: TeamInfoAndData[];
 		onNext: () => void;
 		onPrev: () => void;
 	}
 
-	let { isEditingEventSetup, teams = $bindable(), onNext, onPrev }: Props = $props();
+	let { teams = $bindable(), onNext, onPrev }: Props = $props();
 
 	// Team management states
-	let teamGroups = $state<Record<string, TeamInfoAndData[]>>(groupTeamsByGroupV2(teams));
+	let teamGroups = $state<Record<string, TeamInfoAndData[]>>(groupTeamsByGroup(teams));
 	let newGroupName = $state('');
 
 	// Multi-select drag and drop states
-	let selectedItems = $state(new EditingTeamListV2());
+	let selectedItems = $state(new EditingTeamList());
 	let activeZoneId = $state('');
 
 	const allTeamsHaveSameGrade = $derived(teams.every((team) => team.grade === teams[0]?.grade));
@@ -75,7 +74,7 @@
 		{#if Object.keys(teamGroups).length > 0}
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
 				{#each Object.keys(teamGroups) as groupName (groupName)}
-					<TeamGroupV2
+					<TeamGroup
 						{groupName}
 						bind:teamList={teamGroups[groupName]}
 						bind:selectedItems

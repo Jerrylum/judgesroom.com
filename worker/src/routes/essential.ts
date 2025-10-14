@@ -77,6 +77,9 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 		}
 
 		return {
+			robotEventsSku: metadataRows[0].robotEventsSku,
+			robotEventsEventId: metadataRows[0].robotEventsEventId,
+			divisionId: metadataRows[0].divisionId,
 			eventName: metadataRows[0].eventName,
 			program: metadataRows[0].program,
 			eventGradeLevel: metadataRows[0].eventGradeLevel,
@@ -179,6 +182,8 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 			await tx.insert(judgeGroupsAssignedTeams).values({ ...assignedTeams[i], order: i });
 		}
 	}
+
+	// DISCUSS: Should we update cache?
 
 	return transaction(db, async (tx) => {
 		await tx.delete(metadata);

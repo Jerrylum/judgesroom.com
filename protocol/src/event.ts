@@ -24,8 +24,9 @@ export const EventNameSchema = z
 	.regex(/^\S.*\S$|^\S$/, { message: 'Event name must not have leading or trailing whitespace' });
 
 export const EssentialDataSchema = z.object({
-	robotEventsSku: RobotEventsSkuSchema.optional(),
-	robotEventsEventId: RobotEventsEventIdSchema.optional(),
+	robotEventsSku: RobotEventsSkuSchema.nullable(),
+	robotEventsEventId: RobotEventsEventIdSchema.nullable(),
+	divisionId: z.number().nullable(),
 	eventName: EventNameSchema,
 	program: ProgramSchema,
 	eventGradeLevel: EventGradeLevelSchema,

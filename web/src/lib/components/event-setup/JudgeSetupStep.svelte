@@ -1,19 +1,19 @@
 <script lang="ts">
-	import JudgeGroupComponent from './JudgeGroup.svelte';
+	import JudgeGroup from './JudgeGroup.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick, untrack } from 'svelte';
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
-	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
+	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
 
 	interface Props {
 		isEditingEventSetup: boolean;
-		teams: EditingTeam[];
+		teams: TeamInfoAndData[];
 		judgingMethod: JudgingMethod;
 		judgeGroups: EditingJudgeGroup[];
-		unassignedTeams: EditingTeam[];
+		unassignedTeams: TeamInfoAndData[];
 		judges: Judge[];
 		onNext: () => void;
 		onPrev: () => void;
@@ -34,7 +34,7 @@
 	let selectedItems = $state(new EditingTeamList());
 	let activeZoneId = $state('');
 
-	const allTeamsHaveSameGrade = $derived(teamsProp.every((team) => team.grade === teamsProp[0].grade));
+	const allTeamsHaveSameGrade = $derived(teamsProp.every((team) => team.grade === teamsProp[0]?.grade));
 
 	const unassignedZoneId = 'unassigned-teams';
 
@@ -46,32 +46,31 @@
 		}
 	});
 
-	// If teams are updated
+	// If teams are updated, we need to convert TeamInfoAndData to EditingTeam for judge groups
+	// Since judgeGroups still use EditingTeam internally, we need conversion logic
 	$effect(() => {
-		const allIncludedTeams = new EditingTeamList(teamsProp.filter((team) => !team.absent));
-		const ignoredTeams = new EditingTeamList([...allIncludedTeams]);
+		const allIncludedTeams = teamsProp.filter((team) => !team.absent);
+		const allIncludedTeamIds = new Set(allIncludedTeams.map((team) => team.id));
 
 		untrack(() => {
+			// Update judge groups - remove teams that are no longer included
 			judgeGroups.forEach((group) => {
-				const includedTeams = group.assignedTeams.filter((team) => allIncludedTeams.includes(team.id));
-				group.assignedTeams = includedTeams;
-
-				includedTeams.forEach((team) => {
-					ignoredTeams.removeById(team.id);
-				});
+				group.assignedTeams = group.assignedTeams.filter((team) => allIncludedTeamIds.has(team.id));
 			});
 
-			unassignedTeams.forEach((team) => {
-				ignoredTeams.removeById(team.id);
+			// Update unassigned teams - only include teams that aren't assigned to any group
+			const assignedTeamIds = new Set();
+			judgeGroups.forEach((group) => {
+				group.assignedTeams.forEach((team) => assignedTeamIds.add(team.id));
 			});
 
-			unassignedTeams = unassignedTeams.concat([...ignoredTeams]).filter((team) => !team.absent);
+			unassignedTeams = allIncludedTeams.filter((team) => !assignedTeamIds.has(team.id));
 		});
 	});
 
 	interface DropEvent {
 		detail: {
-			items: EditingTeam[];
+			items: TeamInfoAndData[];
 			info: {
 				trigger: string;
 				source: string;
@@ -91,7 +90,7 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						unassignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+						unassignedTeams = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
 					});
 				} else {
 					selectedItems = new EditingTeamList();
@@ -117,13 +116,12 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				unassignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+				unassignedTeams = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
 			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
-					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
-					// to support arrow up when keyboard dragging
+					const idx = newItems.findIndex((item: TeamInfoAndData) => item.id === id);
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+					newItems = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
 					newItems.splice(idx - sidx, 0, ...selectedItems);
 					unassignedTeams = newItems;
 					activeZoneId = unassignedZoneId;
@@ -147,7 +145,7 @@
 		if (selectedItems.includes(teamId)) {
 			selectedItems.removeById(teamId);
 		} else {
-			selectedItems.push(unassignedTeams.find((item) => item.id === teamId)!);
+			selectedItems.push(unassignedTeams.find((t) => t.id === teamId)!);
 		}
 	}
 
@@ -181,10 +179,8 @@
 	}
 
 	function randomlyAssignTeams() {
-		randomlyAssignTeamsToGroups(
-			teamsProp.filter((team) => !team.absent),
-			judgeGroups
-		);
+		randomlyAssignTeamsToGroups(teamsProp, judgeGroups);
+
 		// Clear unassigned teams since they've been assigned
 		unassignedTeams = [];
 	}
@@ -195,9 +191,6 @@
 		} else {
 			// For assigned method, all non-absent teams must be assigned
 			const totalActiveTeams = unassignedTeams.length;
-
-			console.log('totalActiveTeams', totalActiveTeams);
-
 			return totalActiveTeams === 0;
 		}
 	}
@@ -259,17 +252,20 @@
 
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
 			{#each judgeGroups as judgeGroup, index (judgeGroup.id)}
-				<JudgeGroupComponent
-					{isEditingEventSetup}
+				<JudgeGroup
 					judgeGroup={judgeGroups[index]}
-					bind:selectedItems
-					bind:activeZoneId
+					{selectedItems}
+					{activeZoneId}
 					onDeleteGroup={deleteJudgeGroup}
 					showGrade={!allTeamsHaveSameGrade}
 					showAssignedTeams={judgingMethod === 'assigned'}
 					judges={getJudgesInGroup(judges, judgeGroup.id)}
 					onAddJudges={(judgeNames) => addJudgesToGroup(judgeGroup.id, judgeNames)}
 					onRemoveJudge={removeJudgeFromGroup}
+					transformDraggedElement={transformDraggedElement}
+					onTeamConsider={handleTeamConsider}
+					onTeamDrop={handleTeamDrop}
+					onMaybeSelect={handleMaybeSelect}
 				/>
 			{/each}
 		</div>

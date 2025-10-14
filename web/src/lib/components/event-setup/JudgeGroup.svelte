@@ -1,61 +1,112 @@
 <script lang="ts">
-	import { EditingJudgeGroup, parseJudgeNamesFromInput } from '$lib/judging.svelte';
-	import { dndzone, TRIGGERS, SOURCES } from 'svelte-dnd-action';
-	import { flip } from 'svelte/animate';
-	import { tick } from 'svelte';
+	import JudgeCard from './JudgeCard.svelte';
 	import TeamPlate from './TeamPlate.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import CheckIcon from '$lib/icon/CheckIcon.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
 	import { dialogs } from '$lib/app-page.svelte';
+	import { dndzone } from 'svelte-dnd-action';
+	import { flip } from 'svelte/animate';
+	import { type EditingJudgeGroup } from '$lib/judging.svelte';
+	import { type TeamInfoAndData, EditingTeamList } from '$lib/team.svelte';
+	import type { Judge } from '@judging.jerryio/protocol/src/judging';
+	import EditIcon from '$lib/icon/EditIcon.svelte';
+	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 
 	interface Props {
-		isEditingEventSetup: boolean;
 		judgeGroup: EditingJudgeGroup;
 		selectedItems: EditingTeamList;
 		activeZoneId: string;
 		onDeleteGroup: (groupId: string) => void;
-		showGrade?: boolean;
+		showGrade: boolean;
 		showAssignedTeams: boolean;
-		judges: Array<{ id: string; name: string }>; // Optional judges to display
+		judges: Judge[];
 		onAddJudges: (judgeNames: string[]) => void;
 		onRemoveJudge: (judgeId: string) => void;
+		transformDraggedElement: (el: HTMLElement | undefined) => void;
+		onTeamConsider: (e: DropEvent) => void;
+		onTeamDrop: (e: DropEvent) => void;
+		onMaybeSelect: (teamId: string, e: MouseEvent | KeyboardEvent) => void;
 	}
 
 	let {
-		isEditingEventSetup,
 		judgeGroup = $bindable(),
 		selectedItems = $bindable(),
 		activeZoneId = $bindable(),
 		onDeleteGroup,
-		showGrade = true,
+		showGrade,
 		showAssignedTeams,
 		judges,
 		onAddJudges,
-		onRemoveJudge
+		onRemoveJudge,
+		transformDraggedElement,
+		onTeamConsider,
+		onTeamDrop,
+		onMaybeSelect
 	}: Props = $props();
 
 	let isEditingName = $state(false);
-	let editedGroupName = $state(judgeGroup.name);
-	let nameInput: HTMLInputElement | null = $state(null);
+	let editingName = $state(judgeGroup.name);
+	let newJudgesText = $state('');
 
-	let isAddingJudge = $state(false);
-	let judgeInput = $state('');
-	let judgeInputRef: HTMLInputElement | null = $state(null);
+	function startEditingName() {
+		isEditingName = true;
+		editingName = judgeGroup.name;
+	}
 
-	let zoneId = `judge-zone-${judgeGroup.id}`;
-	const flipDurationMs = 200;
+	function saveGroupName() {
+		const trimmedName = editingName.trim().slice(0, 100);
+		if (trimmedName && trimmedName !== judgeGroup.name) {
+			judgeGroup.name = trimmedName;
+			isEditingName = false;
+		} else if (trimmedName === judgeGroup.name) {
+			isEditingName = false;
+		}
+	}
 
-	function transformDraggedElement(el: HTMLElement | undefined) {
-		if (el && !el.getAttribute('data-selected-items-count') && selectedItems.length) {
-			el.setAttribute('data-selected-items-count', String(selectedItems.length + 1));
+	function cancelEditingName() {
+		isEditingName = false;
+		editingName = judgeGroup.name;
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			saveGroupName();
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			cancelEditingName();
+		}
+	}
+
+	async function confirmDeleteGroup() {
+		const confirmed = await dialogs.showConfirmation({
+			title: 'Delete Judge Group',
+			message: `Are you sure you want to delete "${judgeGroup.name}"? All assigned teams will be moved back to the available teams list and all judges will be removed.`,
+			confirmText: 'Delete Group',
+			cancelText: 'Cancel',
+			confirmButtonClass: 'danger'
+		});
+
+		if (confirmed) {
+			onDeleteGroup(judgeGroup.id);
+		}
+	}
+
+	function addJudges() {
+		if (!newJudgesText.trim()) return;
+
+		const judgeNames = newJudgesText
+			.split('\n')
+			.map((name) => name.trim())
+			.filter((name) => name.length > 0);
+
+		if (judgeNames.length > 0) {
+			onAddJudges(judgeNames);
+			newJudgesText = '';
 		}
 	}
 
 	interface DropEvent {
 		detail: {
-			items: EditingTeam[];
+			items: TeamInfoAndData[];
 			info: {
 				trigger: string;
 				source: string;
@@ -64,303 +115,89 @@
 		};
 	}
 
-	function handleTeamConsider(e: DropEvent) {
-		const {
-			items: newItems,
-			info: { trigger, source, id }
-		} = e.detail;
-
-		if (source !== SOURCES.KEYBOARD) {
-			if (selectedItems.length && trigger === TRIGGERS.DRAG_STARTED) {
-				if (selectedItems.includes(id)) {
-					selectedItems.removeById(id);
-					tick().then(() => {
-						judgeGroup.assignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
-					});
-				} else {
-					selectedItems = new EditingTeamList();
-				}
-			}
-		}
-
-		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new EditingTeamList();
-		judgeGroup.assignedTeams = newItems;
-	}
-
-	function handleTeamDrop(e: DropEvent) {
-		let {
-			items: newItems,
-			info: { trigger, source, id }
-		} = e.detail;
-
-		if (selectedItems.length) {
-			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				judgeGroup.assignedTeams = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
-			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
-				tick().then(() => {
-					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
-					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
-					newItems.splice(idx - sidx, 0, ...selectedItems);
-					judgeGroup.assignedTeams = newItems;
-					activeZoneId = zoneId;
-					if (source !== SOURCES.KEYBOARD) selectedItems = new EditingTeamList();
-				});
-			}
-		} else {
-			judgeGroup.assignedTeams = newItems;
-		}
-	}
-
-	function handleMaybeSelect(teamId: string, e: MouseEvent | KeyboardEvent) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		if (activeZoneId !== zoneId) {
-			selectedItems = new EditingTeamList();
-			activeZoneId = zoneId;
-		}
-
-		if (selectedItems.includes(teamId)) {
-			selectedItems.removeById(teamId);
-		} else {
-			selectedItems.push(judgeGroup.assignedTeams.find((item) => item.id === teamId)!);
-		}
-	}
-
-	async function deleteGroup() {
-		const confirmed =
-			!isEditingEventSetup ||
-			(await dialogs.showConfirmation({
-				title: 'Delete Judge Group',
-				message:
-					'Are you sure you want to delete this judge group? If this judge group has been used for judging, all related rubrics and award rankings will be lost forever. This action cannot be undone.',
-				confirmText: 'Delete Group',
-				cancelText: 'Cancel',
-				confirmButtonClass: 'danger'
-			}));
-
-		if (confirmed) {
-			onDeleteGroup(judgeGroup.id);
-		}
-	}
-
-	function startEditingName() {
-		isEditingName = true;
-		editedGroupName = judgeGroup.name;
-	}
-
-	function saveGroupName() {
-		const newName = editedGroupName.trim();
-		const hasLeadingTrailingWhitespace = editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
-
-		if (newName && !hasLeadingTrailingWhitespace && newName.length <= 100) {
-			judgeGroup.name = newName;
-			isEditingName = false;
-		}
-	}
-
-	function cancelEditingName() {
-		isEditingName = false;
-		editedGroupName = judgeGroup.name;
-	}
-
-	function handleNameKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			saveGroupName();
-		} else if (event.key === 'Escape') {
-			cancelEditingName();
-		}
-	}
-
-	// Judge management functions
-	function startAddingJudge() {
-		isAddingJudge = true;
-		judgeInput = '';
-	}
-
-	function addJudges() {
-		if (judgeInput.trim()) {
-			const judgeNames = parseJudgeNamesFromInput(judgeInput);
-			// Filter out names with leading/trailing whitespace
-			const validJudgeNames = judgeNames.filter((name) => {
-				const trimmedName = name.trim();
-				return trimmedName.length > 0 && trimmedName.length <= 100 && name === trimmedName; // No leading/trailing whitespace
-			});
-
-			if (validJudgeNames.length > 0) {
-				onAddJudges(validJudgeNames);
-			}
-			judgeInput = '';
-			isAddingJudge = false;
-		}
-	}
-
-	function cancelAddingJudge() {
-		isAddingJudge = false;
-		judgeInput = '';
-	}
-
-	function handleJudgeKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter' || event.key === ',') {
-			event.preventDefault();
-			addJudges();
-			startAddingJudge(); // Allow continuous adding
-		} else if (event.key === 'Escape') {
-			cancelAddingJudge();
-		}
-	}
-
-	function handleJudgePaste(event: ClipboardEvent) {
-		event.preventDefault();
-		const pastedText = event.clipboardData?.getData('text') || '';
-		judgeInput = pastedText;
-		addJudges();
-		startAddingJudge(); // Allow continuous adding
-	}
-
-	async function removeJudge(judgeId: string) {
-		const confirmed =
-			!isEditingEventSetup ||
-			(await dialogs.showConfirmation({
-				title: 'Remove Judge',
-				message:
-					'Are you sure you want to remove this judge? If this judge has completed rubrics, all their judging data and evaluations will be lost forever. This action cannot be undone.',
-				confirmText: 'Remove Judge',
-				cancelText: 'Cancel',
-				confirmButtonClass: 'danger'
-			}));
-
-		if (confirmed) {
-			onRemoveJudge(judgeId);
-		}
-	}
-
-	// Auto-focus effects
-	$effect(() => {
-		if (isEditingName && nameInput) {
-			nameInput.focus();
-		}
-	});
-
-	$effect(() => {
-		if (isAddingJudge && judgeInputRef) {
-			judgeInputRef.focus();
-		}
-	});
+	const flipDurationMs = 200;
 </script>
 
-<div class="min-h-12 rounded-lg bg-gray-50 p-4">
+<div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
 	<!-- Group Header -->
-	<div class="mb-3 flex items-center justify-between">
-		{#if isEditingName}
-			<div class="flex items-center gap-2">
+	<div class="mb-4 flex items-center justify-between">
+		<div class="flex flex-1 items-center gap-2">
+			{#if isEditingName}
 				<input
 					type="text"
-					bind:value={editedGroupName}
-					bind:this={nameInput}
-					onkeydown={handleNameKeydown}
+					bind:value={editingName}
+					onblur={saveGroupName}
+					onkeydown={handleKeydown}
 					maxlength="100"
-					class="classic"
+					class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
 				/>
-				<button onclick={saveGroupName} class="text-sm text-green-600 hover:text-green-800" title="Save">
-					<CheckIcon size={20} />
+			{:else}
+				<button
+					onclick={startEditingName}
+					class="flex flex-1 items-center gap-1 rounded px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100"
+					title="Click to rename group"
+				>
+					<span class="truncate">{judgeGroup.name}</span>
+					<EditIcon class="h-3 w-3 text-gray-400" />
 				</button>
-				<button onclick={cancelEditingName} class="text-sm text-red-600 hover:text-red-800" title="Cancel">
-					<CloseIcon size={20} />
-				</button>
-			</div>
-		{:else}
-			<div class="flex items-center gap-2">
-				<h4 class="font-medium text-gray-900">{judgeGroup.name}</h4>
-				<button onclick={startEditingName} class="text-sm text-gray-500 hover:text-gray-700" title="Rename group">
-					<EditIcon size={16} />
-				</button>
-			</div>
-		{/if}
+			{/if}
+		</div>
 
-		{#if !isEditingName}
-			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800" title="Delete group (only if empty)">
-				<CloseIcon size={20} />
-			</button>
-		{/if}
+		<button onclick={confirmDeleteGroup} class="ml-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600" title="Delete group">
+			<TrashBinIcon />
+		</button>
 	</div>
 
 	<!-- Judges Section -->
-	<div class="mb-4">
-		<div class="mb-2 flex h-6 items-center justify-between">
-			<h5 class="text-sm font-medium text-gray-700">Judges ({judges.length})</h5>
-			{#if !isAddingJudge}
-				<button
-					onclick={startAddingJudge}
-					class="rounded-full bg-green-600 p-1 text-white hover:bg-green-700"
-					title="Add judge"
-					aria-label={`Add judge to ${judgeGroup.name}`}
-				>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-					</svg>
-				</button>
-			{/if}
-		</div>
+	<div class="mb-4 space-y-3">
+		<h4 class="text-sm font-medium text-gray-800">Judges ({judges.length})</h4>
 
-		<div class="min-h-[0px] space-y-2">
-			{#each judges as judge (judge.id)}
-				<div class="flex items-center justify-between rounded bg-white px-2 py-1 text-sm">
-					<span>{judge.name}</span>
-					<button onclick={() => removeJudge(judge.id)} class="text-red-600 hover:text-red-800" title="Remove judge">
-						<CloseIcon size={16} />
-					</button>
-				</div>
-			{/each}
+		{#if judges.length > 0}
+			<div class="space-y-2">
+				{#each judges as judge (judge.id)}
+					<JudgeCard {judge} {onRemoveJudge} />
+				{/each}
+			</div>
+		{/if}
 
-			{#if isAddingJudge}
-				<div class="flex items-center gap-2 rounded bg-white px-2 py-1">
-					<input
-						type="text"
-						bind:value={judgeInput}
-						bind:this={judgeInputRef}
-						placeholder="Judge name(s), separate with commas"
-						onkeydown={handleJudgeKeydown}
-						onpaste={handleJudgePaste}
-						maxlength="100"
-						class="flex-1 border-none bg-transparent text-sm focus:outline-none"
-					/>
-					<button onclick={addJudges} class="text-green-600 hover:text-green-800" title="Add judges">
-						<CheckIcon size={16} />
-					</button>
-					<button onclick={cancelAddingJudge} class="text-red-600 hover:text-red-800" title="Cancel">
-						<CloseIcon size={16} />
-					</button>
-				</div>
-			{/if}
+		<div class="space-y-2">
+			<textarea
+				bind:value={newJudgesText}
+				placeholder="Enter judge names (one per line)"
+				rows="2"
+				class="w-full resize-none rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+			></textarea>
+			<button onclick={addJudges} disabled={!newJudgesText.trim()} class="primary tiny"> Add Judges </button>
 		</div>
 	</div>
-	<!-- Teams Section -->
+
+	<!-- Assigned Teams Section -->
 	{#if showAssignedTeams}
-		<div>
-			<h5 class="mb-2 text-sm font-medium text-gray-700">
+		<div class="space-y-3">
+			<h4 class="text-sm font-medium text-gray-800">
 				Assigned Teams ({judgeGroup.assignedTeams.length})
-			</h5>
+			</h4>
 
 			<div class="relative">
 				<div
-					class="flex max-h-[320px] min-h-[120px] flex-col space-y-2 overflow-y-auto rounded-md border-2 border-dashed border-gray-300 bg-gray-50 p-4"
+					class="grid min-h-[96px] grid-cols-1 gap-2 rounded border-2 border-dashed border-gray-200 bg-gray-50 p-2"
+					class:border-blue-300={activeZoneId === judgeGroup.id}
+					class:bg-blue-50={activeZoneId === judgeGroup.id}
 					use:dndzone={{
 						items: judgeGroup.assignedTeams,
 						flipDurationMs,
 						transformDraggedElement,
 						dropTargetStyle: { outline: '1px solid #EEE' }
 					}}
-					onconsider={handleTeamConsider}
-					onfinalize={handleTeamDrop}
+					onconsider={onTeamConsider}
+					onfinalize={onTeamDrop}
 				>
 					{#each judgeGroup.assignedTeams as team (team.id)}
 						<div
 							animate:flip={{ duration: flipDurationMs }}
 							class="draggable-team-card relative"
 							class:selected={selectedItems.includes(team.id)}
-							oncontextmenu={(e) => handleMaybeSelect(team.id, e)}
+							oncontextmenu={(e) => onMaybeSelect(team.id, e)}
 							role="button"
 							tabindex="0"
 						>
@@ -370,7 +207,7 @@
 				</div>
 
 				{#if judgeGroup.assignedTeams.length === 0}
-					<div class="absolute left-0 top-0 flex h-[120px] w-full items-center justify-center text-gray-500">
+					<div class="flex h-full items-center justify-center text-gray-400">
 						<p class="text-sm">Drop teams here</p>
 					</div>
 				{/if}

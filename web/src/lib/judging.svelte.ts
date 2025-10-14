@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
-import { type EditingTeam } from './team.svelte';
+import { type TeamInfoAndData } from './team.svelte';
 import { type Judge } from '@judging.jerryio/protocol/src/judging';
 
 export class EditingJudgeGroup {
 	public readonly id: string;
 	public name: string = $state('');
-	public assignedTeams: EditingTeam[] = $state([]);
+	public assignedTeams: TeamInfoAndData[] = $state([]);
 
 	constructor(name: string) {
 		this.id = uuidv4();
 		this.name = name;
 	}
 
-	assignTeam(team: EditingTeam) {
+	assignTeam(team: TeamInfoAndData) {
 		if (!this.assignedTeams.find((t) => t.id === team.id)) {
 			this.assignedTeams.push(team);
 		}
@@ -27,15 +27,11 @@ export class EditingJudgeGroup {
 }
 
 export function createJudge(id: string, name: string, groupId: string): Judge {
-	return {
-		id,
-		name,
-		groupId
-	};
+	return { id, name, groupId };
 }
 
 export function createJudgeFromString(name: string, groupId: string): Judge {
-	return createJudge(uuidv4(), name.trim(), groupId);
+	return createJudge(uuidv4(), name.trim().slice(0, 100), groupId);
 }
 
 export function parseJudgeNamesFromInput(input: string): string[] {
@@ -45,7 +41,7 @@ export function parseJudgeNamesFromInput(input: string): string[] {
 		.filter((name) => name.length > 0);
 }
 
-export function randomlyAssignTeamsToGroups(teams: EditingTeam[], judgeGroups: EditingJudgeGroup[]): void {
+export function randomlyAssignTeamsToGroups(teams: TeamInfoAndData[], judgeGroups: EditingJudgeGroup[]): void {
 	if (judgeGroups.length === 0) return;
 
 	// Clear existing assignments

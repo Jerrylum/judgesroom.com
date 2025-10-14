@@ -149,12 +149,11 @@ export class EditingTeam {
 	}
 }
 
-export class EditingTeamList extends List<EditingTeam, 'id'> {
-	constructor(initialItems: EditingTeam[] = []) {
+export class EditingTeamList extends List<TeamInfoAndData, 'id'> {
+	constructor(initialItems: TeamInfoAndData[] = []) {
 		super('id', initialItems);
 	}
 }
-
 // Type for Tournament Manager CSV row
 interface TMCSVRow {
 	Number: string;
@@ -375,27 +374,7 @@ export function mergeTeamData(
 	});
 }
 
-export function groupTeamsByGroup(teams: EditingTeam[]): Record<string, EditingTeam[]> {
-	const groups: Record<string, EditingTeam[]> = {};
-
-	teams.forEach((team) => {
-		const groupName = team.group || 'Ungrouped';
-		if (!groups[groupName]) {
-			groups[groupName] = [];
-		}
-		groups[groupName].push(team);
-	});
-
-	return groups;
-}
-
-export class EditingTeamListV2 extends List<TeamInfoAndData, 'id'> {
-	constructor(initialItems: TeamInfoAndData[] = []) {
-		super('id', initialItems);
-	}
-}
-
-export function groupTeamsByGroupV2(teamList: TeamInfoAndData[]): Record<string, TeamInfoAndData[]> {
+export function groupTeamsByGroup(teamList: TeamInfoAndData[]): Record<string, TeamInfoAndData[]> {
 	const groups: Record<string, TeamInfoAndData[]> = {};
 
 	teamList.forEach((team) => {

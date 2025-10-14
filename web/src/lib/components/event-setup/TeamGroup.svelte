@@ -1,22 +1,21 @@
 <script lang="ts">
-	import { dndzone, TRIGGERS, SOURCES } from 'svelte-dnd-action';
+	import TeamPlate from './TeamPlate.svelte';
+	import { dialogs } from '$lib/app-page.svelte';
+	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { tick } from 'svelte';
-	import TeamCard from './TeamCard.svelte';
+	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import CheckIcon from '$lib/icon/CheckIcon.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { EditingTeamList, type EditingTeam } from '$lib/team.svelte';
+	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
+	import { tick } from 'svelte';
 
 	interface Props {
 		groupName: string;
-		teamList: EditingTeam[];
+		teamList: TeamInfoAndData[];
 		selectedItems: EditingTeamList;
 		activeZoneId: string;
-		onEditTeam: (team: EditingTeam) => void;
 		onRenameGroup: (oldName: string, newName: string) => boolean;
 		onDeleteGroup: (groupName: string) => void;
-		showGrade?: boolean;
+		showGrade: boolean;
 	}
 
 	let {
@@ -24,17 +23,53 @@
 		teamList = $bindable(),
 		selectedItems = $bindable(),
 		activeZoneId = $bindable(),
-		onEditTeam,
 		onRenameGroup,
 		onDeleteGroup,
-		showGrade = true
+		showGrade
 	}: Props = $props();
 
-	let isEditingName = $state(false);
-	let editedGroupName = $state(groupName);
-	let nameInput: HTMLInputElement | null = $state(null);
-	let zoneId = `zone-${groupName}-${Math.floor(Math.random() * 1000000)}`;
 	const flipDurationMs = 200;
+
+	let isEditingName = $state(false);
+	let editingName = $state(groupName);
+	let zoneId = `zone-${groupName}-${Math.floor(Math.random() * 1000000)}`;
+
+	function startEditingName() {
+		isEditingName = true;
+		editingName = groupName;
+	}
+
+	function saveGroupName() {
+		const trimmedName = editingName.trim();
+		const hasLeadingTrailingWhitespace = editingName.length > 0 && editingName !== editingName.trim();
+
+		if (trimmedName && !hasLeadingTrailingWhitespace && trimmedName.length <= 100 && trimmedName !== groupName) {
+			const success = onRenameGroup(groupName, trimmedName);
+			if (success) {
+				isEditingName = false;
+			} else {
+				// Reset to original name if rename failed
+				editingName = groupName;
+			}
+		} else if (trimmedName === groupName) {
+			isEditingName = false;
+		}
+	}
+
+	function cancelEditingName() {
+		isEditingName = false;
+		editingName = groupName;
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			saveGroupName();
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			cancelEditingName();
+		}
+	}
 
 	function transformDraggedElement(el: HTMLElement | undefined) {
 		if (el && !el.getAttribute('data-selected-items-count') && selectedItems.length) {
@@ -44,7 +79,7 @@
 
 	interface DropEvent {
 		detail: {
-			items: EditingTeam[];
+			items: TeamInfoAndData[];
 			info: {
 				trigger: string;
 				source: string;
@@ -64,7 +99,7 @@
 				if (selectedItems.includes(id)) {
 					selectedItems.removeById(id);
 					tick().then(() => {
-						teamList = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+						teamList = newItems.filter((item) => !selectedItems.includes(item.id));
 					});
 				} else {
 					selectedItems = new EditingTeamList();
@@ -84,13 +119,13 @@
 
 		if (selectedItems.length) {
 			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
-				teamList = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+				teamList = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
 			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
 				tick().then(() => {
-					const idx = newItems.findIndex((item: EditingTeam) => item.id === id);
+					const idx = newItems.findIndex((item: TeamInfoAndData) => item.id === id);
 					// to support arrow up when keyboard dragging
 					const sidx = Math.max(selectedItems.findIndex(id), 0);
-					newItems = newItems.filter((item: EditingTeam) => !selectedItems.includes(item.id));
+					newItems = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
 					newItems.splice(idx - sidx, 0, ...selectedItems);
 					teamList = newItems;
 					activeZoneId = zoneId;
@@ -117,107 +152,81 @@
 			selectedItems.push(teamList.find((item) => item.id === teamId)!);
 		}
 	}
-
-	function deleteGroup() {
-		if (teamList.length === 0) {
-			onDeleteGroup(groupName);
-		}
-	}
-
-	function startEditingName() {
-		isEditingName = true;
-		editedGroupName = groupName;
-	}
-
-	$effect(() => {
-		if (isEditingName && nameInput) {
-			nameInput.focus();
-		}
-	});
-
-	function saveGroupName() {
-		const newName = editedGroupName.trim();
-		const hasLeadingTrailingWhitespace = editedGroupName.length > 0 && editedGroupName !== editedGroupName.trim();
-
-		if (newName && newName !== groupName && !hasLeadingTrailingWhitespace && newName.length <= 100) {
-			const success = onRenameGroup(groupName, newName);
-			if (success) {
-				isEditingName = false;
-			}
-			// If not successful, keep editing mode active
-		} else if (newName === groupName) {
-			isEditingName = false;
-		}
-	}
-
-	function cancelEditingName() {
-		isEditingName = false;
-		editedGroupName = groupName;
-	}
-
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			saveGroupName();
-		} else if (event.key === 'Escape') {
-			cancelEditingName();
-		}
-	}
 </script>
 
-<div class="min-h-[200px] rounded-lg bg-gray-50 p-4">
+<div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+	<!-- Group Header -->
 	<div class="mb-3 flex items-center justify-between">
-		{#if isEditingName}
-			<div class="flex items-center gap-2">
-				<input type="text" bind:value={editedGroupName} bind:this={nameInput} onkeydown={handleKeydown} maxlength="100" class="classic" />
-				<button onclick={saveGroupName} class="text-sm text-green-600 hover:text-green-800" title="Save">
-					<CheckIcon size={24} />
-				</button>
-				<button onclick={cancelEditingName} class="text-sm text-red-600 hover:text-red-800" title="Cancel">
-					<CloseIcon size={24} />
-				</button>
-			</div>
-		{:else}
-			<div class="flex items-center gap-2">
-				<h4 class="font-medium text-gray-900">{groupName}</h4>
+		<div class="flex flex-1 items-center gap-2">
+			{#if isEditingName}
+				<input
+					type="text"
+					bind:value={editingName}
+					onblur={saveGroupName}
+					onkeydown={handleKeydown}
+					maxlength="100"
+					class="h-8 flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
+				/>
+			{:else}
 				<button
 					onclick={startEditingName}
-					class="text-sm text-gray-500 hover:text-gray-700"
-					title="Rename group"
-					aria-label={`Rename group ${groupName}`}
+					class="flex h-8 flex-1 items-center gap-1 rounded px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100"
+					title="Click to rename group"
 				>
-					<EditIcon size={24} />
+					<span class="truncate">{groupName}</span>
+					<EditIcon class="h-3 w-3 text-gray-400" />
 				</button>
-			</div>
-		{/if}
+			{/if}
+		</div>
 
 		{#if teamList.length === 0}
-			<button onclick={deleteGroup} class="text-sm text-red-600 hover:text-red-800">Delete</button>
+			<button
+				onclick={() => onDeleteGroup(groupName)}
+				class="ml-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+				title="Delete group"
+			>
+				<TrashBinIcon />
+			</button>
+		{:else}
+			<span class="ml-2 text-xs text-gray-500">({teamList.length})</span>
 		{/if}
 	</div>
 
-	<div
-		class="min-h-[150px] space-y-2"
-		use:dndzone={{
-			items: teamList,
-			flipDurationMs,
-			transformDraggedElement,
-			dropTargetStyle: { outline: '1px solid #EEE' }
-		}}
-		onconsider={handleTeamConsider}
-		onfinalize={handleTeamDrop}
-	>
-		{#each teamList as team, index (team.id)}
-			<div
-				animate:flip={{ duration: flipDurationMs }}
-				class="draggable-team-card relative"
-				class:selected={selectedItems.includes(team.id)}
-				oncontextmenu={(e) => handleMaybeSelect(team.id, e)}
-				role="button"
-				tabindex="0"
-			>
-				<TeamCard bind:team={teamList[index]} onEdit={onEditTeam} {showGrade} />
+	<!-- Team List -->
+	<div class="relative">
+		<div
+			class="grid min-h-[96px] grid-cols-1 gap-2 rounded border-2 border-dashed border-gray-200 bg-gray-50 p-2"
+			class:border-blue-300={activeZoneId === groupName}
+			class:bg-blue-50={activeZoneId === groupName}
+			use:dndzone={{
+				items: teamList,
+				flipDurationMs,
+				transformDraggedElement,
+				dropTargetStyle: { outline: '1px solid #EEE' }
+			}}
+			onconsider={handleTeamConsider}
+			onfinalize={handleTeamDrop}
+		>
+			{#each teamList as team (team.id)}
+				<div
+					animate:flip={{ duration: flipDurationMs }}
+					class="draggable-team-card relative"
+					class:selected={selectedItems.includes(team.id)}
+					oncontextmenu={(e) => handleMaybeSelect(team.id, e)}
+					role="button"
+					tabindex="0"
+				>
+					<TeamPlate {team} {showGrade} />
+				</div>
+			{/each}
+		</div>
+		{#if teamList.length === 0}
+			<div class="absolute inset-0 select-none">
+				<div class="flex h-full items-center justify-center text-gray-400">
+					<p class="text-sm">Drop teams here</p>
+				</div>
 			</div>
-		{/each}
+		{/if}
 	</div>
 </div>
 
@@ -232,7 +241,7 @@
 		}
 
 		:global(&[data-selected-items-count]::after) {
-			@apply absolute top-[-0.75rem] right-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
+			@apply absolute right-[-0.75rem] top-[-0.75rem] z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
 		}
 	}
 </style>
