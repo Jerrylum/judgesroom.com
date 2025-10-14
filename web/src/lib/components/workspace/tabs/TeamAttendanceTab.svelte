@@ -230,46 +230,44 @@
 							{teamDifference === 'should-be-present' ? 'animate-pulse border-2 border-green-400' : ''}
 							{teamDifference === 'should-be-absent' ? 'animate-pulse border-2 border-red-400' : ''}"
 					>
-						<div class="flex items-start">
-							<div class="flex-1">
-								<div class="text-sm font-medium {team.absent ? 'text-red-900' : 'text-gray-900'}">{team.number}</div>
-								<div class="truncate text-xs {team.absent ? 'text-red-600' : 'text-gray-600'}">{team.name}</div>
-								<div class="text-xs {team.absent ? 'text-red-500' : 'text-gray-500'}">{team.grade}</div>
-							</div>
-							<div class="ml-2 flex flex-col gap-1">
-								{#if hasRobotEventsId}
-									<!-- RobotEvents managed - show status only -->
-									<div
-										class="flex h-6 w-6 items-center justify-center rounded {team.absent
-											? 'bg-red-100 text-red-600'
-											: 'bg-green-100 text-green-600'}"
-									>
-										{#if team.absent}
-											<CloseIcon class="h-4 w-4" />
-										{:else}
-											<CheckIcon class="h-4 w-4" />
-										{/if}
-									</div>
-								{:else if team.absent}
-									<!-- Absent button (X mark) -->
-									<button
-										onclick={() => toggleTeamAttendance(team)}
-										class="flex h-6 w-6 items-center justify-center rounded bg-red-100 text-red-600 transition-colors hover:bg-red-200 active:bg-red-300"
-										title="Mark as present"
-									>
+						<div class="pr-8">
+							<div class="text-sm font-medium {team.absent ? 'text-red-900' : 'text-gray-900'}">{team.number}</div>
+							<div class="truncate text-xs {team.absent ? 'text-red-600' : 'text-gray-600'}">{team.name}</div>
+							<div class="text-xs {team.absent ? 'text-red-500' : 'text-gray-500'}">{team.grade}</div>
+						</div>
+						<div class="absolute right-2 top-2">
+							{#if hasRobotEventsId}
+								<!-- RobotEvents managed - show status only -->
+								<div
+									class="flex h-6 w-6 items-center justify-center rounded {team.absent
+										? 'bg-red-100 text-red-600'
+										: 'bg-green-100 text-green-600'}"
+								>
+									{#if team.absent}
 										<CloseIcon class="h-4 w-4" />
-									</button>
-								{:else}
-									<!-- Present button (check mark) -->
-									<button
-										onclick={() => toggleTeamAttendance(team)}
-										class="flex h-6 w-6 items-center justify-center rounded bg-green-100 text-green-600 transition-colors hover:bg-green-200 active:bg-green-300"
-										title="Mark as absent"
-									>
+									{:else}
 										<CheckIcon class="h-4 w-4" />
-									</button>
-								{/if}
-							</div>
+									{/if}
+								</div>
+							{:else if team.absent}
+								<!-- Absent button (X mark) -->
+								<button
+									onclick={() => toggleTeamAttendance(team)}
+									class="flex h-6 w-6 items-center justify-center rounded bg-red-100 text-red-600 transition-colors hover:bg-red-200 active:bg-red-300"
+									title="Mark as present"
+								>
+									<CloseIcon class="h-4 w-4" />
+								</button>
+							{:else}
+								<!-- Present button (check mark) -->
+								<button
+									onclick={() => toggleTeamAttendance(team)}
+									class="flex h-6 w-6 items-center justify-center rounded bg-green-100 text-green-600 transition-colors hover:bg-green-200 active:bg-green-300"
+									title="Mark as absent"
+								>
+									<CheckIcon class="h-4 w-4" />
+								</button>
+							{/if}
 						</div>
 						<!-- {#if team.absent}
 							<div class="mt-2 text-xs font-medium text-red-600">ABSENT</div>
