@@ -283,19 +283,22 @@ export function getExcellenceAwardTeamEligibility(
 }
 
 /**
- * Get the excellence award team eligibility for a division
+ * Get the Excellence Award team eligibility for a division
  *
  * The team info list is the list of all teams in the judging system.
- * It should be the same list as the one in the RobotEvents.
- * It must be the superset of the teams in the division. Otherwise, the results
- * will be incorrect.
+ * If there are only one division, the team info list should be the same list as the one in the RobotEvents.
+ * If there are more then one division, the team info list should be the same list as the specified division.
+ * Otherwise, the results will be incorrect.
+ *
+ * This function can be only used to determine DIVISION SPECIFIC Excellence Award team eligibility, not EVENT WIDE.
+ * Teams that are not in the team info list will be excluded from the results before calculating the 40% threshold.
  *
  * @param client The RobotEvents client
  * @param evtId The event ID
  * @param divisionId The division ID
  * @param teamInfo The team info, must be the superset of the teams in the division,
- * @param excellenceAwards The excellence awards to get the team eligibility for
- * @returns The excellence award team eligibility
+ * @param excellenceAwards The Excellence Awards to get the team eligibility for
+ * @returns The Excellence Award team eligibility
  */
 export async function getEventDivisionExcellenceAwardTeamEligibility(
 	client: RobotEventsClient,
@@ -317,7 +320,7 @@ export async function getEventDivisionExcellenceAwardTeamEligibility(
 
 		rtn[award.name] = getExcellenceAwardTeamEligibility(allTargetGradesRankings, allTargetGradesOverallSkills);
 	}
-	
+
 	return rtn;
 }
 
@@ -393,10 +396,11 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 		throw new Error(`Unable to get division info from RobotEvents for division ${division.id} because it is missing required fields`);
 	};
 
-	const divisionInfos = evt.divisions?.map((division) => ({
-		id: division.id ?? throwDivisionError(division),
-		name: division.name ?? throwDivisionError(division),
-	})) ?? [];
+	const divisionInfos =
+		evt.divisions?.map((division) => ({
+			id: division.id ?? throwDivisionError(division),
+			name: division.name ?? throwDivisionError(division)
+		})) ?? [];
 
 	if (divisionInfos.length === 0) throw new Error('No divisions found in RobotEvents');
 
