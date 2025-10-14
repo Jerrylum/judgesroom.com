@@ -30,11 +30,12 @@
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
+	const isShowingOnlyAssignedTeams = $derived(isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup);
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived.by(() => {
-		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
-			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		if (isShowingOnlyAssignedTeams) {
+			return sortByAssignedTeams(includedTeams, currentJudgeGroup!.assignedTeams);
 		} else {
 			return sortByTeamNumber(Object.values(includedTeams));
 		}
@@ -102,7 +103,12 @@
 				<!-- Progress Indicators -->
 				<div class="grid gap-4 sm:grid-cols-3">
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-sm font-medium text-gray-900">Teams Scanned</div>
+						<div class="text-base font-medium text-gray-900">Teams Scanned</div>
+						{#if isShowingOnlyAssignedTeams}
+							<div class="text-sm text-gray-900 mb-2">Your judge group ({currentJudgeGroup!.name})</div>
+						{:else}
+							<div class="text-sm text-gray-900 mb-2">All judge groups</div>
+						{/if}
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.scanned.count} / {progressMetrics.scanned.total}
 						</div>
@@ -112,7 +118,12 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-sm font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+						<div class="text-base font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+						{#if isShowingOnlyAssignedTeams}
+							<div class="text-sm text-gray-900 mb-2">Your judge group ({currentJudgeGroup!.name})</div>
+						{:else}
+							<div class="text-sm text-gray-900 mb-2">All judge groups</div>
+						{/if}
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.withRubrics.count} / {progressMetrics.withRubrics.total}
 						</div>
@@ -124,7 +135,8 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-sm font-medium text-gray-900">Your Progress</div>
+						<div class="text-base font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+						<div class="text-sm text-gray-900 mb-2">Your progress</div>
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.currentJudgeFinished.count} / {progressMetrics.currentJudgeFinished.total}
 						</div>
