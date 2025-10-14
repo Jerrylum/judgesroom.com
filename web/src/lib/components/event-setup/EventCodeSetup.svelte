@@ -197,7 +197,7 @@
 				needs to know which teams belong to which division before it starts.
 			</li>
 			<li>
-				Each Judges' Room can only be used for one division. Please use a second computer or browser or incognito mode to create another
+				Each Judges' Room can only be used for one division. Please use a second computer, another browser or incognito mode to create another
 				Judges' Room for the second division.
 			</li>
 			<li>
