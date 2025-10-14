@@ -105,8 +105,10 @@
 
 			// Convert to TeamInfoAndData format
 			const newTeams = csvTeams.map((team) => {
-				const id = uuidv4();
 				const teamNumber = team.number!;
+				// Reuse the id of the existing team if it exists, otherwise generate a new one
+				const existingTeam = teams.find((t) => t.number === teamNumber);
+				const id = existingTeam?.id ?? uuidv4();
 
 				return {
 					id,
@@ -118,10 +120,10 @@
 					shortName: team.shortName || '',
 					school: team.school || '',
 					grade: team.grade || 'College',
-					group: team.group || '',
-					notebookLink: '',
-					notebookDevelopmentStatus: 'undetermined' as const,
-					absent: false
+					group: existingTeam?.group ?? team.group ?? '',
+					notebookLink: existingTeam?.notebookLink ?? '',
+					notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
+					absent: existingTeam?.absent ?? false
 				} satisfies TeamInfoAndData;
 			});
 
@@ -219,9 +221,7 @@
 				<p class="text-sm text-gray-600">
 					Download CSV from RobotEvents: Event Admin → "Downloads & Links" → "Download Tournament Manager Import Data"
 				</p>
-				<p class="text-sm text-gray-600">
-					Download CSV from Tournament Manager: File → Export → "Team List for Event"
-				</p>
+				<p class="text-sm text-gray-600">Download CSV from Tournament Manager: File → Export → "Team List for Event"</p>
 			</div>
 
 			<div

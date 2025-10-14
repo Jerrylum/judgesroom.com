@@ -10,6 +10,7 @@ import AwardRankingTabComponent from './components/workspace/tabs/AwardRankingTa
 import AwardNominationTabComponent from './components/workspace/tabs/AwardNominationTab.svelte';
 import FinalRankingTabComponent from './components/workspace/tabs/FinalRankingTab.svelte';
 import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.svelte';
+import TeamAttendanceTabComponent from './components/workspace/tabs/TeamAttendanceTab.svelte';
 
 // ============================================================================
 // Tab System
@@ -45,34 +46,43 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 	}
 }
 
-export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubricTabComponent> {
+export class TeamAttendanceTab implements BaseTab<typeof TeamAttendanceTabComponent> {
 	readonly id: string;
 	readonly isPinned = false;
-	readonly type = 'team_interview_rubric';
-	readonly component = TeamInterviewRubricTabComponent;
-	readonly props = { tab: this };
-	teamId: string = $state('');
-	rubricId: string | null = $state(null);
+	readonly type = 'team_attendance';
+	readonly component = TeamAttendanceTabComponent;
+	readonly props = {};
 
 	get title() {
-		const team = app.findTeamById(this.teamId);
-		return team ? `${team.number} Team Interview` : 'Team Interview';
+		return 'Team Attendance';
 	}
 
 	get hash() {
-		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
+		return JSON.stringify({ type: this.type });
 	}
 
-	constructor(params: { teamId: string } | { rubricId: string }) {
+	constructor() {
 		this.id = generateUUID();
+	}
+}
 
-		if ('rubricId' in params) {
-			this.rubricId = params.rubricId;
-			this.teamId = ''; // Will be set when rubric loads
-		} else {
-			this.teamId = params.teamId;
-			this.rubricId = null; // Will be set after the rubric is saved
-		}
+export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComponent> {
+	readonly id: string;
+	readonly isPinned = false;
+	readonly type = 'notebook_sorting';
+	readonly component = NotebookSortingTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Notebook Sorting';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
+	constructor() {
+		this.id = generateUUID();
 	}
 }
 
@@ -107,23 +117,34 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 	}
 }
 
-export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComponent> {
+export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubricTabComponent> {
 	readonly id: string;
 	readonly isPinned = false;
-	readonly type = 'notebook_sorting';
-	readonly component = NotebookSortingTabComponent;
+	readonly type = 'team_interview_rubric';
+	readonly component = TeamInterviewRubricTabComponent;
 	readonly props = { tab: this };
+	teamId: string = $state('');
+	rubricId: string | null = $state(null);
 
 	get title() {
-		return 'Notebook Sorting';
+		const team = app.findTeamById(this.teamId);
+		return team ? `${team.number} Team Interview` : 'Team Interview';
 	}
 
 	get hash() {
-		return JSON.stringify({ type: this.type });
+		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
 	}
 
-	constructor() {
+	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
+
+		if ('rubricId' in params) {
+			this.rubricId = params.rubricId;
+			this.teamId = ''; // Will be set when rubric loads
+		} else {
+			this.teamId = params.teamId;
+			this.rubricId = null; // Will be set after the rubric is saved
+		}
 	}
 }
 
@@ -209,11 +230,12 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 
 export type Tab =
 	| OverviewTab
-	| TeamInterviewRubricTab
-	| NotebookRubricTab
+	| TeamAttendanceTab
 	| NotebookSortingTab
-	| AwardNominationTab
+	| NotebookRubricTab
+	| TeamInterviewRubricTab
 	| AwardRankingTab
+	| AwardNominationTab
 	| FinalAwardRankingTab
 	| AwardWinnerTab;
 

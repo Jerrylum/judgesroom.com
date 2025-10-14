@@ -11,6 +11,8 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import type { Program } from '@judging.jerryio/protocol/src/award';
 	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import { untrack } from 'svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	interface Props {
 		isEditingEventSetup: boolean;
@@ -114,6 +116,22 @@
 		}
 	}
 
+	async function handleUpdateTeams(newTeams: TeamInfoAndData[]) {
+		// Reuse the id of the existing team if it exists, otherwise generate a new one
+		teams = newTeams.map((team) => {
+			const existingTeam = teams.find((t) => t.number === team.number);
+
+			return {
+				...team,
+				id: existingTeam?.id ?? uuidv4(),
+				group: existingTeam?.group ?? team.group,
+				notebookLink: existingTeam?.notebookLink ?? team.notebookLink,
+				notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? team.notebookDevelopmentStatus,
+				absent: existingTeam?.absent ?? team.absent
+			};
+		});
+	}
+
 	$effect(() => {
 		if (importedData && inputDivisionId) {
 			if (importedData.divisionInfos.length > 1) {
@@ -127,7 +145,10 @@
 						if (!importedData) return;
 
 						divisionId = inputDivisionId;
-						teams = importedData.teamInfos.filter((team) => divisionRanking.some((ranking) => ranking.teamNumber === team.number));
+						// teams = importedData.teamInfos.filter((team) => divisionRanking.some((ranking) => ranking.teamNumber === team.number));
+						handleUpdateTeams(
+							importedData.teamInfos.filter((team) => divisionRanking.some((ranking) => ranking.teamNumber === team.number))
+						);
 					})
 					.catch((error) => {
 						isImporting = false;
@@ -140,8 +161,10 @@
 						});
 					});
 			} else {
-				divisionId = inputDivisionId;
-				teams = importedData.teamInfos;
+				untrack(() => {
+					divisionId = inputDivisionId;
+					handleUpdateTeams(importedData?.teamInfos ?? []);
+				});
 			}
 		}
 	});
