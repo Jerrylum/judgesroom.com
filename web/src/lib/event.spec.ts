@@ -171,6 +171,9 @@ describe('Integration Tests', () => {
 
 		// Create a complete event setup using the selected grade level
 		const eventSetup: EssentialData = {
+			robotEventsSku: null,
+			robotEventsEventId: null,
+			divisionId: null,
 			eventName: 'Regional Championship',
 			program: 'V5RC',
 			eventGradeLevel: selectedGradeLevel!.value,
@@ -234,6 +237,9 @@ describe('Integration Tests', () => {
 		expect(blendedOption?.grades).toEqual(['Elementary School', 'Middle School']);
 
 		const eventSetup: EssentialData = {
+			robotEventsSku: null,
+			robotEventsEventId: null,
+			divisionId: null,
 			eventName: 'A',
 			program: 'VIQRC',
 			eventGradeLevel: blendedOption!.value,

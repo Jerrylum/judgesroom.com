@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { List } from './list.svelte';
-import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+import { SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
 import {
 	type TeamInfo,
@@ -52,101 +52,6 @@ export function createTeamData(
 		notebookDevelopmentStatus,
 		absent
 	};
-}
-
-export class EditingTeam {
-	public readonly id: string;
-	public info: TeamInfo;
-	public data: TeamData;
-
-	constructor(info: TeamInfo, data: TeamData) {
-		if (info.id !== data.id) {
-			throw new Error('Team info and data IDs do not match');
-		}
-		this.id = info.id;
-		this.info = $state(info);
-		this.data = $state(data);
-	}
-
-	get number() {
-		return this.info.number;
-	}
-	get name() {
-		return this.info.name;
-	}
-	set name(value: string) {
-		this.info.name = value;
-	}
-
-	get city() {
-		return this.info.city;
-	}
-	set city(value: string) {
-		this.info.city = value;
-	}
-
-	get state() {
-		return this.info.state;
-	}
-	set state(value: string) {
-		this.info.state = value;
-	}
-
-	get country() {
-		return this.info.country;
-	}
-	set country(value: string) {
-		this.info.country = value;
-	}
-
-	get shortName() {
-		return this.info.shortName;
-	}
-	set shortName(value: string) {
-		this.info.shortName = value;
-	}
-
-	get school() {
-		return this.info.school;
-	}
-	set school(value: string) {
-		this.info.school = value;
-	}
-
-	get grade() {
-		return this.info.grade;
-	}
-	set grade(value: Grade) {
-		this.info.grade = value;
-	}
-
-	get group() {
-		return this.info.group;
-	}
-	set group(value: string) {
-		this.info.group = value;
-	}
-
-	get notebookLink() {
-		return this.data.notebookLink;
-	}
-	set notebookLink(value: string) {
-		this.data.notebookLink = value;
-	}
-
-	get notebookDevelopmentStatus() {
-		return this.data.notebookDevelopmentStatus;
-	}
-	set notebookDevelopmentStatus(value: NotebookDevelopmentStatus) {
-		this.data.notebookDevelopmentStatus = value;
-	}
-
-	get absent() {
-		return this.data.absent;
-	}
-	set absent(value: boolean) {
-		this.data.absent = value;
-	}
 }
 
 export class EditingTeamList extends List<TeamInfoAndData, 'id'> {
@@ -335,43 +240,6 @@ export function mapGradeToGradeLevel(gradeString: string): Grade {
 
 	// Default to College if no match found
 	return 'College';
-}
-
-export function mergeTeamData(
-	csvTeams: Partial<TeamInfo & TeamData>[],
-	notebookLinks: Record<string, string>,
-	existingTeams: EditingTeam[] = []
-): EditingTeam[] {
-	const existingTeamMap = new SvelteMap(existingTeams.map((team) => [team.number, team]));
-
-	return csvTeams.map((team) => {
-		const existingTeam = existingTeamMap.get(team.number!);
-		const id = existingTeam?.id || uuidv4(); // reuse existing team id if it exists
-		const teamNumber = team.number!; // Already validated in parseTournamentManagerCSV
-		const notebookLink = notebookLinks[teamNumber] || '';
-
-		const teamInfo = createTeamInfo(
-			id,
-			teamNumber,
-			team.name || '',
-			team.city || '',
-			team.state || '',
-			team.country || '',
-			team.shortName || '',
-			team.school || '',
-			team.grade || 'College',
-			team.group || ''
-		);
-
-		const teamData = createTeamData(
-			id,
-			notebookLink,
-			team.notebookDevelopmentStatus ?? existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
-			team.absent ?? existingTeam?.absent ?? false
-		);
-
-		return new EditingTeam(teamInfo, teamData);
-	});
 }
 
 export function groupTeamsByGroup(teamList: TeamInfoAndData[]): Record<string, TeamInfoAndData[]> {

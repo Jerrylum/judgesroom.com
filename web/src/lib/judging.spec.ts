@@ -8,8 +8,10 @@ import {
 	randomlyAssignTeamsToGroups,
 	getJudgesInGroup
 } from './judging.svelte';
-import { EditingTeam, createTeamInfo, createTeamData } from './team.svelte';
+import { type TeamInfoAndData } from './team.svelte';
 import { JudgeSchema, type Judge } from '@judging.jerryio/protocol/src/judging';
+import { type Grade } from '@judging.jerryio/protocol/src/award';
+import { type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 
 describe('Judge Class', () => {
 	let judge: Judge;
@@ -43,7 +45,7 @@ describe('Judge Class', () => {
 
 describe('EditingJudgeGroup', () => {
 	let judgeGroup: EditingJudgeGroup;
-	let mockTeams: EditingTeam[];
+	let mockTeams: TeamInfoAndData[];
 
 	beforeEach(() => {
 		judgeGroup = new EditingJudgeGroup('Technical Judges');
@@ -53,18 +55,51 @@ describe('EditingJudgeGroup', () => {
 		const teamId2 = uuidv4();
 		const teamId3 = uuidv4();
 		mockTeams = [
-			new EditingTeam(
-				createTeamInfo(teamId1, '123A', 'Team Alpha', 'City A', 'State A', 'Country A', 'TA', 'School A', 'High School', '123'),
-				createTeamData(teamId1, 'https://example.com/notebook-a', 'undetermined', false)
-			),
-			new EditingTeam(
-				createTeamInfo(teamId2, '456B', 'Team Beta', 'City B', 'State B', 'Country B', 'TB', 'School B', 'Middle School', '456'),
-				createTeamData(teamId2, 'https://example.com/notebook-b', 'undetermined', false)
-			),
-			new EditingTeam(
-				createTeamInfo(teamId3, '789C', 'Team Gamma', 'City C', 'State C', 'Country C', 'TC', 'School C', 'College', '789'),
-				createTeamData(teamId3, 'https://example.com/notebook-c', 'undetermined', false)
-			)
+			{
+				id: teamId1,
+				number: '123A',
+				name: 'Team Alpha',
+				city: 'City A',
+				state: 'State A', 
+				country: 'Country A',
+				shortName: 'TA',
+				school: 'School A',
+				grade: 'High School' as Grade,
+				group: '123',
+				notebookLink: 'https://example.com/notebook-a',
+				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
+				absent: false
+			},
+			{
+				id: teamId2,
+				number: '456B',
+				name: 'Team Beta',
+				city: 'City B',
+				state: 'State B',
+				country: 'Country B',
+				shortName: 'TB',
+				school: 'School B',
+				grade: 'Middle School' as Grade,
+				group: '456',
+				notebookLink: 'https://example.com/notebook-b',
+				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
+				absent: false
+			},
+			{
+				id: teamId3,
+				number: '789C',
+				name: 'Team Gamma',
+				city: 'City C',
+				state: 'State C',
+				country: 'Country C',
+				shortName: 'TC',
+				school: 'School C',
+				grade: 'College' as Grade,
+				group: '789',
+				notebookLink: 'https://example.com/notebook-c',
+				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
+				absent: false
+			}
 		];
 	});
 
@@ -209,28 +244,28 @@ describe('parseJudgeNamesFromInput', () => {
 });
 
 describe('randomlyAssignTeamsToGroups', () => {
-	let mockTeams: EditingTeam[];
+	let mockTeams: TeamInfoAndData[];
 	let judgeGroups: EditingJudgeGroup[];
 
 	beforeEach(() => {
 		// Create mock teams
 		mockTeams = Array.from({ length: 10 }, (_, i) => {
 			const teamId = uuidv4();
-			return new EditingTeam(
-				createTeamInfo(
-					teamId,
-					`${100 + i}A`,
-					`Team ${i + 1}`,
-					`City ${i + 1}`,
-					`State ${i + 1}`,
-					`Country ${i + 1}`,
-					`T${i + 1}`,
-					`School ${i + 1}`,
-					'High School',
-					`${100 + i}`
-				),
-				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, 'undetermined', false)
-			);
+			return {
+				id: teamId,
+				number: `${100 + i}A`,
+				name: `Team ${i + 1}`,
+				city: `City ${i + 1}`,
+				state: `State ${i + 1}`,
+				country: `Country ${i + 1}`,
+				shortName: `T${i + 1}`,
+				school: `School ${i + 1}`,
+				grade: 'High School' as Grade,
+				group: `${100 + i}`,
+				notebookLink: `https://example.com/notebook-${i + 1}`,
+				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
+				absent: false
+			};
 		});
 
 		// Create judge groups
@@ -382,21 +417,21 @@ describe('Integration Tests', () => {
 		// Create teams
 		const teams = Array.from({ length: 6 }, (_, i) => {
 			const teamId = uuidv4();
-			return new EditingTeam(
-				createTeamInfo(
-					teamId,
-					`${100 + i}A`,
-					`Team ${i + 1}`,
-					`City ${i + 1}`,
-					`State ${i + 1}`,
-					`Country ${i + 1}`,
-					`T${i + 1}`,
-					`School ${i + 1}`,
-					'High School',
-					`${100 + i}`
-				),
-				createTeamData(teamId, `https://example.com/notebook-${i + 1}`, 'undetermined', false)
-			);
+			return {
+				id: teamId,
+				number: `${100 + i}A`,
+				name: `Team ${i + 1}`,
+				city: `City ${i + 1}`,
+				state: `State ${i + 1}`,
+				country: `Country ${i + 1}`,
+				shortName: `T${i + 1}`,
+				school: `School ${i + 1}`,
+				grade: 'High School' as Grade,
+				group: `${100 + i}`,
+				notebookLink: `https://example.com/notebook-${i + 1}`,
+				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
+				absent: false
+			};
 		});
 
 		// Assign teams to groups
@@ -431,10 +466,21 @@ describe('Integration Tests', () => {
 		const singleGroup = new EditingJudgeGroup('Single Group');
 		const singleJudge = createJudgeFromString('Solo Judge', singleGroup.id);
 		const soloTeamId = uuidv4();
-		const singleTeam = new EditingTeam(
-			createTeamInfo(soloTeamId, '100A', 'Solo Team', 'City', 'State', 'Country', 'ST', 'School', 'High School', '100'),
-			createTeamData(soloTeamId, 'https://example.com/notebook', 'undetermined', false)
-		);
+		const singleTeam: TeamInfoAndData = {
+			id: soloTeamId,
+			number: '100A',
+			name: 'Solo Team',
+			city: 'City',
+			state: 'State',
+			country: 'Country',
+			shortName: 'ST',
+			school: 'School',
+			grade: 'High School',
+			group: '100',
+			notebookLink: 'https://example.com/notebook',
+			notebookDevelopmentStatus: 'undetermined',
+			absent: false
+		};
 
 		randomlyAssignTeamsToGroups([singleTeam], [singleGroup]);
 
