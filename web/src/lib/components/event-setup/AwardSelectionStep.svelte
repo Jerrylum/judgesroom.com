@@ -147,7 +147,7 @@
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-semibold text-gray-900">Award Selection</h2>
+		<h2 class="text-xl font-semibold text-gray-900">Awards Setup</h2>
 		<button onclick={openCustomAwardDialog} class="success tiny">+ Add Custom Award</button>
 	</div>
 
@@ -223,7 +223,7 @@
 				submit();
 				onNext();
 			}}
-			class="primary">Next: Team Import</button
+			class="primary">Next: Review</button
 		>
 	</div>
 </div>

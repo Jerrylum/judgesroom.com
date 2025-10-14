@@ -1,9 +1,9 @@
 <script lang="ts">
-	import CompetitionSetupStepV2 from './CompetitionSetupStepV2.svelte';
+	import CompetitionSetupStep from './CompetitionSetupStep.svelte';
 	import AwardSelectionStep from './AwardSelectionStep.svelte';
 	import TeamGroupsStep from './TeamGroupsStep.svelte';
-	import JudgeSetupStepV2 from './JudgeSetupStepV2.svelte';
-	import ReviewStepV2 from './ReviewStepV2.svelte';
+	import JudgeSetupStep from './JudgeSetupStep.svelte';
+	import ReviewStep from './ReviewStep.svelte';
 	import { onMount } from 'svelte';
 	import { app, AppUI } from '$lib/app-page.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
@@ -13,20 +13,23 @@
 	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import EventCodeSetup from './EventCodeSetup.svelte';
 
 	// Step management
 	let currentStep = $state(0);
-	const totalSteps = 5;
+	const totalSteps = 6;
 
 	let isEditingEventSetup = $state(false);
+
+	// RobotEvents import state
+	let robotEventsSku: string | null = $state(null);
+	let robotEventsEventId: number | null = $state(null);
+	let divisionId: number | null = $state(null);
 
 	// Event setup state
 	let eventName: string = $state('My Event');
 	let selectedProgram: Program = $state('V5RC');
 	let selectedEventGradeLevel: EventGradeLevel = $state('Blended');
-
-	// Award state - will be managed by the AwardSelectionStep
-	let awardOptions: AwardOptions[] = $state([]);
 
 	// Teams
 	let teams: TeamInfoAndData[] = $state([]);
@@ -40,6 +43,9 @@
 
 	let originalJudges = app.getAllJudges();
 
+	// Award state - will be managed by the AwardSelectionStep
+	let awardOptions: AwardOptions[] = $state([]);
+
 	/**
 	 * Load current data from app
 	 */
@@ -50,6 +56,12 @@
 
 		if (eventSetup) {
 			isEditingEventSetup = true;
+
+			// Load RobotEvents import info
+			robotEventsSku = eventSetup.robotEventsSku;
+			robotEventsEventId = eventSetup.robotEventsEventId;
+			divisionId = eventSetup.divisionId;
+
 			// Load event info
 			eventName = eventSetup.eventName;
 			selectedProgram = eventSetup.program;
@@ -62,28 +74,14 @@
 			awardOptions = restoreAwardOptions(eventSetup.awards, officialAwardOptions, selectedProgram);
 
 			// Load teams
-			teams = eventSetup.teamInfos.map((teamWithData) => {
-				const teamData = allTeamData[teamWithData.id] || {
-					id: teamWithData.id,
+			teams = eventSetup.teamInfos.map((teamInfo) => {
+				const teamData = allTeamData[teamInfo.id] || {
+					id: teamInfo.id,
 					notebookLink: '',
 					notebookDevelopmentStatus: 'undetermined' as const,
 					absent: false
 				};
-				return {
-					id: teamWithData.id,
-					number: teamWithData.number,
-					name: teamWithData.name,
-					city: teamWithData.city,
-					state: teamWithData.state,
-					country: teamWithData.country,
-					shortName: teamWithData.shortName,
-					school: teamWithData.school,
-					grade: teamWithData.grade,
-					group: teamWithData.group,
-					notebookLink: teamData.notebookLink,
-					notebookDevelopmentStatus: teamData.notebookDevelopmentStatus,
-					absent: teamData.absent
-				} satisfies TeamInfoAndData;
+				return { ...teamInfo, ...teamData } satisfies TeamInfoAndData;
 			});
 
 			// Load judging setup
@@ -94,49 +92,9 @@
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
 				Object.assign(judgeGroup, { id: group.id });
-				
-				// Convert TeamInfoAndData to EditingTeam for compatibility
-				judgeGroup.assignedTeams = group.assignedTeams.map((id) => {
-					const teamInfo = teams.find((t) => t.id === id);
-					if (!teamInfo) return null;
-					assignedTeamIds.add(id);
-					
-					return {
-						id: teamInfo.id,
-						info: {
-							id: teamInfo.id,
-							number: teamInfo.number,
-							name: teamInfo.name,
-							city: teamInfo.city,
-							state: teamInfo.state,
-							country: teamInfo.country,
-							shortName: teamInfo.shortName,
-							school: teamInfo.school,
-							grade: teamInfo.grade,
-							group: teamInfo.group
-						},
-						data: {
-							id: teamInfo.id,
-							notebookLink: teamInfo.notebookLink,
-							notebookDevelopmentStatus: teamInfo.notebookDevelopmentStatus,
-							absent: teamInfo.absent
-						},
-						// Add getters to match EditingTeam interface
-						get number() { return this.info.number; },
-						get name() { return this.info.name; },
-						get city() { return this.info.city; },
-						get state() { return this.info.state; },
-						get country() { return this.info.country; },
-						get shortName() { return this.info.shortName; },
-						get school() { return this.info.school; },
-						get grade() { return this.info.grade; },
-						get group() { return this.info.group; },
-						get notebookLink() { return this.data.notebookLink; },
-						get notebookDevelopmentStatus() { return this.data.notebookDevelopmentStatus; },
-						get absent() { return this.data.absent; }
-					} as any; // Type assertion needed due to complex EditingTeam structure
-				}).filter(Boolean);
-				
+
+				judgeGroup.assignedTeams = group.assignedTeams.map((id) => teams.find((t) => t.id === id) ?? null).filter((t) => t !== null);
+
 				return judgeGroup;
 			});
 
@@ -175,6 +133,9 @@
 		try {
 			// Create the event setup object
 			const essentialData = {
+				robotEventsSku,
+				robotEventsEventId,
+				divisionId,
 				eventName,
 				program: selectedProgram,
 				eventGradeLevel: selectedEventGradeLevel,
@@ -203,12 +164,14 @@
 			// Redirect based on whether user is judging ready
 			if (app.isJudgesRoomJoined()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
-				await app.wrpcClient.team.updateAllTeamData.mutation(teams.map((team) => ({
-					id: team.id,
-					notebookLink: team.notebookLink,
-					notebookDevelopmentStatus: team.notebookDevelopmentStatus,
-					absent: team.absent
-				})));
+				await app.wrpcClient.team.updateAllTeamData.mutation(
+					teams.map((team) => ({
+						id: team.id,
+						notebookLink: team.notebookLink,
+						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+						absent: team.absent
+					}))
+				);
 
 				// Just in case: keep judges that are created during the event setup
 				const currentJudges = app.getAllJudges();
@@ -221,12 +184,14 @@
 				AppUI.appPhase = 'workspace';
 			} else {
 				app.handleEssentialDataUpdate(essentialData);
-				app.handleAllTeamDataUpdate(teams.map((team) => ({
-					id: team.id,
-					notebookLink: team.notebookLink,
-					notebookDevelopmentStatus: team.notebookDevelopmentStatus,
-					absent: team.absent
-				})));
+				app.handleAllTeamDataUpdate(
+					teams.map((team) => ({
+						id: team.id,
+						notebookLink: team.notebookLink,
+						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+						absent: team.absent
+					}))
+				);
 				app.handleAllJudgesUpdate(judges);
 
 				await app.createJudgesRoom();
@@ -251,7 +216,7 @@
 	});
 </script>
 
-<div class="h-full overflow-auto p-2 md:p-6 bg-slate-100">
+<div class="h-full overflow-auto bg-slate-100 p-2 md:p-6">
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Step Indicator -->
 		<div class="mb-8 flex items-center justify-between">
@@ -283,28 +248,34 @@
 		<!-- Step Content -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			{#if currentStep === 1}
-				<CompetitionSetupStepV2
+				<EventCodeSetup
+					{isEditingEventSetup}
+					bind:robotEventsSku
+					bind:robotEventsEventId
+					bind:divisionId
 					bind:eventName
 					bind:selectedProgram
 					bind:selectedEventGradeLevel
 					bind:teams
-					onResetAwards={resetAwards}
+					bind:awardOptions
 					onNext={nextStep}
 					onCancel={cancelSetup}
-					isJudgesRoomJoined={app.isJudgesRoomJoined()}
 				/>
 			{:else if currentStep === 2}
-				<AwardSelectionStep
-					{selectedProgram}
-					{selectedEventGradeLevel}
-					bind:allAwardOptions={awardOptions}
+				<CompetitionSetupStep
+					{robotEventsEventId}
+					bind:eventName
+					bind:selectedProgram
+					bind:selectedEventGradeLevel
+					bind:teams
+					bind:awardOptions
 					onNext={nextStep}
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 3}
-				<TeamGroupsStep {isEditingEventSetup} bind:teams onNext={nextStep} onPrev={prevStep} />
+				<TeamGroupsStep bind:teams onNext={nextStep} onPrev={prevStep} />
 			{:else if currentStep === 4}
-				<JudgeSetupStepV2
+				<JudgeSetupStep
 					{isEditingEventSetup}
 					{teams}
 					bind:judgingMethod
@@ -315,7 +286,15 @@
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 5}
-				<ReviewStepV2
+				<AwardSelectionStep
+					{selectedProgram}
+					{selectedEventGradeLevel}
+					bind:allAwardOptions={awardOptions}
+					onNext={nextStep}
+					onPrev={prevStep}
+				/>
+			{:else if currentStep === 6}
+				<ReviewStep
 					{selectedProgram}
 					{selectedEventGradeLevel}
 					{teams}

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import JudgeCard from './JudgeCard.svelte';
 	import TeamPlate from './TeamPlate.svelte';
-	import { dialogs } from '$lib/app-page.svelte';
-	import { dndzone } from 'svelte-dnd-action';
+	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { type EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData, EditingTeamList } from '$lib/team.svelte';
 	import type { Judge } from '@judging.jerryio/protocol/src/judging';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
+	import { tick } from 'svelte';
 
 	interface Props {
 		judgeGroup: EditingJudgeGroup;
@@ -36,15 +36,14 @@
 		judges,
 		onAddJudges,
 		onRemoveJudge,
-		transformDraggedElement,
-		onTeamConsider,
-		onTeamDrop,
-		onMaybeSelect
+		transformDraggedElement
 	}: Props = $props();
 
 	let isEditingName = $state(false);
 	let editingName = $state(judgeGroup.name);
 	let newJudgesText = $state('');
+
+	const zoneId = $derived(`judge-zone-${judgeGroup.id}`);
 
 	function startEditingName() {
 		isEditingName = true;
@@ -77,17 +76,7 @@
 	}
 
 	async function confirmDeleteGroup() {
-		const confirmed = await dialogs.showConfirmation({
-			title: 'Delete Judge Group',
-			message: `Are you sure you want to delete "${judgeGroup.name}"? All assigned teams will be moved back to the available teams list and all judges will be removed.`,
-			confirmText: 'Delete Group',
-			cancelText: 'Cancel',
-			confirmButtonClass: 'danger'
-		});
-
-		if (confirmed) {
-			onDeleteGroup(judgeGroup.id);
-		}
+		onDeleteGroup(judgeGroup.id);
 	}
 
 	function addJudges() {
@@ -115,6 +104,70 @@
 		};
 	}
 
+	function handleTeamConsider(e: DropEvent) {
+		const {
+			items: newItems,
+			info: { trigger, source, id }
+		} = e.detail;
+
+		if (source !== SOURCES.KEYBOARD) {
+			if (selectedItems.length && trigger === TRIGGERS.DRAG_STARTED) {
+				if (selectedItems.includes(id)) {
+					selectedItems.removeById(id);
+					tick().then(() => {
+						judgeGroup.assignedTeams = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
+					});
+				} else {
+					selectedItems = new EditingTeamList();
+				}
+			}
+		}
+
+		if (trigger === TRIGGERS.DRAG_STOPPED) selectedItems = new EditingTeamList();
+		judgeGroup.assignedTeams = newItems;
+	}
+
+	function handleTeamDrop(e: DropEvent) {
+		let {
+			items: newItems,
+			info: { trigger, source, id }
+		} = e.detail;
+
+		if (selectedItems.length) {
+			if (trigger === TRIGGERS.DROPPED_INTO_ANOTHER) {
+				judgeGroup.assignedTeams = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
+			} else if (trigger === TRIGGERS.DROPPED_INTO_ZONE || trigger === TRIGGERS.DROPPED_OUTSIDE_OF_ANY) {
+				tick().then(() => {
+					const idx = newItems.findIndex((item: TeamInfoAndData) => item.id === id);
+					const sidx = Math.max(selectedItems.findIndex(id), 0);
+					newItems = newItems.filter((item: TeamInfoAndData) => !selectedItems.includes(item.id));
+					newItems.splice(idx - sidx, 0, ...selectedItems);
+					judgeGroup.assignedTeams = newItems;
+					activeZoneId = zoneId;
+					if (source !== SOURCES.KEYBOARD) selectedItems = new EditingTeamList();
+				});
+			}
+		} else {
+			judgeGroup.assignedTeams = newItems;
+		}
+	}
+
+	function handleMaybeSelect(teamId: string, e: MouseEvent | KeyboardEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (activeZoneId !== zoneId) {
+			selectedItems = new EditingTeamList();
+			activeZoneId = zoneId;
+		}
+
+		if (selectedItems.includes(teamId)) {
+			selectedItems.removeById(teamId);
+		} else {
+			selectedItems.push(judgeGroup.assignedTeams.find((item) => item.id === teamId)!);
+		}
+	}
+
 	const flipDurationMs = 200;
 </script>
 
@@ -129,12 +182,12 @@
 					onblur={saveGroupName}
 					onkeydown={handleKeydown}
 					maxlength="100"
-					class="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
+					class="h-8 flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:ring-blue-500"
 				/>
 			{:else}
 				<button
 					onclick={startEditingName}
-					class="flex flex-1 items-center gap-1 rounded px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100"
+					class="flex h-8 flex-1 items-center gap-1 rounded px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100"
 					title="Click to rename group"
 				>
 					<span class="truncate">{judgeGroup.name}</span>
@@ -180,7 +233,7 @@
 
 			<div class="relative">
 				<div
-					class="grid min-h-[96px] grid-cols-1 gap-2 rounded border-2 border-dashed border-gray-200 bg-gray-50 p-2"
+					class="grid max-h-[360px] min-h-[96px] grid-cols-1 gap-2 overflow-y-auto rounded border-2 border-dashed border-gray-200 bg-gray-50 p-2"
 					class:border-blue-300={activeZoneId === judgeGroup.id}
 					class:bg-blue-50={activeZoneId === judgeGroup.id}
 					use:dndzone={{
@@ -189,15 +242,15 @@
 						transformDraggedElement,
 						dropTargetStyle: { outline: '1px solid #EEE' }
 					}}
-					onconsider={onTeamConsider}
-					onfinalize={onTeamDrop}
+					onconsider={handleTeamConsider}
+					onfinalize={handleTeamDrop}
 				>
 					{#each judgeGroup.assignedTeams as team (team.id)}
 						<div
 							animate:flip={{ duration: flipDurationMs }}
 							class="draggable-team-card relative"
 							class:selected={selectedItems.includes(team.id)}
-							oncontextmenu={(e) => onMaybeSelect(team.id, e)}
+							oncontextmenu={(e) => handleMaybeSelect(team.id, e)}
 							role="button"
 							tabindex="0"
 						>
@@ -207,8 +260,10 @@
 				</div>
 
 				{#if judgeGroup.assignedTeams.length === 0}
-					<div class="flex h-full items-center justify-center text-gray-400">
-						<p class="text-sm">Drop teams here</p>
+					<div class="absolute inset-0 select-none">
+						<div class="flex h-full items-center justify-center text-gray-400">
+							<p class="text-sm">Drop teams here</p>
+						</div>
 					</div>
 				{/if}
 			</div>

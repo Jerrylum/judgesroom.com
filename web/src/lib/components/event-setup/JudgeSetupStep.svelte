@@ -7,6 +7,7 @@
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
+	import { dialogs } from '$lib/app-page.svelte';
 
 	interface Props {
 		isEditingEventSetup: boolean;
@@ -153,7 +154,19 @@
 		judgeGroups.push(new EditingJudgeGroup(`Group ${judgeGroups.length + 1}`));
 	}
 
-	function deleteJudgeGroup(groupId: string) {
+	async function deleteJudgeGroup(groupId: string) {
+		if (isEditingEventSetup) {
+			const confirmed = await dialogs.showConfirmation({
+				title: 'Delete Judge Group',
+				message: `Are you sure you want to delete this judge group? If this judge group has been used for judging, all related rubrics and award rankings will be lost forever. This action cannot be undone.`,
+				confirmText: 'Delete Group',
+				cancelText: 'Cancel',
+				confirmButtonClass: 'danger'
+			});
+
+			if (!confirmed) return;
+		}
+
 		const index = judgeGroups.findIndex((group) => group.id === groupId);
 		if (index > -1) {
 			const group = judgeGroups[index];
@@ -204,7 +217,7 @@
 	<!-- Judging Method Selection -->
 	<div class="space-y-4">
 		<div class="space-y-3">
-			<label class="flex cursor-pointer items-start space-x-3">
+			<label class="flex cursor-pointer items-stretch space-x-3">
 				<input
 					type="radio"
 					name="judgingMethod"
@@ -219,7 +232,7 @@
 				</div>
 			</label>
 
-			<label class="flex cursor-pointer items-start space-x-3">
+			<label class="flex cursor-pointer items-stretch space-x-3">
 				<input
 					type="radio"
 					name="judgingMethod"
@@ -262,7 +275,7 @@
 					judges={getJudgesInGroup(judges, judgeGroup.id)}
 					onAddJudges={(judgeNames) => addJudgesToGroup(judgeGroup.id, judgeNames)}
 					onRemoveJudge={removeJudgeFromGroup}
-					transformDraggedElement={transformDraggedElement}
+					{transformDraggedElement}
 					onTeamConsider={handleTeamConsider}
 					onTeamDrop={handleTeamDrop}
 					onMaybeSelect={handleMaybeSelect}
@@ -339,7 +352,7 @@
 			class:opacity-50={!canProceed()}
 			class:cursor-not-allowed={!canProceed()}
 		>
-			Review & Confirm
+			Awards Setup
 		</button>
 	</div>
 </div>

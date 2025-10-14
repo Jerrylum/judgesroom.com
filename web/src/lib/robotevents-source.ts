@@ -56,7 +56,7 @@ export interface RobotEventsImportedData {
 	program: Program;
 	eventGradeLevel: EventGradeLevel;
 	teamInfos: TeamInfoAndData[];
-	awardsOptions: AwardOptions[];
+	awardOptions: AwardOptions[];
 	divisionInfos: DivisionInfo[];
 }
 
@@ -388,9 +388,24 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 
 	const resultAwards = await evt.awards();
 	if (resultAwards.error) throw new Error('Failed to get awards from RobotEvents');
-	const awards = resultAwards.data ?? [];
 
-	const awardsOptions = getOfficialAwardOptionsList(program, possibleGrades).filter((a) => awards.some((b) => b.title?.includes(a.name)));
+	const awards = resultAwards.data ?? [];
+	// XXX: RobotEvents API returns the title of the "Teamwork 2nd Place  Award (VIQRC)" award with 2 spaces after the "2nd"
+	const awardTitles = awards
+		.map((a) => a.title)
+		.filter((t) => t !== undefined)
+		.map((t) => t.replace(/\s+/g, ' '));
+
+	const awardsOptions = getOfficialAwardOptionsList(program, possibleGrades).map((a) => {
+		if (a.name === 'Excellence Award') {
+			a.isSelected = eventGradeLevel !== 'Blended';
+		} else if (a.name.startsWith('Excellence Award')) {
+			a.isSelected = eventGradeLevel === 'Blended';
+		} else {
+			a.isSelected = awardTitles.some((b) => b.includes(a.name));
+		}
+		return a;
+	});
 
 	const throwDivisionError = (division: Division) => {
 		throw new Error(`Unable to get division info from RobotEvents for division ${division.id} because it is missing required fields`);
@@ -411,7 +426,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 		program,
 		eventGradeLevel,
 		teamInfos,
-		awardsOptions,
+		awardOptions: awardsOptions,
 		divisionInfos
 	} satisfies RobotEventsImportedData;
 }

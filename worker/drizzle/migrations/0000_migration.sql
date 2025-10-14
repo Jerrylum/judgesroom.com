@@ -97,6 +97,7 @@ CREATE TABLE `Judges` (
 CREATE TABLE `Metadata` (
 	`robotEventsSku` text,
 	`robotEventsEventId` integer,
+	`divisionId` integer,
 	`eventName` text NOT NULL,
 	`program` text NOT NULL,
 	`eventGradeLevel` text NOT NULL,

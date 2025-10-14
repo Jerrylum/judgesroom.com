@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d7cc7726-af11-4682-951e-9d2e5f1cf12f",
+  "id": "b3111672-39c5-40a8-a810-216b98b8895f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -724,6 +724,13 @@
         },
         "robotEventsEventId": {
           "name": "robotEventsEventId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "divisionId": {
+          "name": "divisionId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

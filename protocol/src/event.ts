@@ -14,6 +14,8 @@ export const RobotEventsSkuSchema = z
 	});
 export const RobotEventsEventIdSchema = z.number();
 
+export const DivisionIdSchema = z.number();
+
 export const EventGradeLevelSchema = z.enum(['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only']);
 export type EventGradeLevel = z.infer<typeof EventGradeLevelSchema>;
 
@@ -26,7 +28,7 @@ export const EventNameSchema = z
 export const EssentialDataSchema = z.object({
 	robotEventsSku: RobotEventsSkuSchema.nullable(),
 	robotEventsEventId: RobotEventsEventIdSchema.nullable(),
-	divisionId: z.number().nullable(),
+	divisionId: DivisionIdSchema.nullable(),
 	eventName: EventNameSchema,
 	program: ProgramSchema,
 	eventGradeLevel: EventGradeLevelSchema,

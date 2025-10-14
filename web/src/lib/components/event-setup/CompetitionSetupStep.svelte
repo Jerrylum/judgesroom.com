@@ -2,25 +2,30 @@
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import { type Program, ProgramSchema } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import { parseTournamentManagerCSV, type TeamInfoAndData } from '$lib/team.svelte';
+	import type { AwardOptions } from '$lib/award.svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	interface Props {
+		robotEventsEventId: number | null;
 		eventName: string;
 		selectedProgram: Program;
 		selectedEventGradeLevel: EventGradeLevel;
-		onResetAwards: () => void;
+		teams: TeamInfoAndData[];
+		awardOptions: AwardOptions[];
 		onNext: () => void;
-		onCancel: () => void;
-		isJudgesRoomJoined: boolean;
+		onPrev: () => void;
 	}
 
 	let {
+		robotEventsEventId,
 		eventName = $bindable(),
 		selectedProgram = $bindable(),
 		selectedEventGradeLevel = $bindable(),
-		onResetAwards,
+		teams = $bindable(),
+		awardOptions = $bindable(),
 		onNext,
-		onCancel,
-		isJudgesRoomJoined
+		onPrev
 	}: Props = $props();
 
 	const originalSelectedEventGradeLevel = selectedEventGradeLevel;
@@ -34,12 +39,116 @@
 	const hasLeadingTrailingWhitespace = $derived(eventName.length > 0 && eventName !== eventName.trim());
 	const isEventNameTooLong = $derived(eventName.length > 100);
 
-	const canProceed = $derived(isEventNameValid && !hasLeadingTrailingWhitespace && !isEventNameTooLong);
+	const canProceed = $derived(
+		isEventNameValid && !hasLeadingTrailingWhitespace && !isEventNameTooLong && (robotEventsEventId !== null || teams.length > 0) // For unofficial events, teams must be imported
+	);
+
+	const isEditable = robotEventsEventId === null;
+
+	// Manual CSV import state (for unofficial events)
+	let csvContent = $state('');
+	let isDragOver = $state(false);
+	let uploadError = $state('');
+	let uploadSuccess = $state('');
+
+	// File input reference
+	let fileInput: HTMLInputElement | undefined = $state();
+
+	// Manual CSV import functions (for unofficial events)
+	function handleFileSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file) {
+			readFile(file);
+		}
+	}
+
+	function handleFileDrop(event: DragEvent) {
+		event.preventDefault();
+		isDragOver = false;
+
+		const files = event.dataTransfer?.files;
+		if (files && files.length > 0) {
+			readFile(files[0]);
+		}
+	}
+
+	function readFile(file: File) {
+		if (!file.name.endsWith('.csv')) {
+			uploadSuccess = '';
+			uploadError = 'Please upload a CSV file from RobotEvents or Tournament Manager';
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			csvContent = e.target?.result as string;
+			uploadError = '';
+			// Automatically process the CSV data
+			processManualTeamData();
+		};
+		reader.onerror = () => {
+			uploadError = 'Error reading file';
+		};
+		reader.readAsText(file);
+	}
+
+	async function processManualTeamData() {
+		if (!csvContent.trim()) {
+			uploadSuccess = '';
+			uploadError = 'Please upload a CSV file first';
+			return;
+		}
+
+		try {
+			const csvTeams = parseTournamentManagerCSV(csvContent);
+
+			// Convert to TeamInfoAndData format
+			const newTeams = csvTeams.map((team) => {
+				const id = uuidv4();
+				const teamNumber = team.number!;
+
+				return {
+					id,
+					number: teamNumber,
+					name: team.name || '',
+					city: team.city || '',
+					state: team.state || '',
+					country: team.country || '',
+					shortName: team.shortName || '',
+					school: team.school || '',
+					grade: team.grade || 'College',
+					group: team.group || '',
+					notebookLink: '',
+					notebookDevelopmentStatus: 'undetermined' as const,
+					absent: false
+				} satisfies TeamInfoAndData;
+			});
+
+			teams = newTeams;
+			uploadSuccess = `Successfully imported ${newTeams.length} teams`;
+			uploadError = '';
+		} catch (error) {
+			console.error('Error processing data', error);
+			uploadError = `Error processing data: ${error}`;
+			uploadSuccess = '';
+		}
+	}
+
+	function handleDragOver(event: DragEvent) {
+		event.preventDefault();
+		isDragOver = true;
+	}
+
+	function handleDragLeave(event: DragEvent) {
+		event.preventDefault();
+		isDragOver = false;
+	}
 
 	function handleNext() {
 		if (canProceed) {
 			if (originalSelectedEventGradeLevel !== selectedEventGradeLevel || originalSelectedProgram !== selectedProgram) {
-				onResetAwards();
+				awardOptions = []; // reset awards, the award options will be re-generated based on the new program and grade level
 			}
 			onNext();
 		}
@@ -54,54 +163,123 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Competition Information</h2>
+	<h2 class="text-xl font-semibold text-gray-900">Competition Setup</h2>
 
-	<div>
-		<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700">Event Name </label>
-		<input
-			type="text"
-			id="event-name"
-			bind:value={eventName}
-			maxlength="100"
-			class="classic block w-full"
-			class:border-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
-			class:focus:ring-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
-			placeholder="Enter event name"
-		/>
-		{#if !isEventNameValid}
-			<p class="mt-1 text-sm text-red-600">Event name is required</p>
-		{:else if hasLeadingTrailingWhitespace}
-			<p class="mt-1 text-sm text-red-600">Event name must not have leading or trailing whitespace</p>
-		{:else if isEventNameTooLong}
-			<p class="mt-1 text-sm text-red-600">Event name must be 100 characters or less</p>
-		{/if}
+	<!-- Event Information -->
+	<div class="space-y-4">
+		<h3 class="text-lg font-medium text-gray-800">Event Information</h3>
+
+		<div>
+			<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700">Event Name</label>
+			<input
+				type="text"
+				id="event-name"
+				bind:value={eventName}
+				maxlength="100"
+				class="classic block w-full"
+				class:border-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
+				class:focus:ring-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
+				placeholder="Enter event name"
+				disabled={!isEditable}
+			/>
+			{#if !isEventNameValid}
+				<p class="mt-1 text-sm text-red-600">Event name is required</p>
+			{:else if hasLeadingTrailingWhitespace}
+				<p class="mt-1 text-sm text-red-600">Event name must not have leading or trailing whitespace</p>
+			{:else if isEventNameTooLong}
+				<p class="mt-1 text-sm text-red-600">Event name must be 100 characters or less</p>
+			{/if}
+		</div>
+
+		<div>
+			<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Program</label>
+			<select id="competition-type" bind:value={selectedProgram} class="classic block w-full" disabled={!isEditable}>
+				{#each ProgramSchema.options as type (type)}
+					<option value={type}>{type}</option>
+				{/each}
+			</select>
+		</div>
+
+		<div>
+			<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700">Grade Level</label>
+			<select id="grade-level" bind:value={selectedEventGradeLevel} class="classic block w-full" disabled={!isEditable}>
+				{#each gradeOptions as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</div>
 	</div>
 
-	<div>
-		<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Program </label>
-		<select id="competition-type" bind:value={selectedProgram} class="classic block w-full">
-			{#each ProgramSchema.options as type (type)}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
-	</div>
+	<!-- Manual Import Section (for unofficial events) -->
+	{#if isEditable}
+		<div class="space-y-4">
+			<h3 class="text-lg font-medium text-gray-800">Team Import</h3>
+			<div class="space-y-2">
+				<p class="text-sm text-gray-600">Import teams using CSV files from RobotEvents or Tournament Manager.</p>
+				<p class="text-sm text-gray-600">
+					Download CSV from RobotEvents: Event Admin → "Downloads & Links" → "Download Tournament Manager Import Data"
+				</p>
+				<p class="text-sm text-gray-600">
+					Download CSV from Tournament Manager: File → Export → "Team List for Event"
+				</p>
+			</div>
 
-	<div>
-		<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700">Grade Level </label>
-		<select id="grade-level" bind:value={selectedEventGradeLevel} class="classic block w-full">
-			{#each gradeOptions as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</div>
+			<div
+				class="flex h-32 flex-col justify-center rounded-lg border-2 border-dashed p-4 text-center transition-colors"
+				class:border-blue-400={isDragOver}
+				class:bg-blue-50={isDragOver}
+				class:border-gray-300={!isDragOver}
+				ondragover={handleDragOver}
+				ondragleave={handleDragLeave}
+				ondrop={handleFileDrop}
+				role="none"
+				tabindex="-1"
+			>
+				<div>
+					<svg class="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+						<path
+							d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<button onclick={() => fileInput?.click()} class="cursor-pointer font-medium text-blue-600 hover:text-blue-500">
+						Upload CSV
+					</button>
+					<p class="text-xs text-gray-500">or drag and drop</p>
+				</div>
+			</div>
+
+			<input bind:this={fileInput} type="file" accept=".csv" onchange={handleFileSelect} class="hidden" />
+
+			{#if uploadError}
+				<div class="rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+					{uploadError}
+				</div>
+			{/if}
+
+			{#if uploadSuccess}
+				<div class="rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
+					{uploadSuccess}
+				</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Team Summary -->
+	{#if teams.length > 0}
+		<div class="rounded-lg bg-slate-50 p-4">
+			<h4 class="mb-2 font-medium text-slate-900">Team Summary</h4>
+			<div class="space-y-1 text-sm text-slate-800">
+				<p>Total Teams: {teams.length}</p>
+			</div>
+		</div>
+	{/if}
 
 	<div class="flex justify-between pt-4">
 		<div class="flex space-x-3">
-			{#if isJudgesRoomJoined}
-				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-					Cancel
-				</button>
-			{/if}
+			<button onclick={onPrev} class="secondary">Back</button>
 		</div>
 		<button
 			onclick={handleNext}
@@ -110,7 +288,7 @@
 			class:cursor-not-allowed={!canProceed}
 			disabled={!canProceed}
 		>
-			Next: Award Selection
+			Next: Team Groups
 		</button>
 	</div>
 </div>

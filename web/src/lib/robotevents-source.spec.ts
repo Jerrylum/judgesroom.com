@@ -23,6 +23,8 @@ describe('RobotEventsSource', () => {
 
 	it('should get the correct event data with 1 division', async () => {
 		// const events = await client.events.search({ 'sku[]': ['RE-VRC-23-1488'] });
+		// RE-V5RC-25-0139
+		// RE-VIQRC-25-0140
 
 		// https://www.robotevents.com/robot-competitions/vex-robotics-competition/RE-VRC-23-1488.html#results-
 		// const resultEvt = await client.events.getBySKU('RE-VRC-23-1488');
@@ -108,7 +110,7 @@ describe('RobotEventsSource', () => {
 			program: result.program,
 			eventGradeLevel: result.eventGradeLevel,
 			teamInfos: result.teamInfos.map((team) => ({ number: team.number })),
-			awardsOptions: result.awardsOptions.map((award) => ({ name: award.name })),
+			awardsOptions: result.awardOptions.map((award) => ({ name: award.name })),
 			divisionInfos: result.divisionInfos
 		}).toMatchSnapshot();
 	});
@@ -116,7 +118,7 @@ describe('RobotEventsSource', () => {
 	it('should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility', async () => {
 		const imported = await importFromRobotEvents(client, 'RE-VIQRC-24-8288');
 
-		const middleSchoolAwards = imported.awardsOptions.filter((award) => award.name === 'Excellence Award - Middle School');
+		const middleSchoolAwards = imported.awardOptions.filter((award) => award.name === 'Excellence Award - Middle School');
 
 		const result = await getEventDivisionExcellenceAwardTeamEligibility(
 			client,
