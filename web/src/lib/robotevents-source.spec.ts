@@ -110,7 +110,7 @@ describe('RobotEventsSource', () => {
 			program: result.program,
 			eventGradeLevel: result.eventGradeLevel,
 			teamInfos: result.teamInfos.map((team) => ({ number: team.number })),
-			awardsOptions: result.awardOptions.map((award) => ({ name: award.name })),
+			awardsOptions: result.awardOptions.filter((award) => award.isSelected).map((award) => ({ name: award.name })),
 			divisionInfos: result.divisionInfos
 		}).toMatchSnapshot();
 	});
