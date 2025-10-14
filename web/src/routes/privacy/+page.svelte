@@ -117,8 +117,8 @@
 							<h3 class="mb-3 text-xl font-semibold">Room Security</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
 								Judges' rooms are protected by a unique room ID. Anyone who has access to the room ID can access all data and judging
-								materials in the judges' room. To protect your privacy and maintain judging material confidentiality, judges and judge
-								advisors should not share the invitation link beyond judges.
+								materials in the judges' room. To protect your privacy and maintain the confidentiality of judging material, judges and
+								judge advisors should not share the invitation link beyond judges.
 							</p>
 						</div>
 
@@ -143,7 +143,7 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Compliance</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							In accordance with the Robotics Education & Competition Foundation "Guide to Judging" confidentiality principles, <strong
+							In accordance with the Robotics Education & Competition Foundation's "Guide to Judging" confidentiality principles, <strong
 								>all judging materials are strictly confidential</strong
 							>. We treat all data stored in the judges' room as highly sensitive information that must be protected at all times.
 						</p>
