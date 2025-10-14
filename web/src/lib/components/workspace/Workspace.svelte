@@ -110,6 +110,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Workspace | Judges' Room</title>
+</svelte:head>
+
 <div class="flex h-screen flex-col bg-slate-100">
 	<!-- Header -->
 	<Header />
