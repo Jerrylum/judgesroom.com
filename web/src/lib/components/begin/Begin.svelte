@@ -65,21 +65,14 @@
 				</p>
 			</div>
 
-			<div class="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+			<div class="rounded-2xl bg-white p-4 shadow-sm sm:p-6 max-w-lg">
 				<h3 class="text-2xl font-medium text-gray-900">Join Judges' Room</h3>
-				<p class="mb-2 mt-4 leading-relaxed text-gray-700">Join an existing Judges' Room using a link from your judge advisor.</p>
+				<p class="mb-2 mt-4 leading-relaxed text-gray-700 text-sm">You could join by clicking the invite link directly or pasting the link below and clicking "Join".</p>
 				<div class="mb-6 space-y-4">
 					<input type="text" bind:value={judgesRoomUrl} placeholder="Paste the invite link here..." class="classic w-full" />
 					<button onclick={handleJoinJudgesRoom} class="primary w-full">Join</button>
 				</div>
-				<div class="rounded-lg bg-gray-50 p-4 text-sm">
-					<p class="mb-2 font-semibold text-gray-800">How to get a Judges' Room link:</p>
-					<ol class="list-inside list-decimal space-y-1 text-gray-600">
-						<li>Ask your judge advisor for the invite link</li>
-						<li>They can share it via QR code or copy/paste</li>
-						<li>Paste the link above and click "Join"</li>
-					</ol>
-				</div>
+				<p class="text-gray-700"></p>
 				<div class="mt-4 flex justify-center">
 					<button
 						class="cursor-pointer text-center text-sm text-gray-500 hover:text-gray-800 active:text-gray-900"
