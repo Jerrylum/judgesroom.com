@@ -15,7 +15,7 @@
 	$effect(() => {
 		if (link) {
 			(async () => {
-				qrCodeDataUrl = await QRCode.toDataURL(link, { width: 200, margin: 2 });
+				qrCodeDataUrl = await QRCode.toDataURL(link, { width: 20, margin: 0 });
 			})();
 		}
 	});
@@ -34,8 +34,18 @@
 			</button>
 		</div>
 
-		<div class="flex justify-center">
-			<img src={qrCodeDataUrl} alt="QR Code for Judges' Room link" class="h-48 w-48 rounded" />
+		<div class="mb-2 flex justify-center">
+			<img src={qrCodeDataUrl} alt="QR Code for Judges' Room link" class="w-full" />
+		</div>
+		<div>
+			<a
+				href={link}
+				target="_blank"
+				class="block overflow-hidden text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+				title={link}
+			>
+				{link}
+			</a>
 		</div>
 	</div>
 </Dialog>

@@ -72,7 +72,9 @@
 			</a>
 			<QRCodeButton link={team.notebookLink} />
 		{:else}
-			<span class="block text-xs text-gray-400">No notebook link</span>
+			<div class="flex h-6 items-center">
+				<span class="block text-xs text-gray-400">No notebook link</span>
+			</div>
 		{/if}
 	</div>
 
