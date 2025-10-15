@@ -193,13 +193,13 @@
 
 			<!-- Status Messages -->
 			{#if importError}
-				<div class="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+				<div class="mt-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-sm text-red-700">
 					{importError}
 				</div>
 			{/if}
 
 			{#if importSuccess}
-				<div class="mb-4 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
+				<div class="mt-4 rounded border border-green-400 bg-green-100 px-4 py-3 text-sm text-green-700">
 					{importSuccess}
 				</div>
 			{/if}
