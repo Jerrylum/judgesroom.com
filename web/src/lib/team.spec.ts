@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-	createTeamInfo,
-	createTeamData,
 	EditingTeamList,
 	parseTournamentManagerCSV,
 	parseNotebookData,
@@ -12,25 +10,24 @@ import {
 } from './team.svelte';
 import { v4 as uuidv4 } from 'uuid';
 import { type TeamInfo, type TeamData, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
-import { type Grade } from '@judging.jerryio/protocol/src/award';
 
 describe('TeamInfo Class', () => {
 	let teamInfo: TeamInfo;
 	const mockId = uuidv4();
 
 	beforeEach(() => {
-		teamInfo = createTeamInfo(
-			mockId,
-			'123A',
-			'Test Team',
-			'Test City',
-			'Test State',
-			'Test Country',
-			'TT',
-			'Test School',
-			'High School',
-			'123'
-		);
+		teamInfo = {
+			id: mockId,
+			number: '123A',
+			name: 'Test Team',
+			city: 'Test City',
+			state: 'Test State',
+			country: 'Test Country',
+			shortName: 'TT',
+			school: 'Test School',
+			grade: 'High School',
+			group: '123'
+		}
 	});
 
 	it('should create a TeamInfo instance with correct properties', () => {
@@ -72,7 +69,12 @@ describe('TeamData Class', () => {
 	let teamData: TeamData;
 
 	beforeEach(() => {
-		teamData = createTeamData(uuidv4(), 'https://example.com/notebook', 'undetermined', false);
+		teamData = {
+			id: uuidv4(),
+			notebookLink: 'https://example.com/notebook',
+			notebookDevelopmentStatus: 'undetermined',
+			absent: false
+		};
 	});
 
 	it('should create a TeamData instance with correct properties', () => {
@@ -731,4 +733,10 @@ describe('groupTeamsByGroup', () => {
 		expect(result['TEAM99'].map((t) => t.number)).toEqual(['TEAM99A', 'TEAM99B']);
 		expect(result['ABC123'][0].number).toBe('ABC123X');
 	});
+
+	// it('temp', () => {
+	// 	parseXlsx('./test/DigitalEngineeringNotebooks-Test.xlsx').then((data) => {
+	// 		console.log(data);
+	// 	});
+	// });
 });

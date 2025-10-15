@@ -13,47 +13,6 @@ import {
 
 export type TeamInfoAndData = TeamInfo & TeamData;
 
-// Factory functions
-export function createTeamInfo(
-	id: string,
-	number: string,
-	name: string,
-	city: string,
-	state: string,
-	country: string,
-	shortName: string,
-	school: string,
-	grade: Grade,
-	group: string
-): TeamInfo {
-	return {
-		id,
-		number,
-		name,
-		city,
-		state,
-		country,
-		shortName,
-		school,
-		grade,
-		group
-	};
-}
-
-export function createTeamData(
-	id: string,
-	notebookLink: string,
-	notebookDevelopmentStatus: NotebookDevelopmentStatus,
-	absent: boolean
-): TeamData {
-	return {
-		id,
-		notebookLink,
-		notebookDevelopmentStatus,
-		absent
-	};
-}
-
 export class EditingTeamList extends List<TeamInfoAndData, 'id'> {
 	constructor(initialItems: TeamInfoAndData[] = []) {
 		super('id', initialItems);
@@ -76,8 +35,7 @@ interface TMCSVRow {
 	Location: string;
 }
 
-// Update the return type to use the legacy format for compatibility
-export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfo & TeamData>[] {
+export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfoAndData>[] {
 	const parseResult = Papa.parse<TMCSVRow>(csvContent, {
 		header: true,
 		skipEmptyLines: true,
