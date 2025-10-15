@@ -60,23 +60,23 @@
 	</div>
 
 	<!-- Notebook Link -->
-	<div class="mb-2 flex flex-row items-center justify-between gap-1">
-		{#if team.notebookLink}
+	{#if team.notebookLink}
+		<div class="relative mb-2 flex flex-row items-center justify-end gap-1">
 			<a
 				href={team.notebookLink}
 				target="_blank"
-				class="block overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+				class="absolute left-0 w-[calc(100%-30px)] overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
 				title={team.notebookLink}
 			>
 				{team.notebookLink.replace(/^https?:\/\//, '')}
 			</a>
 			<QRCodeButton link={team.notebookLink} />
-		{:else}
-			<div class="flex h-6 items-center">
-				<span class="block text-xs text-gray-400">No notebook link</span>
-			</div>
-		{/if}
-	</div>
+		</div>
+	{:else}
+		<div class="mb-2 flex h-6 items-center">
+			<span class="block text-xs text-gray-400">No notebook link</span>
+		</div>
+	{/if}
 
 	<div class="flex flex-col gap-2">
 		<label class="flex items-center gap-2">
