@@ -1,15 +1,10 @@
 import Papa from 'papaparse';
-import { v4 as uuidv4 } from 'uuid';
+import * as XLSX from 'xlsx';
 import { List } from './list.svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judging.jerryio/protocol/src/award';
-import {
-	type TeamInfo,
-	type TeamData,
-	TeamNumberSchema,
-	TeamGroupNameSchema,
-	type NotebookDevelopmentStatus
-} from '@judging.jerryio/protocol/src/team';
+import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
+import z from 'zod';
 
 export type TeamInfoAndData = TeamInfo & TeamData;
 
@@ -116,51 +111,28 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfoA
 	return teams;
 }
 
-// Type for notebook TSV row (flexible to handle different column names)
-interface NotebookTSVRow {
-	[key: string]: string;
-}
+export const NotebookLinksExcelRowSchema = z.object({
+	team: z.string(),
+	// program: z.string(),
+	// grade_level: z.string(),
+	// update_time: z.string(),
+	notebook_link: z.string()
+});
 
-export function parseNotebookData(tsvContent: string): Record<string, string> {
-	const parseResult = Papa.parse<NotebookTSVRow>(tsvContent, {
-		delimiter: '\t',
-		header: true,
-		skipEmptyLines: true,
-		transformHeader: (header: string) => header.trim()
-	});
+export type NotebookLinksExcelRow = z.infer<typeof NotebookLinksExcelRowSchema>;
 
-	if (parseResult.errors.length > 0) {
-		console.error('TSV parsing errors:', parseResult.errors);
-		throw new Error(`Notebook data parsing failed: ${parseResult.errors.map((e) => e.message).join(', ')}`);
+export function readNotebookLinksExcel(excelContent: Uint8Array): NotebookLinksExcelRow[] {
+	const workbook = XLSX.read(excelContent, { type: 'array' });
+	const sheet = workbook.Sheets[workbook.SheetNames[0]];
+	const data = XLSX.utils.sheet_to_json(sheet);
+
+	const rows: NotebookLinksExcelRow[] = [];
+	for (const row of data) {
+		const result = NotebookLinksExcelRowSchema.safeParse(row);
+		if (!result.success) continue;
+		rows.push(result.data);
 	}
-
-	const notebookLinks: Record<string, string> = {};
-	const validationErrors: string[] = [];
-
-	parseResult.data.forEach((row, index) => {
-		const rowNumber = index + 2; // +2 because Papa Parse starts from 0 and there's a header row
-		const teamNumber = row.team || row.Team || '';
-		const link = row.notebook_link || row['Notebook Link'] || '';
-
-		if (teamNumber && link && link !== 'none') {
-			// Validate team number format
-			try {
-				TeamNumberSchema.parse(teamNumber);
-				notebookLinks[teamNumber] = link;
-			} catch {
-				validationErrors.push(
-					`Row ${rowNumber}: Invalid team number "${teamNumber}" in notebook data - must only contain uppercase letters (A-Z) and digits (0-9), max 10 characters`
-				);
-			}
-		}
-	});
-
-	// Just warn about validation errors for notebook data since it's optional
-	if (validationErrors.length > 0) {
-		console.warn(`Notebook data validation warnings:\n${validationErrors.join('\n')}`);
-	}
-
-	return notebookLinks;
+	return rows;
 }
 
 export function extractGroupFromTeamNumber(teamNumber: string): string {

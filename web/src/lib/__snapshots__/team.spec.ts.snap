@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`readNotebookLinksExcel > should read valid Excel data 1`] = `
+[
+  {
+    "notebook_link": "Link 1",
+    "team": "4815A",
+  },
+  {
+    "notebook_link": "Link 2",
+    "team": "4815R",
+  },
+]
+`;

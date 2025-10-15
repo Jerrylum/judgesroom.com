@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import * as fs from 'fs';
 import {
 	EditingTeamList,
 	parseTournamentManagerCSV,
-	parseNotebookData,
 	extractGroupFromTeamNumber,
 	mapGradeToGradeLevel,
 	groupTeamsByGroup,
-	type TeamInfoAndData
+	type TeamInfoAndData,
+	readNotebookLinksExcel
 } from './team.svelte';
 import { v4 as uuidv4 } from 'uuid';
 import { type TeamInfo, type TeamData, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
@@ -294,79 +295,14 @@ TEAM99A,Team 99A,Team City,Team State,Team Country,T99A,Team School,Team Sponsor
 	});
 });
 
-describe('parseNotebookData', () => {
-	it('should parse valid TSV data with "team" and "notebook_link" columns', () => {
-		const tsvData = `team\tnotebook_link
-123A\thttps://example.com/notebook-a
-456B\thttps://example.com/notebook-b`;
+describe('readNotebookLinksExcel', () => {
+	it('should read valid Excel data', () => {
+		
+		const data = fs.readFileSync('./test/DigitalEngineeringNotebooks-Test.xlsx');
 
-		const result = parseNotebookData(tsvData);
+		const result = readNotebookLinksExcel(new Uint8Array(data));
 
-		expect(result).toEqual({
-			'123A': 'https://example.com/notebook-a',
-			'456B': 'https://example.com/notebook-b'
-		});
-	});
-
-	it('should parse valid TSV data with "Team" and "Notebook Link" columns', () => {
-		const tsvData = `Team\tNotebook Link
-123A\thttps://example.com/notebook-a
-456B\thttps://example.com/notebook-b`;
-
-		const result = parseNotebookData(tsvData);
-
-		expect(result).toEqual({
-			'123A': 'https://example.com/notebook-a',
-			'456B': 'https://example.com/notebook-b'
-		});
-	});
-
-	it('should skip rows with "none" as notebook link', () => {
-		const tsvData = `team\tnotebook_link
-123A\thttps://example.com/notebook-a
-456B\tnone
-789C\thttps://example.com/notebook-c`;
-
-		const result = parseNotebookData(tsvData);
-
-		expect(result).toEqual({
-			'123A': 'https://example.com/notebook-a',
-			'789C': 'https://example.com/notebook-c'
-		});
-	});
-
-	it('should skip rows with empty team numbers or links', () => {
-		const tsvData = `team\tnotebook_link
-123A\thttps://example.com/notebook-a
-\thttps://example.com/notebook-b
-456B\t`;
-
-		const result = parseNotebookData(tsvData);
-
-		expect(result).toEqual({
-			'123A': 'https://example.com/notebook-a'
-		});
-	});
-
-	it('should handle invalid team numbers gracefully', () => {
-		const tsvData = `team\tnotebook_link
-123a\thttps://example.com/notebook-a
-456B\thttps://example.com/notebook-b`;
-
-		// Should not throw but should warn about invalid team numbers
-		const result = parseNotebookData(tsvData);
-
-		expect(result).toEqual({
-			'456B': 'https://example.com/notebook-b'
-		});
-	});
-
-	it('should handle malformed TSV gracefully', () => {
-		const tsvData = 'invalid tsv data';
-
-		// The function should not throw for malformed TSV, but should return empty object
-		const result = parseNotebookData(tsvData);
-		expect(result).toEqual({});
+		expect(result).matchSnapshot();
 	});
 });
 

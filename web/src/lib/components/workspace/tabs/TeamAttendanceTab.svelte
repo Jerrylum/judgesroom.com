@@ -160,11 +160,7 @@
 				</div>
 				{#if hasRobotEventsId}
 					<div class="flex gap-2">
-						<button
-							onclick={fetchRobotEventsAttendance}
-							disabled={isFetching}
-							class="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-						>
+						<button onclick={fetchRobotEventsAttendance} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 							{#if isFetching}
 								<RefreshIcon class="h-4 w-4 animate-spin" />
 								Fetching...
