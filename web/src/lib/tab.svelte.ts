@@ -24,6 +24,7 @@ interface BaseTab<C extends Component<ComponentProps<C>>> {
 	props: Omit<ComponentProps<C>, 'isActive'>;
 	get title(): string;
 	get hash(): string;
+	isEqual(other: BaseTab<C>): boolean;
 }
 
 export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
@@ -39,6 +40,10 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 
 	get hash() {
 		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
 	}
 
 	constructor() {
@@ -61,6 +66,10 @@ export class TeamAttendanceTab implements BaseTab<typeof TeamAttendanceTabCompon
 		return JSON.stringify({ type: this.type });
 	}
 
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -79,6 +88,10 @@ export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComp
 
 	get hash() {
 		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
 	}
 
 	constructor() {
@@ -102,6 +115,19 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 
 	get hash() {
 		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		if (other.component === this.component) {
+			const otherRubricId = (other as NotebookRubricTab).rubricId;
+			const thisRubricId = this.rubricId;
+			if (otherRubricId !== null || thisRubricId !== null) {
+				return otherRubricId === thisRubricId;
+			} else {
+				return (other as NotebookRubricTab).teamId === this.teamId;
+			}
+		}
+		return false;
 	}
 
 	constructor(params: { teamId: string } | { rubricId: string }) {
@@ -135,6 +161,19 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 		return JSON.stringify({ type: this.type, rubricId: this.rubricId });
 	}
 
+	isEqual(other: BaseTab<any>): boolean {
+		if (other.component === this.component) {
+			const otherRubricId = (other as NotebookRubricTab).rubricId;
+			const thisRubricId = this.rubricId;
+			if (otherRubricId !== null || thisRubricId !== null) {
+				return otherRubricId === thisRubricId;
+			} else {
+				return (other as NotebookRubricTab).teamId === this.teamId;
+			}
+		}
+		return false;
+	}
+
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 
@@ -163,6 +202,10 @@ export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent>
 		return JSON.stringify({ type: this.type });
 	}
 
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -181,6 +224,10 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 
 	get hash() {
 		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
 	}
 
 	constructor() {
@@ -203,6 +250,10 @@ export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabCompo
 		return JSON.stringify({ type: this.type });
 	}
 
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -221,6 +272,10 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 
 	get hash() {
 		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
 	}
 
 	constructor() {
@@ -329,7 +384,7 @@ export class TabController {
 	 * Find tab by component and optional properties
 	 */
 	findTab(targetTab: Tab): Tab | null {
-		return this.tabs.find((tab) => tab.hash === targetTab.hash) || null;
+		return this.tabs.find((tab) => tab.isEqual(targetTab)) || null;
 	}
 
 	/**
