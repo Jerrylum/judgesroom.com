@@ -965,355 +965,11 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 7
 `;
 
 exports[`RobotEventsSource > should get the correct event data with 1 division 8`] = `
-[
-  {
-    "autoSkills": {
-      "no": 3,
-      "result": "eligible",
-      "score": 13,
-    },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 2,
-      "result": "eligible",
-      "score": 113,
-    },
-    "qualRanking": {
-      "no": 1,
-      "result": "eligible",
-      "score": 1,
-    },
-    "teamNumber": "6626A",
-  },
-  {
-    "autoSkills": {
-      "no": 6,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 5,
-      "result": "eligible",
-      "score": 100,
-    },
-    "qualRanking": {
-      "no": 2,
-      "result": "eligible",
-      "score": 2,
-    },
-    "teamNumber": "4815A",
-  },
-  {
-    "autoSkills": {
-      "no": 1,
-      "result": "eligible",
-      "score": 100,
-    },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 1,
-      "result": "eligible",
-      "score": 200,
-    },
-    "qualRanking": {
-      "no": 3,
-      "result": "eligible",
-      "score": 3,
-    },
-    "teamNumber": "4815B",
-  },
-  {
-    "autoSkills": {
-      "no": 8,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 8,
-      "result": "ineligible",
-      "score": 88,
-    },
-    "qualRanking": {
-      "no": 4,
-      "result": "eligible",
-      "score": 4,
-    },
-    "teamNumber": "10863A",
-  },
-  {
-    "autoSkills": {
-      "no": 4,
-      "result": "eligible",
-      "score": 5,
-    },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 3,
-      "result": "eligible",
-      "score": 105,
-    },
-    "qualRanking": {
-      "no": 5,
-      "result": "eligible",
-      "score": 5,
-    },
-    "teamNumber": "2706E",
-  },
-  {
-    "autoSkills": {
-      "no": 7,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 7,
-      "result": "eligible",
-      "score": 88,
-    },
-    "qualRanking": {
-      "no": 6,
-      "result": "eligible",
-      "score": 6,
-    },
-    "teamNumber": "13205A",
-  },
-  {
-    "autoSkills": {
-      "no": 5,
-      "result": "eligible",
-      "score": 1,
-    },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 6,
-      "result": "eligible",
-      "score": 89,
-    },
-    "qualRanking": {
-      "no": 7,
-      "result": "eligible",
-      "score": 7,
-    },
-    "teamNumber": "13205B",
-  },
-  {
-    "autoSkills": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 52,
-    },
-    "qualRanking": {
-      "no": 8,
-      "result": "eligible",
-      "score": 8,
-    },
-    "teamNumber": "10863B",
-  },
-  {
-    "autoSkills": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 5,
-    },
-    "qualRanking": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 9,
-    },
-    "teamNumber": "20230D",
-  },
-  {
-    "autoSkills": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 76,
-    },
-    "qualRanking": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 10,
-    },
-    "teamNumber": "2706F",
-  },
-  {
-    "autoSkills": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 5,
-    },
-    "qualRanking": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 11,
-    },
-    "teamNumber": "4206A",
-  },
-  {
-    "autoSkills": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "qualRanking": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 12,
-    },
-    "teamNumber": "20230A",
-  },
-  {
-    "autoSkills": {
-      "no": 2,
-      "result": "eligible",
-      "score": 40,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 4,
-      "result": "eligible",
-      "score": 104,
-    },
-    "qualRanking": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 13,
-    },
-    "teamNumber": "70909S",
-  },
-  {
-    "autoSkills": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 64,
-    },
-    "qualRanking": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 14,
-    },
-    "teamNumber": "13520B",
-  },
-  {
-    "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 15,
-    },
-    "teamNumber": "20230C",
-  },
-  {
-    "autoSkills": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 16,
-    },
-    "teamNumber": "20230B",
-  },
-  {
-    "autoSkills": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "qualRanking": {
-      "no": 17,
-      "result": "ineligible",
-      "score": 17,
-    },
-    "teamNumber": "70909C",
-  },
-  {
-    "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 18,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "teamNumber": "13520A",
-  },
-]
-`;
-
-exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility 1`] = `
 {
-  "Excellence Award - Middle School": [
+  "joinedTeamsInEventCount": 20,
+  "rankingEligibilityThreshold": 7,
+  "skillsEligibilityThreshold": 8,
+  "teamsInGroup": [
     {
       "autoSkills": {
         "no": 3,
@@ -1380,7 +1036,7 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "isEligible": false,
       "overallSkills": {
         "no": 8,
-        "result": "ineligible",
+        "result": "eligible",
         "score": 88,
       },
       "qualRanking": {
@@ -1461,7 +1117,7 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       },
       "qualRanking": {
         "no": 8,
-        "result": "eligible",
+        "result": "ineligible",
         "score": 8,
       },
       "teamNumber": "10863B",
@@ -1657,6 +1313,360 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "teamNumber": "13520A",
     },
   ],
+}
+`;
+
+exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility 1`] = `
+{
+  "Excellence Award - Middle School": {
+    "joinedTeamsInEventCount": 20,
+    "rankingEligibilityThreshold": 7,
+    "skillsEligibilityThreshold": 8,
+    "teamsInGroup": [
+      {
+        "autoSkills": {
+          "no": 3,
+          "result": "eligible",
+          "score": 13,
+        },
+        "isEligible": true,
+        "overallSkills": {
+          "no": 2,
+          "result": "eligible",
+          "score": 113,
+        },
+        "qualRanking": {
+          "no": 1,
+          "result": "eligible",
+          "score": 1,
+        },
+        "teamNumber": "6626A",
+      },
+      {
+        "autoSkills": {
+          "no": 6,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 5,
+          "result": "eligible",
+          "score": 100,
+        },
+        "qualRanking": {
+          "no": 2,
+          "result": "eligible",
+          "score": 2,
+        },
+        "teamNumber": "4815A",
+      },
+      {
+        "autoSkills": {
+          "no": 1,
+          "result": "eligible",
+          "score": 100,
+        },
+        "isEligible": true,
+        "overallSkills": {
+          "no": 1,
+          "result": "eligible",
+          "score": 200,
+        },
+        "qualRanking": {
+          "no": 3,
+          "result": "eligible",
+          "score": 3,
+        },
+        "teamNumber": "4815B",
+      },
+      {
+        "autoSkills": {
+          "no": 8,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 8,
+          "result": "eligible",
+          "score": 88,
+        },
+        "qualRanking": {
+          "no": 4,
+          "result": "eligible",
+          "score": 4,
+        },
+        "teamNumber": "10863A",
+      },
+      {
+        "autoSkills": {
+          "no": 4,
+          "result": "eligible",
+          "score": 5,
+        },
+        "isEligible": true,
+        "overallSkills": {
+          "no": 3,
+          "result": "eligible",
+          "score": 105,
+        },
+        "qualRanking": {
+          "no": 5,
+          "result": "eligible",
+          "score": 5,
+        },
+        "teamNumber": "2706E",
+      },
+      {
+        "autoSkills": {
+          "no": 7,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 7,
+          "result": "eligible",
+          "score": 88,
+        },
+        "qualRanking": {
+          "no": 6,
+          "result": "eligible",
+          "score": 6,
+        },
+        "teamNumber": "13205A",
+      },
+      {
+        "autoSkills": {
+          "no": 5,
+          "result": "eligible",
+          "score": 1,
+        },
+        "isEligible": true,
+        "overallSkills": {
+          "no": 6,
+          "result": "eligible",
+          "score": 89,
+        },
+        "qualRanking": {
+          "no": 7,
+          "result": "eligible",
+          "score": 7,
+        },
+        "teamNumber": "13205B",
+      },
+      {
+        "autoSkills": {
+          "no": 11,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 11,
+          "result": "ineligible",
+          "score": 52,
+        },
+        "qualRanking": {
+          "no": 8,
+          "result": "ineligible",
+          "score": 8,
+        },
+        "teamNumber": "10863B",
+      },
+      {
+        "autoSkills": {
+          "no": 15,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 15,
+          "result": "ineligible",
+          "score": 5,
+        },
+        "qualRanking": {
+          "no": 9,
+          "result": "ineligible",
+          "score": 9,
+        },
+        "teamNumber": "20230D",
+      },
+      {
+        "autoSkills": {
+          "no": 9,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 9,
+          "result": "ineligible",
+          "score": 76,
+        },
+        "qualRanking": {
+          "no": 10,
+          "result": "ineligible",
+          "score": 10,
+        },
+        "teamNumber": "2706F",
+      },
+      {
+        "autoSkills": {
+          "no": 14,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 14,
+          "result": "ineligible",
+          "score": 5,
+        },
+        "qualRanking": {
+          "no": 11,
+          "result": "ineligible",
+          "score": 11,
+        },
+        "teamNumber": "4206A",
+      },
+      {
+        "autoSkills": {
+          "no": 12,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 12,
+          "result": "ineligible",
+          "score": 18,
+        },
+        "qualRanking": {
+          "no": 12,
+          "result": "ineligible",
+          "score": 12,
+        },
+        "teamNumber": "20230A",
+      },
+      {
+        "autoSkills": {
+          "no": 2,
+          "result": "eligible",
+          "score": 40,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 4,
+          "result": "eligible",
+          "score": 104,
+        },
+        "qualRanking": {
+          "no": 13,
+          "result": "ineligible",
+          "score": 13,
+        },
+        "teamNumber": "70909S",
+      },
+      {
+        "autoSkills": {
+          "no": 10,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 10,
+          "result": "ineligible",
+          "score": 64,
+        },
+        "qualRanking": {
+          "no": 14,
+          "result": "ineligible",
+          "score": 14,
+        },
+        "teamNumber": "13520B",
+      },
+      {
+        "autoSkills": {
+          "no": 0,
+          "result": "no data",
+          "score": -1,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 0,
+          "result": "no data",
+          "score": 0,
+        },
+        "qualRanking": {
+          "no": 15,
+          "result": "ineligible",
+          "score": 15,
+        },
+        "teamNumber": "20230C",
+      },
+      {
+        "autoSkills": {
+          "no": 16,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 16,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "qualRanking": {
+          "no": 16,
+          "result": "ineligible",
+          "score": 16,
+        },
+        "teamNumber": "20230B",
+      },
+      {
+        "autoSkills": {
+          "no": 13,
+          "result": "ineligible",
+          "score": 0,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 13,
+          "result": "ineligible",
+          "score": 18,
+        },
+        "qualRanking": {
+          "no": 17,
+          "result": "ineligible",
+          "score": 17,
+        },
+        "teamNumber": "70909C",
+      },
+      {
+        "autoSkills": {
+          "no": 0,
+          "result": "no data",
+          "score": -1,
+        },
+        "isEligible": false,
+        "overallSkills": {
+          "no": 0,
+          "result": "no data",
+          "score": 0,
+        },
+        "qualRanking": {
+          "no": 18,
+          "result": "ineligible",
+          "score": 18,
+        },
+        "teamNumber": "13520A",
+      },
+    ],
+  },
 }
 `;
 
@@ -2285,348 +2295,353 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
 `;
 
 exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionRankings 7`] = `
-[
-  {
-    "autoSkills": {
-      "no": 3,
-      "result": "eligible",
-      "score": 13,
+{
+  "joinedTeamsInEventCount": 20,
+  "rankingEligibilityThreshold": 7,
+  "skillsEligibilityThreshold": 8,
+  "teamsInGroup": [
+    {
+      "autoSkills": {
+        "no": 3,
+        "result": "eligible",
+        "score": 13,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 2,
+        "result": "eligible",
+        "score": 113,
+      },
+      "qualRanking": {
+        "no": 1,
+        "result": "eligible",
+        "score": 1,
+      },
+      "teamNumber": "6626A",
     },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 2,
-      "result": "eligible",
-      "score": 113,
+    {
+      "autoSkills": {
+        "no": 6,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 5,
+        "result": "eligible",
+        "score": 100,
+      },
+      "qualRanking": {
+        "no": 2,
+        "result": "eligible",
+        "score": 2,
+      },
+      "teamNumber": "4815A",
     },
-    "qualRanking": {
-      "no": 1,
-      "result": "eligible",
-      "score": 1,
+    {
+      "autoSkills": {
+        "no": 1,
+        "result": "eligible",
+        "score": 100,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 1,
+        "result": "eligible",
+        "score": 200,
+      },
+      "qualRanking": {
+        "no": 3,
+        "result": "eligible",
+        "score": 3,
+      },
+      "teamNumber": "4815B",
     },
-    "teamNumber": "6626A",
-  },
-  {
-    "autoSkills": {
-      "no": 6,
-      "result": "ineligible",
-      "score": 0,
+    {
+      "autoSkills": {
+        "no": 8,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 8,
+        "result": "eligible",
+        "score": 88,
+      },
+      "qualRanking": {
+        "no": 4,
+        "result": "eligible",
+        "score": 4,
+      },
+      "teamNumber": "10863A",
     },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 5,
-      "result": "eligible",
-      "score": 100,
+    {
+      "autoSkills": {
+        "no": 4,
+        "result": "eligible",
+        "score": 5,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 3,
+        "result": "eligible",
+        "score": 105,
+      },
+      "qualRanking": {
+        "no": 5,
+        "result": "eligible",
+        "score": 5,
+      },
+      "teamNumber": "2706E",
     },
-    "qualRanking": {
-      "no": 2,
-      "result": "eligible",
-      "score": 2,
+    {
+      "autoSkills": {
+        "no": 7,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 7,
+        "result": "eligible",
+        "score": 88,
+      },
+      "qualRanking": {
+        "no": 6,
+        "result": "eligible",
+        "score": 6,
+      },
+      "teamNumber": "13205A",
     },
-    "teamNumber": "4815A",
-  },
-  {
-    "autoSkills": {
-      "no": 1,
-      "result": "eligible",
-      "score": 100,
+    {
+      "autoSkills": {
+        "no": 5,
+        "result": "eligible",
+        "score": 1,
+      },
+      "isEligible": true,
+      "overallSkills": {
+        "no": 6,
+        "result": "eligible",
+        "score": 89,
+      },
+      "qualRanking": {
+        "no": 7,
+        "result": "eligible",
+        "score": 7,
+      },
+      "teamNumber": "13205B",
     },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 1,
-      "result": "eligible",
-      "score": 200,
+    {
+      "autoSkills": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 52,
+      },
+      "qualRanking": {
+        "no": 8,
+        "result": "ineligible",
+        "score": 8,
+      },
+      "teamNumber": "10863B",
     },
-    "qualRanking": {
-      "no": 3,
-      "result": "eligible",
-      "score": 3,
+    {
+      "autoSkills": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 5,
+      },
+      "qualRanking": {
+        "no": 9,
+        "result": "ineligible",
+        "score": 9,
+      },
+      "teamNumber": "20230D",
     },
-    "teamNumber": "4815B",
-  },
-  {
-    "autoSkills": {
-      "no": 8,
-      "result": "ineligible",
-      "score": 0,
+    {
+      "autoSkills": {
+        "no": 9,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 9,
+        "result": "ineligible",
+        "score": 76,
+      },
+      "qualRanking": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 10,
+      },
+      "teamNumber": "2706F",
     },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 8,
-      "result": "ineligible",
-      "score": 88,
+    {
+      "autoSkills": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 5,
+      },
+      "qualRanking": {
+        "no": 11,
+        "result": "ineligible",
+        "score": 11,
+      },
+      "teamNumber": "4206A",
     },
-    "qualRanking": {
-      "no": 4,
-      "result": "eligible",
-      "score": 4,
+    {
+      "autoSkills": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "qualRanking": {
+        "no": 12,
+        "result": "ineligible",
+        "score": 12,
+      },
+      "teamNumber": "20230A",
     },
-    "teamNumber": "10863A",
-  },
-  {
-    "autoSkills": {
-      "no": 4,
-      "result": "eligible",
-      "score": 5,
+    {
+      "autoSkills": {
+        "no": 2,
+        "result": "eligible",
+        "score": 40,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 4,
+        "result": "eligible",
+        "score": 104,
+      },
+      "qualRanking": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 13,
+      },
+      "teamNumber": "70909S",
     },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 3,
-      "result": "eligible",
-      "score": 105,
+    {
+      "autoSkills": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 10,
+        "result": "ineligible",
+        "score": 64,
+      },
+      "qualRanking": {
+        "no": 14,
+        "result": "ineligible",
+        "score": 14,
+      },
+      "teamNumber": "13520B",
     },
-    "qualRanking": {
-      "no": 5,
-      "result": "eligible",
-      "score": 5,
+    {
+      "autoSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": -1,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 15,
+        "result": "ineligible",
+        "score": 15,
+      },
+      "teamNumber": "20230C",
     },
-    "teamNumber": "2706E",
-  },
-  {
-    "autoSkills": {
-      "no": 7,
-      "result": "ineligible",
-      "score": 0,
+    {
+      "autoSkills": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 16,
+        "result": "ineligible",
+        "score": 16,
+      },
+      "teamNumber": "20230B",
     },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 7,
-      "result": "eligible",
-      "score": 88,
+    {
+      "autoSkills": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 0,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 13,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "qualRanking": {
+        "no": 17,
+        "result": "ineligible",
+        "score": 17,
+      },
+      "teamNumber": "70909C",
     },
-    "qualRanking": {
-      "no": 6,
-      "result": "eligible",
-      "score": 6,
+    {
+      "autoSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": -1,
+      },
+      "isEligible": false,
+      "overallSkills": {
+        "no": 0,
+        "result": "no data",
+        "score": 0,
+      },
+      "qualRanking": {
+        "no": 18,
+        "result": "ineligible",
+        "score": 18,
+      },
+      "teamNumber": "13520A",
     },
-    "teamNumber": "13205A",
-  },
-  {
-    "autoSkills": {
-      "no": 5,
-      "result": "eligible",
-      "score": 1,
-    },
-    "isEligible": true,
-    "overallSkills": {
-      "no": 6,
-      "result": "eligible",
-      "score": 89,
-    },
-    "qualRanking": {
-      "no": 7,
-      "result": "eligible",
-      "score": 7,
-    },
-    "teamNumber": "13205B",
-  },
-  {
-    "autoSkills": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 52,
-    },
-    "qualRanking": {
-      "no": 8,
-      "result": "eligible",
-      "score": 8,
-    },
-    "teamNumber": "10863B",
-  },
-  {
-    "autoSkills": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 5,
-    },
-    "qualRanking": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 9,
-    },
-    "teamNumber": "20230D",
-  },
-  {
-    "autoSkills": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 9,
-      "result": "ineligible",
-      "score": 76,
-    },
-    "qualRanking": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 10,
-    },
-    "teamNumber": "2706F",
-  },
-  {
-    "autoSkills": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 5,
-    },
-    "qualRanking": {
-      "no": 11,
-      "result": "ineligible",
-      "score": 11,
-    },
-    "teamNumber": "4206A",
-  },
-  {
-    "autoSkills": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "qualRanking": {
-      "no": 12,
-      "result": "ineligible",
-      "score": 12,
-    },
-    "teamNumber": "20230A",
-  },
-  {
-    "autoSkills": {
-      "no": 2,
-      "result": "eligible",
-      "score": 40,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 4,
-      "result": "eligible",
-      "score": 104,
-    },
-    "qualRanking": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 13,
-    },
-    "teamNumber": "70909S",
-  },
-  {
-    "autoSkills": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 10,
-      "result": "ineligible",
-      "score": 64,
-    },
-    "qualRanking": {
-      "no": 14,
-      "result": "ineligible",
-      "score": 14,
-    },
-    "teamNumber": "13520B",
-  },
-  {
-    "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 15,
-      "result": "ineligible",
-      "score": 15,
-    },
-    "teamNumber": "20230C",
-  },
-  {
-    "autoSkills": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 16,
-      "result": "ineligible",
-      "score": 16,
-    },
-    "teamNumber": "20230B",
-  },
-  {
-    "autoSkills": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 0,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 13,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "qualRanking": {
-      "no": 17,
-      "result": "ineligible",
-      "score": 17,
-    },
-    "teamNumber": "70909C",
-  },
-  {
-    "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 18,
-      "result": "ineligible",
-      "score": 18,
-    },
-    "teamNumber": "13520A",
-  },
-]
+  ],
+}
 `;

@@ -44,6 +44,13 @@ export interface ExcellenceAwardTeamEligibility {
 	autoSkills: ExcellenceAwardTeamEligibilityCriterion;
 }
 
+export interface ExcellenceAwardCandidatesReport {
+	rankingEligibilityThreshold: number;
+	skillsEligibilityThreshold: number;
+	teamsInGroup: ExcellenceAwardTeamEligibility[];
+	joinedTeamsInEventCount: number;
+}
+
 export interface DivisionInfo {
 	id: number;
 	name: string;
@@ -86,7 +93,7 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
 	const result = await client.api.PaginatedGET('/events/{id}/teams', {
 		params: {
 			path: {
-				id: evtId,
+				id: evtId
 			}
 		}
 	});
@@ -218,8 +225,8 @@ export function filterTeamsByGrade(teams: Readonly<Readonly<TeamData>[]>, grade:
 	return teams.filter((team) => team.grade === grade);
 }
 
-export function filterTeamsByGrades(teams: Readonly<Readonly<TeamInfo>[]>, grades: Grade[]): TeamInfo[] {
-	return teams.filter((team) => grades.includes(team.grade));
+export function filterTeamsByGrades<T extends TeamInfo | TeamData>(teams: Readonly<Readonly<T>[]>, grades: Grade[]): T[] {
+	return teams.filter((team) => grades.includes(team.grade ?? ('not provided' as Grade)));
 }
 
 export function filterRankingsByDivision(rankings: Readonly<Readonly<TeamQualRanking>[]>, divisionId: number): TeamQualRanking[] {
@@ -231,18 +238,30 @@ export function filterRankingsOrRecordsBySubset<T extends TeamQualRanking | Team
 	return targets.filter((target) => subsetIds.has(target.teamNumber));
 }
 
-export function getExcellenceAwardTeamEligibility(
+/**
+ * Get the Excellence Award candidates report for a group (division or event)
+ *
+ * The ranking eligibility threshold is calculated based on the number of joined teams in the specified group (division or event).
+ * The skills eligibility threshold is calculated based on the number of joined teams in the event.
+ *
+ * @param rankings The rankings of all teams in the group (division or event)
+ * @param overallSkills The overall skills of all teams in a division or in an event
+ * @param joinedTeamsInEventCount The number of joined teams in the event
+ * @returns The Excellence Award candidates report
+ */
+export function getExcellenceAwardCandidatesReport(
 	rankings: TeamQualRanking[],
-	overallSkills: TeamSkillsRecord[]
-): ExcellenceAwardTeamEligibility[] {
+	overallSkills: TeamSkillsRecord[],
+	joinedTeamsInEventCount: number
+): ExcellenceAwardCandidatesReport {
 	const THRESHOLD = 0.4;
 
-	const rankingsThresholdNo = Math.round(rankings.length * THRESHOLD) + 1;
-	const overallSkillsThresholdNo = Math.round(overallSkills.length * THRESHOLD) + 1;
+	const rankingEligibilityThresholdNo = Math.round(rankings.length * THRESHOLD);
+	const skillsEligibilityThresholdNo = Math.round(joinedTeamsInEventCount * THRESHOLD);
 
 	const autoSkills = [...overallSkills].sort((a, b) => b.programmingScore - a.programmingScore);
 
-	const rtn = [] as ExcellenceAwardTeamEligibility[];
+	const rtnTeams = [] as ExcellenceAwardTeamEligibility[];
 	for (let qualRankingIndex = 0; qualRankingIndex < rankings.length; qualRankingIndex++) {
 		const qualRanking = rankings[qualRankingIndex];
 		const teamNumber = qualRanking.teamNumber;
@@ -252,14 +271,14 @@ export function getExcellenceAwardTeamEligibility(
 
 		const qualRankingNo = qualRankingIndex + 1;
 		const qualRankingEligibility: ExcellenceAwardTeamEligibilityCriterion = {
-			result: qualRankingNo <= rankingsThresholdNo ? 'eligible' : 'ineligible',
+			result: qualRankingNo <= rankingEligibilityThresholdNo ? 'eligible' : 'ineligible',
 			no: qualRankingNo,
 			score: qualRankingNo
 		};
 
 		const overallSkillsNo = overallSkillsIndex + 1;
 		const overallSkillsEligibility: ExcellenceAwardTeamEligibilityCriterion = {
-			result: overallSkillsIndex === -1 ? 'no data' : overallSkillsNo <= overallSkillsThresholdNo ? 'eligible' : 'ineligible',
+			result: overallSkillsIndex === -1 ? 'no data' : overallSkillsNo <= skillsEligibilityThresholdNo ? 'eligible' : 'ineligible',
 			no: overallSkillsNo,
 			score: overallSkillsIndex === -1 ? 0 : overallSkills[overallSkillsIndex].overallScore
 		};
@@ -268,12 +287,16 @@ export function getExcellenceAwardTeamEligibility(
 		const autoSkillsScore = autoSkillsIndex === -1 ? -1 : autoSkills[autoSkillsIndex].programmingScore;
 		const autoSkillsEligibility: ExcellenceAwardTeamEligibilityCriterion = {
 			result:
-				autoSkillsIndex === -1 ? 'no data' : autoSkillsNo <= overallSkillsThresholdNo && autoSkillsScore > 0 ? 'eligible' : 'ineligible',
+				autoSkillsIndex === -1
+					? 'no data'
+					: autoSkillsNo <= skillsEligibilityThresholdNo && autoSkillsScore > 0
+						? 'eligible'
+						: 'ineligible',
 			no: autoSkillsNo,
 			score: autoSkillsScore
 		};
 
-		rtn.push({
+		rtnTeams.push({
 			teamNumber,
 			isEligible:
 				qualRankingEligibility.result === 'eligible' &&
@@ -284,11 +307,16 @@ export function getExcellenceAwardTeamEligibility(
 			autoSkills: autoSkillsEligibility
 		});
 	}
-	return rtn;
+	return {
+		rankingEligibilityThreshold: rankingEligibilityThresholdNo,
+		skillsEligibilityThreshold: skillsEligibilityThresholdNo,
+		teamsInGroup: rtnTeams,
+		joinedTeamsInEventCount: joinedTeamsInEventCount
+	};
 }
 
 /**
- * Get the Excellence Award team eligibility for a division
+ * Get the Excellence Award team eligibility for a group (division or event)
  *
  * The team info list is the list of all teams in the judging system.
  * If there are only one division, the team info list should be the same list as the one in the RobotEvents.
@@ -301,29 +329,36 @@ export function getExcellenceAwardTeamEligibility(
  * @param client The RobotEvents client
  * @param evtId The event ID
  * @param divisionId The division ID
- * @param teamInfo The team info, must be the superset of the teams in the division,
+ * @param teamsInGroup The team info, must be the superset of the teams in the division/event,
  * @param excellenceAwards The Excellence Awards to get the team eligibility for
- * @returns The Excellence Award team eligibility
+ * @returns The Excellence Award candidates report
  */
-export async function getEventDivisionExcellenceAwardTeamEligibility(
+export async function getEventDivisionExcellenceAwardCandidatesReport(
 	client: RobotEventsClient,
 	evtId: number,
 	divisionId: number,
-	teamInfo: Readonly<Readonly<TeamInfo>[]>,
+	teamsInGroup: Readonly<Readonly<TeamInfo>[]>,
 	excellenceAwards: Award[]
-): Promise<Record<string, ExcellenceAwardTeamEligibility[]>> {
-	const allGradesRankings = await getEventDivisionRankings(client, evtId, divisionId);
-	const allGradesOverallSkills = await getEventSkills(client, evtId);
+): Promise<Record<string, ExcellenceAwardCandidatesReport>> {
+	const allGradesJoinedTeamsInEvent = await getEventJoinedTeams(client, evtId);
+	const allGradesRankingsInGroup = await getEventDivisionRankings(client, evtId, divisionId);
+	const allGradesOverallSkillsInEvent = await getEventSkills(client, evtId);
 
-	const rtn = {} as Record<string, ExcellenceAwardTeamEligibility[]>;
+	const rtn = {} as Record<string, ExcellenceAwardCandidatesReport>;
 	for (const award of excellenceAwards) {
-		const allTargetGradesTeams = filterTeamsByGrades(teamInfo, award.acceptedGrades);
+		const allTargetGradesTeamsInGroup = filterTeamsByGrades(teamsInGroup, award.acceptedGrades);
 
-		const allTargetGradesRankings = filterRankingsOrRecordsBySubset(allGradesRankings, allTargetGradesTeams);
+		const allTargetGradesRankingsInGroup = filterRankingsOrRecordsBySubset(allGradesRankingsInGroup, allTargetGradesTeamsInGroup);
 
-		const allTargetGradesOverallSkills = filterRankingsOrRecordsBySubset(allGradesOverallSkills, allTargetGradesTeams);
+		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(allGradesOverallSkillsInEvent, allTargetGradesTeamsInGroup);
 
-		rtn[award.name] = getExcellenceAwardTeamEligibility(allTargetGradesRankings, allTargetGradesOverallSkills);
+		const allTargetGradesJoinedTeamsInEvent = filterTeamsByGrades(allGradesJoinedTeamsInEvent, award.acceptedGrades);
+
+		rtn[award.name] = getExcellenceAwardCandidatesReport(
+			allTargetGradesRankingsInGroup,
+			allTargetGradesOverallSkillsInGroup,
+			allTargetGradesJoinedTeamsInEvent.length
+		);
 	}
 
 	return rtn;

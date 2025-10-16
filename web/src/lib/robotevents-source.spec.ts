@@ -6,12 +6,12 @@ import {
 	getEventSkills,
 	filterTeamsByGrade,
 	filterRankingsByDivision,
-	getExcellenceAwardTeamEligibility,
+	getExcellenceAwardCandidatesReport,
 	filterRankingsOrRecordsBySubset,
 	getRobotEventsClient,
 	getEventDivisionRankings,
 	importFromRobotEvents,
-	getEventDivisionExcellenceAwardTeamEligibility
+	getEventDivisionExcellenceAwardCandidatesReport
 } from './robotevents-source';
 
 describe('RobotEventsSource', () => {
@@ -52,16 +52,20 @@ describe('RobotEventsSource', () => {
 		expect(div1AllGradesRankings).toMatchSnapshot();
 
 		// Let's say all teams from middle school are target
-		const allMiddleSchoolTeams = filterTeamsByGrade(allDivsAllGradesJoinedTeams, 'Middle School');
-		expect(allMiddleSchoolTeams.length).toMatchSnapshot();
+		const allDivsMiddleSchoolTeams = filterTeamsByGrade(allDivsAllGradesJoinedTeams, 'Middle School');
+		expect(allDivsMiddleSchoolTeams.length).toMatchSnapshot();
 
-		const div1MiddleSchoolRankings = filterRankingsOrRecordsBySubset(div1AllGradesRankings, allMiddleSchoolTeams);
+		const div1MiddleSchoolRankings = filterRankingsOrRecordsBySubset(div1AllGradesRankings, allDivsMiddleSchoolTeams);
 		expect(div1MiddleSchoolRankings).toMatchSnapshot();
 
-		const allMiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesOverallSkills, allMiddleSchoolTeams);
-		expect(allMiddleSchoolOverallSkills).toMatchSnapshot();
+		const allDivsMiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesOverallSkills, allDivsMiddleSchoolTeams);
+		expect(allDivsMiddleSchoolOverallSkills).toMatchSnapshot();
 
-		const result = getExcellenceAwardTeamEligibility(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills);
+		const result = getExcellenceAwardCandidatesReport(
+			div1MiddleSchoolRankings,
+			allDivsMiddleSchoolOverallSkills,
+			allDivsMiddleSchoolTeams.length
+		);
 		expect(result).toMatchSnapshot();
 
 		// console.log(result);
@@ -96,7 +100,7 @@ describe('RobotEventsSource', () => {
 		const allMiddleSchoolOverallSkills = filterRankingsOrRecordsBySubset(allDivsAllGradesOverallSkills, allMiddleSchoolTeams);
 		expect(allMiddleSchoolOverallSkills).toMatchSnapshot();
 
-		const result = getExcellenceAwardTeamEligibility(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills);
+		const result = getExcellenceAwardCandidatesReport(div1MiddleSchoolRankings, allMiddleSchoolOverallSkills, allMiddleSchoolTeams.length);
 		expect(result).toMatchSnapshot();
 	});
 
@@ -120,7 +124,7 @@ describe('RobotEventsSource', () => {
 
 		const middleSchoolAwards = imported.awardOptions.filter((award) => award.name === 'Excellence Award - Middle School');
 
-		const result = await getEventDivisionExcellenceAwardTeamEligibility(
+		const result = await getEventDivisionExcellenceAwardCandidatesReport(
 			client,
 			imported.robotEventsEventId,
 			1,
