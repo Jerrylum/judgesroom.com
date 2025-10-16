@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
 import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
 import type { Award, Program } from '@judging.jerryio/protocol/src/award';
-import { Client, type Division, type Event, type Grade, type RobotEventsClient, type Team } from 'robotevents';
+import { Client, type Division, type Event, type Grade, type RobotEventsClient, type Team, type TeamData } from 'robotevents';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
 import { getEventGradeLevelOptions } from './event.svelte';
@@ -28,10 +28,10 @@ export interface TeamSkillsRecord {
 
 export interface ExcellenceAwardTeamEligibilityCriterion {
 	result: 'eligible' | 'ineligible' | 'no data';
-	// "no" stands for "number", calculated by index, starts from 1
-	// Here, the "no" is unique, so it can be used to determine the eligibility
-	// This is different from the "ranking" showing on RobotEvents
+	// Here, "no" is unique and starts from 1, so it can be used to determine the eligibility
+	// This is different from the "rank" in Tournament Manager
 	// In some scenarios, the ranking of two teams are the same if their skills overall scores are the same
+	// This is almost the same as the "rank" in RobotEvents API, except "no" can be 0 when there is no data
 	no: number;
 	score: number;
 }
@@ -82,10 +82,15 @@ export function getRobotEventsClient(): RobotEventsClient {
  * @param evtId
  * @returns The joined teams in the event
  */
-export async function getEventJoinedTeams(client: RobotEventsClient, evtId: number): Promise<Team[]> {
-	// Both are identical
-	// const result = await evt.teams({ registered: undefined });
-	const result = await client.teams.search({ 'event[]': [evtId], registered: undefined });
+export async function getEventJoinedTeams(client: RobotEventsClient, evtId: number): Promise<TeamData[]> {
+	const result = await client.api.PaginatedGET('/events/{id}/teams', {
+		params: {
+			path: {
+				id: evtId,
+			}
+		}
+	});
+	if (result.error) throw new Error('Failed to get event joined teams from RobotEvents');
 	return result.data ?? [];
 }
 
@@ -209,15 +214,15 @@ export async function getEventSkills(client: RobotEventsClient, evtId: number): 
 		.sort((a, b) => a.rank - b.rank);
 }
 
-export function filterTeamsByGrade(teams: Team[], grade: Grade): Team[] {
+export function filterTeamsByGrade(teams: Readonly<Readonly<TeamData>[]>, grade: Grade): TeamData[] {
 	return teams.filter((team) => team.grade === grade);
 }
 
-export function filterTeamsByGrades(teams: TeamInfo[], grades: Grade[]): TeamInfo[] {
+export function filterTeamsByGrades(teams: Readonly<Readonly<TeamInfo>[]>, grades: Grade[]): TeamInfo[] {
 	return teams.filter((team) => grades.includes(team.grade));
 }
 
-export function filterRankingsByDivision(rankings: TeamQualRanking[], divisionId: number): TeamQualRanking[] {
+export function filterRankingsByDivision(rankings: Readonly<Readonly<TeamQualRanking>[]>, divisionId: number): TeamQualRanking[] {
 	return rankings.filter((ranking) => ranking.divisionId === divisionId);
 }
 
@@ -304,7 +309,7 @@ export async function getEventDivisionExcellenceAwardTeamEligibility(
 	client: RobotEventsClient,
 	evtId: number,
 	divisionId: number,
-	teamInfo: TeamInfo[],
+	teamInfo: Readonly<Readonly<TeamInfo>[]>,
 	excellenceAwards: Award[]
 ): Promise<Record<string, ExcellenceAwardTeamEligibility[]>> {
 	const allGradesRankings = await getEventDivisionRankings(client, evtId, divisionId);
@@ -337,7 +342,7 @@ export function convertProgramIdToProgram(programId: number): Program {
 	}
 }
 
-export function getEventGradeLevel(teams: Team[]): EventGradeLevel {
+export function getEventGradeLevel(teams: TeamData[]): EventGradeLevel {
 	if (teams.every((team) => team.grade === 'Elementary School')) return 'ES Only';
 	if (teams.every((team) => team.grade === 'Middle School')) return 'MS Only';
 	if (teams.every((team) => team.grade === 'High School')) return 'HS Only';
@@ -363,7 +368,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 	const gradeOptions = getEventGradeLevelOptions(program);
 	const possibleGrades = gradeOptions.find((g) => g.value === eventGradeLevel)?.grades ?? [];
 
-	const throwTeamError = (team: Team) => {
+	const throwTeamError = (team: TeamData) => {
 		throw new Error(`Unable to get team info from RobotEvents for team ${team.number} because it is missing required fields`);
 	};
 

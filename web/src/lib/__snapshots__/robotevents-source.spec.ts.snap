@@ -734,7 +734,7 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 4
 ]
 `;
 
-exports[`RobotEventsSource > should get the correct event data with 1 division 5`] = `21`;
+exports[`RobotEventsSource > should get the correct event data with 1 division 5`] = `20`;
 
 exports[`RobotEventsSource > should get the correct event data with 1 division 6`] = `
 [
@@ -772,11 +772,6 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 6
     "divisionId": 1,
     "rank": 11,
     "teamNumber": "13205B",
-  },
-  {
-    "divisionId": 1,
-    "rank": 12,
-    "teamNumber": "21169E",
   },
   {
     "divisionId": 1,
@@ -1106,25 +1101,6 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
   },
   {
     "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 8,
-      "result": "eligible",
-      "score": 8,
-    },
-    "teamNumber": "21169E",
-  },
-  {
-    "autoSkills": {
       "no": 11,
       "result": "ineligible",
       "score": 0,
@@ -1136,9 +1112,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 52,
     },
     "qualRanking": {
-      "no": 9,
+      "no": 8,
       "result": "eligible",
-      "score": 9,
+      "score": 8,
     },
     "teamNumber": "10863B",
   },
@@ -1155,9 +1131,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 5,
     },
     "qualRanking": {
-      "no": 10,
+      "no": 9,
       "result": "ineligible",
-      "score": 10,
+      "score": 9,
     },
     "teamNumber": "20230D",
   },
@@ -1174,9 +1150,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 76,
     },
     "qualRanking": {
-      "no": 11,
+      "no": 10,
       "result": "ineligible",
-      "score": 11,
+      "score": 10,
     },
     "teamNumber": "2706F",
   },
@@ -1193,9 +1169,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 5,
     },
     "qualRanking": {
-      "no": 12,
+      "no": 11,
       "result": "ineligible",
-      "score": 12,
+      "score": 11,
     },
     "teamNumber": "4206A",
   },
@@ -1212,9 +1188,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 18,
     },
     "qualRanking": {
-      "no": 13,
+      "no": 12,
       "result": "ineligible",
-      "score": 13,
+      "score": 12,
     },
     "teamNumber": "20230A",
   },
@@ -1231,9 +1207,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 104,
     },
     "qualRanking": {
-      "no": 14,
+      "no": 13,
       "result": "ineligible",
-      "score": 14,
+      "score": 13,
     },
     "teamNumber": "70909S",
   },
@@ -1250,9 +1226,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 64,
     },
     "qualRanking": {
-      "no": 15,
+      "no": 14,
       "result": "ineligible",
-      "score": 15,
+      "score": 14,
     },
     "teamNumber": "13520B",
   },
@@ -1269,9 +1245,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 0,
     },
     "qualRanking": {
-      "no": 16,
+      "no": 15,
       "result": "ineligible",
-      "score": 16,
+      "score": 15,
     },
     "teamNumber": "20230C",
   },
@@ -1288,9 +1264,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 0,
     },
     "qualRanking": {
-      "no": 17,
+      "no": 16,
       "result": "ineligible",
-      "score": 17,
+      "score": 16,
     },
     "teamNumber": "20230B",
   },
@@ -1307,9 +1283,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 18,
     },
     "qualRanking": {
-      "no": 18,
+      "no": 17,
       "result": "ineligible",
-      "score": 18,
+      "score": 17,
     },
     "teamNumber": "70909C",
   },
@@ -1326,9 +1302,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
       "score": 0,
     },
     "qualRanking": {
-      "no": 19,
+      "no": 18,
       "result": "ineligible",
-      "score": 19,
+      "score": 18,
     },
     "teamNumber": "13520A",
   },
@@ -1473,25 +1449,6 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
     },
     {
       "autoSkills": {
-        "no": 0,
-        "result": "no data",
-        "score": -1,
-      },
-      "isEligible": false,
-      "overallSkills": {
-        "no": 0,
-        "result": "no data",
-        "score": 0,
-      },
-      "qualRanking": {
-        "no": 8,
-        "result": "eligible",
-        "score": 8,
-      },
-      "teamNumber": "21169E",
-    },
-    {
-      "autoSkills": {
         "no": 11,
         "result": "ineligible",
         "score": 0,
@@ -1503,9 +1460,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 52,
       },
       "qualRanking": {
-        "no": 9,
+        "no": 8,
         "result": "eligible",
-        "score": 9,
+        "score": 8,
       },
       "teamNumber": "10863B",
     },
@@ -1522,9 +1479,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 5,
       },
       "qualRanking": {
-        "no": 10,
+        "no": 9,
         "result": "ineligible",
-        "score": 10,
+        "score": 9,
       },
       "teamNumber": "20230D",
     },
@@ -1541,9 +1498,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 76,
       },
       "qualRanking": {
-        "no": 11,
+        "no": 10,
         "result": "ineligible",
-        "score": 11,
+        "score": 10,
       },
       "teamNumber": "2706F",
     },
@@ -1560,9 +1517,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 5,
       },
       "qualRanking": {
-        "no": 12,
+        "no": 11,
         "result": "ineligible",
-        "score": 12,
+        "score": 11,
       },
       "teamNumber": "4206A",
     },
@@ -1579,9 +1536,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 18,
       },
       "qualRanking": {
-        "no": 13,
+        "no": 12,
         "result": "ineligible",
-        "score": 13,
+        "score": 12,
       },
       "teamNumber": "20230A",
     },
@@ -1598,9 +1555,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 104,
       },
       "qualRanking": {
-        "no": 14,
+        "no": 13,
         "result": "ineligible",
-        "score": 14,
+        "score": 13,
       },
       "teamNumber": "70909S",
     },
@@ -1617,9 +1574,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 64,
       },
       "qualRanking": {
-        "no": 15,
+        "no": 14,
         "result": "ineligible",
-        "score": 15,
+        "score": 14,
       },
       "teamNumber": "13520B",
     },
@@ -1636,9 +1593,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 0,
       },
       "qualRanking": {
-        "no": 16,
+        "no": 15,
         "result": "ineligible",
-        "score": 16,
+        "score": 15,
       },
       "teamNumber": "20230C",
     },
@@ -1655,9 +1612,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 0,
       },
       "qualRanking": {
-        "no": 17,
+        "no": 16,
         "result": "ineligible",
-        "score": 17,
+        "score": 16,
       },
       "teamNumber": "20230B",
     },
@@ -1674,9 +1631,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 18,
       },
       "qualRanking": {
-        "no": 18,
+        "no": 17,
         "result": "ineligible",
-        "score": 18,
+        "score": 17,
       },
       "teamNumber": "70909C",
     },
@@ -1693,9 +1650,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "score": 0,
       },
       "qualRanking": {
-        "no": 19,
+        "no": 18,
         "result": "ineligible",
-        "score": 19,
+        "score": 18,
       },
       "teamNumber": "13520A",
     },
@@ -2097,7 +2054,7 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
 ]
 `;
 
-exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionRankings 4`] = `21`;
+exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionRankings 4`] = `20`;
 
 exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionRankings 5`] = `
 [
@@ -2135,11 +2092,6 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
     "divisionId": 1,
     "rank": 11,
     "teamNumber": "13205B",
-  },
-  {
-    "divisionId": 1,
-    "rank": 12,
-    "teamNumber": "21169E",
   },
   {
     "divisionId": 1,
@@ -2469,25 +2421,6 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
   },
   {
     "autoSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": -1,
-    },
-    "isEligible": false,
-    "overallSkills": {
-      "no": 0,
-      "result": "no data",
-      "score": 0,
-    },
-    "qualRanking": {
-      "no": 8,
-      "result": "eligible",
-      "score": 8,
-    },
-    "teamNumber": "21169E",
-  },
-  {
-    "autoSkills": {
       "no": 11,
       "result": "ineligible",
       "score": 0,
@@ -2499,9 +2432,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 52,
     },
     "qualRanking": {
-      "no": 9,
+      "no": 8,
       "result": "eligible",
-      "score": 9,
+      "score": 8,
     },
     "teamNumber": "10863B",
   },
@@ -2518,9 +2451,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 5,
     },
     "qualRanking": {
-      "no": 10,
+      "no": 9,
       "result": "ineligible",
-      "score": 10,
+      "score": 9,
     },
     "teamNumber": "20230D",
   },
@@ -2537,9 +2470,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 76,
     },
     "qualRanking": {
-      "no": 11,
+      "no": 10,
       "result": "ineligible",
-      "score": 11,
+      "score": 10,
     },
     "teamNumber": "2706F",
   },
@@ -2556,9 +2489,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 5,
     },
     "qualRanking": {
-      "no": 12,
+      "no": 11,
       "result": "ineligible",
-      "score": 12,
+      "score": 11,
     },
     "teamNumber": "4206A",
   },
@@ -2575,9 +2508,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 18,
     },
     "qualRanking": {
-      "no": 13,
+      "no": 12,
       "result": "ineligible",
-      "score": 13,
+      "score": 12,
     },
     "teamNumber": "20230A",
   },
@@ -2594,9 +2527,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 104,
     },
     "qualRanking": {
-      "no": 14,
+      "no": 13,
       "result": "ineligible",
-      "score": 14,
+      "score": 13,
     },
     "teamNumber": "70909S",
   },
@@ -2613,9 +2546,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 64,
     },
     "qualRanking": {
-      "no": 15,
+      "no": 14,
       "result": "ineligible",
-      "score": 15,
+      "score": 14,
     },
     "teamNumber": "13520B",
   },
@@ -2632,9 +2565,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 0,
     },
     "qualRanking": {
-      "no": 16,
+      "no": 15,
       "result": "ineligible",
-      "score": 16,
+      "score": 15,
     },
     "teamNumber": "20230C",
   },
@@ -2651,9 +2584,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 0,
     },
     "qualRanking": {
-      "no": 17,
+      "no": 16,
       "result": "ineligible",
-      "score": 17,
+      "score": 16,
     },
     "teamNumber": "20230B",
   },
@@ -2670,9 +2603,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 18,
     },
     "qualRanking": {
-      "no": 18,
+      "no": 17,
       "result": "ineligible",
-      "score": 18,
+      "score": 17,
     },
     "teamNumber": "70909C",
   },
@@ -2689,9 +2622,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
       "score": 0,
     },
     "qualRanking": {
-      "no": 19,
+      "no": 18,
       "result": "ineligible",
-      "score": 19,
+      "score": 18,
     },
     "teamNumber": "13520A",
   },
