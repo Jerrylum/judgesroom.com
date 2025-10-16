@@ -1319,9 +1319,9 @@ exports[`RobotEventsSource > should get the correct event data with 1 division 8
 exports[`RobotEventsSource > should get the correct event data with 1 division using getEventDivisionExcellenceAwardTeamEligibility 1`] = `
 {
   "Excellence Award - Middle School": {
-    "joinedTeamsInEventCount": 20,
+    "joinedTeamsInEventCount": 18,
     "rankingEligibilityThreshold": 7,
-    "skillsEligibilityThreshold": 8,
+    "skillsEligibilityThreshold": 7,
     "teamsInGroup": [
       {
         "autoSkills": {
@@ -1389,7 +1389,7 @@ exports[`RobotEventsSource > should get the correct event data with 1 division u
         "isEligible": false,
         "overallSkills": {
           "no": 8,
-          "result": "eligible",
+          "result": "ineligible",
           "score": 88,
         },
         "qualRanking": {

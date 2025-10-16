@@ -102,7 +102,7 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
 }
 
 /**
- * Get the rankings of all teams in the event, in all divisions
+ * Get the rankings of all teams in the event, in all divisions, a.k.a present teams
  *
  * If the events have multiple divisions, the rankings of all teams in all divisions are returned
  *
@@ -340,8 +340,12 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 	teamsInGroup: Readonly<Readonly<TeamInfo>[]>,
 	excellenceAwards: Award[]
 ): Promise<Record<string, ExcellenceAwardCandidatesReport>> {
-	const allGradesJoinedTeamsInEvent = await getEventJoinedTeams(client, evtId);
-	const allGradesRankingsInGroup = await getEventDivisionRankings(client, evtId, divisionId);
+	const evtResult = await client.events.get(evtId);
+	if (!evtResult.data) throw new Error('Event not found');
+
+	const allGradesTeamsRegistered = await getEventJoinedTeams(client, evtId);
+	const allGradesRankingsInEvent = await getEventRankings(evtResult.data); // a.k.a present teams
+	const allGradesRankingsInGroup = filterRankingsByDivision(allGradesRankingsInEvent, divisionId);
 	const allGradesOverallSkillsInEvent = await getEventSkills(client, evtId);
 
 	const rtn = {} as Record<string, ExcellenceAwardCandidatesReport>;
@@ -352,12 +356,14 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 
 		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(allGradesOverallSkillsInEvent, allTargetGradesTeamsInGroup);
 
-		const allTargetGradesJoinedTeamsInEvent = filterTeamsByGrades(allGradesJoinedTeamsInEvent, award.acceptedGrades);
+		const allTargetGradesTeamsRegistered = filterTeamsByGrades(allGradesTeamsRegistered, award.acceptedGrades);
+
+		const allTargetGradesTeamsInEvent = filterRankingsOrRecordsBySubset(allGradesRankingsInEvent, allTargetGradesTeamsRegistered);
 
 		rtn[award.name] = getExcellenceAwardCandidatesReport(
 			allTargetGradesRankingsInGroup,
 			allTargetGradesOverallSkillsInGroup,
-			allTargetGradesJoinedTeamsInEvent.length
+			allTargetGradesTeamsInEvent.length
 		);
 	}
 
