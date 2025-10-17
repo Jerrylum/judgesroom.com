@@ -98,19 +98,6 @@
 			/>
 			<p class="mt-1 text-xs text-gray-500">Enter the URL to the team's engineering notebook</p>
 		</div>
-
-		<!-- Exclude from Judging -->
-		<div>
-			<label class="flex items-center">
-				<input 
-					type="checkbox" 
-					bind:checked={editedTeam.absent} 
-					class="mr-2 rounded border-gray-300 text-red-600 focus:ring-red-500" 
-				/>
-				<span class="text-sm text-gray-700">Exclude this team from judged awards</span>
-			</label>
-			<p class="mt-1 text-xs text-gray-500">If checked, this team will not be considered for judged awards</p>
-		</div>
 	</div>
 
 	<div class="mt-6 flex justify-end space-x-3">

@@ -22,7 +22,7 @@ export type EventGradeLevel = z.infer<typeof EventGradeLevelSchema>;
 export const EventNameSchema = z
 	.string()
 	.nonempty()
-	.max(100)
+	.max(200)
 	.regex(/^\S.*\S$|^\S$/, { message: 'Event name must not have leading or trailing whitespace' });
 
 export const EssentialDataSchema = z.object({

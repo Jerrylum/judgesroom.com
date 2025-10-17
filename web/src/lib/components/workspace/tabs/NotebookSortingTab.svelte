@@ -150,11 +150,10 @@
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>
 			<p class="mb-2 text-sm text-gray-600">
-				<strong>Instructions:</strong> Judges perform a quick scan of all the Engineering Notebooks and divide them into two categories:
-				<b>Developing</b>
-				and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as Developing or Fully Developed, either
-				another Judge can help make that determination or the notebook should be given the benefit of the doubt and categorized as Fully
-				Developed.
+				Judges perform a quick scan of all the Engineering Notebooks and divide them into three categories:
+				<b>Not Submitted</b>, <b>Developing</b>, and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as
+				Developing or Fully Developed, either another Judge can help make that determination or the notebook should be given the benefit of
+				the doubt and categorized as Fully Developed.
 			</p>
 			<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric.</p>
 
@@ -175,8 +174,9 @@
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">Import Digital Engineering Notebook Links report</h3>
 			<p class="mb-4 text-sm text-gray-600">
-				Download the Excel file from RobotEvents → Event Admin → "Downloads & Links" → "Download Digital Engineering Notebook Links report".
-				This will update notebook links for existing teams in your event.
+				If Engineering Notebooks are submitted digitally, please ask the Event Partner to provide digital notebook links report. This report
+				can be downloaded from RobotEvents → Event Admin → "Downloads & Links" → "Download Digital Engineering Notebook Links report".
+				Import the Excel file to this Judges' Room to set notebook links for teams in your event.
 			</p>
 
 			<div class="flex items-center gap-4">

@@ -1,12 +1,9 @@
 <script lang="ts">
-	import { app, dialogs, subscriptions, tabs } from '$lib/app-page.svelte';
-	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
+	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
-	import { sortByTeamNumber, type TeamInfoAndData } from '$lib/team.svelte';
+	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
-	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 
 	const teams = $derived(app.getAllTeamInfoAndData());
@@ -100,11 +97,6 @@
 	function openTeamInterviewRubric(teamId: string, rubricId?: string) {
 		const tab = rubricId ? new TeamInterviewRubricTab({ rubricId }) : new TeamInterviewRubricTab({ teamId });
 		tabs.addOrReuseTab(tab);
-	}
-
-	// Open team data edit dialog
-	function openEditTeamDataDialog(team: TeamInfoAndData) {
-		dialogs.showCustom(EditTeamDataDialog, { props: { team } });
 	}
 
 	// Calculate progress metrics
@@ -207,15 +199,8 @@
 						<h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold text-gray-900">
 							<span>{team.number} - {team.name}</span>
 							{#if team.absent}
-								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Absent from judged awards</span>
+								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Absent</span>
 							{/if}
-							<button
-								onclick={() => openEditTeamDataDialog(team)}
-								class="text-gray-400 hover:text-gray-600 active:text-gray-800"
-								title="Edit team data"
-							>
-								<EditIcon size={16} />
-							</button>
 						</h3>
 						<p class="text-sm text-gray-600">
 							{team.school} • {team.grade}

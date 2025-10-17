@@ -89,25 +89,26 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Event Overview -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="text-lg font-medium text-gray-900">Event Overview</h2>
-			{#if app.hasEssentialData()}
-				<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-					<div class="rounded-lg bg-gray-50 p-4">
-						<div class="text-2xl font-bold text-gray-900">
-							{app.getTeamCount()}
-						</div>
-						<div class="text-sm text-gray-500">Teams</div>
-					</div>
-					<div class="rounded-lg bg-gray-50 p-4">
-						<div class="text-2xl font-bold text-gray-900">
-							{app.getJudgeGroupCount()}
-						</div>
-						<div class="text-sm text-gray-500">Judge Groups</div>
-					</div>
-					<div class="rounded-lg bg-gray-50 p-4">
-						<div class="text-2xl font-bold text-gray-900">{app.getJudgeCount()}</div>
-						<div class="text-sm text-gray-500">Judges</div>
-					</div>
+			<h2 class="mb-2 text-lg font-medium text-gray-900">Event Overview</h2>
+			{#if essentialData}
+				<div class="text-sm text-gray-500">
+					<!-- <p>Event Name: {essentialData.eventName}</p> -->
+					<p>
+						Event Code:
+						{#if essentialData.robotEventsSku}
+							<a
+								href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
+								target="_blank"
+								class="text-blue-500 hover:text-blue-600">{essentialData.robotEventsSku}</a
+							>
+						{:else}
+							(Not set)
+						{/if}
+					</p>
+					<p>Division: {essentialData.divisionId ?? '(Not set)'}</p>
+					<p>The number of teams: {essentialData.teamInfos.length}</p>
+					<p>The number of judge groups: {essentialData.judgeGroups.length}</p>
+					<p>The number of judges: {app.getJudgeCount()}</p>
 				</div>
 			{/if}
 		</div>
