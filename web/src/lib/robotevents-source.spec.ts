@@ -128,7 +128,6 @@ describe('RobotEventsSource', () => {
 			client,
 			imported.robotEventsEventId,
 			1,
-			imported.teamInfos,
 			middleSchoolAwards.map((award) => award.generateAward())
 		);
 		expect(result).toMatchSnapshot();

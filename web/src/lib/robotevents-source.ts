@@ -337,7 +337,6 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 	client: RobotEventsClient,
 	evtId: number,
 	divisionId: number,
-	teamsInGroup: Readonly<Readonly<TeamInfo>[]>,
 	excellenceAwards: Award[]
 ): Promise<Record<string, ExcellenceAwardCandidatesReport>> {
 	const evtResult = await client.events.get(evtId);
@@ -350,15 +349,13 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 
 	const rtn = {} as Record<string, ExcellenceAwardCandidatesReport>;
 	for (const award of excellenceAwards) {
-		const allTargetGradesTeamsInGroup = filterTeamsByGrades(teamsInGroup, award.acceptedGrades);
-
-		const allTargetGradesRankingsInGroup = filterRankingsOrRecordsBySubset(allGradesRankingsInGroup, allTargetGradesTeamsInGroup);
-
-		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(allGradesOverallSkillsInEvent, allTargetGradesTeamsInGroup);
-
 		const allTargetGradesTeamsRegistered = filterTeamsByGrades(allGradesTeamsRegistered, award.acceptedGrades);
 
 		const allTargetGradesTeamsInEvent = filterRankingsOrRecordsBySubset(allGradesRankingsInEvent, allTargetGradesTeamsRegistered);
+
+		const allTargetGradesRankingsInGroup = filterRankingsOrRecordsBySubset(allGradesRankingsInGroup, allTargetGradesTeamsRegistered);
+
+		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(allGradesOverallSkillsInEvent, allTargetGradesTeamsRegistered);
 
 		rtn[award.name] = getExcellenceAwardCandidatesReport(
 			allTargetGradesRankingsInGroup,
