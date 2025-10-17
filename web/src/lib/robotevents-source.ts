@@ -74,7 +74,7 @@ export function getRobotEventsClient(): RobotEventsClient {
 }
 
 /**
- * Get the joined teams in the event
+ * Get the joined teams at the event
  *
  * Joined teams are teams that are in the team list on the event page on RobotEvents.
  * Sometimes, people call them "registered teams".
@@ -87,7 +87,7 @@ export function getRobotEventsClient(): RobotEventsClient {
  *
  * @param client The RobotEvents client
  * @param evtId
- * @returns The joined teams in the event
+ * @returns The joined teams at the event
  */
 export async function getEventJoinedTeams(client: RobotEventsClient, evtId: number): Promise<TeamData[]> {
 	const result = await client.api.PaginatedGET('/events/{id}/teams', {
@@ -102,7 +102,7 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
 }
 
 /**
- * Get the rankings of all teams in the event, in all divisions, a.k.a present teams
+ * Get the rankings of all teams at the event, in all divisions, a.k.a present teams
  *
  * If the events have multiple divisions, the rankings of all teams in all divisions are returned
  *
@@ -114,7 +114,7 @@ export async function getEventJoinedTeams(client: RobotEventsClient, evtId: numb
  * ...
  *
  * @param evt The event
- * @returns The rankings of all teams in the event, ordered by rank, from the first place to the last place
+ * @returns The rankings of all teams at the event, ordered by rank, from the first place to the last place
  */
 export async function getEventRankings(evt: Event): Promise<TeamQualRanking[]> {
 	const rtn = [] as TeamQualRanking[];
@@ -166,11 +166,11 @@ export async function getEventDivisionRankings(client: RobotEventsClient, evtId:
 }
 
 /**
- * Get the skills records of all teams in the event, in all divisions
+ * Get the skills records of all teams at the event, in all divisions
  *
  * @param client The RobotEvents client
  * @param evtId The event ID
- * @returns The skills records of all teams in the event, ordered by rank, from the first place to the last place
+ * @returns The skills records of all teams at the event, ordered by rank, from the first place to the last place
  */
 export async function getEventSkills(client: RobotEventsClient, evtId: number): Promise<TeamSkillsRecord[]> {
 	const resultSkills = await client.api.PaginatedGET('/events/{id}/skills', {
@@ -242,11 +242,11 @@ export function filterRankingsOrRecordsBySubset<T extends TeamQualRanking | Team
  * Get the Excellence Award candidates report for a group (division or event)
  *
  * The ranking eligibility threshold is calculated based on the number of joined teams in the specified group (division or event).
- * The skills eligibility threshold is calculated based on the number of joined teams in the event.
+ * The skills eligibility threshold is calculated based on the number of joined teams at the event.
  *
  * @param rankings The rankings of all teams in the group (division or event)
  * @param overallSkills The overall skills of all teams in a division or in an event
- * @param joinedTeamsInEventCount The number of joined teams in the event
+ * @param joinedTeamsInEventCount The number of joined teams at the event
  * @returns The Excellence Award candidates report
  */
 export function getExcellenceAwardCandidatesReport(

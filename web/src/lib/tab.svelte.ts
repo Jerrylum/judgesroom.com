@@ -11,6 +11,7 @@ import AwardNominationTabComponent from './components/workspace/tabs/AwardNomina
 import FinalRankingTabComponent from './components/workspace/tabs/FinalRankingTab.svelte';
 import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.svelte';
 import TeamAttendanceTabComponent from './components/workspace/tabs/TeamAttendanceTab.svelte';
+import ExcellenceAwardEligibilityTabComponent from './components/workspace/tabs/ExcellenceAwardCandidatesTab.svelte';
 
 // ============================================================================
 // Tab System
@@ -235,6 +236,30 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 	}
 }
 
+export class ExcellenceAwardCandidatesTab implements BaseTab<typeof ExcellenceAwardEligibilityTabComponent> {
+	readonly id: string;
+	readonly isPinned = false;
+	readonly type = 'excellence_award_candidates';
+	readonly component = ExcellenceAwardEligibilityTabComponent;
+	readonly props = { tab: this };
+
+	get title() {
+		return 'Excellence Award Candidates';
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
 export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabComponent> {
 	readonly id: string;
 	readonly isPinned = false;
@@ -291,6 +316,7 @@ export type Tab =
 	| TeamInterviewRubricTab
 	| AwardRankingTab
 	| AwardNominationTab
+	| ExcellenceAwardCandidatesTab
 	| FinalAwardRankingTab
 	| AwardWinnerTab;
 
