@@ -89,6 +89,7 @@
 			const assignedTeamIds = new Set<string>();
 
 			judgingMethod = eventSetup.judgingMethod;
+			judgingStep = eventSetup.judgingStep;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
