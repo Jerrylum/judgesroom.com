@@ -55,7 +55,7 @@
 		"robotevents": "^6.0.4",
 		"svelte-dnd-action": "^0.9.64",
 		"uuid": "^13.0.0",
-		"xlsx": "^0.18.5",
+		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
 		"zod": "^4.0.15"
 	}
 }
