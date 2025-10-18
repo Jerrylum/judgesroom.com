@@ -396,7 +396,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 	const robotEventsSku = evt.sku;
 	const robotEventsEventId = evt.id;
 
-	const eventName = evt.name;
+	const eventName = evt.name.trim().slice(0, 200);
 	const program = convertProgramIdToProgram(evt.program.id);
 
 	const teams = await getEventJoinedTeams(client, robotEventsEventId);
