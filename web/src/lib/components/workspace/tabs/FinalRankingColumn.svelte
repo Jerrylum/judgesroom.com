@@ -7,6 +7,7 @@
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
 	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 	import AddNominationDialog from './AddNominationDialog.svelte';
+	import type { ExcellenceAwardTeamEligibility } from '$lib/robotevents-source';
 
 	interface Props {
 		award: Award;
@@ -21,6 +22,7 @@
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
 		winners: string[];
+		teamEligibilities?: Readonly<Readonly<ExcellenceAwardTeamEligibility>[]>;
 	}
 
 	type AwardNominationWithId = AwardNomination & {
@@ -51,7 +53,8 @@
 		showFullAwardName,
 		dropFromOthersDisabled,
 		showAddButton,
-		winners
+		winners,
+		teamEligibilities
 	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
@@ -95,6 +98,47 @@
 
 	// Get absent team IDs (already nominated)
 	let absentTeamIds = $derived(new Set(editing.map((nom) => nom.teamId)));
+
+	// Create a map of team eligibility status for Excellence Awards
+	const teamEligibilityMap = $derived.by(() => {
+		if (!teamEligibilities) return new Map<string, boolean>();
+		
+		const map = new Map<string, boolean>();
+		for (const team of teamEligibilities) {
+			map.set(team.teamNumber, team.isEligible);
+		}
+		return map;
+	});
+
+	// Create a map of team auto skills scores for Think Award
+	const teamAutoSkillsMap = $derived.by(() => {
+		if (!teamEligibilities) return new Map<string, number>();
+		
+		const map = new Map<string, number>();
+		for (const team of teamEligibilities) {
+			map.set(team.teamNumber, team.autoSkills.score);
+		}
+
+		console.log(map);
+		
+		return map;
+	});
+
+	// Function to get eligibility status for a team
+	function getEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
+		if (!teamEligibilities) return 'no-data';
+		
+		// For Think Award, check if team has auto skills score > 0
+		if (award.name === 'Think Award') {
+			if (!teamAutoSkillsMap.has(teamNumber)) return 'no-data';
+			const autoSkillsScore = teamAutoSkillsMap.get(teamNumber) ?? 0;
+			return autoSkillsScore > 0 ? 'eligible' : 'ineligible';
+		}
+		
+		// For Excellence and Design Awards, check Excellence Award eligibility
+		if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
+		return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
+	}
 </script>
 
 <div class="flex min-w-40 max-w-40 flex-col gap-1">
@@ -128,12 +172,15 @@
 				{@const isWinner = winners.includes(nom.teamId)}
 				{@const isBeforeLastWinner = winners.length > 0 && editingTeamIds.indexOf(winners[winners.length - 1]) > index}
 				{@const isSkipped = !isWinner && isBeforeLastWinner}
+				{@const team = allTeams[nom.teamId]}
+				{@const eligibilityStatus = team ? getEligibilityStatus(team.number) : 'no-data'}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<AwardNominationComponent
-						team={allTeams[nom.teamId]}
+						{team}
 						judgeGroup={nom.judgeGroupId ? allJudgeGroups[nom.judgeGroupId] : null}
 						{isWinner}
 						{isSkipped}
+						{eligibilityStatus}
 					/>
 				</div>
 			{/each}

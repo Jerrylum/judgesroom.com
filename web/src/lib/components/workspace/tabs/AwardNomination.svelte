@@ -9,9 +9,10 @@
 		judgeGroup: JudgeGroup | null;
 		isWinner: boolean;
 		isSkipped: boolean;
+		eligibilityStatus?: 'eligible' | 'ineligible' | 'no-data';
 	}
 
-	const { team, judgeGroup, isWinner, isSkipped }: Props = $props();
+	const { team, judgeGroup, isWinner, isSkipped, eligibilityStatus = 'no-data' }: Props = $props();
 
 	const gradeLevel = $derived(getGradeLevel(team.grade));
 
@@ -37,7 +38,12 @@
 	<div class="flex items-center justify-between">
 		<div class="flex items-center space-x-3">
 			<div>
-				<p class="text-sm font-medium text-gray-900">
+				<p 
+					class="text-sm font-medium"
+					class:text-green-600={eligibilityStatus === 'eligible'}
+					class:text-red-600={eligibilityStatus === 'ineligible'}
+					class:text-gray-900={eligibilityStatus === 'no-data'}
+				>
 					{team ? team.number : 'Unknown Team'}
 				</p>
 				<p class="text-xs text-gray-500">
