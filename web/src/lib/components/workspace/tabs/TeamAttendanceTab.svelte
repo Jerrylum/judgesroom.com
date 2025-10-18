@@ -66,6 +66,7 @@
 			await app.wrpcClient.team.updateTeamData.mutation({
 				id: team.id,
 				notebookLink: team.notebookLink,
+				hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
 				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 				absent: newAbsentStatus
 			});
@@ -129,6 +130,7 @@
 			const updates = allTeams.map((team) => ({
 				id: team.id,
 				notebookLink: team.notebookLink,
+				hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
 				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 				absent: !robotEventsTeamNumbers.has(team.number)
 			}));

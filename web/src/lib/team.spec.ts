@@ -28,7 +28,7 @@ describe('TeamInfo Class', () => {
 			school: 'Test School',
 			grade: 'High School',
 			group: '123'
-		}
+		};
 	});
 
 	it('should create a TeamInfo instance with correct properties', () => {
@@ -73,6 +73,7 @@ describe('TeamData Class', () => {
 		teamData = {
 			id: uuidv4(),
 			notebookLink: 'https://example.com/notebook',
+			hasInnovateAwardSubmissionForm: false,
 			notebookDevelopmentStatus: 'undetermined',
 			absent: false
 		};
@@ -91,7 +92,6 @@ describe('TeamData Class', () => {
 		expect(teamData.absent).toBe(true);
 	});
 });
-
 
 describe('EditingTeamList Class', () => {
 	let teamList: EditingTeamList;
@@ -113,6 +113,7 @@ describe('EditingTeamList Class', () => {
 				grade: 'High School',
 				group: '123',
 				notebookLink: 'https://example.com/notebook-a',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -128,6 +129,7 @@ describe('EditingTeamList Class', () => {
 				grade: 'Middle School',
 				group: '456',
 				notebookLink: 'https://example.com/notebook-b',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			}
@@ -160,6 +162,7 @@ describe('EditingTeamList Class', () => {
 			grade: 'College',
 			group: '789',
 			notebookLink: 'https://example.com/notebook-c',
+			hasInnovateAwardSubmissionForm: false,
 			notebookDevelopmentStatus: 'undetermined',
 			absent: false
 		};
@@ -297,7 +300,6 @@ TEAM99A,Team 99A,Team City,Team State,Team Country,T99A,Team School,Team Sponsor
 
 describe('readNotebookLinksExcel', () => {
 	it('should read valid Excel data', () => {
-		
 		const data = fs.readFileSync('./test/DigitalEngineeringNotebooks-Test.xlsx');
 
 		const result = readNotebookLinksExcel(new Uint8Array(data));
@@ -410,6 +412,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: '123',
 				notebookLink: 'https://example.com/notebook-a',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -425,6 +428,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: '123',
 				notebookLink: 'https://example.com/notebook-b',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -440,6 +444,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'Middle School',
 				group: '456',
 				notebookLink: 'https://example.com/notebook-c',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -455,6 +460,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'College',
 				group: '',
 				notebookLink: 'https://example.com/notebook-d',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			}
@@ -511,6 +517,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: 'APPLE',
 				notebookLink: 'https://example.com/notebook-apple',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -526,6 +533,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: 'BANANA',
 				notebookLink: 'https://example.com/notebook-banana1',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -541,6 +549,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: 'BANANA',
 				notebookLink: 'https://example.com/notebook-banana2',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -556,6 +565,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'Middle School',
 				group: 'CHERRY',
 				notebookLink: 'https://example.com/notebook-cherry3',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			}
@@ -593,6 +603,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: 'BLRS',
 				notebookLink: 'https://example.com/notebook-blrs1',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -608,6 +619,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'High School',
 				group: 'BLRS',
 				notebookLink: 'https://example.com/notebook-blrs2',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -623,6 +635,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'Middle School',
 				group: 'TEAM99',
 				notebookLink: 'https://example.com/notebook-team99a',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -638,6 +651,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'Middle School',
 				group: 'TEAM99',
 				notebookLink: 'https://example.com/notebook-team99b',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			},
@@ -653,6 +667,7 @@ describe('groupTeamsByGroup', () => {
 				grade: 'College',
 				group: 'ABC123',
 				notebookLink: 'https://example.com/notebook-abc123x',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			}

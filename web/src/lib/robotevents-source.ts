@@ -424,6 +424,7 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 				grade: team.grade ?? throwTeamError(team),
 				group: extractGroupFromTeamNumber(team.number),
 				notebookLink: '',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined',
 				absent: false
 			}) satisfies TeamInfoAndData

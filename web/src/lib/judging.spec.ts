@@ -60,13 +60,14 @@ describe('EditingJudgeGroup', () => {
 				number: '123A',
 				name: 'Team Alpha',
 				city: 'City A',
-				state: 'State A', 
+				state: 'State A',
 				country: 'Country A',
 				shortName: 'TA',
 				school: 'School A',
 				grade: 'High School' as Grade,
 				group: '123',
 				notebookLink: 'https://example.com/notebook-a',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
 				absent: false
 			},
@@ -82,6 +83,7 @@ describe('EditingJudgeGroup', () => {
 				grade: 'Middle School' as Grade,
 				group: '456',
 				notebookLink: 'https://example.com/notebook-b',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
 				absent: false
 			},
@@ -97,6 +99,7 @@ describe('EditingJudgeGroup', () => {
 				grade: 'College' as Grade,
 				group: '789',
 				notebookLink: 'https://example.com/notebook-c',
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
 				absent: false
 			}
@@ -263,6 +266,7 @@ describe('randomlyAssignTeamsToGroups', () => {
 				grade: 'High School' as Grade,
 				group: `${100 + i}`,
 				notebookLink: `https://example.com/notebook-${i + 1}`,
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
 				absent: false
 			};
@@ -429,6 +433,7 @@ describe('Integration Tests', () => {
 				grade: 'High School' as Grade,
 				group: `${100 + i}`,
 				notebookLink: `https://example.com/notebook-${i + 1}`,
+				hasInnovateAwardSubmissionForm: false,
 				notebookDevelopmentStatus: 'undetermined' as NotebookDevelopmentStatus,
 				absent: false
 			};
@@ -478,6 +483,7 @@ describe('Integration Tests', () => {
 			grade: 'High School',
 			group: '100',
 			notebookLink: 'https://example.com/notebook',
+			hasInnovateAwardSubmissionForm: false,
 			notebookDevelopmentStatus: 'undetermined',
 			absent: false
 		};

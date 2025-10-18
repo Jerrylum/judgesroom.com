@@ -122,6 +122,7 @@
 					grade: team.grade || 'College',
 					group: existingTeam?.group ?? team.group ?? '',
 					notebookLink: existingTeam?.notebookLink ?? '',
+					hasInnovateAwardSubmissionForm: existingTeam?.hasInnovateAwardSubmissionForm ?? false,
 					notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
 					absent: existingTeam?.absent ?? false
 				} satisfies TeamInfoAndData;

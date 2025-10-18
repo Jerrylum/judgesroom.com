@@ -151,6 +151,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'High School',
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
+		hasInnovateAwardSubmissionForm: false,
 		notebookDevelopmentStatus: 'undetermined',
 		absent: false
 	},
@@ -166,6 +167,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'Middle School',
 		group: 'Group B',
 		notebookLink: 'https://example.com/notebook',
+		hasInnovateAwardSubmissionForm: false,
 		notebookDevelopmentStatus: 'undetermined',
 		absent: false
 	},
@@ -181,6 +183,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'High School',
 		group: 'Group A',
 		notebookLink: 'https://example.com/notebook',
+		hasInnovateAwardSubmissionForm: false,
 		notebookDevelopmentStatus: 'undetermined',
 		absent: false
 	},
@@ -196,6 +199,7 @@ export const sampleTeamInfoAndData: (TeamInfo & TeamData)[] = [
 		grade: 'Middle School',
 		group: 'Group C',
 		notebookLink: 'https://example.com/notebook',
+		hasInnovateAwardSubmissionForm: false,
 		notebookDevelopmentStatus: 'undetermined',
 		absent: false
 	}

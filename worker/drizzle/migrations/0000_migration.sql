@@ -156,6 +156,7 @@ CREATE TABLE `Teams` (
 	`grade` text NOT NULL,
 	`group_` text NOT NULL,
 	`notebookLink` text DEFAULT '' NOT NULL,
+	`hasInnovateAwardSubmissionForm` integer DEFAULT false NOT NULL,
 	`notebookDevelopmentStatus` text DEFAULT 'undetermined' NOT NULL,
 	`absent` integer DEFAULT false NOT NULL
 );

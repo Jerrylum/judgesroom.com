@@ -120,6 +120,7 @@
 				teamDataUpdates.push({
 					id: teamId,
 					notebookLink: notebookLink,
+					hasInnovateAwardSubmissionForm: currentTeamData.hasInnovateAwardSubmissionForm,
 					notebookDevelopmentStatus: currentTeamData.notebookDevelopmentStatus,
 					absent: currentTeamData.absent
 				});

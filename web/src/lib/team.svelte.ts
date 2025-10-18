@@ -95,6 +95,7 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfoA
 			school: row.School || '',
 			grade: mapGradeToGradeLevel(row.Grade || ''),
 			notebookLink: '',
+			hasInnovateAwardSubmissionForm: false,
 			notebookDevelopmentStatus: undefined,
 			absent: undefined,
 			group: groupName

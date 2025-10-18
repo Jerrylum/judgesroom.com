@@ -52,6 +52,7 @@
 			await app.wrpcClient.team.updateTeamData.mutation({
 				id: team.id,
 				notebookLink: editedTeam.notebookLink.trim(),
+				hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
 				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 				absent: editedTeam.absent
 			});

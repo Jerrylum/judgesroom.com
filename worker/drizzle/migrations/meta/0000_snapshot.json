@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b3111672-39c5-40a8-a810-216b98b8895f",
+  "id": "8a1fa921-fb9b-4ce3-8853-9b71d0dba99a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "AwardRankings": {
@@ -1124,6 +1124,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "''"
+        },
+        "hasInnovateAwardSubmissionForm": {
+          "name": "hasInnovateAwardSubmissionForm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "notebookDevelopmentStatus": {
           "name": "notebookDevelopmentStatus",

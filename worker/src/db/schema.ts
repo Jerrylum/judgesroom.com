@@ -56,6 +56,7 @@ export const teams = sqliteTable(
 		grade: text('grade', { enum: ['Elementary School', 'Middle School', 'High School', 'College'] }).notNull(),
 		group: text('group_').notNull(),
 		notebookLink: text('notebookLink').notNull().default(''),
+		hasInnovateAwardSubmissionForm: integer('hasInnovateAwardSubmissionForm', { mode: 'boolean' }).notNull().default(false),
 		notebookDevelopmentStatus: text('notebookDevelopmentStatus', {
 			enum: ['undetermined', 'not_submitted', 'developing', 'fully_developed']
 		})

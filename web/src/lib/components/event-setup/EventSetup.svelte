@@ -78,6 +78,7 @@
 				const teamData = allTeamData[teamInfo.id] || {
 					id: teamInfo.id,
 					notebookLink: '',
+					hasInnovateAwardSubmissionForm: false,
 					notebookDevelopmentStatus: 'undetermined' as const,
 					absent: false
 				};
@@ -168,6 +169,7 @@
 					teams.map((team) => ({
 						id: team.id,
 						notebookLink: team.notebookLink,
+						hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
 						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 						absent: team.absent
 					}))
@@ -188,6 +190,7 @@
 					teams.map((team) => ({
 						id: team.id,
 						notebookLink: team.notebookLink,
+						hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
 						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
 						absent: team.absent
 					}))

@@ -3,7 +3,7 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
 
@@ -15,13 +15,26 @@
 	let { team, isSubmitted }: Props = $props();
 
 	const devStatus = $derived(team.notebookDevelopmentStatus);
+	const isSubmittedNotebookStatus = $derived(isSubmittedNotebook(devStatus));
 
 	// Function to update notebook development status
 	async function updateNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
 		try {
-			await app.wrpcClient.team.updateTeamData.mutation({ ...team, notebookDevelopmentStatus });
+			await app.wrpcClient.team.updateTeamData.mutation({
+				...team,
+				notebookDevelopmentStatus,
+				hasInnovateAwardSubmissionForm: isSubmittedNotebook(notebookDevelopmentStatus) ? team.hasInnovateAwardSubmissionForm : false
+			});
 		} catch (error) {
 			app.addErrorNotice('Failed to update notebook status');
+		}
+	}
+
+	async function updateInnovateAwardSubmissionForm(hasInnovateAwardSubmissionForm: boolean) {
+		try {
+			await app.wrpcClient.team.updateTeamData.mutation({ ...team, hasInnovateAwardSubmissionForm });
+		} catch (error) {
+			app.addErrorNotice('Failed to update innovate award submission form');
 		}
 	}
 
@@ -37,7 +50,7 @@
 </script>
 
 <div
-	class="min-h-51 relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
+	class="min-h-67 relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
 	class:border-green-500={devStatus === 'fully_developed'}
 	class:border-yellow-500={devStatus === 'developing'}
 	class:border-gray-500={devStatus === 'not_submitted'}
@@ -108,6 +121,17 @@
 				onchange={() => updateNotebookStatus('not_submitted')}
 			/>
 			<span class="text-sm text-gray-700">Not Submitted</span>
+		</label>
+		<hr />
+		<label class="flex items-center gap-2">
+			<input
+				type="checkbox"
+				disabled={!isSubmittedNotebookStatus}
+				checked={team.hasInnovateAwardSubmissionForm}
+				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
+				onchange={() => updateInnovateAwardSubmissionForm(!team.hasInnovateAwardSubmissionForm)}
+			/>
+			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>Has Innovate Award Submission Form</span>
 		</label>
 	</div>
 

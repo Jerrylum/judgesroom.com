@@ -126,6 +126,7 @@
 				id: existingTeam?.id ?? uuidv4(),
 				group: existingTeam?.group ?? team.group,
 				notebookLink: existingTeam?.notebookLink ?? team.notebookLink,
+				hasInnovateAwardSubmissionForm: existingTeam?.hasInnovateAwardSubmissionForm ?? team.hasInnovateAwardSubmissionForm,
 				notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? team.notebookDevelopmentStatus,
 				absent: existingTeam?.absent ?? team.absent
 			};
