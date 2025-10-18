@@ -131,7 +131,7 @@
 				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateInnovateAwardSubmissionForm(!team.hasInnovateAwardSubmissionForm)}
 			/>
-			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>Has Innovate Award Submission Form</span>
+			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>Innovate Award Submission Form</span>
 		</label>
 	</div>
 
