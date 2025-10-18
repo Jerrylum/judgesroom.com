@@ -46,6 +46,25 @@
 		tabs.reorderTabs(newOrder);
 	}
 
+	// Warn user before closing browser tab if there are unsaved changes
+	$effect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			const hasUnsavedData = allTabs.some((tab) => tab.isDataUnsaved());
+			if (hasUnsavedData) {
+				// Modern browsers require both preventDefault and returnValue
+				e.preventDefault();
+				e.returnValue = ''; // Chrome requires returnValue to be set
+				return ''; // Some browsers use the return value
+			}
+		};
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	});
+
 	$effect(() => {
 		if (!isJudgingReady) return;
 
