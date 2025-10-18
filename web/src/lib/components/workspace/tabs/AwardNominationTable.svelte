@@ -71,17 +71,20 @@
 						<content>
 							{#each awardRankings.judgedAwards as awardName, awardIndex}
 								{@const award = awards[awardName]}
-								{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
-								{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
-								<NominationButtons
-									{award}
-									{team}
-									judgeGroupId={judgeGroup.id}
-									{ranking}
-									{isNominated}
-									{bypassAwardRequirements}
-									showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
-								/>
+								<!-- The event setup has been updated and an award is removed, but the award rankings are not updated yet -->
+								{#if award !== undefined}
+									{@const ranking = awardRankings.rankings?.[teamId]?.[awardIndex] ?? 0}
+									{@const isNominated = finalAwardNominations[awardName]?.some((nomination) => nomination.teamId === teamId)}
+									<NominationButtons
+										{award}
+										{team}
+										judgeGroupId={judgeGroup.id}
+										{ranking}
+										{isNominated}
+										{bypassAwardRequirements}
+										showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
+									/>
+								{/if}
 							{/each}
 						</content>
 					</scroll-container>

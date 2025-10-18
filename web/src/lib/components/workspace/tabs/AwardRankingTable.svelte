@@ -66,14 +66,17 @@
 					<content>
 						{#each awardRankings.judgedAwards as _, awardIndex}
 							{@const award = awards[awardRankings.judgedAwards[awardIndex]]}
-							<RankingButtons
-								{awardIndex}
-								{awardRankings}
-								{award}
-								{team}
-								judgeGroupId={awardRankings.judgeGroupId}
-								{bypassAwardRequirements}
-							/>
+							<!-- The event setup has been updated and an award is removed, but the award rankings are not updated yet -->
+							{#if award !== undefined}
+								<RankingButtons
+									{awardIndex}
+									{awardRankings}
+									{award}
+									{team}
+									judgeGroupId={awardRankings.judgeGroupId}
+									{bypassAwardRequirements}
+								/>
+							{/if}
 						{/each}
 					</content>
 				</scroll-container>
