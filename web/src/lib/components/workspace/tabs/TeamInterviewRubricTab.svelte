@@ -35,6 +35,27 @@
 	let notes = $state('');
 	let timestamp = $state(0);
 
+	// Track initial state for unsaved changes detection
+	let initialTeamId = $state('');
+	let initialRubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let initialNotes = $state('');
+
+	// Track unsaved changes
+	$effect(() => {
+		if (isSubmitted) {
+			// No unsaved changes when submitted
+			tab._isDataUnsaved = false;
+		} else {
+			// Check if any data has changed from initial state
+			const hasChanges =
+				tab.teamId !== initialTeamId ||
+				rubricScores.some((score, idx) => score !== initialRubricScores[idx]) ||
+				notes !== initialNotes;
+
+			tab._isDataUnsaved = hasChanges;
+		}
+	});
+
 	let qrCodeDataUrl = $state<string | null>(null);
 
 	async function loadRubric() {
@@ -46,6 +67,11 @@
 			rubricScores = existingRubric.rubric as number[];
 			notes = existingRubric.notes;
 			timestamp = existingRubric.timestamp;
+			
+			// Reset initial state to loaded values
+			initialTeamId = existingRubric.teamId;
+			initialRubricScores = [...(existingRubric.rubric as number[])];
+			initialNotes = existingRubric.notes;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
 			app.addErrorNotice('Failed to load existing rubric');
@@ -133,6 +159,12 @@
 			});
 
 			isSubmitted = true;
+			
+			// Update initial state to current saved state
+			initialTeamId = tab.teamId;
+			initialRubricScores = [...rubricScores];
+			initialNotes = notes;
+			
 			app.addSuccessNotice('Team interview rubric saved successfully!');
 		} catch (error) {
 			console.error('Failed to save team interview rubric:', error);
@@ -162,6 +194,11 @@
 		notes = '';
 		showValidationErrors = false;
 		isSubmitted = false;
+
+		// Reset initial state to empty
+		initialTeamId = '';
+		initialRubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
+		initialNotes = '';
 
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });

@@ -26,6 +26,7 @@ interface BaseTab<C extends Component<ComponentProps<C>>> {
 	get title(): string;
 	get hash(): string;
 	isEqual(other: BaseTab<C>): boolean;
+	isDataUnsaved(): boolean;
 }
 
 export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
@@ -45,6 +46,10 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 
 	isEqual(other: BaseTab<any>): boolean {
 		return this.hash === other.hash;
+	}
+
+	isDataUnsaved(): boolean {
+		return false;
 	}
 
 	constructor() {
@@ -71,6 +76,10 @@ export class TeamAttendanceTab implements BaseTab<typeof TeamAttendanceTabCompon
 		return this.hash === other.hash;
 	}
 
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -95,6 +104,10 @@ export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComp
 		return this.hash === other.hash;
 	}
 
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -108,6 +121,7 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 	readonly props = { tab: this };
 	teamId: string = $state('');
 	rubricId: string | null = $state(null);
+	_isDataUnsaved: boolean = $state(false);
 
 	get title() {
 		const team = app.findTeamById(this.teamId);
@@ -131,6 +145,10 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 		return false;
 	}
 
+	isDataUnsaved(): boolean {
+		return this._isDataUnsaved;
+	}
+
 	constructor(params: { teamId: string } | { rubricId: string }) {
 		this.id = generateUUID();
 
@@ -152,6 +170,7 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 	readonly props = { tab: this };
 	teamId: string = $state('');
 	rubricId: string | null = $state(null);
+	_isDataUnsaved: boolean = $state(false);
 
 	get title() {
 		const team = app.findTeamById(this.teamId);
@@ -173,6 +192,10 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 			}
 		}
 		return false;
+	}
+
+	isDataUnsaved(): boolean {
+		return this._isDataUnsaved;
 	}
 
 	constructor(params: { teamId: string } | { rubricId: string }) {
@@ -207,6 +230,10 @@ export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent>
 		return this.hash === other.hash;
 	}
 
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -229,6 +256,10 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 
 	isEqual(other: BaseTab<any>): boolean {
 		return this.hash === other.hash;
+	}
+
+	isDataUnsaved(): boolean {
+		return false;
 	}
 
 	constructor() {
@@ -255,6 +286,10 @@ export class ExcellenceAwardCandidatesTab implements BaseTab<typeof ExcellenceAw
 		return this.hash === other.hash;
 	}
 
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -279,6 +314,10 @@ export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabCompo
 		return this.hash === other.hash;
 	}
 
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
 	constructor() {
 		this.id = generateUUID();
 	}
@@ -301,6 +340,10 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 
 	isEqual(other: BaseTab<any>): boolean {
 		return this.hash === other.hash;
+	}
+
+	isDataUnsaved(): boolean {
+		return false;
 	}
 
 	constructor() {

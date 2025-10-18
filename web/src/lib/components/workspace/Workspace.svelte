@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
+	import { app, subscriptions, tabs, dialogs } from '$lib/app-page.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judging.jerryio/protocol/src/rubric';
@@ -18,8 +18,26 @@
 		tabs.switchToTab(tabId);
 	}
 
-	function closeTab(tabId: string) {
+	async function closeTab(tabId: string) {
 		console.log('closeTab', tabId);
+
+		const tab = tabs.getTab(tabId);
+		
+		// Check if tab has unsaved data
+		if (tab && tab.isDataUnsaved()) {
+			const confirmed = await dialogs.showConfirmation({
+				title: 'Unsaved Changes',
+				message: 'You have unsaved changes. Are you sure you want to close this tab?',
+				confirmText: 'Close Anyway',
+				cancelText: 'Keep Editing',
+				confirmButtonClass: 'danger',
+				cancelButtonClass: 'primary'
+			});
+
+			if (!confirmed) {
+				return; // User cancelled, don't close the tab
+			}
+		}
 
 		tabs.closeTab(tabId);
 	}
