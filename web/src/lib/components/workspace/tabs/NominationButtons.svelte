@@ -18,7 +18,8 @@
 
 	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
-	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
+	const isMeetInnovateAwardSubmissionFormRequirement = $derived(award.name !== 'Innovate Award' || team.hasInnovateAwardSubmissionForm);
+	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement || !isMeetInnovateAwardSubmissionFormRequirement);
 
 	async function removeNomination() {
 		await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName: award.name, teamId: team.id });
@@ -61,6 +62,9 @@
 			{/if}
 			{#if !isMeetGradeRequirement}
 				<p>{award.acceptedGrades.join(', ')} Required</p>
+			{/if}
+			{#if !isMeetInnovateAwardSubmissionFormRequirement}
+				<p>Submission Form Required</p>
 			{/if}
 		</div>
 	{:else}

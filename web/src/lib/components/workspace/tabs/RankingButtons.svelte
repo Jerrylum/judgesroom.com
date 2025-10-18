@@ -23,7 +23,10 @@
 
 	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
-	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
+	const isMeetInnovateAwardSubmissionFormRequirement = $derived(award.name !== 'Innovate Award' || team.hasInnovateAwardSubmissionForm);
+	const isDisabled = $derived(
+		bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement || !isMeetInnovateAwardSubmissionFormRequirement
+	);
 
 	// Handle ranking update
 	async function updateRanking(newRanking: number) {
@@ -106,12 +109,15 @@
 	onkeydown={(e) => e.key === 'Enter' && handleTouch()}
 >
 	{#if isDisabled}
-		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-xs text-gray-600">
+		<div class="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
 				<p>Notebook Required</p>
 			{/if}
 			{#if !isMeetGradeRequirement}
 				<p>{award.acceptedGrades.join(', ')} Required</p>
+			{/if}
+			{#if !isMeetInnovateAwardSubmissionFormRequirement}
+				<p>Submission Form Required</p>
 			{/if}
 		</div>
 	{:else if isEditMode}

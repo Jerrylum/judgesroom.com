@@ -48,8 +48,9 @@
 			if (!bypassRequirements) {
 				const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true;
 				const meetGradeReq = award.acceptedGrades.includes(team.grade);
+				const meetInnovateAwardSubmissionFormReq = award.name !== 'Innovate Award' || team.hasInnovateAwardSubmissionForm;
 
-				if (!meetNotebookReq || !meetGradeReq) {
+				if (!meetNotebookReq || !meetGradeReq || !meetInnovateAwardSubmissionFormReq) {
 					return false;
 				}
 			}
