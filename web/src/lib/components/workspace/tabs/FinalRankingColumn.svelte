@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Award } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward, type Award } from '@judging.jerryio/protocol/src/award';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
@@ -133,11 +133,12 @@
 			if (!teamAutoSkillsMap.has(teamNumber)) return 'no-data';
 			const autoSkillsScore = teamAutoSkillsMap.get(teamNumber) ?? 0;
 			return autoSkillsScore > 0 ? 'eligible' : 'ineligible';
+		} else if (award.name === 'Design Award' || isExcellenceAward(award.name)) {
+			if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
+			return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
 		}
 		
-		// For Excellence and Design Awards, check Excellence Award eligibility
-		if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
-		return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
+		return 'no-data';
 	}
 </script>
 
