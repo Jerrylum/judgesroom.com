@@ -188,7 +188,7 @@ export function groupTeamsByGroup(teamList: TeamInfoAndData[]): Record<string, T
 }
 
 export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
-	return teams.sort((a, b) => {
+	return [...teams].sort((a, b) => {
 		const aIsStartWithDigit = /[0-9]/.test(a.number);
 		const bIsStartWithDigit = /[0-9]/.test(b.number);
 
@@ -208,7 +208,7 @@ export function sortByTeamNumber(teams: Readonly<TeamInfoAndData>[]) {
 }
 
 export function sortByTeamNumberInMap(teamIds: Readonly<string>[], teamsMap: Readonly<Record<string, Readonly<TeamInfoAndData>>>) {
-	return teamIds.sort((a, b) => {
+	return [...teamIds].sort((a, b) => {
 		const aIsStartWithDigit = /[0-9]/.test(teamsMap[a].number);
 		const bIsStartWithDigit = /[0-9]/.test(teamsMap[b].number);
 
