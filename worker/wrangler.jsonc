@@ -8,6 +8,11 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-26",
 	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": "../web/build",
+		"not_found_handling": "404-page",
+		"html_handling": "auto-trailing-slash"
+	},
 	"migrations": [
 		{
 			"new_sqlite_classes": ["WebSocketHibernationServer"],
