@@ -19,6 +19,21 @@
 				]
 			}
 		},
+		"beta": {
+			"assets": {
+				"directory": "../web/build",
+				"not_found_handling": "404-page",
+				"html_handling": "auto-trailing-slash"
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"class_name": "WebSocketHibernationServer",
+						"name": "WEBSOCKET_HIBERNATION_SERVER"
+					}
+				]
+			}
+		},
 		"production": {
 			"assets": {
 				"directory": "../web/build",
