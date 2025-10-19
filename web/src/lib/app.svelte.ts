@@ -129,7 +129,7 @@ export class App {
 		}
 
 		if (this.getConnectionState() === 'connected') {
-			throw new Error('CRITICAL: already connected to a Judges\' Room');
+			throw new Error("CRITICAL: already connected to a Judges' Room");
 		}
 
 		// Just to be safe, reset the client manager
@@ -161,12 +161,12 @@ export class App {
 	async joinJudgesRoomFromUrl(url: string): Promise<void> {
 		try {
 			if (this.hasPermit()) {
-				throw new Error('CRITICAL: already in a Judges\' Room');
+				throw new Error("CRITICAL: already in a Judges' Room");
 			}
 
 			const roomId = parseJudgesRoomUrl(url);
 			if (!roomId) {
-				throw new Error('Invalid Judges\' Room URL');
+				throw new Error("Invalid Judges' Room URL");
 			}
 
 			this.permit = this.createNewPermit(roomId);
@@ -191,7 +191,7 @@ export class App {
 	 */
 	getJudgesRoomUrl(): string {
 		if (!this.permit?.roomId) {
-			throw new Error('CRITICAL: No active Judges\' Room');
+			throw new Error("CRITICAL: No active Judges' Room");
 		}
 		return `${window.location.origin}${window.location.pathname}#${this.permit.roomId}`;
 	}
@@ -624,7 +624,7 @@ export class App {
 		const isDevelopment = import.meta.env.DEV;
 		const wsUrl = isDevelopment
 			? `ws://${window.location.hostname}:8787/ws` // Local development server
-			: 'wss://judging.jerryio.workers.dev/ws'; // Production Cloudflare Worker
+			: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`; // Production Cloudflare Worker
 
 		if (this.permit === null) {
 			throw new Error('CRITICAL: No permit');
@@ -641,12 +641,12 @@ export class App {
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
 					this.leaveJudgesRoom();
-					this.addErrorNotice('You have been kicked from the Judges\' Room');
+					this.addErrorNotice("You have been kicked from the Judges' Room");
 
 					AppUI.appPhase = 'begin';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
 					this.leaveJudgesRoom();
-					this.addErrorNotice('The Judges\' Room has been destroyed');
+					this.addErrorNotice("The Judges' Room has been destroyed");
 
 					AppUI.appPhase = 'begin';
 				}
