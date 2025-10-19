@@ -64,7 +64,8 @@ export function createClientProxy<TClientRouter extends AnyRouter>(
 	return new Proxy({} as RouterProxy<TClientRouter>, {
 		get(_target, prop: string) {
 			if (prop === 'query' || prop === 'mutation') {
-				return async (input: unknown) => {
+				// Create a function that can be called
+				const fn = async (input: unknown) => {
 					const request: WRPCRequest = {
 						kind: 'request',
 						id: crypto.randomUUID(),
@@ -85,6 +86,18 @@ export function createClientProxy<TClientRouter extends AnyRouter>(
 						return responses;
 					}
 				};
+
+				// Wrap it in a proxy to allow property access for traversal
+				return new Proxy(fn, {
+					get(_target, nestedProp: string | symbol) {
+						if (typeof nestedProp === 'symbol') return undefined;
+						// Continue traversal by treating it as a path segment
+						return createClientProxy(connectionManager, targetClientId, [...pathParts, prop, nestedProp]);
+					},
+					apply(_target, _thisArg, args: unknown[]) {
+						return fn(args[0]);
+					}
+				});
 			}
 
 			return createClientProxy(connectionManager, targetClientId, [...pathParts, prop]);

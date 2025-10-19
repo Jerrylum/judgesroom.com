@@ -21,11 +21,25 @@ export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter 
 						get(_t, key: string | symbol) {
 							if (typeof key === 'symbol') return undefined;
 							if (key === 'constructor') return undefined;
-							if (key === 'query') {
-								return (input: unknown) => client.query(currentParts.join('.'), input);
-							}
-							if (key === 'mutation') {
-								return (input: unknown) => client.mutation(currentParts.join('.'), input);
+							if (key === 'query' || key === 'mutation') {
+								// Create a function that can be called
+								const fn = (input: unknown) => {
+									return key === 'query'
+										? client.query(currentParts.join('.'), input)
+										: client.mutation(currentParts.join('.'), input);
+								};
+
+								// Wrap it in a proxy to allow property access for traversal
+								return new Proxy(fn, {
+									get(_target, nestedProp: string | symbol) {
+										if (typeof nestedProp === 'symbol') return undefined;
+										// Continue traversal by treating it as a path segment
+										return createPathProxy([...currentParts, key, nestedProp]);
+									},
+									apply(_target, _thisArg, args: unknown[]) {
+										return fn(args[0]);
+									}
+								});
 							}
 							return createPathProxy([...currentParts, key]);
 						}

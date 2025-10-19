@@ -138,6 +138,90 @@ describe('createWRPCClient', () => {
 			expect(result).toBe(10);
 		});
 
+		it('should handle query as an intermediate path segment', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.query).mockResolvedValue({ items: [] });
+
+			// Accessing 'query' as a path segment, then calling .query() as terminal
+			const result = await (wrpcProxy as any).query.list.query();
+
+			expect(wsClient.query).toHaveBeenCalledWith('query.list', undefined);
+			expect(result).toEqual({ items: [] });
+		});
+
+		it('should handle mutation as an intermediate path segment', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.mutation).mockResolvedValue({ success: true });
+
+			// Accessing 'mutation' as a path segment, then calling .mutation() as terminal
+			const result = await (wrpcProxy as any).mutation.update.mutation({ id: 1 });
+
+			expect(wsClient.mutation).toHaveBeenCalledWith('mutation.update', { id: 1 });
+			expect(result).toEqual({ success: true });
+		});
+
+		it('should handle deeply nested paths with query/mutation as segments', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.query).mockResolvedValue({ profile: 'data' });
+
+			// Complex path: user.query.profile.query()
+			const result = await (wrpcProxy as any).user.query.profile.query();
+
+			expect(wsClient.query).toHaveBeenCalledWith('user.query.profile', undefined);
+			expect(result).toEqual({ profile: 'data' });
+		});
+
+		it('should handle query as both path segment and terminal method', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.query).mockResolvedValue('result1');
+
+			// Test 1: query as terminal method only
+			const result1 = await (wrpcProxy as any).getStatus.query();
+			expect(wsClient.query).toHaveBeenCalledWith('getStatus', undefined);
+			expect(result1).toBe('result1');
+
+			vi.mocked(wsClient.query).mockResolvedValue('result2');
+
+			// Test 2: query as path segment
+			const result2 = await (wrpcProxy as any).query.getStatus.query();
+			expect(wsClient.query).toHaveBeenCalledWith('query.getStatus', undefined);
+			expect(result2).toBe('result2');
+		});
+
+		it('should handle mutation as both path segment and terminal method', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.mutation).mockResolvedValue('result1');
+
+			// Test 1: mutation as terminal method only
+			const result1 = await (wrpcProxy as any).updateUser.mutation({ id: 1 });
+			expect(wsClient.mutation).toHaveBeenCalledWith('updateUser', { id: 1 });
+			expect(result1).toBe('result1');
+
+			vi.mocked(wsClient.mutation).mockResolvedValue('result2');
+
+			// Test 2: mutation as path segment
+			const result2 = await (wrpcProxy as any).mutation.updateUser.mutation({ id: 2 });
+			expect(wsClient.mutation).toHaveBeenCalledWith('mutation.updateUser', { id: 2 });
+			expect(result2).toBe('result2');
+		});
+
+		it('should handle multiple query/mutation segments in the same path', async () => {
+			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
+
+			vi.mocked(wsClient.query).mockResolvedValue('complex result');
+
+			// Path with multiple reserved words: query.mutation.query.list.query()
+			const result = await (wrpcProxy as any).query.mutation.query.list.query();
+
+			expect(wsClient.query).toHaveBeenCalledWith('query.mutation.query.list', undefined);
+			expect(result).toBe('complex result');
+		});
+
 		it('should handle dynamic procedure names', async () => {
 			const [wsClient, wrpcProxy] = createWRPCClient(clientOptions, clientRouter);
 
