@@ -6,6 +6,7 @@
 	import {
 		getEventDivisionExcellenceAwardCandidatesReport,
 		getRobotEventsClient,
+		sortByTeamNumberAndEligibility,
 		type ExcellenceAwardCandidatesReport
 	} from '$lib/robotevents-source';
 	import { isExcellenceAward } from '@judging.jerryio/protocol/src/award';
@@ -179,7 +180,7 @@
 								</scroll-container>
 							</table-header>
 							<table-body>
-								{#each report.teamsInGroup as team (team.teamNumber)}
+								{#each sortByTeamNumberAndEligibility(report.teamsInGroup) as team (team.teamNumber)}
 									<row>
 										<team>
 											<div class:text-green-500={team.isEligible}>

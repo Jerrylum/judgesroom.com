@@ -474,3 +474,27 @@ export async function importFromRobotEvents(client: RobotEventsClient, evtSku: s
 		divisionInfos
 	} satisfies RobotEventsImportedData;
 }
+
+export function sortByTeamNumberAndEligibility(eligibility: Readonly<ExcellenceAwardTeamEligibility>[]): ExcellenceAwardTeamEligibility[] {
+	return [...eligibility].sort((a, b) => {
+		if (a.isEligible !== b.isEligible) {
+			return a.isEligible ? -1 : 1;
+		}
+
+		const aIsStartWithDigit = /[0-9]/.test(a.teamNumber);
+		const bIsStartWithDigit = /[0-9]/.test(b.teamNumber);
+
+		if (aIsStartWithDigit && !bIsStartWithDigit) {
+			return -1;
+		} else if (!aIsStartWithDigit && bIsStartWithDigit) {
+			return 1;
+		} else if (aIsStartWithDigit && bIsStartWithDigit) {
+			// 0000A -> 0000 (all letters after the digits are ignored)
+			const aNumber = parseInt(a.teamNumber);
+			const bNumber = parseInt(b.teamNumber);
+			return aNumber - bNumber;
+		} else {
+			return a.teamNumber.localeCompare(b.teamNumber);
+		}
+	});
+}
