@@ -111,21 +111,22 @@
 		const fullyDevelopedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
 		const fullyDevelopedCount = fullyDevelopedTeams.length;
 
-		const teamsWithSubmittedRubrics = teamsToShow.filter((team) => {
-			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
-			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
-		});
-		const teamsWithRubricsCount = teamsWithSubmittedRubrics.length;
-
 		const fullyDevelopedWithRubrics = fullyDevelopedTeams.filter((team) => {
 			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
 			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
 		}).length;
 
+		const teamsInterviewed = teamsToShow.filter((team) => {
+			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
+			return teamRubricsAndNotes.teamInterviewRubrics.length > 0;
+		}).length;
+
+		const presentTeams = teamsToShow.filter((team) => !team.absent).length;
+
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
 			fullyDevelopedWithRubrics: { count: fullyDevelopedWithRubrics, total: fullyDevelopedCount },
-			allTeamsWithRubrics: { count: teamsWithRubricsCount, total: totalTeams }
+			teamsInterviewed: { count: teamsInterviewed, total: presentTeams }
 		};
 	});
 </script>
@@ -175,11 +176,11 @@
 		<div class="rounded-lg bg-gray-50 p-3">
 			<div class="text-sm font-medium text-gray-900">Teams Interviewed</div>
 			<div class="text-lg font-semibold text-gray-700">
-				{progressMetrics.allTeamsWithRubrics.count} / {progressMetrics.allTeamsWithRubrics.total}
+				{progressMetrics.teamsInterviewed.count} / {progressMetrics.teamsInterviewed.total}
 			</div>
 			<div class="text-xs text-gray-600">
-				{progressMetrics.allTeamsWithRubrics.total > 0
-					? Math.round((progressMetrics.allTeamsWithRubrics.count / progressMetrics.allTeamsWithRubrics.total) * 100)
+				{progressMetrics.teamsInterviewed.total > 0
+					? Math.round((progressMetrics.teamsInterviewed.count / progressMetrics.teamsInterviewed.total) * 100)
 					: 0}%
 			</div>
 		</div>

@@ -104,7 +104,7 @@
 			judges = [...allJudges];
 
 			// Update unassigned teams
-			unassignedTeams = teams.filter((team) => !team.absent && !assignedTeamIds.has(team.id));
+			unassignedTeams = teams.filter((team) => !assignedTeamIds.has(team.id));
 		}
 	}
 
