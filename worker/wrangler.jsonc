@@ -8,10 +8,32 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-26",
 	"compatibility_flags": ["nodejs_compat"],
-	"assets": {
-		"directory": "../web/build",
-		"not_found_handling": "404-page",
-		"html_handling": "auto-trailing-slash"
+	"env": {
+		"development": {
+			"durable_objects": {
+				"bindings": [
+					{
+						"class_name": "WebSocketHibernationServer",
+						"name": "WEBSOCKET_HIBERNATION_SERVER"
+					}
+				]
+			}
+		},
+		"production": {
+			"assets": {
+				"directory": "../web/build",
+				"not_found_handling": "404-page",
+				"html_handling": "auto-trailing-slash"
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"class_name": "WebSocketHibernationServer",
+						"name": "WEBSOCKET_HIBERNATION_SERVER"
+					}
+				]
+			}
+		}
 	},
 	"migrations": [
 		{
@@ -19,14 +41,6 @@
 			"tag": "v1"
 		}
 	],
-	"durable_objects": {
-		"bindings": [
-			{
-				"class_name": "WebSocketHibernationServer",
-				"name": "WEBSOCKET_HIBERNATION_SERVER"
-			}
-		]
-	},
 	"rules": [
 		{
 			"type": "Text",
