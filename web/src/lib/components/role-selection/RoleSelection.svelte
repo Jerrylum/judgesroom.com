@@ -75,6 +75,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Role Selection | Judges' Room</title>
+</svelte:head>
+
 <div class="flex flex-1 flex-col items-center justify-center p-8">
 	<div class="w-full max-w-4xl">
 		<div class="space-y-6">

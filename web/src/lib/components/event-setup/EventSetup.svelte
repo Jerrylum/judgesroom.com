@@ -220,6 +220,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Event Setup | Judges' Room</title>
+</svelte:head>
+
 <div class="h-full overflow-auto bg-slate-100 p-2 md:p-6">
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Step Indicator -->
