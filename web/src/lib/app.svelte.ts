@@ -113,8 +113,10 @@ export class App {
 		this.isDevelopment = isDevelopment;
 		this.clientManager = createClientManager(this.createClientOptions.bind(this), clientRouter);
 
-		this.loadPermitFromStorage();
-		this.loadUserFromStorage();
+		if (typeof window !== 'undefined') {
+			this.loadPermitFromStorage();
+			this.loadUserFromStorage();
+		}
 	}
 
 	// ============================================================================
