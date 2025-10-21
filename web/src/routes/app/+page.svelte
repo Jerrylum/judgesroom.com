@@ -8,14 +8,12 @@
 	import Loading from '$lib/components/loading/Loading.svelte';
 	import Begin from '$lib/components/begin/Begin.svelte';
 	import JoiningJudgesRoom from '$lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
+	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
 	import { parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
 
-	// App state persistence error message
-
-	let errorMessage = $state('');
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
 
@@ -77,8 +75,12 @@
 			AppUI.appPhase = 'joining_judges_room';
 		} catch (error) {
 			console.error('Error joining Judges\' Room from URL:', error);
-			errorMessage = `Failed to join Judges' Room: ${error}`;
 			AppUI.appPhase = 'begin';
+			dialogs.showAlert({
+				title: 'Failed to Join',
+				message: `Failed to join Judges' Room: ${error}`,
+				confirmButtonClass: 'primary'
+			});
 		}
 	}
 
@@ -91,8 +93,12 @@
 			// Permit in storage but couldn't be used, show choice
 			// TODO: handle this case
 			console.error('Error rejoining stored permit:', error);
-			errorMessage = `Failed to rejoin Judges' Room: ${error}`;
 			AppUI.appPhase = 'begin';
+			dialogs.showAlert({
+				title: 'Failed to Rejoin',
+				message: `Failed to rejoin Judges' Room: ${error}`,
+				confirmButtonClass: 'primary'
+			});
 		}
 	}
 
@@ -108,7 +114,7 @@
 	{#if AppUI.appPhase === 'loading'}
 		<Loading />
 	{:else if AppUI.appPhase === 'begin'}
-		<Begin {errorMessage} />
+		<Begin />
 	{:else if AppUI.appPhase === 'joining_judges_room'}
 		<JoiningJudgesRoom />
 	{:else if AppUI.appPhase === 'event_setup'}
@@ -130,7 +136,9 @@
 
 	<!-- Dialog System -->
 	{#if currentDialog}
-		{#if currentDialog.type === 'confirmation'}
+		{#if currentDialog.type === 'alert'}
+			<AlertDialog dialog={currentDialog} />
+		{:else if currentDialog.type === 'confirmation'}
 			<ConfirmationDialog dialog={currentDialog} />
 		{:else if currentDialog.type === 'prompt'}
 			<PromptDialog dialog={currentDialog} />

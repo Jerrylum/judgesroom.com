@@ -1,17 +1,7 @@
 <script lang="ts">
-	import { app, AppUI } from '$lib/index.svelte';
-
-	interface Props {
-		errorMessage: string;
-	}
-
-	let { errorMessage = $bindable() }: Props = $props();
+	import { app, AppUI, dialogs } from '$lib/index.svelte';
 
 	let judgesRoomUrl = $state('');
-
-	function clearError() {
-		errorMessage = '';
-	}
 
 	async function handleStartNewEvent() {
 		AppUI.appPhase = 'event_setup';
@@ -19,7 +9,10 @@
 
 	async function handleJoinJudgesRoom() {
 		if (!judgesRoomUrl.trim()) {
-			errorMessage = "Please enter a Judges' Room URL";
+			dialogs.showAlert({
+				title: 'Invalid URL',
+				message: "Please enter a Judges' Room URL"
+			});
 			return;
 		}
 
@@ -32,6 +25,10 @@
 		} catch (error) {
 			console.error("Error joining Judges' Room:", error);
 			AppUI.appPhase = 'begin';
+			dialogs.showAlert({
+				title: 'Failed to Join',
+				message: `Failed to join Judges' Room: ${error}`
+			});
 		}
 	}
 </script>
@@ -42,19 +39,6 @@
 
 <div class="flex h-screen flex-col bg-slate-100">
 	<div class="flex flex-1 flex-col items-center justify-center p-8">
-		{#if errorMessage}
-			<div class="mb-8 flex w-full max-w-2xl items-center gap-4 rounded-lg border-2 border-red-600 bg-red-500/90 p-4" role="alert">
-				<p class="flex-1 text-white">{errorMessage}</p>
-				<button
-					onclick={clearError}
-					class="flex h-6 w-6 items-center justify-center text-xl text-white transition-colors hover:text-red-200"
-					aria-label="Clear error"
-				>
-					×
-				</button>
-			</div>
-		{/if}
-
 		<div class="flex w-full max-w-3xl flex-col items-center gap-6">
 			<div class="flex flex-col items-center justify-center gap-2">
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
@@ -65,9 +49,11 @@
 				</p>
 			</div>
 
-			<div class="rounded-2xl bg-white p-4 shadow-sm sm:p-6 max-w-lg">
+			<div class="max-w-lg rounded-2xl bg-white p-4 shadow-sm sm:p-6">
 				<h3 class="text-2xl font-medium text-gray-900">Join Judges' Room</h3>
-				<p class="mb-2 mt-4 leading-relaxed text-gray-700 text-sm">You could join by clicking the invite link directly or pasting the link below and clicking "Join".</p>
+				<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
+					You could join by clicking the invite link directly or pasting the link below and clicking "Join".
+				</p>
 				<div class="mb-6 space-y-4">
 					<input type="text" bind:value={judgesRoomUrl} placeholder="Paste the invite link here..." class="classic w-full" />
 					<button onclick={handleJoinJudgesRoom} class="primary w-full">Join</button>

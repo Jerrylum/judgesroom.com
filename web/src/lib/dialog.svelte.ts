@@ -7,6 +7,15 @@ interface BaseDialog {
 	type: string;
 }
 
+// Alert dialog
+export interface AlertDialog extends BaseDialog {
+	type: 'alert';
+	title: string;
+	message: string;
+	confirmText?: string;
+	confirmButtonClass?: string;
+}
+
 // Confirmation dialog
 export interface ConfirmationDialog extends BaseDialog {
 	type: 'confirmation';
@@ -38,7 +47,7 @@ export interface CustomDialog extends BaseDialog {
 	maxWidth?: string;
 }
 
-export type Dialog = ConfirmationDialog | PromptDialog | CustomDialog;
+export type Dialog = AlertDialog | ConfirmationDialog | PromptDialog | CustomDialog;
 
 export class DialogController {
 	private dialogs: Dialog[] = $state([]);
@@ -54,6 +63,20 @@ export class DialogController {
 
 	private generateId(): string {
 		return `dialog-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+	}
+
+	showAlert(options: Omit<AlertDialog, 'id' | 'type'>): Promise<void> {
+		const id = this.generateId();
+		const dialog: AlertDialog = {
+			id,
+			type: 'alert',
+			...options
+		};
+
+		return new Promise<void>((resolve) => {
+			this.resolvers.set(id, () => resolve());
+			this.dialogs.push(dialog);
+		});
 	}
 
 	/**
