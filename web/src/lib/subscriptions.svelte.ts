@@ -1,4 +1,4 @@
-import type { AwardRankingsFullUpdate, SubmissionCache } from '@judging.jerryio/protocol/src/rubric';
+import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 
 export interface SubscriptionsStorage {
 	allJudgeGroupsAwardRankings: Record<string, AwardRankingsFullUpdate>; // key is judge group id

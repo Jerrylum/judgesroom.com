@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { type Program } from '@judging.jerryio/protocol/src/award';
-import { EventGradeLevelSchema, EventNameSchema, EssentialDataSchema, type EssentialData } from '@judging.jerryio/protocol/src/event';
-import { uuidv4 } from '@judging.jerryio/protocol/src/utils';
+import { type Program } from '@judgesroom.com/protocol/src/award';
+import { EventGradeLevelSchema, EventNameSchema, EssentialDataSchema, type EssentialData } from '@judgesroom.com/protocol/src/event';
+import { uuidv4 } from '@judgesroom.com/protocol/src/utils';
 import { getEventGradeLevelOptions } from './event.svelte';
 
 describe('Event Grade Level Options', () => {

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
-import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
-import type { Award, Program } from '@judging.jerryio/protocol/src/award';
+import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
+import type { Award, Program } from '@judgesroom.com/protocol/src/award';
 import { Client, type Division, type Event, type Grade, type RobotEventsClient, type Team, type TeamData } from 'robotevents';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
-	import { type Program, ProgramSchema } from '@judging.jerryio/protocol/src/award';
-	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import { type Program, ProgramSchema } from '@judgesroom.com/protocol/src/award';
+	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { parseTournamentManagerCSV, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import { v4 as uuidv4 } from 'uuid';

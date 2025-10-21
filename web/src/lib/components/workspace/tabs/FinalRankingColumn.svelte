@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { isExcellenceAward, type Award } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward, type Award } from '@judgesroom.com/protocol/src/award';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
+	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import AddNominationDialog from './AddNominationDialog.svelte';
 	import type { ExcellenceAwardTeamEligibility } from '$lib/robotevents-source';
 

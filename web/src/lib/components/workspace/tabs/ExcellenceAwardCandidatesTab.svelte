@@ -9,7 +9,7 @@
 		sortByTeamNumberAndEligibility,
 		type ExcellenceAwardCandidatesReport
 	} from '$lib/robotevents-source';
-	import { isExcellenceAward } from '@judging.jerryio/protocol/src/award';
+	import { isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 
 	interface Props {

@@ -9,9 +9,9 @@
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData } from '$lib/team.svelte';
-	import type { Program } from '@judging.jerryio/protocol/src/award';
-	import type { EssentialData, EventGradeLevel } from '@judging.jerryio/protocol/src/event';
-	import type { JudgingMethod, Judge, JudgingStep } from '@judging.jerryio/protocol/src/judging';
+	import type { Program } from '@judgesroom.com/protocol/src/award';
+	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import EventCodeSetup from './EventCodeSetup.svelte';
 

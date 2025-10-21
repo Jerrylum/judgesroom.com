@@ -1,7 +1,7 @@
-import { type Program, type AwardType, type Grade, type Award } from '@judging.jerryio/protocol/src/award';
+import { type Program, type AwardType, type Grade, type Award } from '@judgesroom.com/protocol/src/award';
 import { generateUUID } from './utils.svelte';
-import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
-import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
+import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
+import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 
 export class AwardOptions {
 	public readonly id: string;

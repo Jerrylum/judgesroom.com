@@ -3,9 +3,9 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judging.jerryio/protocol/src/award';
-	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
+	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judgesroom.com/protocol/src/award';
+	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
 
 	interface Props {
 		title: string;

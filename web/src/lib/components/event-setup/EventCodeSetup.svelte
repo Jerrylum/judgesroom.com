@@ -9,8 +9,8 @@
 		type RobotEventsImportedData
 	} from '$lib/robotevents-source';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import type { Program } from '@judging.jerryio/protocol/src/award';
-	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+	import type { Program } from '@judgesroom.com/protocol/src/award';
+	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { untrack } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 

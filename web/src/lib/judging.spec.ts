@@ -9,9 +9,9 @@ import {
 	getJudgesInGroup
 } from './judging.svelte';
 import { type TeamInfoAndData } from './team.svelte';
-import { JudgeSchema, type Judge } from '@judging.jerryio/protocol/src/judging';
-import { type Grade } from '@judging.jerryio/protocol/src/award';
-import { type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+import { JudgeSchema, type Judge } from '@judgesroom.com/protocol/src/judging';
+import { type Grade } from '@judgesroom.com/protocol/src/award';
+import { type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 describe('Judge Class', () => {
 	let judge: Judge;

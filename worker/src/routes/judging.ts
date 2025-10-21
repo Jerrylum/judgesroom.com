@@ -7,7 +7,7 @@ import {
 	SubmissionCacheSchema,
 	TeamInterviewNoteSchema,
 	TeamInterviewRubricSchema
-} from '@judging.jerryio/protocol/src/rubric';
+} from '@judgesroom.com/protocol/src/rubric';
 import type {
 	AwardNomination,
 	AwardRankingsFullUpdate,
@@ -15,7 +15,7 @@ import type {
 	SubmissionCache,
 	TeamInterviewNote,
 	TeamInterviewRubric
-} from '@judging.jerryio/protocol/src/rubric';
+} from '@judgesroom.com/protocol/src/rubric';
 import { eq, desc, and, asc } from 'drizzle-orm';
 import {
 	awardRankings,
@@ -27,13 +27,13 @@ import {
 	teamInterviewRubrics,
 	metadata
 } from '../db/schema';
-import { AwardNameSchema, isExcellenceAward } from '@judging.jerryio/protocol/src/award';
-import { RankSchema } from '@judging.jerryio/protocol/src/rubric';
-import type { RouterBroadcastProxy, WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import { AwardNameSchema, isExcellenceAward } from '@judgesroom.com/protocol/src/award';
+import { RankSchema } from '@judgesroom.com/protocol/src/rubric';
+import type { RouterBroadcastProxy, WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeTopic } from './subscriptions';
 import { transaction } from '../utils';
 import { getAwards } from './essential';
-import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
 
 export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: string): Promise<AwardRankingsFullUpdate> {
 	const { judgedAwards, rankingsData } = await transaction(db, async (tx) => {

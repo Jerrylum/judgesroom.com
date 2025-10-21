@@ -2,7 +2,7 @@
 	import { app, subscriptions, tabs, dialogs } from '$lib/index.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
-	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judging.jerryio/protocol/src/rubric';
+	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 	import type { Tab } from '$lib/tab.svelte';
 
 	// Get tab state

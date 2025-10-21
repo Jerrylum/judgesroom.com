@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { app } from '$lib/index.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import type { Award } from '@judging.jerryio/protocol/src/award';
-	import type { AwardRankingsFullUpdate } from '@judging.jerryio/protocol/src/rubric';
-	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';
+	import type { Award } from '@judgesroom.com/protocol/src/award';
+	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
+	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		awardIndex: number;

@@ -2,9 +2,9 @@
 	import { separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
 	import type { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { groupTeamsByGroup, type TeamInfoAndData } from '$lib/team.svelte';
-	import type { Program } from '@judging.jerryio/protocol/src/award';
-	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
-	import type { JudgingMethod } from '@judging.jerryio/protocol/src/judging';
+	import type { Program } from '@judgesroom.com/protocol/src/award';
+	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+	import type { JudgingMethod } from '@judgesroom.com/protocol/src/judging';
 
 	interface Props {
 		selectedProgram: Program;

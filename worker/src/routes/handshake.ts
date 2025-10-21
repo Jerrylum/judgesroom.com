@@ -1,18 +1,18 @@
 import z from 'zod';
 import { getEssentialData, hasEssentialData, updateEssentialData } from './essential';
-import { EssentialDataSchema } from '@judging.jerryio/protocol/src/event';
-import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
-import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
-import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import { EssentialDataSchema } from '@judgesroom.com/protocol/src/event';
+import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
+import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
+import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
 import { broadcastDeviceListUpdate, getDevices } from './device';
 import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
-import { WRPCError } from '@judging.jerryio/wrpc/server/types';
-import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
-import { AwardNominationSchema } from '@judging.jerryio/protocol/src/rubric';
+import { WRPCError } from '@judgesroom.com/wrpc/server/types';
+import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
+import { AwardNominationSchema } from '@judgesroom.com/protocol/src/rubric';
 import { getFinalAwardNominations } from './judging';
 
 export const StarterKitSchema = z.object({

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { type TeamInfoAndData } from './team.svelte';
-import { type Judge } from '@judging.jerryio/protocol/src/judging';
+import { type Judge } from '@judgesroom.com/protocol/src/judging';
 
 export class EditingJudgeGroup {
 	public readonly id: string;

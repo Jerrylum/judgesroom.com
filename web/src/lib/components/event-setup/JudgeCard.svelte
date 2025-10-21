@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
-	import type { Judge } from '@judging.jerryio/protocol/src/judging';
+	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 
 	interface Props {
 		judge: Judge;

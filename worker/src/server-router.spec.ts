@@ -5,8 +5,8 @@ import { getAwards, getTeamInfos, getEssentialData } from './routes/essential';
 import { getTeamData } from './routes/team';
 import { getJudges } from './routes/judge';
 import type { ServerContext } from './server-router';
-import type { Session } from '@judging.jerryio/wrpc/server/session';
-import type { AnyRouter } from '@judging.jerryio/wrpc/server/router';
+import type { Session } from '@judgesroom.com/wrpc/server/session';
+import type { AnyRouter } from '@judgesroom.com/wrpc/server/router';
 
 describe('ServerRouter', () => {
 	let context: ServerContext & { cleanup: () => void };

@@ -5,7 +5,7 @@
 	import { flip } from 'svelte/animate';
 	import { type EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData, EditingTeamList } from '$lib/team.svelte';
-	import type { Judge } from '@judging.jerryio/protocol/src/judging';
+	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import { tick } from 'svelte';

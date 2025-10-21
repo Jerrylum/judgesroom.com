@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Award } from '@judging.jerryio/protocol/src/award';
+	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';
+	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		open: boolean;

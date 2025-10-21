@@ -28,7 +28,7 @@ Define your server-side router and WebSocket handler.
 ```ts
 // server/router.ts
 import { z } from 'zod';
-import { initWRPC } from '@judging.jerryio/wrpc/server';
+import { initWRPC } from '@judgesroom.com/wrpc/server';
 
 // 1) Initialize WRPC root (optionally provide default meta)
 const root = initWRPC.createServer<{ userId?: string }>();
@@ -64,7 +64,7 @@ Integrate the WebSocket handler (example: Cloudflare Durable Object with hiberna
 
 ```ts
 // server/handler.ts
-import { createWebSocketHandler } from '@judging.jerryio/wrpc/server';
+import { createWebSocketHandler } from '@judgesroom.com/wrpc/server';
 import { appRouter } from './router';
 
 // Storage helpers for Durable Object (shape is app-defined)
@@ -104,9 +104,9 @@ Define the client router (procedures the server may call on the client), then cr
 ```ts
 // client/index.ts
 import { z } from 'zod';
-import { createWRPCClient } from '@judging.jerryio/wrpc/client';
+import { createWRPCClient } from '@judgesroom.com/wrpc/client';
 import type { AppRouter } from '../server/router';
-import { initWRPC } from '@judging.jerryio/wrpc/server';
+import { initWRPC } from '@judgesroom.com/wrpc/server';
 
 // 1) Client router (procedures the server can call on the client)
 const root = initWRPC.createClient<AppRouter>();
@@ -149,7 +149,7 @@ run();
 You can also manage a singleton client instance with the built-in manager:
 
 ```ts
-import { createClientManager } from '@judging.jerryio/wrpc/client';
+import { createClientManager } from '@judgesroom.com/wrpc/client';
 
 export const wrpcManager = createClientManager<AppRouter, typeof clientRouter>(
 	() => ({

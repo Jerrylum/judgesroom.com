@@ -10,7 +10,7 @@ import {
 	readNotebookLinksExcel
 } from './team.svelte';
 import { v4 as uuidv4 } from 'uuid';
-import { type TeamInfo, type TeamData, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+import { type TeamInfo, type TeamData, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 describe('TeamInfo Class', () => {
 	let teamInfo: TeamInfo;

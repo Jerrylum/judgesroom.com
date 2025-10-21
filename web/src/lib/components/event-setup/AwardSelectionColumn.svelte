@@ -3,7 +3,7 @@
 	import { flip } from 'svelte/animate';
 	import AwardOptionsComponent from './AwardOptions.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
-	import type { AwardType } from '@judging.jerryio/protocol/src/award';
+	import type { AwardType } from '@judgesroom.com/protocol/src/award';
 
 	interface Props {
 		type: AwardType;

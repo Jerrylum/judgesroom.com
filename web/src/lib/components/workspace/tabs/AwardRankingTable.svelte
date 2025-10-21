@@ -2,7 +2,7 @@
 	import { app, subscriptions } from '$lib/index.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import RankingButtons from './RankingButtons.svelte';
-	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
+	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 
 	interface Props {

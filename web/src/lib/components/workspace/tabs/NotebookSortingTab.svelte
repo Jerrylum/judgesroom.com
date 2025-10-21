@@ -3,7 +3,7 @@
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
 	import NotebookSortingTeam from './NotebookSortingTeam.svelte';
-	import type { TeamData } from '@judging.jerryio/protocol/src/team';
+	import type { TeamData } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		tab: NotebookSortingTab;

@@ -1,5 +1,5 @@
 {
-	"name": "@judging.jerryio/web",
+	"name": "@judgesroom.com/web",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -18,7 +18,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
-		"@judging.jerryio/worker": "workspace:*",
+		"@judgesroom.com/worker": "workspace:*",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.22.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
@@ -46,8 +46,8 @@
 		"vitest-browser-svelte": "^0.1.0"
 	},
 	"dependencies": {
-		"@judging.jerryio/protocol": "workspace:*",
-		"@judging.jerryio/wrpc": "workspace:*",
+		"@judgesroom.com/protocol": "workspace:*",
+		"@judgesroom.com/wrpc": "workspace:*",
 		"crypto-js": "^4.2.0",
 		"events": "^3.3.0",
 		"papaparse": "^5.5.3",

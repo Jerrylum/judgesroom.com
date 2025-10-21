@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AwardOptions, getOfficialAwardOptionsList, createCustomAwardOptions } from './award.svelte';
-import { AwardSchema, type Program, type Grade } from '@judging.jerryio/protocol/src/award';
+import { AwardSchema, type Program, type Grade } from '@judgesroom.com/protocol/src/award';
 
 describe('AwardOptions Class', () => {
 	let awardOptions: AwardOptions;

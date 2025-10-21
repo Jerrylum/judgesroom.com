@@ -2,7 +2,7 @@
 	import { dialogs } from '$lib/index.svelte';
 	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { type Program, type Grade, type AwardType, AwardTypeSchema } from '@judging.jerryio/protocol/src/award';
+	import { type Program, type Grade, type AwardType, AwardTypeSchema } from '@judgesroom.com/protocol/src/award';
 
 	interface Props {
 		existingAwards: AwardOptions[];

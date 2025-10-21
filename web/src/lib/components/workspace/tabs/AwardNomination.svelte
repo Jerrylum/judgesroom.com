@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Grade } from '@judging.jerryio/protocol/src/award';
-	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
-	import type { TeamInfo } from '@judging.jerryio/protocol/src/team';
+	import type { Grade } from '@judgesroom.com/protocol/src/award';
+	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
+	import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		team: TeamInfo;

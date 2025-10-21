@@ -1,5 +1,5 @@
 {
-	"name": "@judging.jerryio/worker",
+	"name": "@judgesroom.com/worker",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
@@ -32,9 +32,9 @@
 		"wrangler": "^4.26.0"
 	},
 	"dependencies": {
-		"@judging.jerryio/protocol": "workspace:*",
-		"@judging.jerryio/web": "workspace:*",
-		"@judging.jerryio/wrpc": "workspace:*",
+		"@judgesroom.com/protocol": "workspace:*",
+		"@judgesroom.com/web": "workspace:*",
+		"@judgesroom.com/wrpc": "workspace:*",
 		"drizzle-orm": "^0.44.4",
 		"zod": "^4.0.15"
 	}

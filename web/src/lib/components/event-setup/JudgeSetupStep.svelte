@@ -6,7 +6,7 @@
 	import { tick, untrack } from 'svelte';
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
-	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
+	import type { JudgingMethod, Judge } from '@judgesroom.com/protocol/src/judging';
 	import { dialogs } from '$lib/index.svelte';
 
 	interface Props {

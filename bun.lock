@@ -2,13 +2,13 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "judging.jerryio",
+      "name": "judgesroom.com",
       "devDependencies": {
         "typescript": "^5.0.0",
       },
     },
     "protocol": {
-      "name": "@judging.jerryio/protocol",
+      "name": "@judgesroom.com/protocol",
       "version": "0.0.0",
       "dependencies": {
         "uuid": "^13.0.0",
@@ -26,11 +26,11 @@
       },
     },
     "web": {
-      "name": "@judging.jerryio/web",
+      "name": "@judgesroom.com/web",
       "version": "0.0.0",
       "dependencies": {
-        "@judging.jerryio/protocol": "workspace:*",
-        "@judging.jerryio/wrpc": "workspace:*",
+        "@judgesroom.com/protocol": "workspace:*",
+        "@judgesroom.com/wrpc": "workspace:*",
         "crypto-js": "^4.2.0",
         "events": "^3.3.0",
         "papaparse": "^5.5.3",
@@ -44,7 +44,7 @@
       "devDependencies": {
         "@eslint/compat": "^1.2.5",
         "@eslint/js": "^9.18.0",
-        "@judging.jerryio/worker": "workspace:*",
+        "@judgesroom.com/worker": "workspace:*",
         "@sveltejs/adapter-static": "^3.0.8",
         "@sveltejs/kit": "^2.22.0",
         "@sveltejs/vite-plugin-svelte": "^6.0.0",
@@ -73,12 +73,12 @@
       },
     },
     "worker": {
-      "name": "@judging.jerryio/worker",
+      "name": "@judgesroom.com/worker",
       "version": "0.0.0",
       "dependencies": {
-        "@judging.jerryio/protocol": "workspace:*",
-        "@judging.jerryio/web": "workspace:*",
-        "@judging.jerryio/wrpc": "workspace:*",
+        "@judgesroom.com/protocol": "workspace:*",
+        "@judgesroom.com/web": "workspace:*",
+        "@judgesroom.com/wrpc": "workspace:*",
         "drizzle-orm": "^0.44.4",
         "zod": "^4.0.15",
       },
@@ -100,7 +100,7 @@
       },
     },
     "wrpc": {
-      "name": "@judging.jerryio/wrpc",
+      "name": "@judgesroom.com/wrpc",
       "version": "0.0.0",
       "dependencies": {
         "zod": "^4.0.15",
@@ -276,13 +276,13 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@judging.jerryio/protocol": ["@judging.jerryio/protocol@workspace:protocol"],
+    "@judgesroom.com/protocol": ["@judgesroom.com/protocol@workspace:protocol"],
 
-    "@judging.jerryio/web": ["@judging.jerryio/web@workspace:web"],
+    "@judgesroom.com/web": ["@judgesroom.com/web@workspace:web"],
 
-    "@judging.jerryio/worker": ["@judging.jerryio/worker@workspace:worker"],
+    "@judgesroom.com/worker": ["@judgesroom.com/worker@workspace:worker"],
 
-    "@judging.jerryio/wrpc": ["@judging.jerryio/wrpc@workspace:wrpc"],
+    "@judgesroom.com/wrpc": ["@judgesroom.com/wrpc@workspace:wrpc"],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 

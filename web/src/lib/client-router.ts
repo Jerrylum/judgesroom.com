@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { initWRPC } from '@judging.jerryio/wrpc/client';
-import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
-import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
+import { initWRPC } from '@judgesroom.com/wrpc/client';
+import type { ServerRouter } from '@judgesroom.com/worker/src/server-router';
+import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
 import { app, subscriptions } from './index.svelte';
-import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
-import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
-import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judging.jerryio/protocol/src/rubric';
-import { AwardNameSchema } from '@judging.jerryio/protocol/src/award';
-import { JoiningKitSchema } from '@judging.jerryio/worker/src/routes/handshake';
+import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
+import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
+import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judgesroom.com/protocol/src/rubric';
+import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
+import { JoiningKitSchema } from '@judgesroom.com/worker/src/routes/handshake';
 
 // Initialize WRPC client with server router type
 const w = initWRPC.createClient<ServerRouter>();

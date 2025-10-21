@@ -3,7 +3,7 @@
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
 

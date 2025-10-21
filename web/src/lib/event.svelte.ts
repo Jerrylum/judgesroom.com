@@ -1,5 +1,5 @@
-import type { Program, Grade } from '@judging.jerryio/protocol/src/award';
-import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';
+import type { Program, Grade } from '@judgesroom.com/protocol/src/award';
+import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 
 export interface EventGradeLevelOptions {
 	value: EventGradeLevel;

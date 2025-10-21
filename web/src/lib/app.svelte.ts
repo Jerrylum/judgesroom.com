@@ -4,20 +4,20 @@ import {
 	type ClientOptions,
 	type ConnectionState,
 	type WRPCClientManager
-} from '@judging.jerryio/wrpc/client';
-import type { Judge, JudgeGroup } from '@judging.jerryio/protocol/src/judging';
-import type { DeviceInfo } from '@judging.jerryio/protocol/src/client';
-import type { EssentialData } from '@judging.jerryio/protocol/src/event';
-import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
-import type { Award } from '@judging.jerryio/protocol/src/award';
-import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
+} from '@judgesroom.com/wrpc/client';
+import type { Judge, JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
+import type { EssentialData } from '@judgesroom.com/protocol/src/event';
+import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
+import type { Award } from '@judgesroom.com/protocol/src/award';
+import type { ServerRouter } from '@judgesroom.com/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseJudgesRoomUrl, processTeamDataArray } from './utils.svelte';
 import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
-import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
-import type { JoiningKit } from '@judging.jerryio/worker/src/routes/handshake';
+import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
+import type { JoiningKit } from '@judgesroom.com/worker/src/routes/handshake';
 import z from 'zod';
 
 export interface Notice {

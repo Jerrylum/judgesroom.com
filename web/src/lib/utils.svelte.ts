@@ -1,4 +1,4 @@
-import type { TeamData } from '@judging.jerryio/protocol/src/team';
+import type { TeamData } from '@judgesroom.com/protocol/src/team';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
 import { v4 } from 'uuid';

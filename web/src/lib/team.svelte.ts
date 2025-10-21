@@ -2,8 +2,8 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { List } from './list.svelte';
 import { SvelteSet } from 'svelte/reactivity';
-import { type Grade } from '@judging.jerryio/protocol/src/award';
-import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judging.jerryio/protocol/src/team';
+import { type Grade } from '@judgesroom.com/protocol/src/award';
+import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judgesroom.com/protocol/src/team';
 import z from 'zod';
 
 export type TeamInfoAndData = TeamInfo & TeamData;

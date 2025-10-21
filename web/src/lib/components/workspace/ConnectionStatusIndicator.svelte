@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app } from '$lib/index.svelte';
-	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
+	import type { ConnectionState } from '@judgesroom.com/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let isJudgesRoomJoined = $derived(app.isJudgesRoomJoined());

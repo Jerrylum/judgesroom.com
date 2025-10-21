@@ -1,9 +1,9 @@
-import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
+import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineDevices } from '../db/schema';
-import type { Network } from '@judging.jerryio/wrpc/server';
-import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import type { Network } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { eq } from 'drizzle-orm';
 import { broadcastTopic, type ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { app } from '$lib/index.svelte';
 	import type { AwardWinnerTab } from '$lib/tab.svelte';
-	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
+	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '$lib/award.svelte';
 

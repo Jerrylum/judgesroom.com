@@ -3,8 +3,8 @@
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';
-	import type { Submission } from '@judging.jerryio/protocol/src/rubric';
-	import type { NotebookDevelopmentStatus } from '@judging.jerryio/protocol/src/team';
+	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
+	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 	const teams = $derived(app.getAllTeamInfoAndData());
 

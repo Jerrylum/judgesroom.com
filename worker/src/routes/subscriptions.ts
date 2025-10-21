@@ -1,8 +1,8 @@
 import { eq, and } from 'drizzle-orm';
 import { subscriptions } from '../db/schema';
 import type { DatabaseOrTransaction } from '../server-router';
-import type { RouterProxy } from '@judging.jerryio/wrpc/server';
-import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { RouterProxy } from '@judgesroom.com/wrpc/server';
+import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
 import { transaction } from '../utils';
 
 export type ClientSource = { getClient: (clientId: string) => RouterProxy<ClientRouter> };

@@ -2,7 +2,7 @@
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
 	import { app, AppUI } from '$lib/index.svelte';
-	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
+	import type { ConnectionState } from '@judgesroom.com/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');

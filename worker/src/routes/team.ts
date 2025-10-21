@@ -1,11 +1,11 @@
-import type { TeamData } from '@judging.jerryio/protocol/src/team';
-import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
-import type { WRPCRootObject } from '@judging.jerryio/wrpc/server';
+import type { TeamData } from '@judgesroom.com/protocol/src/team';
+import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
+import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ClientRouter } from '@judging.jerryio/web/src/lib/client-router';
+import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
 import { transaction } from '../utils';
 
 export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]> {

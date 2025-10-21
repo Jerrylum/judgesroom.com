@@ -3,9 +3,9 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { awards, teams, metadata, judgeGroups } from './db/schema';
 import type { ServerContext } from './server-router';
-import type { Network, ClientData } from '@judging.jerryio/wrpc/server/types';
-import type { Award } from '@judging.jerryio/protocol/src/award';
-import type { TeamData, TeamInfo } from '@judging.jerryio/protocol/src/team';
+import type { Network, ClientData } from '@judgesroom.com/wrpc/server/types';
+import type { Award } from '@judgesroom.com/protocol/src/award';
+import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
 import path from 'path';
 
 /**

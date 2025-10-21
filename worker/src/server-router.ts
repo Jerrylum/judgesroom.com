@@ -1,5 +1,5 @@
-import { initWRPC } from '@judging.jerryio/wrpc/server';
-import type { Network } from '@judging.jerryio/wrpc/server';
+import { initWRPC } from '@judgesroom.com/wrpc/server';
+import type { Network } from '@judgesroom.com/wrpc/server';
 import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { buildHandshakeRoute } from './routes/handshake';
 import { buildTeamRoute } from './routes/team';
