@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: judgesroom:local
+    container_name: judgesroom
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "8787:8787"
