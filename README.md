@@ -30,11 +30,11 @@ This system is aligned with the RECF/VEX “Guide To Judging,” mapping app fea
 
 [placeholder: screenshot-performance-eligibility.png]
 
-### Rank winners and alternates with guardrails against duplicate judged awards
+### Rank winners and re-order teams without worrying about duplicate judged awards
 
 [placeholder: screenshot-award-ranking-guardrails.png]
 
-### Keep confidential materials in one secure place and delete them when done
+### Keep confidential materials in one secure place and delete them afterward
 
 [placeholder: screenshot-destroy-room.png]
 
