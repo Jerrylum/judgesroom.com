@@ -621,8 +621,7 @@ export class App {
 	// ============================================================================
 
 	private createClientOptions(): ClientOptions<ClientRouter> {
-		const isDevelopment = import.meta.env.DEV;
-		const wsUrl = isDevelopment
+		const wsUrl = this.isDevelopment
 			? `ws://${window.location.hostname}:8787/ws` // Local development server
 			: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`; // Production Cloudflare Worker
 
