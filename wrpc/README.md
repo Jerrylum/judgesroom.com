@@ -1,6 +1,6 @@
 ## WRPC — Typed WebSocket RPC for Client↔Server and Server→Client calls
 
-WRPC is a lightweight, type-safe RPC layer over WebSockets, inspired by tRPC’s developer ergonomics but designed for bidirectional communication. It provides:
+WRPC is a lightweight, type-safe RPC layer over WebSockets, inspired by tRPC's developer ergonomics but designed for bidirectional communication. It provides:
 
 - **Typed procedures**: `query` and `mutation` with Zod-driven input/output validation
 - **Routers**: nestable, composable routers mirroring your API structure
