@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ConfirmationDialog } from '$lib/dialog.svelte';
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	interface Props {

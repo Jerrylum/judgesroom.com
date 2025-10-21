@@ -1,6 +1,6 @@
 <script lang="ts">
 	import QRCode from 'qrcode';
-	import { app, dialogs } from '$lib/app-page.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';

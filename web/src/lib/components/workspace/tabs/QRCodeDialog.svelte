@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import QRCode from 'qrcode';
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 
 	interface Props {

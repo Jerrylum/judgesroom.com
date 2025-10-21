@@ -1,7 +1,7 @@
 import type { Component, ComponentProps } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { generateUUID } from './utils.svelte';
-import { app } from './app-page.svelte';
+import { app } from './index.svelte';
 import OverviewTabComponent from './components/workspace/tabs/OverviewTab.svelte';
 import TeamInterviewRubricTabComponent from './components/workspace/tabs/TeamInterviewRubricTab.svelte';
 import NotebookRubricTabComponent from './components/workspace/tabs/NotebookRubricTab.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, dialogs, tabs } from '$lib/app-page.svelte';
+	import { app, dialogs, tabs } from '$lib/index.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';

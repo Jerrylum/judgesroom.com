@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { AwardNominationTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
 	import AwardNominationTable from './AwardNominationTable.svelte';

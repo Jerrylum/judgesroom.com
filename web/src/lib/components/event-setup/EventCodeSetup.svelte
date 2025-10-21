@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import {

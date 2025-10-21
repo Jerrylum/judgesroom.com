@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, AppUI } from '$lib/app-page.svelte';
+	import { app, AppUI } from '$lib/index.svelte';
 
 	// Watch for app data to become available and transition UI automatically
 	$effect(() => {

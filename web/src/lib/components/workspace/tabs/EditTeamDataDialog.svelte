@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, dialogs } from '$lib/app-page.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 

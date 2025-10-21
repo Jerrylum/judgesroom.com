@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
+	import { app, AppUI, dialogs } from '$lib/index.svelte';
 	import GearIcon from '$lib/icon/GearIcon.svelte';
 	import LeaveDoorIcon from '$lib/icon/LeaveDoorIcon.svelte';
 	import ShareIcon from '$lib/icon/ShareIcon.svelte';

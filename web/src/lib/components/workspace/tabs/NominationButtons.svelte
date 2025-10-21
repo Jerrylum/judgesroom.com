@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { Award } from '@judging.jerryio/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import { isSubmittedNotebook } from '@judging.jerryio/protocol/src/team';

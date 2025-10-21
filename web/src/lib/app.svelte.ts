@@ -14,7 +14,7 @@ import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
 import { generateUUID, getDeviceNameFromUserAgent, parseJudgesRoomUrl, processTeamDataArray } from './utils.svelte';
-import { AppUI } from './app-page.svelte';
+import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 import type { JoiningKit } from '@judging.jerryio/worker/src/routes/handshake';

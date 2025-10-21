@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
-	import { app, AppUI } from '$lib/app-page.svelte';
+	import { app, AppUI } from '$lib/index.svelte';
 	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());

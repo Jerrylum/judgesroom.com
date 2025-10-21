@@ -2,7 +2,7 @@
 	import './eligibility-table.css';
 	import type { ExcellenceAwardCandidatesTab } from '$lib/tab.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import {
 		getEventDivisionExcellenceAwardCandidatesReport,
 		getRobotEventsClient,

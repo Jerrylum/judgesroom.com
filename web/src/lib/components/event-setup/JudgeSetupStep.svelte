@@ -7,7 +7,7 @@
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judging.jerryio/protocol/src/judging';
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 
 	interface Props {
 		isEditingEventSetup: boolean;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions } from '$lib/app-page.svelte';
+	import { app, subscriptions } from '$lib/index.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';

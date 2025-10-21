@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions } from '$lib/app-page.svelte';
+	import { app, subscriptions } from '$lib/index.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
 	import NotebookSortingTeam from './NotebookSortingTeam.svelte';

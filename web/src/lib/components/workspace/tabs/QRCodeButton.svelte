@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import QRCodeDialog from './QRCodeDialog.svelte';
 	import QRCodeIcon from '$lib/icon/QRCodeIcon.svelte';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, dialogs, tabs } from '$lib/app-page.svelte';
+	import { app, dialogs, tabs } from '$lib/index.svelte';
 	import {
 		AwardNominationTab,
 		AwardRankingTab,

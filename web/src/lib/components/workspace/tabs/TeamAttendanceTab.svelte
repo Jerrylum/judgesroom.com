@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import CheckIcon from '$lib/icon/CheckIcon.svelte';

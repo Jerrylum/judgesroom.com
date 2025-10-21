@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, AppUI } from '$lib/app-page.svelte';
+	import { app, AppUI } from '$lib/index.svelte';
 
 	interface Props {
 		errorMessage: string;

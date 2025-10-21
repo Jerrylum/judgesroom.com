@@ -5,7 +5,7 @@
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
 	import { onMount } from 'svelte';
-	import { app, AppUI } from '$lib/app-page.svelte';
+	import { app, AppUI } from '$lib/index.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData } from '$lib/team.svelte';

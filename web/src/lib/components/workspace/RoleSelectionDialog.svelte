@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
-	import { app, dialogs } from '$lib/app-page.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';

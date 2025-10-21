@@ -1,7 +1,7 @@
 <script lang="ts">
 	import QRCode from 'qrcode';
 	import './rubric.css';
-	import { app, tabs, subscriptions, dialogs } from '$lib/app-page.svelte';
+	import { app, tabs, subscriptions, dialogs } from '$lib/index.svelte';
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';

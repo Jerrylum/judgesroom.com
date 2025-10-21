@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import ConnectionStatusIndicator from './ConnectionStatusIndicator.svelte';
 	import UserMenu from './UserMenu.svelte';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
-	import { app, AppUI, dialogs } from '$lib/app-page.svelte';
+	import { app, AppUI, dialogs } from '$lib/index.svelte';
 	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
 	import Workspace from '$lib/components/workspace/Workspace.svelte';
 	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';

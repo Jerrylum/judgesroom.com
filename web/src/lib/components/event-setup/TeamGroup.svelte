@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TeamPlate from './TeamPlate.svelte';
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';

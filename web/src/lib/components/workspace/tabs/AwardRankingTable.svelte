@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions } from '$lib/app-page.svelte';
+	import { app, subscriptions } from '$lib/index.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import RankingButtons from './RankingButtons.svelte';
 	import type { JudgeGroup } from '@judging.jerryio/protocol/src/judging';

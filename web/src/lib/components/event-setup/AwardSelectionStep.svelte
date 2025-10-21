@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
-	import { dialogs } from '$lib/app-page.svelte';
+	import { dialogs } from '$lib/index.svelte';
 	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
 	import { isExcellenceAward, type AwardType, type Program } from '@judging.jerryio/protocol/src/award';
 	import type { EventGradeLevel } from '@judging.jerryio/protocol/src/event';

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { initWRPC } from '@judging.jerryio/wrpc/client';
 import type { ServerRouter } from '@judging.jerryio/worker/src/server-router';
 import { DeviceInfoSchema } from '@judging.jerryio/protocol/src/client';
-import { app, subscriptions } from './app-page.svelte';
+import { app, subscriptions } from './index.svelte';
 import { TeamDataSchema } from '@judging.jerryio/protocol/src/team';
 import { JudgeSchema } from '@judging.jerryio/protocol/src/judging';
 import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judging.jerryio/protocol/src/rubric';

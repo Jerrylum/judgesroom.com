@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions, tabs, dialogs } from '$lib/app-page.svelte';
+	import { app, subscriptions, tabs, dialogs } from '$lib/index.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judging.jerryio/protocol/src/rubric';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { ConnectionState } from '@judging.jerryio/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());

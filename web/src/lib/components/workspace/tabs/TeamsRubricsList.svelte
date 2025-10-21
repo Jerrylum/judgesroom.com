@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, subscriptions, tabs } from '$lib/app-page.svelte';
+	import { app, subscriptions, tabs } from '$lib/index.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';

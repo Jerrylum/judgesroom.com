@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app } from '$lib/app-page.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judging.jerryio/protocol/src/rubric';
 	import { isExcellenceAward, type Award } from '@judging.jerryio/protocol/src/award';
