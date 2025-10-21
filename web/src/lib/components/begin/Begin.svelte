@@ -61,7 +61,7 @@
 				<p class="text-gray-700"></p>
 				<div class="mt-4 flex justify-center">
 					<button
-						class="cursor-pointer text-center text-sm text-gray-500 hover:text-gray-800 active:text-gray-900"
+						class="cursor-pointer text-center text-sm text-gray-500 underline hover:text-gray-800 active:text-gray-900"
 						onclick={handleStartNewEvent}
 						aria-label="Start a new one"
 					>
@@ -70,8 +70,26 @@
 				</div>
 			</div>
 		</div>
-		<a class="mt-4 text-sm text-gray-500 hover:text-gray-800 active:text-gray-900" href="./privacy" target="_blank"
+		<!-- <a class="mt-4 text-sm text-gray-500 hover:text-gray-800 active:text-gray-900" href="./privacy" target="_blank"
 			>See how your data and judging materials are managed...</a
-		>
+		> -->
+		<div class="mt-4 flex max-w-2xl flex-row flex-wrap justify-center gap-2 text-sm text-gray-500">
+			<!-- <a href="./privacy" target="_blank"> See how your data and judging materials are managed... </a> -->
+			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">Source Code</a>
+			|
+			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">License</a>
+			|
+			<a href="./privacy" target="_blank">Data Protection and Privacy</a> |
+			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">Discord Support</a> |
+			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">YouTube Channel</a>
+		</div>
 	</div>
 </div>
+
+<style lang="postcss">
+	@reference 'tailwindcss';
+
+	a {
+		@apply text-gray-500 underline hover:text-gray-800 active:text-gray-900;
+	}
+</style>

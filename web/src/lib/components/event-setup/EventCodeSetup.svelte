@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dialogs } from '$lib/index.svelte';
+	import { AppUI, dialogs } from '$lib/index.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import {
@@ -133,6 +133,10 @@
 		});
 	}
 
+	function handleBackToBegin() {
+		AppUI.appPhase = 'begin';
+	}
+
 	$effect(() => {
 		if (importedData && inputDivisionId) {
 			if (importedData.divisionInfos.length > 1) {
@@ -198,8 +202,8 @@
 				needs to know which teams belong to which division before it starts.
 			</li>
 			<li>
-				Each Judges' Room can only be used for one division. Please use a second computer, another browser or incognito mode to create another
-				Judges' Room for the second division.
+				Each Judges' Room can only be used for one division. Please use a second computer, another browser or incognito mode to create
+				another Judges' Room for the second division.
 			</li>
 			<li>
 				Judges' Room can only calculate Excellence Award(s) for its own division (division specific). If your event has event wide
@@ -298,6 +302,13 @@
 			{#if isEditingEventSetup}
 				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
 					Cancel
+				</button>
+			{:else}
+				<button
+					onclick={handleBackToBegin}
+					class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				>
+					Back to Begin
 				</button>
 			{/if}
 		</div>
