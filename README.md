@@ -5,6 +5,7 @@ Before judgesroom.com, judging meant paper rubrics, sticky notes, and hours of s
 By digitizing the judging steps (interviews, rubrics, nominations, rankings), judgesroom.com streamlines the process, reduces errors, and keeps materials confidential. Judges can share the same Judges' Room across multiple devices, making collaboration faster and easier.
 
 judgesroom.com is an open source project and fully compliant with the RECF/VEX "Guide To Judging." The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. A ready‑to‑use Docker Compose is provided below.
+judgesroom.com is an open source project and fully compliant with the RECF/VEX "Guide To Judging." The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. A local self‑hosting guide (Bun + Wrangler) is provided below.
 
 ## What judgesroom.com does for you
 
@@ -47,40 +48,59 @@ This system is aligned with the RECF/VEX “Guide To Judging,” mapping app fea
 
 You can always return to the same room from the saved permit on your device.
 
-## Self‑Hosting (Recommended: Docker Compose)
-
-For Event Partners who prefer running the system themselves.
+## Self‑Hosting
 
 Prerequisites:
 
-- Docker and Docker Compose
+- Bun
+- Node.js (required by Wrangler)
 
-Build and run:
+Steps:
+
+1) Install workspaces
 
 ```bash
 # From repo root
-docker compose build
-docker compose up -d
-
-# Web UI is served by the Worker
-echo "Open http://localhost:8787"
+bun install
 ```
 
-What this does:
-
-- Single image builds the web app and runs the Worker (via Miniflare) on port 8787
-- In production (Cloudflare), the Worker serves static assets from `web/build`
-
-Tear down:
+2) Build the web app for production
 
 ```bash
-docker compose down -v
+cd web && bun run build
+```
+
+This produces static assets in `web/build` (SvelteKit adapter-static).
+
+3) Run the Worker locally in production mode (serves `web/build`)
+
+```bash
+cd ../worker && bunx wrangler dev --env production
 ```
 
 Notes:
 
-- Self‑hosting is for your own infrastructure and data control. You are responsible for privacy, security, and compliance.
-- The hosted privacy policy applies only to `judgesroom.com`. For self‑hosting, follow the confidentiality practices in the Guide To Judging (e.g., secure access, destroy materials post‑event).
+- The Worker will serve static assets from `../web/build` per `wrangler.jsonc` when using `--env production` (or `--env beta`).
+- Default local port is http://localhost:8787
+- Keep the terminal open while running. Press Ctrl+C to stop.
+
+Optional: Deploy to Cloudflare (production)
+
+```bash
+cd worker && bun run deploy
+```
+
+Optional: Update database schema (Drizzle ORM)
+
+```bash
+# Generate migrations from schema changes
+cd worker && bun run db:generate
+```
+
+Self‑hosting responsibilities:
+
+- You are responsible for privacy, security, and compliance when self‑hosting.
+- The hosted privacy policy applies only to `judgesroom.com`. Follow the confidentiality practices in the Guide To Judging (e.g., secure access, destroy materials post‑event).
 
 ## How judgesroom.com aligns with the Guide To Judging
 
