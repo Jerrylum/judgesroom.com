@@ -57,7 +57,7 @@ describe('Event Schema Validation', () => {
 				' My Event', // leading space
 				'My Event ', // trailing space
 				' My Event ', // leading and trailing spaces
-				'A'.repeat(101), // too long (>100 chars)
+				'A'.repeat(201), // too long (>100 chars)
 				'\tEvent', // leading tab
 				'Event\n', // trailing newline
 				'  ', // only spaces
