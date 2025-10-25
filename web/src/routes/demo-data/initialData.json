@@ -1,0 +1,970 @@
+{
+  "essentialData": {
+    "robotEventsSku": "RE-VIQRC-24-8288",
+    "robotEventsEventId": 58288,
+    "divisionId": 1,
+    "eventName": "Super Awesome Robotics Tournament - VIQRC",
+    "program": "VIQRC",
+    "eventGradeLevel": "Blended",
+    "judgingMethod": "assigned",
+    "judgingStep": "beginning",
+    "teamInfos": [
+      {
+        "id": "8f4a249a-3767-4f49-9077-f94638f1c017",
+        "number": "2706A",
+        "name": "WYJJ Team A",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong",
+        "shortName": "WYJJ Team A",
+        "school": "TWGHs Wong Yee Jar Jat Memorial Primary School",
+        "grade": "Elementary School",
+        "group": "2706"
+      },
+      {
+        "id": "de65c263-2b53-4659-87cb-441e49215882",
+        "number": "2706C",
+        "name": "WYJJ Team C",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "WYJJ Team C",
+        "school": "TWGHs Wong Yee Jar Jat Memorial Primary School",
+        "grade": "Elementary School",
+        "group": "2706"
+      },
+      {
+        "id": "80418629-c38a-4c7c-857a-e1932364c7fc",
+        "number": "2706E",
+        "name": "WYJJ Team E",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "WYJJ Team E",
+        "school": "TWGHs Wong Yee Jar Jat Memorial Primary School",
+        "grade": "Middle School",
+        "group": "2706"
+      },
+      {
+        "id": "eb60bb42-3cc3-4844-b113-a787b0695e57",
+        "number": "2706F",
+        "name": "WYJJ Team F",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "WYJJ Team F",
+        "school": "TWGHs Wong Yee Jar Jat Memorial Primary School",
+        "grade": "Middle School",
+        "group": "2706"
+      },
+      {
+        "id": "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+        "number": "3415A",
+        "name": "TKP-DimSum點心",
+        "city": "Tseung Kwun O",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TKP-DimSum點心",
+        "school": "Yan Oi Tong Tin Ka Ping Primary School",
+        "grade": "Elementary School",
+        "group": "3415"
+      },
+      {
+        "id": "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+        "number": "3415B",
+        "name": "TKP-CaaSiu叉燒",
+        "city": "Tseung Kwun O",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TKP-CaaSiu叉燒",
+        "school": "Yan Oi Tong Tin Ka Ping Primary School",
+        "grade": "Elementary School",
+        "group": "3415"
+      },
+      {
+        "id": "50efc995-0ceb-4f9b-8427-5d337039e4d7",
+        "number": "3708A",
+        "name": "VSA Sharks Primary #1",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "VSA Sharks Primary #1",
+        "school": "Victoria Shanghai Academy",
+        "grade": "Elementary School",
+        "group": "3708"
+      },
+      {
+        "id": "fea0fb1b-4514-40e5-b465-6d18a0c3beb7",
+        "number": "3708B",
+        "name": "VSA Sharks PYP #2",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "VSA Sharks PYP #2",
+        "school": "Victoria Shanghai Academy",
+        "grade": "Elementary School",
+        "group": "3708"
+      },
+      {
+        "id": "07596558-a5e9-4ede-ade3-c66744be5d0e",
+        "number": "3708C",
+        "name": "Techno Sharks",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Techno Sharks",
+        "school": "Victoria Shanghai Academy",
+        "grade": "Elementary School",
+        "group": "3708"
+      },
+      {
+        "id": "99c1d501-306e-4c7c-b9f0-76261b1c6d39",
+        "number": "3708D",
+        "name": "Sharks 4",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Sharks 4",
+        "school": "Victoria Shanghai Academy",
+        "grade": "Middle School",
+        "group": "3708"
+      },
+      {
+        "id": "ed4c9c5e-b972-4131-8282-96cfe96febed",
+        "number": "3708E",
+        "name": "Sharks 4",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Sharks 4",
+        "school": "Victoria Shanghi Academy",
+        "grade": "Middle School",
+        "group": "3708"
+      },
+      {
+        "id": "1a8cf2c4-60c7-420f-b4b7-5df2f643356b",
+        "number": "4206A",
+        "name": "JCCSS",
+        "city": "New Territories",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "JCCSS",
+        "school": "Ju Ching Chu Secondary School (Yuen Long)",
+        "grade": "Middle School",
+        "group": "4206"
+      },
+      {
+        "id": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+        "number": "4815A",
+        "name": "CPC Robotics A",
+        "city": "New Territories",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "CPC Robotics A",
+        "school": "WEO Chang Pui Chung Memorial School",
+        "grade": "Middle School",
+        "group": "4815"
+      },
+      {
+        "id": "5f3c15d2-09d5-4e14-85e5-bb0c28ca06a1",
+        "number": "4815B",
+        "name": "CPC Robotics B",
+        "city": "New Territories",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "CPC Robotics B",
+        "school": "WEO Chang Pui Chung Memorial School",
+        "grade": "Middle School",
+        "group": "4815"
+      },
+      {
+        "id": "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+        "number": "5354A",
+        "name": "MTPS-A",
+        "city": "新界",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "MTPS-A",
+        "school": "港澳信義會明道小學",
+        "grade": "Elementary School",
+        "group": "5354"
+      },
+      {
+        "id": "8261696f-1cb5-46e0-9d4e-e746013db852",
+        "number": "5354B",
+        "name": "MTPS-B",
+        "city": "新界",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "MTPS-B",
+        "school": "港澳信義會明道小學",
+        "grade": "Elementary School",
+        "group": "5354"
+      },
+      {
+        "id": "6cfddffb-3379-4140-821b-c284f470c527",
+        "number": "6626A",
+        "name": "Coconut Squad",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Coconut Squad",
+        "school": "The Independent Schools Foundation",
+        "grade": "Middle School",
+        "group": "6626"
+      },
+      {
+        "id": "630725e7-b90c-4b1a-af8b-fdaa01d21879",
+        "number": "10863A",
+        "name": "SKHYKH",
+        "city": "New Territories",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "SKHYKH",
+        "school": "JSTEA",
+        "grade": "Middle School",
+        "group": "10863"
+      },
+      {
+        "id": "49e0cf5a-5832-4e75-80f8-f6b0b8a5914c",
+        "number": "10863B",
+        "name": "JSTEA TEAM B",
+        "city": "New Territories",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "JSTEA TEAM B",
+        "school": "JSTEA",
+        "grade": "Middle School",
+        "group": "10863"
+      },
+      {
+        "id": "b3f040f6-2056-4768-a9e6-1a36190ca998",
+        "number": "10863D",
+        "name": "JSTEA - 4",
+        "city": "Kwai Chung",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "JSTEA - 4",
+        "school": "Hong Kong Joint School Technology Education Association",
+        "grade": "Elementary School",
+        "group": "10863"
+      },
+      {
+        "id": "8dd86e71-f191-477c-8a1a-466f7e3bdb57",
+        "number": "13205A",
+        "name": "TCCS A Team",
+        "city": "Islands District",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TCCS A Team",
+        "school": "Tung Chung Catholic School(Secondary Section)",
+        "grade": "Middle School",
+        "group": "13205"
+      },
+      {
+        "id": "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+        "number": "13205B",
+        "name": "TCCS B Team",
+        "city": "Island District",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TCCS B Team",
+        "school": "Tung Chung Catholic School(Secondary Section)",
+        "grade": "Middle School",
+        "group": "13205"
+      },
+      {
+        "id": "e5975fe1-5622-443e-9241-cac2bb8f2252",
+        "number": "13520A",
+        "name": "TCCS Alpha Team",
+        "city": "N.t.",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TCCS Alpha Team",
+        "school": "Tung Chung Catholic School",
+        "grade": "Middle School",
+        "group": "13520"
+      },
+      {
+        "id": "32dab0e6-4253-484c-b50f-603a3d590c89",
+        "number": "13520B",
+        "name": "TCCS Beta Team",
+        "city": "N.t.",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TCCS Beta Team",
+        "school": "Tung Chung Catholic School",
+        "grade": "Middle School",
+        "group": "13520"
+      },
+      {
+        "id": "3269b867-85d4-404f-bcf2-1dec1f2b0673",
+        "number": "16481A",
+        "name": "STMATTHEW-A",
+        "city": "Sheung Wan",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "STMATTHEW-A",
+        "school": "S.K.H. St. Matthew's Primary School",
+        "grade": "Elementary School",
+        "group": "16481"
+      },
+      {
+        "id": "b72d7d5e-d31e-4b0a-b805-316cdcc7a22e",
+        "number": "16481B",
+        "name": "STMATTHEW-B",
+        "city": "Sheung Wan",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "STMATTHEW-B",
+        "school": "S.K.H. St. Matthew's Primary School",
+        "grade": "Elementary School",
+        "group": "16481"
+      },
+      {
+        "id": "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+        "number": "20230A",
+        "name": "CyberFusion",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "CyberFusion",
+        "school": "South Island School",
+        "grade": "Middle School",
+        "group": "20230"
+      },
+      {
+        "id": "f52b0f95-5cc7-4f7c-ab28-22d51306e779",
+        "number": "20230B",
+        "name": "Pixel Puffs",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Pixel Puffs",
+        "school": "South Island School",
+        "grade": "Middle School",
+        "group": "20230"
+      },
+      {
+        "id": "16c45934-1534-420d-8646-40ab393dfd09",
+        "number": "20230C",
+        "name": "SLAC",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "SLAC",
+        "school": "South Island School",
+        "grade": "Middle School",
+        "group": "20230"
+      },
+      {
+        "id": "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+        "number": "20230D",
+        "name": "Error 404",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Error 404",
+        "school": "South Island School",
+        "grade": "Middle School",
+        "group": "20230"
+      },
+      {
+        "id": "de245681-9ba8-4a3a-8cb4-2bcfd9a18669",
+        "number": "21119A",
+        "name": "21119A",
+        "city": "佛山",
+        "state": "Guangdong",
+        "country": "China",
+        "shortName": "21119A",
+        "school": "佛山市南海区石实实验学校小学部",
+        "grade": "Elementary School",
+        "group": "21119"
+      },
+      {
+        "id": "2adaacb6-23c3-4560-a1e6-3f287777352b",
+        "number": "21119B",
+        "name": "21119B",
+        "city": "佛山",
+        "state": "Guangdong",
+        "country": "China",
+        "shortName": "21119B",
+        "school": "佛山市南海区石实实验学校小学部",
+        "grade": "Elementary School",
+        "group": "21119"
+      },
+      {
+        "id": "9d6339d3-b320-4126-87e7-75d62d40afd6",
+        "number": "21169E",
+        "name": "Stamford Elementary Lion Legends",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "Stamford Elementary Lion Legends",
+        "school": "Stamford American School Hong Kong",
+        "grade": "Elementary School",
+        "group": "21169"
+      },
+      {
+        "id": "1f30db9b-1cc5-4318-b40c-925156acfd30",
+        "number": "26054A",
+        "name": "TPS1",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TPS1",
+        "school": "Taikoo Primary School",
+        "grade": "Elementary School",
+        "group": "26054"
+      },
+      {
+        "id": "aadb986b-6e43-4124-94e8-5cd8b482a0f2",
+        "number": "26054B",
+        "name": "TPS2",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "TPS2",
+        "school": "Taikoo Primary School",
+        "grade": "Elementary School",
+        "group": "26054"
+      },
+      {
+        "id": "21bc97b9-039d-4496-82da-cfe6877dadbd",
+        "number": "70909C",
+        "name": "CLBSS",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "CLBSS",
+        "school": "CLBSS",
+        "grade": "Middle School",
+        "group": "70909"
+      },
+      {
+        "id": "44a4c6ac-2d1a-45de-898a-d0cf969c6f82",
+        "number": "70909S",
+        "name": "CLBSS",
+        "city": "Hong Kong",
+        "state": "",
+        "country": "Hong Kong, China",
+        "shortName": "CLBSS",
+        "school": "CLBSS",
+        "grade": "Middle School",
+        "group": "70909"
+      }
+    ],
+    "judgeGroups": [
+      {
+        "id": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+        "name": "Group 1",
+        "assignedTeams": [
+          "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+          "e5975fe1-5622-443e-9241-cac2bb8f2252",
+          "de65c263-2b53-4659-87cb-441e49215882",
+          "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+          "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+          "b72d7d5e-d31e-4b0a-b805-316cdcc7a22e",
+          "2adaacb6-23c3-4560-a1e6-3f287777352b",
+          "8dd86e71-f191-477c-8a1a-466f7e3bdb57",
+          "6cfddffb-3379-4140-821b-c284f470c527",
+          "21bc97b9-039d-4496-82da-cfe6877dadbd",
+          "8f4a249a-3767-4f49-9077-f94638f1c017",
+          "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+          "9d6339d3-b320-4126-87e7-75d62d40afd6",
+          "44a4c6ac-2d1a-45de-898a-d0cf969c6f82",
+          "1f30db9b-1cc5-4318-b40c-925156acfd30",
+          "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+          "49e0cf5a-5832-4e75-80f8-f6b0b8a5914c",
+          "f52b0f95-5cc7-4f7c-ab28-22d51306e779",
+          "99c1d501-306e-4c7c-b9f0-76261b1c6d39"
+        ]
+      },
+      {
+        "id": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+        "name": "Group 2",
+        "assignedTeams": [
+          "50efc995-0ceb-4f9b-8427-5d337039e4d7",
+          "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+          "630725e7-b90c-4b1a-af8b-fdaa01d21879",
+          "3269b867-85d4-404f-bcf2-1dec1f2b0673",
+          "ed4c9c5e-b972-4131-8282-96cfe96febed",
+          "aadb986b-6e43-4124-94e8-5cd8b482a0f2",
+          "8261696f-1cb5-46e0-9d4e-e746013db852",
+          "32dab0e6-4253-484c-b50f-603a3d590c89",
+          "5f3c15d2-09d5-4e14-85e5-bb0c28ca06a1",
+          "1a8cf2c4-60c7-420f-b4b7-5df2f643356b",
+          "b3f040f6-2056-4768-a9e6-1a36190ca998",
+          "fea0fb1b-4514-40e5-b465-6d18a0c3beb7",
+          "07596558-a5e9-4ede-ade3-c66744be5d0e",
+          "80418629-c38a-4c7c-857a-e1932364c7fc",
+          "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+          "de245681-9ba8-4a3a-8cb4-2bcfd9a18669",
+          "eb60bb42-3cc3-4844-b113-a787b0695e57",
+          "16c45934-1534-420d-8646-40ab393dfd09"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "name": "Teamwork Champion Award",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 2,
+        "requireNotebook": false
+      },
+      {
+        "name": "Teamwork 2nd Place Award",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 2,
+        "requireNotebook": false
+      },
+      {
+        "name": "Teamwork 3rd Place Award",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 2,
+        "requireNotebook": false
+      },
+      {
+        "name": "Robot Skills Champion",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      },
+      {
+        "name": "Robot Skills 2nd Place",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      },
+      {
+        "name": "Robot Skills 3rd Place",
+        "type": "performance",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      },
+      {
+        "name": "Excellence Award - Middle School",
+        "type": "judged",
+        "acceptedGrades": [
+          "Middle School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Excellence Award - Elementary School",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Design Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Innovate Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Create Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Think Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Amaze Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Build Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": true
+      },
+      {
+        "name": "Judges Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 2,
+        "requireNotebook": false
+      },
+      {
+        "name": "Inspire Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      },
+      {
+        "name": "Sportsmanship Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      },
+      {
+        "name": "Energy Award",
+        "type": "judged",
+        "acceptedGrades": [
+          "Elementary School",
+          "Middle School",
+          "High School",
+          "College"
+        ],
+        "winnersCount": 1,
+        "requireNotebook": false
+      }
+    ]
+  },
+  "teamData": [
+    {
+      "id": "8f4a249a-3767-4f49-9077-f94638f1c017",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "de65c263-2b53-4659-87cb-441e49215882",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "80418629-c38a-4c7c-857a-e1932364c7fc",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "eb60bb42-3cc3-4844-b113-a787b0695e57",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "50efc995-0ceb-4f9b-8427-5d337039e4d7",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "fea0fb1b-4514-40e5-b465-6d18a0c3beb7",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "07596558-a5e9-4ede-ade3-c66744be5d0e",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "99c1d501-306e-4c7c-b9f0-76261b1c6d39",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "ed4c9c5e-b972-4131-8282-96cfe96febed",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "1a8cf2c4-60c7-420f-b4b7-5df2f643356b",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "5f3c15d2-09d5-4e14-85e5-bb0c28ca06a1",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "8261696f-1cb5-46e0-9d4e-e746013db852",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "6cfddffb-3379-4140-821b-c284f470c527",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "630725e7-b90c-4b1a-af8b-fdaa01d21879",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "49e0cf5a-5832-4e75-80f8-f6b0b8a5914c",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "b3f040f6-2056-4768-a9e6-1a36190ca998",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "8dd86e71-f191-477c-8a1a-466f7e3bdb57",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "e5975fe1-5622-443e-9241-cac2bb8f2252",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "32dab0e6-4253-484c-b50f-603a3d590c89",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "3269b867-85d4-404f-bcf2-1dec1f2b0673",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "b72d7d5e-d31e-4b0a-b805-316cdcc7a22e",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "f52b0f95-5cc7-4f7c-ab28-22d51306e779",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "16c45934-1534-420d-8646-40ab393dfd09",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "de245681-9ba8-4a3a-8cb4-2bcfd9a18669",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "2adaacb6-23c3-4560-a1e6-3f287777352b",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "9d6339d3-b320-4126-87e7-75d62d40afd6",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "1f30db9b-1cc5-4318-b40c-925156acfd30",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "aadb986b-6e43-4124-94e8-5cd8b482a0f2",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "21bc97b9-039d-4496-82da-cfe6877dadbd",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    },
+    {
+      "id": "44a4c6ac-2d1a-45de-898a-d0cf969c6f82",
+      "notebookLink": "",
+      "hasInnovateAwardSubmissionForm": false,
+      "notebookDevelopmentStatus": "undetermined",
+      "absent": false
+    }
+  ],
+  "judges": [],
+  "finalAwardNominations": {}
+}
