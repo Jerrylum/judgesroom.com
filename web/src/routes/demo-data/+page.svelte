@@ -5,6 +5,7 @@
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
+	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
@@ -13,7 +14,6 @@
 	import insertNotebookLinks from './insertNotebookLinks.json';
 	import sortNotebookLinks from './sortNotebookLinks.json';
 	import awardRanking from './awardRanking.json';
-	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 
 	const currentDialog = $derived(dialogs.currentDialog);
 

@@ -1,0 +1,556 @@
+{
+  "meta": {
+    "current_page": 1,
+    "first_page_url": "https://www.robotevents.com/api/v2/events/59999/awards?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://www.robotevents.com/api/v2/events/59999/awards?page=1",
+    "next_page_url": null,
+    "path": "https://www.robotevents.com/api/v2/events/59999/awards",
+    "per_page": 250,
+    "prev_page_url": null,
+    "to": 18,
+    "total": 18
+  },
+  "data": [
+    {
+      "id": 231972,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 191,
+      "title": "Teamwork Champion Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 175243,
+            "name": "2700E",
+            "code": null
+          }
+        },
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 172146,
+            "name": "21000B",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 231973,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 192,
+      "title": "Teamwork 2nd Place  Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 160887,
+            "name": "6600A",
+            "code": null
+          }
+        },
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 103059,
+            "name": "4800A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 231974,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 196,
+      "title": "Design Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 160887,
+            "name": "6600A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 231975,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 197,
+      "title": "Robot Skills Champion (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 105118,
+            "name": "4800B",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242211,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 189,
+      "title": "Excellence Award - Middle School (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 105118,
+            "name": "4800B",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242212,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 190,
+      "title": "Excellence Award - Elementary School (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 129461,
+            "name": "3000A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242213,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 193,
+      "title": "Teamwork 3rd Place Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 105118,
+            "name": "4800B",
+            "code": null
+          }
+        },
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 62270,
+            "name": "10400A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242214,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 198,
+      "title": "Robot Skills 2nd Place (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 160887,
+            "name": "6600A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242215,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 199,
+      "title": "Robot Skills 3rd Place (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 175243,
+            "name": "2700E",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242216,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 200,
+      "title": "Judges Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 136715,
+            "name": "5300A",
+            "code": null
+          }
+        },
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 181592,
+            "name": "26000B",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242217,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 201,
+      "title": "Innovate Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 126531,
+            "name": "13000A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242218,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 202,
+      "title": "Think Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 163901,
+            "name": "70900S",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242219,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 203,
+      "title": "Amaze Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 181990,
+            "name": "10400D",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242220,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 204,
+      "title": "Build Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 126532,
+            "name": "13000B",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242221,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 205,
+      "title": "Create Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 163783,
+            "name": "70900C",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242222,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 206,
+      "title": "Sportsmanship Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [],
+      "individualWinners": []
+    },
+    {
+      "id": 242223,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 207,
+      "title": "Energy Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 180856,
+            "name": "21100E",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    },
+    {
+      "id": 242224,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "order": 208,
+      "title": "Inspire Award (VIQRC)",
+      "qualifications": [],
+      "designation": null,
+      "classification": null,
+      "teamWinners": [
+        {
+          "division": {
+            "id": 1,
+            "name": "Division 1",
+            "code": null
+          },
+          "team": {
+            "id": 182306,
+            "name": "4200A",
+            "code": null
+          }
+        }
+      ],
+      "individualWinners": []
+    }
+  ]
+}

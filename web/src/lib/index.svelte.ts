@@ -1,3 +1,4 @@
+import './demo-data.svelte';
 import { App, AppStorage } from '$lib/app.svelte';
 import { DialogController } from './dialog.svelte';
 import { TabController } from '$lib/tab.svelte';

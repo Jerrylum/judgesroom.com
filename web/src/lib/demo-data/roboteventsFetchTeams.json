@@ -1,0 +1,1016 @@
+{
+  "meta": {
+    "current_page": 1,
+    "first_page_url": "https://www.robotevents.com/api/v2/events/59999/teams?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://www.robotevents.com/api/v2/events/59999/teams?page=1",
+    "next_page_url": null,
+    "path": "https://www.robotevents.com/api/v2/events/59999/teams",
+    "per_page": 250,
+    "prev_page_url": null,
+    "to": 37,
+    "total": 37
+  },
+  "data": [
+    {
+      "id": 102400,
+      "number": "2700A",
+      "team_name": "SMSS Team A",
+      "robot_name": "",
+      "organization": "St. Mary's Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "-1",
+        "country": "Hong Kong",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 104000,
+      "number": "2700C",
+      "team_name": "SMSS Team C",
+      "robot_name": "",
+      "organization": "St. Mary's Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 175200,
+      "number": "2700E",
+      "team_name": "SMSS Team E",
+      "robot_name": "",
+      "organization": "St. Mary's Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 175201,
+      "number": "2700F",
+      "team_name": "SMSS Team F",
+      "robot_name": "",
+      "organization": "St. Mary's Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 129402,
+      "number": "3000A",
+      "team_name": "KBL - Apple Pi",
+      "robot_name": "Apple Pi",
+      "organization": "Kowloon Bay International Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Tseung Kwun O",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 129403,
+      "number": "3000B",
+      "team_name": "KBL - Lemonade",
+      "robot_name": "Lemonade",
+      "organization": "Kowloon Bay International Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Tseung Kwun O",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 144200,
+      "number": "3700A",
+      "team_name": "Valley Methodist #1",
+      "robot_name": "",
+      "organization": "Happy Valley Methodist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "N/A",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 144201,
+      "number": "3700B",
+      "team_name": "Valley Methodist #2",
+      "robot_name": "",
+      "organization": "Happy Valley Methodist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "N/A",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 151700,
+      "number": "3700C",
+      "team_name": "Valley Methodist #3",
+      "robot_name": "",
+      "organization": "Happy Valley Methodist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "N/A",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 154500,
+      "number": "3700D",
+      "team_name": "Valley Methodist #4",
+      "robot_name": "",
+      "organization": "Happy Valley Methodist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "N/A",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 162500,
+      "number": "3700E",
+      "team_name": "Valley Methodist #5",
+      "robot_name": "Sharky",
+      "organization": "Victoria Shanghi Academy",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "N/A",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 182300,
+      "number": "4200A",
+      "team_name": "TWBSS",
+      "robot_name": "TWBSS",
+      "organization": "Tsuen Wan Buddhist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "New Territories",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.5,
+          "lon": 114
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 103000,
+      "number": "4800A",
+      "team_name": "Hang Ten Robotics A",
+      "robot_name": "",
+      "organization": "Hang Ten Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "New Territories",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 103001,
+      "number": "4800B",
+      "team_name": "Hang Ten Robotics B",
+      "robot_name": "",
+      "organization": "Hang Ten Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "New Territories",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 136700,
+      "number": "5300A",
+      "team_name": "STGPS-A",
+      "robot_name": "",
+      "organization": "Sha Tin Government Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "新界",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 136701,
+      "number": "5300B",
+      "team_name": "STGPS-B",
+      "robot_name": null,
+      "organization": "Sha Tin Government Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "新界",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 160800,
+      "number": "6600A",
+      "team_name": "Microbots",
+      "robot_name": "Microbots",
+      "organization": "Tai Po Baptist Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.2,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 62200,
+      "number": "10400A",
+      "team_name": "YLCCSS",
+      "robot_name": "YLCCSS",
+      "organization": "Yuen Long Christian Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "New Territories",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 62201,
+      "number": "10400B",
+      "team_name": "YLCCSS TEAM B",
+      "robot_name": "Team B",
+      "organization": "Yuen Long Christian Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "New Territories",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.3
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 62202,
+      "number": "10400D",
+      "team_name": "YLCCSS - 4",
+      "robot_name": "",
+      "organization": "Hong Kong Joint School Technology Education Association",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Kwai Chung",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.4,
+          "lon": 114.1
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 126500,
+      "number": "13000A",
+      "team_name": "VISS A Team",
+      "robot_name": "",
+      "organization": "Victoria International Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Islands District",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 113.9
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 126501,
+      "number": "13000B",
+      "team_name": "VISS B Team",
+      "robot_name": "",
+      "organization": "Victoria International Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Island District",
+        "region": null,
+        "postcode": "000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 113.9
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 140000,
+      "number": "14000A",
+      "team_name": "VISS Alpha Team",
+      "robot_name": "VISS Alpha Team",
+      "organization": "Victoria International Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "N.t.",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 113.9
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 140001,
+      "number": "14000B",
+      "team_name": "VISS Beta Team",
+      "robot_name": "VISS Beta Team",
+      "organization": "Victoria International Secondary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "N.t.",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 113.9
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 154900,
+      "number": "16400A",
+      "team_name": "KTLPS-A",
+      "robot_name": "",
+      "organization": "Kwun Tong Lutheran Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Sheung Wan",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.1
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 162900,
+      "number": "16400B",
+      "team_name": "KTLPS-B",
+      "robot_name": "",
+      "organization": "Kwun Tong Lutheran Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Sheung Wan",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.1
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 167500,
+      "number": "20200A",
+      "team_name": "Chocolate",
+      "robot_name": "",
+      "organization": "Discovery Bay International School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 167501,
+      "number": "20200B",
+      "team_name": "Pancakes",
+      "robot_name": null,
+      "organization": "Discovery Bay International School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 167502,
+      "number": "20200C",
+      "team_name": "Ice Cream",
+      "robot_name": "",
+      "organization": "Discovery Bay International School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 178700,
+      "number": "20200D",
+      "team_name": "Cookies",
+      "robot_name": "",
+      "organization": "Discovery Bay International School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "00000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 172100,
+      "number": "21000A",
+      "team_name": "21000A",
+      "robot_name": "21000A",
+      "organization": "半山聖公會小學",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "佛山",
+        "region": "Guangdong",
+        "postcode": "528000",
+        "country": "China",
+        "coordinates": {
+          "lat": 23,
+          "lon": 113.1
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 172101,
+      "number": "21000B",
+      "team_name": "21000B",
+      "robot_name": "21000B",
+      "organization": "半山聖公會小學",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "佛山",
+        "region": "Guangdong",
+        "postcode": "528000",
+        "country": "China",
+        "coordinates": {
+          "lat": 23,
+          "lon": 113.1
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 180800,
+      "number": "21100E",
+      "team_name": "Fanling Christian Legends",
+      "robot_name": "",
+      "organization": "Fanling Christian School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "0",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 181500,
+      "number": "26000A",
+      "team_name": "CBPS1",
+      "robot_name": "CBPS1",
+      "organization": "Causeway Bay Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "0000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 181501,
+      "number": "26000B",
+      "team_name": "CBPS2",
+      "robot_name": "CBPS2",
+      "organization": "Causeway Bay Primary School",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "0000000",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Elementary School"
+    },
+    {
+      "id": 163700,
+      "number": "70900C",
+      "team_name": "TMLSS",
+      "robot_name": null,
+      "organization": "TMLSS",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "9999999",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    },
+    {
+      "id": 163701,
+      "number": "70900S",
+      "team_name": "TMLSS",
+      "robot_name": null,
+      "organization": "TMLSS",
+      "location": {
+        "venue": null,
+        "address_1": "",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "9999999",
+        "country": "Hong Kong, China",
+        "coordinates": {
+          "lat": 22.3,
+          "lon": 114.2
+        }
+      },
+      "registered": false,
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "grade": "Middle School"
+    }
+  ]
+}

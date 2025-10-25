@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "current_page": 1,
+    "first_page_url": "https://www.robotevents.com/api/v2/events?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://www.robotevents.com/api/v2/events?page=1",
+    "next_page_url": null,
+    "path": "https://www.robotevents.com/api/v2/events",
+    "per_page": 25,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+  },
+  "data": [
+    {
+      "id": 59999,
+      "sku": "RE-VIQRC-24-9999",
+      "name": "Super Awesome Robotics Tournament - VIQRC",
+      "start": "2024-12-08T00:00:00-05:00",
+      "end": "2024-12-08T00:00:00-05:00",
+      "season": {
+        "id": 189,
+        "name": "VEX IQ Robotics Competition 2024-2025: Rapid Relay",
+        "code": null
+      },
+      "program": {
+        "id": 41,
+        "name": "VEX IQ Robotics Competition",
+        "code": "VIQRC"
+      },
+      "location": {
+        "venue": "Hang Ten Secondary School",
+        "address_1": "1 Hang Ten Street, East District",
+        "address_2": null,
+        "city": "Hong Kong",
+        "region": null,
+        "postcode": "",
+        "country": "Hong Kong",
+        "coordinates": {
+          "lat": 22.300000,
+          "lon": 114.25000
+        }
+      },
+      "locations": {
+        "2024-12-08": {
+          "venue": "Hang Ten Secondary School",
+          "address_1": "1 Hang Ten Street, East District",
+          "address_2": null,
+          "city": "Hong Kong",
+          "region": null,
+          "postcode": "",
+          "country": "Hong Kong",
+          "coordinates": {
+            "lat": 22.300000,
+            "lon": 114.25000
+          }
+        }
+      },
+      "divisions": [
+        {
+          "id": 1,
+          "name": "Division 1",
+          "order": 1
+        }
+      ],
+      "level": "Other",
+      "ongoing": false,
+      "awards_finalized": true,
+      "event_type": null
+    }
+  ]
+}
