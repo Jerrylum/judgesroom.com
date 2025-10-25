@@ -1,5 +1,6 @@
 if (typeof window !== 'undefined') {
 	async function resolveDemoData(resource: object) {
+		await new Promise((resolve) => setTimeout(resolve, 250));
 		return new Response(JSON.stringify(resource), { headers: { 'Content-Type': 'application/json' } });
 	}
 
@@ -13,6 +14,10 @@ if (typeof window !== 'undefined') {
 				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchTeams.json'));
 			case 'https://www.robotevents.com/api/v2/events/59999/awards?page=1&per_page=250':
 				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchAwards.json'));
+			case 'https://www.robotevents.com/api/v2/events/59999/divisions/1/rankings?page=1&per_page=250':
+				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchRanking.json'));
+			case 'https://www.robotevents.com/api/v2/events/59999/skills?page=1&per_page=250':
+				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchSkills.json'));
 			default:
 				return origin(input, init);
 		}

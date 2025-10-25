@@ -1,0 +1,857 @@
+{
+  "meta": {
+    "current_page": 1,
+    "first_page_url": "https://www.robotevents.com/api/v2/events/59999/teams?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "https://www.robotevents.com/api/v2/events/59999/teams?page=1",
+    "next_page_url": null,
+    "path": "https://www.robotevents.com/api/v2/events/59999/teams",
+    "per_page": 250,
+    "prev_page_url": null,
+    "to": 30,
+    "total": 30
+  },
+  "data": [
+    {
+      "id": 26557115,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 30,
+      "team": {
+        "id": 140000,
+        "name": "14000A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 29,
+      "average_points": 10.6,
+      "total_points": 53
+    },
+    {
+      "id": 26557114,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 29,
+      "team": {
+        "id": 163700,
+        "name": "70900C",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 36,
+      "average_points": 11.199999999999999,
+      "total_points": 56
+    },
+    {
+      "id": 26557113,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 28,
+      "team": {
+        "id": 167501,
+        "name": "20200B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 36,
+      "average_points": 13.199999999999999,
+      "total_points": 66
+    },
+    {
+      "id": 26557112,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 27,
+      "team": {
+        "id": 181990,
+        "name": "10400D",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 20,
+      "average_points": 13.800000000000001,
+      "total_points": 69
+    },
+    {
+      "id": 26557111,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 26,
+      "team": {
+        "id": 167502,
+        "name": "20200C",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 26,
+      "average_points": 14.199999999999999,
+      "total_points": 71
+    },
+    {
+      "id": 26557110,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 25,
+      "team": {
+        "id": 140001,
+        "name": "14000B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 45,
+      "average_points": 14.4,
+      "total_points": 72
+    },
+    {
+      "id": 26557109,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 24,
+      "team": {
+        "id": 163001,
+        "name": "70900S",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 58,
+      "average_points": 20.199999999999999,
+      "total_points": 101
+    },
+    {
+      "id": 26557108,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 23,
+      "team": {
+        "id": 167500,
+        "name": "20200A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 56,
+      "average_points": 24,
+      "total_points": 120
+    },
+    {
+      "id": 26557107,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 22,
+      "team": {
+        "id": 182300,
+        "name": "4200A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 36,
+      "average_points": 25.199999999999999,
+      "total_points": 126
+    },
+    {
+      "id": 26557106,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 21,
+      "team": {
+        "id": 175201,
+        "name": "2700F",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 56,
+      "average_points": 26.800000000000001,
+      "total_points": 134
+    },
+    {
+      "id": 26557105,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 20,
+      "team": {
+        "id": 172100,
+        "name": "21000A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 47,
+      "average_points": 27.199999999999999,
+      "total_points": 136
+    },
+    {
+      "id": 26557104,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 19,
+      "team": {
+        "id": 181500,
+        "name": "26000A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 29.800000000000001,
+      "total_points": 149
+    },
+    {
+      "id": 26557103,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 18,
+      "team": {
+        "id": 102400,
+        "name": "2700A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 31.600000000000001,
+      "total_points": 158
+    },
+    {
+      "id": 26557102,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 17,
+      "team": {
+        "id": 136701,
+        "name": "5300B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 32.799999999999997,
+      "total_points": 164
+    },
+    {
+      "id": 26557101,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 16,
+      "team": {
+        "id": 178700,
+        "name": "20200D",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 33,
+      "total_points": 165
+    },
+    {
+      "id": 26557100,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 15,
+      "team": {
+        "id": 136700,
+        "name": "5300A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 82,
+      "average_points": 41.600000000000001,
+      "total_points": 208
+    },
+    {
+      "id": 26557099,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 14,
+      "team": {
+        "id": 62201,
+        "name": "10400B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 42,
+      "total_points": 210
+    },
+    {
+      "id": 26557098,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 13,
+      "team": {
+        "id": 181501,
+        "name": "26000B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 69,
+      "average_points": 42.200000000000003,
+      "total_points": 211
+    },
+    {
+      "id": 26557097,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 12,
+      "team": {
+        "id": 180800,
+        "name": "21100E",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 57,
+      "average_points": 43.200000000000003,
+      "total_points": 216
+    },
+    {
+      "id": 26557096,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 11,
+      "team": {
+        "id": 126501,
+        "name": "13000B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 98,
+      "average_points": 46.399999999999999,
+      "total_points": 232
+    },
+    {
+      "id": 26557095,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 10,
+      "team": {
+        "id": 129403,
+        "name": "3000B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 72,
+      "average_points": 50,
+      "total_points": 250
+    },
+    {
+      "id": 26557094,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 9,
+      "team": {
+        "id": 126500,
+        "name": "13000A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 83,
+      "average_points": 51,
+      "total_points": 255
+    },
+    {
+      "id": 26557093,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 8,
+      "team": {
+        "id": 104000,
+        "name": "2700C",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 95,
+      "average_points": 52.799999999999997,
+      "total_points": 264
+    },
+    {
+      "id": 26557092,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 7,
+      "team": {
+        "id": 129402,
+        "name": "3000A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 95,
+      "average_points": 56.399999999999999,
+      "total_points": 282
+    },
+    {
+      "id": 26557091,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 6,
+      "team": {
+        "id": 172101,
+        "name": "21000B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 95,
+      "average_points": 60.200000000000003,
+      "total_points": 301
+    },
+    {
+      "id": 26557090,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 5,
+      "team": {
+        "id": 175200,
+        "name": "2700E",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 83,
+      "average_points": 61,
+      "total_points": 305
+    },
+    {
+      "id": 26557089,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 4,
+      "team": {
+        "id": 62200,
+        "name": "10400A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 83,
+      "average_points": 63.399999999999999,
+      "total_points": 317
+    },
+    {
+      "id": 26557088,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 3,
+      "team": {
+        "id": 103001,
+        "name": "4800B",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 95,
+      "average_points": 64.599999999999994,
+      "total_points": 323
+    },
+    {
+      "id": 26557087,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 2,
+      "team": {
+        "id": 103000,
+        "name": "4800A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 98,
+      "average_points": 73.400000000000006,
+      "total_points": 367
+    },
+    {
+      "id": 26557086,
+      "event": {
+        "id": 59999,
+        "name": "Super Awesome Robotics Tournament - VIQRC",
+        "code": "RE-VIQRC-24-9999"
+      },
+      "division": {
+        "id": 1,
+        "name": "Division 1",
+        "code": null
+      },
+      "rank": 1,
+      "team": {
+        "id": 160800,
+        "name": "6600A",
+        "code": null
+      },
+      "wins": 0,
+      "losses": 0,
+      "ties": 0,
+      "wp": 0,
+      "ap": 0,
+      "sp": 0,
+      "high_score": 95,
+      "average_points": 83,
+      "total_points": 415
+    }
+  ]
+}
