@@ -1,0 +1,302 @@
+[
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "8f4a249a-3767-4f49-9077-f94638f1c017",
+    "awardName": "Design Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "8f4a249a-3767-4f49-9077-f94638f1c017",
+    "awardName": "Amaze Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "de65c263-2b53-4659-87cb-441e49215882",
+    "awardName": "Inspire Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "80418629-c38a-4c7c-857a-e1932364c7fc",
+    "awardName": "Judges Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+    "awardName": "Design Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+    "awardName": "Create Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "82a38298-d9bb-4b9b-a949-7d9b8f7dc13c",
+    "awardName": "Think Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+    "awardName": "Design Award",
+    "ranking": 1
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "8e34ab85-43f7-4c95-ab83-65a88835b0ca",
+    "awardName": "Create Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "07596558-a5e9-4ede-ade3-c66744be5d0e",
+    "awardName": "Amaze Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "07596558-a5e9-4ede-ade3-c66744be5d0e",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "99c1d501-306e-4c7c-b9f0-76261b1c6d39",
+    "awardName": "Build Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "99c1d501-306e-4c7c-b9f0-76261b1c6d39",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "1a8cf2c4-60c7-420f-b4b7-5df2f643356b",
+    "awardName": "Design Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "1a8cf2c4-60c7-420f-b4b7-5df2f643356b",
+    "awardName": "Innovate Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+    "awardName": "Design Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+    "awardName": "Create Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+    "awardName": "Think Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "c207a0ef-c99b-4630-b252-3cc44ecfc211",
+    "awardName": "Build Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "5f3c15d2-09d5-4e14-85e5-bb0c28ca06a1",
+    "awardName": "Create Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "5f3c15d2-09d5-4e14-85e5-bb0c28ca06a1",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+    "awardName": "Create Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+    "awardName": "Amaze Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "4af5ec7e-cd51-488d-a0b2-c09f0dba7c2a",
+    "awardName": "Inspire Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "8261696f-1cb5-46e0-9d4e-e746013db852",
+    "awardName": "Sportsmanship Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "8261696f-1cb5-46e0-9d4e-e746013db852",
+    "awardName": "Judges Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "6cfddffb-3379-4140-821b-c284f470c527",
+    "awardName": "Design Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "6cfddffb-3379-4140-821b-c284f470c527",
+    "awardName": "Think Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "6cfddffb-3379-4140-821b-c284f470c527",
+    "awardName": "Build Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "49e0cf5a-5832-4e75-80f8-f6b0b8a5914c",
+    "awardName": "Design Award",
+    "ranking": 1
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "49e0cf5a-5832-4e75-80f8-f6b0b8a5914c",
+    "awardName": "Inspire Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "b3f040f6-2056-4768-a9e6-1a36190ca998",
+    "awardName": "Design Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "b3f040f6-2056-4768-a9e6-1a36190ca998",
+    "awardName": "Create Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+    "awardName": "Think Award",
+    "ranking": 1
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+    "awardName": "Amaze Award",
+    "ranking": 1
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "f14bf1e1-ffb6-4f5b-857b-ab8146736c28",
+    "awardName": "Sportsmanship Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "3269b867-85d4-404f-bcf2-1dec1f2b0673",
+    "awardName": "Energy Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+    "awardName": "Amaze Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+    "awardName": "Build Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "3b7058f2-ad9d-4edb-9085-25b00d6c2db3",
+    "awardName": "Judges Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "f52b0f95-5cc7-4f7c-ab28-22d51306e779",
+    "awardName": "Inspire Award",
+    "ranking": 3
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+    "awardName": "Design Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+    "awardName": "Innovate Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "43c89efd-1b6b-4ec7-a91c-110a971868d5",
+    "awardName": "Create Award",
+    "ranking": 4
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "de245681-9ba8-4a3a-8cb4-2bcfd9a18669",
+    "awardName": "Create Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "8f2360dd-c763-4c7a-8b4b-aa63f8b784e5",
+    "teamId": "de245681-9ba8-4a3a-8cb4-2bcfd9a18669",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "9d6339d3-b320-4126-87e7-75d62d40afd6",
+    "awardName": "Judges Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "9d6339d3-b320-4126-87e7-75d62d40afd6",
+    "awardName": "Sportsmanship Award",
+    "ranking": 2
+  },
+  {
+    "judgeGroupId": "a137ebb2-c390-4d2e-b541-ae9fbcd0d74f",
+    "teamId": "1f30db9b-1cc5-4318-b40c-925156acfd30",
+    "awardName": "Energy Award",
+    "ranking": 2
+  }
+]

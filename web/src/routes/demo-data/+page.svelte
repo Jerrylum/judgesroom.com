@@ -12,6 +12,8 @@
 	import teamAttendance from './teamAttendance.json';
 	import insertNotebookLinks from './insertNotebookLinks.json';
 	import sortNotebookLinks from './sortNotebookLinks.json';
+	import awardRanking from './awardRanking.json';
+	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 
 	const currentDialog = $derived(dialogs.currentDialog);
 
@@ -132,6 +134,14 @@
 				});
 			}
 		}
+
+		for (const data of awardRanking) {
+			await app.wrpcClient.judging.updateAwardRanking.mutation(data as AwardRankingsPartialUpdate);
+		}
+
+		await app.wrpcClient.judging.startAwardDeliberation.mutation();
+
+		
 
 		dialogs.showAlert({
 			title: 'Test',
