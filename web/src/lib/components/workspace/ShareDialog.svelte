@@ -131,8 +131,8 @@
 				</div>
 
 				<!-- Instructions -->
-				<div class="rounded-lg bg-blue-50 p-4">
-					<div class="text-sm text-blue-800">
+				<div class="rounded-lg bg-slate-50 p-4">
+					<div class="text-sm text-slate-800">
 						<h5 class="mb-2 font-medium">How to share:</h5>
 						<ul class="space-y-1 text-xs">
 							<li>• Send the link to other judges to invite them to join</li>
