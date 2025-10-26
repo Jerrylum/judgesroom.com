@@ -5,7 +5,7 @@
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
-	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
+	import type { AwardNomination, AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
@@ -14,6 +14,7 @@
 	import insertNotebookLinks from './insertNotebookLinks.json';
 	import sortNotebookLinks from './sortNotebookLinks.json';
 	import awardRanking from './awardRanking.json';
+	import awardNomination from './awardNomination.json';
 
 	const currentDialog = $derived(dialogs.currentDialog);
 
@@ -141,7 +142,9 @@
 
 		await app.wrpcClient.judging.startAwardDeliberation.mutation();
 
-		
+		for (const data of awardNomination) {
+			await app.wrpcClient.judging.nominateFinalAward.mutation(data);
+		}
 
 		dialogs.showAlert({
 			title: 'Test',
