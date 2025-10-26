@@ -13,7 +13,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 22
-      - run: ls -la
       - run: npm install -g bun
       - run: bun remove better-sqlite3
       - run: bun install
