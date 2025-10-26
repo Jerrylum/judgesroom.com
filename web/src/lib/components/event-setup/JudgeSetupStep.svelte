@@ -187,7 +187,19 @@
 		});
 	}
 
-	function removeJudgeFromGroup(judgeId: string) {
+	async function removeJudgeFromGroup(judgeId: string) {
+		// add warning
+		if (isEditingEventSetup) {
+			const confirmed = await dialogs.showConfirmation({
+				title: 'Remove Judge',
+				message: `Are you sure you want to remove this judge? If this judge submitted any rubrics, they will be lost forever.`,
+				confirmText: 'Remove Judge',
+				cancelText: 'Cancel',
+				confirmButtonClass: 'danger'
+			});
+
+			if (!confirmed) return;
+		}
 		judges = judges.filter((judge) => judge.id !== judgeId);
 	}
 
