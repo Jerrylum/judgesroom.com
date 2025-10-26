@@ -233,29 +233,40 @@
 <div class="h-full overflow-auto bg-slate-100 p-2 md:p-6">
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Step Indicator -->
-		<div class="mb-8 flex items-center justify-between">
-			<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
-			<div class="flex items-center">
-				{#each Array(totalSteps) as _, i (i)}
-					<div class="flex items-center">
-						<div
-							class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
-							class:bg-slate-900={i + 1 <= currentStep}
-							class:text-white={i + 1 <= currentStep}
-							class:bg-gray-200={i + 1 > currentStep}
-							class:text-gray-500={i + 1 > currentStep}
-						>
-							{i + 1}
-						</div>
-						{#if i < totalSteps - 1}
+		<div class="mb-4 md:mb-8">
+			<!-- Mobile: Simple text indicator -->
+			<div class="flex items-center justify-between md:hidden">
+				<h1 class="text-xl font-bold text-gray-900">Event Setup</h1>
+				<div class="text-sm font-medium text-gray-600">
+					Step {currentStep} of {totalSteps}
+				</div>
+			</div>
+
+			<!-- Desktop: Full visual indicator -->
+			<div class="hidden items-center justify-between md:flex">
+				<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
+				<div class="flex items-center">
+					{#each Array(totalSteps) as _, i (i)}
+						<div class="flex items-center">
 							<div
-								class="mx-2 h-0.5 w-12 transition-colors"
-								class:bg-slate-900={i + 1 < currentStep}
-								class:bg-gray-200={i + 1 >= currentStep}
-							></div>
-						{/if}
-					</div>
-				{/each}
+								class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
+								class:bg-slate-900={i + 1 <= currentStep}
+								class:text-white={i + 1 <= currentStep}
+								class:bg-gray-200={i + 1 > currentStep}
+								class:text-gray-500={i + 1 > currentStep}
+							>
+								{i + 1}
+							</div>
+							{#if i < totalSteps - 1}
+								<div
+									class="mx-2 h-0.5 w-12 transition-colors"
+									class:bg-slate-900={i + 1 < currentStep}
+									class:bg-gray-200={i + 1 >= currentStep}
+								></div>
+							{/if}
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
 
