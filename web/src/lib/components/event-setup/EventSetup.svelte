@@ -309,13 +309,6 @@
 				/>
 			{:else if currentStep === 6}
 				<ReviewStep
-					{selectedProgram}
-					{selectedEventGradeLevel}
-					{teams}
-					{awardOptions}
-					{judgingMethod}
-					{judgeGroups}
-					{judges}
 					onPrev={prevStep}
 					onComplete={completeSetup}
 					onCancel={cancelSetup}

@@ -1,106 +1,87 @@
 <script lang="ts">
-	import { separateAwardOptionsByType, type AwardOptions } from '$lib/award.svelte';
-	import type { EditingJudgeGroup } from '$lib/judging.svelte';
-	import { groupTeamsByGroup, type TeamInfoAndData } from '$lib/team.svelte';
-	import type { Program } from '@judgesroom.com/protocol/src/award';
-	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
-	import type { JudgingMethod } from '@judgesroom.com/protocol/src/judging';
+	import { app } from '$lib/index.svelte';
 
 	interface Props {
-		selectedProgram: Program;
-		selectedEventGradeLevel: EventGradeLevel;
-		teams: TeamInfoAndData[];
-		awardOptions: AwardOptions[];
-		judgingMethod: JudgingMethod;
-		judgeGroups: EditingJudgeGroup[];
-		judges: { id: string; name: string; groupId: string }[];
 		onPrev: () => void;
-		onComplete: () => void;
+		onComplete: () => Promise<void>;
 		onCancel: () => void;
 		isJudgesRoomJoined: boolean;
 	}
 
-	let {
-		selectedProgram,
-		selectedEventGradeLevel,
-		teams,
-		awardOptions,
-		judgingMethod,
-		judgeGroups,
-		judges,
-		onPrev,
-		onComplete,
-		onCancel,
-		isJudgesRoomJoined
-	}: Props = $props();
+	let { onPrev, onComplete, onCancel, isJudgesRoomJoined }: Props = $props();
 
-	const { performanceAwards, judgedAwards, volunteerNominatedAwards } = $derived(separateAwardOptionsByType(awardOptions));
+	let enableGoogleAnalytics = $state(true);
+	let isLoading = $state(false);
+
+	async function handleComplete() {
+		isLoading = true;
+		try {
+			app.getPreferences().set('isGoogleAnalyticsEnabled', enableGoogleAnalytics);
+			await onComplete();
+		} finally {
+			isLoading = false;
+		}
+	}
 </script>
 
 <div class="space-y-6">
 	<h2 class="text-xl font-semibold text-gray-900">Review & Confirm</h2>
 
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-		<div class="rounded-lg bg-gray-50 p-4">
-			<h3 class="mb-2 font-medium text-gray-900">Competition Details</h3>
-			<p class="text-sm text-gray-600">
-				Type: <span class="font-medium">{selectedProgram}</span>
+	<div class="space-y-4 text-sm text-gray-700">
+		<div class="space-y-2">
+			<p>
+				This software is licensed under the GNU General Public License v3 (GPLv3). Join our <a
+					href="https://discord.gg/BpSDTgq7Zm"
+					target="_blank"
+					class="text-slate-600 underline hover:text-slate-800">Discord Support</a
+				>
+				server or visit our
+				<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank" class="text-slate-600 underline hover:text-slate-800"
+					>GitHub repository</a
+				> for more information.
 			</p>
-			<p class="text-sm text-gray-600">
-				Grade Level: <span class="font-medium">{selectedEventGradeLevel}</span>
-			</p>
-			<p class="text-sm text-gray-600">
-				Teams: <span class="font-medium">{teams.filter((t) => !t.absent).length}</span> active
-			</p>
-			<p class="text-sm text-gray-600">
-				Team Groups: <span class="font-medium">{Object.keys(groupTeamsByGroup(teams)).length}</span>
-			</p>
-		</div>
-
-		<div class="rounded-lg bg-gray-50 p-4">
-			<h3 class="mb-2 font-medium text-gray-900">Selected Awards</h3>
-			<p class="text-sm text-gray-600">
-				Performance: <span class="font-medium">{performanceAwards.filter((a) => a.isSelected).length}</span>
-				of {performanceAwards.length}
-			</p>
-			<p class="text-sm text-gray-600">
-				Judged: <span class="font-medium">{judgedAwards.filter((a) => a.isSelected).length}</span>
-				of {judgedAwards.length}
-			</p>
-			<p class="text-sm text-gray-600">
-				Volunteer Nominated: <span class="font-medium">{volunteerNominatedAwards.filter((a) => a.isSelected).length}</span>
-				of {volunteerNominatedAwards.length}
-			</p>
-		</div>
-
-		<div class="rounded-lg bg-gray-50 p-4">
-			<h3 class="mb-2 font-medium text-gray-900">Judging Setup</h3>
-			<p class="text-sm text-gray-600">
-				Method: <span class="font-medium">{judgingMethod === 'walk_in' ? 'Walk-in' : 'Pre-assigned'}</span>
-			</p>
-			<p class="text-sm text-gray-600">
-				Judge Groups: <span class="font-medium">{judgeGroups.length}</span>
-			</p>
-			<p class="text-sm text-gray-600">
-				Total Judges: <span class="font-medium">{judges.length}</span>
-			</p>
-			{#if judgingMethod === 'assigned'}
-				<p class="text-sm text-gray-600">
-					Assigned Teams: <span class="font-medium">{judgeGroups.reduce((sum, group) => sum + group.assignedTeams.length, 0)}</span>
-				</p>
-			{/if}
 		</div>
 	</div>
 
-	<div class="flex justify-between pt-4">
-		<div class="flex space-x-3">
-			<button onclick={onPrev} class="secondary">Back</button>
-			{#if isJudgesRoomJoined}
-				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-					Cancel
-				</button>
-			{/if}
+	<label class="flex cursor-pointer items-start space-x-3">
+		<input type="checkbox" bind:checked={enableGoogleAnalytics} class="mt-1" disabled={isLoading} />
+		<div class="flex-1">
+			<div class="font-medium text-gray-900">Enable Google Analytics</div>
+			<p class="mt-1 text-sm text-gray-600">
+				Help us improve judgesroom.com by sharing anonymous usage data. This includes metrics like number of teams, judges, and devices. No
+				judging content or personal information is collected. See our <a
+					href="./privacy"
+					target="_blank"
+					class="text-slate-600 underline hover:text-slate-800">Data Protection and Privacy Policy</a
+				> for more information.
+			</p>
 		</div>
-		<button onclick={onComplete} class="success">Complete Setup</button>
+	</label>
+
+	<div class="flex justify-between pt-4">
+		{#if !isLoading}
+			<div class="flex space-x-3">
+				<button onclick={onPrev} class="secondary">Back</button>
+				{#if isJudgesRoomJoined}
+					<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+						Cancel
+					</button>
+				{/if}
+			</div>
+			<button onclick={handleComplete} class="success">Complete Setup</button>
+		{:else}
+			<div></div>
+			<button disabled class="success cursor-not-allowed opacity-75">
+				<svg class="mr-2 inline h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
+				</svg>
+				Loading...
+			</button>
+		{/if}
 	</div>
 </div>
