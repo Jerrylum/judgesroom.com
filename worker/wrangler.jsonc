@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "judging-jerryio",
+	"name": "judgesroom-com",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-07-26",
 	"compatibility_flags": ["nodejs_compat"],
