@@ -50,8 +50,8 @@
 		});
 
 		if (confirmed) {
-			app.leaveJudgesRoom();
-			AppUI.appPhase = 'begin';
+			// await app.leaveJudgesRoom();
+			AppUI.appPhase = 'leaving';
 		}
 	}
 

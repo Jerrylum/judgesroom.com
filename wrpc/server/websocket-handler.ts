@@ -197,7 +197,9 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 						}
 					};
 
-					ws.send(JSON.stringify(errorResponse));
+					if (ws.readyState === WebSocket.OPEN) {
+						ws.send(JSON.stringify(errorResponse));
+					}
 
 					// Call error handler if provided
 					opts.onError?.({
@@ -223,7 +225,9 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 					}
 				};
 
-				ws.send(JSON.stringify(errorResponse));
+				if (ws.readyState === WebSocket.OPEN) {
+					ws.send(JSON.stringify(errorResponse));
+				}
 
 				opts.onError?.({
 					error,

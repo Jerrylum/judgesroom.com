@@ -639,15 +639,11 @@ export class App {
 			onOpen: () => {},
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
-					this.leaveJudgesRoom();
 					this.addErrorNotice("You have been kicked from the Judges' Room");
-
-					AppUI.appPhase = 'begin';
+					AppUI.appPhase = 'leaving';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
-					this.leaveJudgesRoom();
 					this.addErrorNotice("The Judges' Room has been destroyed");
-
-					AppUI.appPhase = 'begin';
+					AppUI.appPhase = 'leaving';
 				}
 			},
 			onConnectionStateChange: (state) => {

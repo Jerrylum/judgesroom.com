@@ -62,7 +62,10 @@ export class WebSocketConnectionManager implements Network {
 	 */
 	async addConnection(ws: WebSocket, roomId: string, clientId: string, deviceId: string, deviceName: string) {
 		if (!this.isRunning()) {
-			throw new Error('CRITICAL: Connection manager not initialized');
+			// throw new Error('CRITICAL: Connection manager not initialized');
+			// Just close the WebSocket and return
+			ws.close(ConnectionCloseCode.NORMAL, 'Room is not initialized');
+			return;
 		}
 
 		if (this.serverData.roomId !== null && this.serverData.roomId !== roomId) {

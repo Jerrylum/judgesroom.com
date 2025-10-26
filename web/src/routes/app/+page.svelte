@@ -13,6 +13,7 @@
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
 	import { parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
+	import Leaving from '$lib/components/leaving/Leaving.svelte';
 
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
@@ -123,6 +124,8 @@
 		<RoleSelection />
 	{:else if AppUI.appPhase === 'workspace'}
 		<Workspace />
+	{:else if AppUI.appPhase === 'leaving'}
+		<Leaving />
 	{/if}
 
 	<!-- Notices -->
