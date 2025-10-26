@@ -33,6 +33,7 @@ export class Preferences {
 	}
 
 	private linkLocalStorage() {
+    if (typeof window === 'undefined') return;
 		const data = this.storage.load<Partial<PreferencesData>>(this.storageKey);
 		if (data) {
 			this.data.isGoogleAnalyticsEnabled = data.isGoogleAnalyticsEnabled ?? true;
