@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, AppUI } from '$lib/index.svelte';
+	import { app, AppUI, dialogs, tabs } from '$lib/index.svelte';
 	import { onMount } from 'svelte';
 
 	// This app phase is important to trigger unmounting before calling leaveJudgesRoom
@@ -8,6 +8,18 @@
 	onMount(async () => {
 		await app.leaveJudgesRoom();
 		AppUI.appPhase = 'begin';
+
+		try {
+			dialogs.closeAllDialogs();
+		} catch (error) {
+			console.error('Failed to close all dialogs:', error);
+		}
+
+		try {
+			tabs.closeAllTabs();
+		} catch (error) {
+			console.error('Failed to close all tabs:', error);
+		}
 	});
 </script>
 
