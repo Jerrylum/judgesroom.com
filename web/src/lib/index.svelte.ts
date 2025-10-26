@@ -3,6 +3,7 @@ import { App, AppStorage } from '$lib/app.svelte';
 import { DialogController } from './dialog.svelte';
 import { TabController } from '$lib/tab.svelte';
 import type { SubscriptionsStorage } from './subscriptions.svelte';
+import { GoogleAnalytics } from './google-analytics.svelte';
 
 // ============================================================================
 // App State
@@ -33,3 +34,8 @@ export const subscriptions: SubscriptionsStorage = $state({
 	allJudgeGroupsReviewedTeams: {},
 	allSubmissionCaches: {}
 });
+export const googleAnalytics = new GoogleAnalytics();
+
+export function gtag(...args: any[]) {
+	googleAnalytics.gtag(...args);
+}

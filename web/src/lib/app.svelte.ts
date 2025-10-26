@@ -19,6 +19,7 @@ import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 import type { JoiningKit } from '@judgesroom.com/worker/src/routes/handshake';
 import z from 'zod';
+import { Preferences } from './preferences.svelte';
 
 export interface Notice {
 	id: string;
@@ -96,6 +97,7 @@ export class App {
 	private readonly storage: AppStorage;
 	private readonly isDevelopment: boolean;
 	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
+	private readonly preferences: Preferences;
 	private connectionState: ConnectionState = $state('offline');
 	private permit: Permit | null = $state(null);
 	private currentUser: User | null = $state(null);
@@ -112,6 +114,7 @@ export class App {
 		this.storage = storage;
 		this.isDevelopment = isDevelopment;
 		this.clientManager = createClientManager(this.createClientOptions.bind(this), clientRouter);
+		this.preferences = new Preferences(storage);
 
 		if (typeof window !== 'undefined') {
 			this.loadPermitFromStorage();
@@ -505,6 +508,10 @@ export class App {
 
 		const judgeGroup = this.getAllJudgeGroups().find((g) => g.id === judge.groupId);
 		return judgeGroup ? $state.snapshot(judgeGroup) : null;
+	}
+
+	getPreferences(): Preferences {
+		return this.preferences;
 	}
 
 	// ============================================================================

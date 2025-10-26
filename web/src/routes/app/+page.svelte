@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { replaceState } from '$app/navigation';
-	import { app, AppUI, dialogs } from '$lib/index.svelte';
+	import { app, AppUI, dialogs, googleAnalytics } from '$lib/index.svelte';
 	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
 	import Workspace from '$lib/components/workspace/Workspace.svelte';
 	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';
@@ -17,6 +17,10 @@
 
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
+
+	$effect(() => {
+		googleAnalytics.setEnabled(app.getPreferences().get('isGoogleAnalyticsEnabled'));
+	});
 
 	// Monitor user state changes
 	$effect(() => {
@@ -75,7 +79,7 @@
 			// Wait for sync to complete
 			AppUI.appPhase = 'joining_judges_room';
 		} catch (error) {
-			console.error('Error joining Judges\' Room from URL:', error);
+			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
 				title: 'Failed to Join',
@@ -132,7 +136,7 @@
 	{#if notices.length > 0}
 		<div class="fixed bottom-4 right-4 z-50 space-y-2">
 			{#each notices as notice (notice.id)}
-				<Notice notice={notice} dismissNotice={dismissNotice} />
+				<Notice {notice} {dismissNotice} />
 			{/each}
 		</div>
 	{/if}
