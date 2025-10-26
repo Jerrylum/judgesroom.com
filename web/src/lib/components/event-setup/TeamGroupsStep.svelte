@@ -1,7 +1,10 @@
 <script lang="ts">
 	import TeamGroup from './TeamGroup.svelte';
 	import { EditingTeamList, type TeamInfoAndData, groupTeamsByGroup } from '$lib/team.svelte';
-	
+	import { gtag } from '$lib/index.svelte';
+
+	gtag('event', 'team_groups_step_loaded');
+
 	interface Props {
 		teams: TeamInfoAndData[];
 		onNext: () => void;
@@ -67,8 +70,8 @@
 		</div>
 
 		<p class="text-sm text-gray-600">
-			Drag and drop teams between groups to organize them. Right click to select multiple teams. Team groups are useful when determining
-			the final ranking of award winners.
+			Drag and drop teams between groups to organize them. Right click to select multiple teams. Team groups are useful when determining the
+			final ranking of award winners.
 		</p>
 
 		{#if Object.keys(teamGroups).length > 0}

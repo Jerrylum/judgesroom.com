@@ -5,6 +5,9 @@
 	import { parseTournamentManagerCSV, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import { v4 as uuidv4 } from 'uuid';
+	import { gtag } from '$lib/index.svelte';
+
+	gtag('event', 'competition_setup_step_loaded');
 
 	interface Props {
 		robotEventsEventId: number | null;

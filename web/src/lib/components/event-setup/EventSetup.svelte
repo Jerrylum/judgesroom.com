@@ -5,7 +5,7 @@
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
 	import { onMount } from 'svelte';
-	import { app, AppUI } from '$lib/index.svelte';
+	import { app, AppUI, gtag } from '$lib/index.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData } from '$lib/team.svelte';
@@ -127,10 +127,6 @@
 		}
 	}
 
-	function resetAwards() {
-		awardOptions = [];
-	}
-
 	async function completeSetup() {
 		try {
 			// Create the event setup object
@@ -204,6 +200,16 @@
 
 				AppUI.appPhase = 'workspace';
 			}
+
+			gtag('event', 'event_setup_completed', {
+				isEditingEventSetup,
+				divisionId,
+				awardCount: awardOptions.length,
+				teamCount: teams.length,
+				judgeGroupCount: judgeGroups.length,
+				judgingMethod,
+				isImportingFromRobotEvents: robotEventsSku && robotEventsEventId && divisionId
+			});
 		} catch (error) {
 			console.error('Failed to complete setup:', error);
 			// You might want to show an error message to the user here

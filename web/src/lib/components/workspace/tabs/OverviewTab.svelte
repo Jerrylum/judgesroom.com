@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { app, dialogs, tabs } from '$lib/index.svelte';
+	import { app, dialogs, subscriptions, tabs } from '$lib/index.svelte';
 	import {
 		AwardNominationTab,
 		AwardRankingTab,
@@ -12,6 +12,7 @@
 		ExcellenceAwardCandidatesTab
 	} from '$lib/tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
+	import { gtag } from '$lib/index.svelte';
 
 	interface Props {
 		isActive: boolean;
@@ -74,6 +75,17 @@
 		if (!confirmed) {
 			return;
 		}
+
+		gtag('event', 'start_award_deliberation', {
+			divisionId: essentialData?.divisionId,
+			awardCount: essentialData?.awards.length,
+			teamCount: essentialData?.teamInfos.length,
+			judgeGroupCount: essentialData?.judgeGroups.length,
+			judgeCount: app.getJudgeCount(),
+			judgingMethod: essentialData?.judgingMethod,
+			isImportingFromRobotEvents: essentialData?.robotEventsSku && essentialData?.robotEventsEventId && essentialData?.divisionId,
+			submissionCount: Object.values(subscriptions.allSubmissionCaches).length
+		});
 
 		try {
 			await app.wrpcClient.judging.startAwardDeliberation.mutation();

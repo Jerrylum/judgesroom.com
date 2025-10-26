@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppUI, dialogs } from '$lib/index.svelte';
+	import { AppUI, dialogs, gtag } from '$lib/index.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import {
@@ -13,6 +13,8 @@
 	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { untrack } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
+
+	gtag('event', 'event_code_setup_loaded');
 
 	interface Props {
 		isEditingEventSetup: boolean;
@@ -53,6 +55,8 @@
 	const canProceed = $derived(importMethod === 'manual' || importedData || (robotEventsSku && robotEventsEventId && divisionId));
 
 	async function handleRobotEventsImport() {
+		gtag('event', 'import_event_from_robotevents', { isEditingEventSetup });
+
 		if (isEditingEventSetup) {
 			const confirm = await dialogs.showConfirmation({
 				title: 'Import from RobotEvents',
@@ -75,6 +79,8 @@
 
 			// Select first division by default
 			if (data.divisionInfos.length < 1) {
+				gtag('event', 'no_divisions_found_in_robotevents', { isEditingEventSetup });
+
 				importedData = null;
 				dialogs.showConfirmation({
 					title: 'No Divisions Found in RobotEvents',
@@ -97,6 +103,13 @@
 			inputRobotEventsSku = data.robotEventsSku;
 			inputDivisionId = data.divisionInfos[0].id;
 			importedData = data;
+
+			gtag('event', 'successfully_imported_event', {
+				isEditingEventSetup,
+				awardCount: data.awardOptions.length,
+				teamCount: data.teamInfos.length
+			});
+
 			dialogs.showConfirmation({
 				title: 'Successfully Imported Event',
 				message: `Successfully imported event "${data.eventName}" with ${data.teamInfos.length} teams`,
@@ -105,6 +118,8 @@
 			});
 		} catch (error) {
 			console.error('Error importing from RobotEvents:', error);
+			gtag('event', 'error_importing_from_robotevents', { isEditingEventSetup });
+
 			dialogs.showConfirmation({
 				title: 'Error Importing from RobotEvents',
 				message: `${error instanceof Error ? error.message : 'Unknown error'}`,

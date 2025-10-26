@@ -9,6 +9,9 @@
 	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
 	import AwardSelectionColumn from './AwardSelectionColumn.svelte';
 	import { tick, untrack } from 'svelte';
+	import { gtag } from '$lib/index.svelte';
+
+	gtag('event', 'award_selection_step_loaded');
 
 	interface Props {
 		selectedProgram: Program;
