@@ -208,7 +208,7 @@
 						</p>
 					</div>
 				</div>
-				<div class="flex-shrink-0 text-left sm:text-right">
+				<div class="shrink-0 text-left sm:text-right">
 					<div class="text-sm {notebookStatus.class} font-medium">
 						{notebookStatus.text}
 					</div>

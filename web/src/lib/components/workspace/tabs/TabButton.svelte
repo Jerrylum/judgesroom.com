@@ -28,7 +28,7 @@
 						e.stopPropagation();
 						onClose();
 					}}
-					class="relative left-1 flex-shrink-0 cursor-pointer rounded-full p-0.5 hover:bg-slate-400"
+					class="relative left-1 shrink-0 cursor-pointer rounded-full p-0.5 hover:bg-slate-400"
 					tabindex="0"
 					aria-label="Close tab"
 				>
