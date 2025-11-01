@@ -124,6 +124,8 @@
 				{@const rankingEligibilityThreshold = report.rankingEligibilityThreshold}
 				{@const skillsEligibilityThreshold = report.skillsEligibilityThreshold}
 				{@const divisionId = essentialData?.divisionId}
+				{@const teams = sortByTeamNumberAndEligibility(report.teamsInGroup)}
+				{@const eligibleTeams = teams.filter((t) => t.isEligible)}
 				<div class="mb-2 rounded-lg bg-white p-6 shadow-sm">
 					<h3 class="mb-2 text-lg font-semibold text-gray-900">{awardName}</h3>
 					<div class="mb-2 space-y-2 text-sm text-gray-600">
@@ -164,6 +166,18 @@
 								rounded to {skillsEligibilityThreshold} teams.
 							</p>
 						{/if}
+						{#if eligibleTeams.length > 0}
+							<p>
+								Teams Eligible For Excellence:
+								<!-- {teams.filter((t) => t.isEligible).map((t) => t.teamNumber).join(', ')} -->
+								{#each eligibleTeams as team, index (team.teamNumber)}
+									<span class="text-green-500">{team.teamNumber}</span>{#if index < eligibleTeams.length - 1}{', '}
+									{/if}
+								{/each}
+							</p>
+						{:else}
+							<p>No teams are eligible for this award. It should not be given out at the event.</p>
+						{/if}
 					</div>
 					<div>
 						<award-rankings-table>
@@ -180,7 +194,7 @@
 								</scroll-container>
 							</table-header>
 							<table-body>
-								{#each sortByTeamNumberAndEligibility(report.teamsInGroup) as team (team.teamNumber)}
+								{#each teams as team (team.teamNumber)}
 									<row>
 										<team>
 											<div class:text-green-500={team.isEligible}>
