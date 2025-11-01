@@ -32,6 +32,7 @@
 
 <div
 	class="cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+	class:border-2={isWinner}
 	class:border-green-500={isWinner}
 	class:opacity-50={isSkipped}
 >
