@@ -219,7 +219,7 @@
 		<!-- Teams Grid -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">All Teams</h3>
-			<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+			<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 				{#each allTeams as team (team.id)}
 					{@const teamDifference = teamDifferences().get(team.id)}
 					<div

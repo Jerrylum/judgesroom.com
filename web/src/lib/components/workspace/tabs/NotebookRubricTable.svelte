@@ -37,8 +37,8 @@
 </div>
 <rubric-table>
 	<rubric-header>
-		<div class="max-w-42 min-w-42 flex flex-grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
-			<div class="border-b-3 flex-1 flex-grow bg-gray-200">CRITERIA</div>
+		<div class="max-w-42 min-w-42 flex grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
+			<div class="border-b-3 flex-1 grow bg-gray-200">CRITERIA</div>
 			<div class="pb-1 pt-1 leading-none">ENGINEERING DESIGN PROCESS</div>
 		</div>
 		<scroll-container use:rsc1>
@@ -235,7 +235,7 @@
 </div>
 <rubric-table class="mt-2 md:mt-6">
 	<rubric-header>
-		<div class="max-h-42 flex min-h-20 flex-grow items-center justify-center text-center text-2xl font-bold">
+		<div class="max-h-42 flex min-h-20 grow items-center justify-center text-center text-2xl font-bold">
 			Engineering Notebook Rubric (Page 2 of 2)
 		</div>
 	</rubric-header>

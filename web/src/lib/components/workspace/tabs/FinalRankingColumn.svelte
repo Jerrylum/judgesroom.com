@@ -157,7 +157,7 @@
 	</div>
 	<div class="relative">
 		<div
-			class="border-1 min-h-18 flex flex-col gap-1 rounded-lg border-dashed border-gray-300 bg-gray-50 p-1"
+			class="border min-h-18 flex flex-col gap-1 rounded-lg border-dashed border-gray-300 bg-gray-50 p-1"
 			use:dndzone={{
 				items: editing,
 				flipDurationMs,
