@@ -33,11 +33,7 @@ This system is aligned with the RECF/VEX “Guide To Judging,” mapping app fea
 
 ### Rank winners and re-order teams without worrying about duplicate judged awards
 
-<!-- ![Award ranking guardrails](/docs/assets/screenshot-award-ranking-guardrails.mp4) -->
-
-<video controls>
-  <source src="/docs/assets/screenshot-award-ranking-guardrails.mp4" type="video/mp4">
-</video>
+[Watch video](/docs/assets/screenshot-award-ranking-guardrails.mp4)
 
 ### Keep confidential materials in one secure place and delete them afterward
 
