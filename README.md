@@ -4,7 +4,6 @@ Before judgesroom.com, judging meant paper rubrics, sticky notes, and hours of s
 
 By digitizing the judging steps (interviews, rubrics, nominations, rankings), judgesroom.com streamlines the process, reduces errors, and keeps materials confidential. Judges can share the same Judges' Room across multiple devices, making collaboration faster and easier.
 
-judgesroom.com is an open source project and fully compliant with the RECF/VEX "Guide To Judging." The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. A ready‑to‑use Docker Compose is provided below.
 judgesroom.com is an open source project and fully compliant with the RECF/VEX "Guide To Judging." The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. A local self‑hosting guide (Bun + Wrangler) is provided below.
 
 ## What judgesroom.com does for you
@@ -13,32 +12,36 @@ This system is aligned with the RECF/VEX “Guide To Judging,” mapping app fea
 
 ### Import teams and event info from RobotEvents, set up awards and divisions
 
-[placeholder: screenshot-import-and-setup.png]
+<!-- [placeholder: screenshot-import-and-setup.png] -->
+![Import and setup](/docs/assets/screenshot-import-and-setup.png)
 
 ### Invite Judges to a shared Judges' Room via link
 
-[placeholder: screenshot-join-judges-room.png]
+![Join judges room](/docs/assets/screenshot-join-judges-room.png)
 
 ### Submit Interview and Engineering Notebook rubrics digitally
 
-[placeholder: screenshot-rubrics.png]
+![Rubrics](/docs/assets/screenshot-rubrics.png)
 
 ### Shortlist nominees per award and track follow‑ups
 
-[placeholder: screenshot-nominations-followups.png]
+![Nominations and followups](/docs/assets/screenshot-nominations-followups.png)
 
 ### View performance data and Excellence eligibility in real time
 
-[placeholder: screenshot-performance-eligibility.png]
+![Performance eligibility](/docs/assets/screenshot-performance-eligibility.png)
 
 ### Rank winners and re-order teams without worrying about duplicate judged awards
 
-[placeholder: screenshot-award-ranking-guardrails.png]
+<!-- ![Award ranking guardrails](/docs/assets/screenshot-award-ranking-guardrails.mp4) -->
+
+<video controls>
+  <source src="/docs/assets/screenshot-award-ranking-guardrails.mp4" type="video/mp4">
+</video>
 
 ### Keep confidential materials in one secure place and delete them afterward
 
-[placeholder: screenshot-destroy-room.png]
-
+![Destroy room](/docs/assets/screenshot-destroy-room.png)
 
 ## Quick Start (Hosted)
 
@@ -57,14 +60,14 @@ Prerequisites:
 
 Steps:
 
-1) Install workspaces
+1. Install workspaces
 
 ```bash
 # From repo root
 bun install
 ```
 
-2) Build the web app for production
+2. Build the web app for production
 
 ```bash
 cd web && bun run build
@@ -72,7 +75,7 @@ cd web && bun run build
 
 This produces static assets in `web/build` (SvelteKit adapter-static).
 
-3) Run the Worker locally in production mode (serves `web/build`)
+3. Run the Worker locally in production mode (serves `web/build`)
 
 ```bash
 cd ../worker && bunx wrangler dev --env production
