@@ -42,31 +42,14 @@
 
 		<div class="rounded-lg bg-white p-4 shadow-lg md:p-8">
 			<div class="aspect-video w-full overflow-hidden rounded-lg bg-slate-200">
-				<!-- YouTube video embed placeholder -->
-				<div class="flex h-full items-center justify-center text-slate-500">
-					<div class="text-center">
-						<svg class="mx-auto mb-4 h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-							></path>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-						</svg>
-						<p class="text-lg font-medium">Introduction Video</p>
-						<p class="text-sm text-slate-400">YouTube embed placeholder</p>
-					</div>
-				</div>
-				<!-- Uncomment and add your YouTube video ID below -->
-				<!-- <iframe
+				<iframe
 					class="h-full w-full"
-					src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+					src="https://www.youtube.com/embed/iNEQAdeVgOM"
 					title="judgesroom.com Introduction"
 					frameborder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					allowfullscreen
-				></iframe> -->
+				></iframe>
 			</div>
 		</div>
 	</div>
