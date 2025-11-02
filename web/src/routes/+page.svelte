@@ -86,7 +86,7 @@
 						onclick={() => {
 							alert('Coming soon');
 						}}
-						href="#judges-training"
+						href="/"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
 						<span>Watch Training Video</span>
@@ -119,7 +119,7 @@
 						onclick={() => {
 							alert('Coming soon');
 						}}
-						href="#judge-advisor-training"
+						href="/"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
 						<span>Watch Training Video</span>
@@ -205,10 +205,10 @@
 	<!-- Footer -->
 	<div class="bg-slate-900 py-12 text-slate-400">
 		<div class="mx-auto max-w-6xl px-6">
-			<div class="mb-8 flex flex-wrap justify-center gap-6 text-center">
+			<div class="flex flex-wrap justify-center gap-6 text-center">
 				<!-- Discord Support -->
 				<a
-					href="https://discord.gg/YOUR_DISCORD_INVITE"
+					href="https://discord.gg/BpSDTgq7Zm"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex items-center gap-2 transition-colors hover:text-white"
@@ -223,7 +223,7 @@
 
 				<!-- YouTube Channel -->
 				<a
-					href="https://youtube.com/@YOUR_CHANNEL"
+					href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex items-center gap-2 transition-colors hover:text-white"
@@ -238,7 +238,7 @@
 
 				<!-- GitHub -->
 				<a
-					href="https://github.com/jerrylum/judging.jerryio"
+					href="https://github.com/Jerrylum/judgesroom.com"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex items-center gap-2 transition-colors hover:text-white"
@@ -252,13 +252,6 @@
 					</svg>
 					<span>GitHub</span>
 				</a>
-			</div>
-
-			<div class="border-t border-slate-700 pt-8 text-center">
-				<p class="mb-2">Open source project — Fully compliant with RECF "Guide To Judging"</p>
-				<p class="text-sm">
-					Questions? Contact us at <a href="mailto:me@jerryio.com" class="font-medium text-slate-300 hover:text-white">me@jerryio.com</a>
-				</p>
 			</div>
 		</div>
 	</div>
