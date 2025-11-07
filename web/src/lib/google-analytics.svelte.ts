@@ -38,7 +38,7 @@ export class GoogleAnalytics {
 		if (typeof window === 'undefined') return;
 		if (!this.enabled) return;
 
-		window.dataLayer?.push(args);
+		window.dataLayer?.push(arguments);
 	}
 }
 
