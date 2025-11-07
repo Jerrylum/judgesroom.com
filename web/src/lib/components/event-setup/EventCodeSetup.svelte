@@ -13,6 +13,7 @@
 	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { untrack } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
+	import RobotEventsImportDialog, { type ImportChoice } from './RobotEventsImportDialog.svelte';
 
 	gtag('event', 'event_code_setup_loaded');
 
@@ -51,6 +52,7 @@
 	let inputDivisionId = $state(divisionId);
 	let isImporting = $state(false);
 	let importedData = $state<RobotEventsImportedData | null>(null);
+	let importChoice = $state<ImportChoice>(null);
 
 	const canProceed = $derived(importMethod === 'manual' || importedData || (robotEventsSku && robotEventsEventId && divisionId));
 
@@ -58,13 +60,11 @@
 		gtag('event', 'import_event_from_robotevents', { isEditingEventSetup });
 
 		if (isEditingEventSetup) {
-			const confirm = await dialogs.showConfirmation({
-				title: 'Import from RobotEvents',
-				message:
-					'Are you sure you want to import from RobotEvents? Any existing teams NOT included in this import will be permanently removed from the system, along with ALL their related rubrics, award rankings, and judging data. Teams that match by team number will keep their existing data. This action cannot be undone.'
-			});
+			importChoice = (await dialogs.showCustom(RobotEventsImportDialog, {
+				props: {}
+			})) as ImportChoice;
 
-			if (!confirm) {
+			if (!importChoice) {
 				return;
 			}
 		}
@@ -98,7 +98,10 @@
 			selectedProgram = data.program;
 			selectedEventGradeLevel = data.eventGradeLevel;
 
-			awardOptions = data.awardOptions;
+			// Only update award options if user chose full setup, or if not editing
+			if (!isEditingEventSetup || importChoice === 'full') {
+				awardOptions = data.awardOptions;
+			}
 
 			inputRobotEventsSku = data.robotEventsSku;
 			inputDivisionId = data.divisionInfos[0].id;
@@ -112,7 +115,7 @@
 
 			dialogs.showConfirmation({
 				title: 'Successfully Imported Event',
-				message: `Successfully imported event "${data.eventName}" with ${data.teamInfos.length} teams`,
+				message: `Successfully imported event "${data.eventName}"`,
 				confirmText: 'OK',
 				cancelButtonClass: 'hidden'
 			});
@@ -165,7 +168,6 @@
 						if (!importedData) return;
 
 						divisionId = inputDivisionId;
-						// teams = importedData.teamInfos.filter((team) => divisionRanking.some((ranking) => ranking.teamNumber === team.number));
 						handleUpdateTeams(
 							importedData.teamInfos.filter((team) => divisionRanking.some((ranking) => ranking.teamNumber === team.number))
 						);
