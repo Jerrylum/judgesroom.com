@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { app } from '$lib/index.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 	import type { AwardWinnerTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '$lib/award.svelte';
+	import AwardWinnersReportDialog from './AwardWinnersReportDialog.svelte';
 
 	interface Props {
 		tab: AwardWinnerTab;
@@ -52,6 +53,38 @@
 	function getTeamDisplayName(teamId: string) {
 		const team = allTeams[teamId];
 		return team ? `${team.number} - ${team.name}` : 'Unknown Team';
+	}
+
+	// Generate report text
+	function generateReportText(): string {
+		const lines: string[] = [];
+
+		// Iterate through all awards in order
+		for (const award of allAwards) {
+			const winners = allAwardWinners[award.name] || [];
+			const teamNumbers = winners
+				.map((teamId) => {
+					const team = allTeams[teamId];
+					return team ? team.number : null;
+				})
+				.filter((num): num is string => num !== null);
+
+			if (teamNumbers.length > 0) {
+				lines.push(`${award.name}: ${teamNumbers.join(', ')}`);
+			} else {
+				lines.push(`${award.name}: no teams`);
+			}
+		}
+
+		return lines.join('\n');
+	}
+
+	// Open report dialog
+	function openReportDialog() {
+		const reportText = generateReportText();
+		dialogs.showCustom(AwardWinnersReportDialog, {
+			props: { reportText }
+		});
 	}
 </script>
 
@@ -180,7 +213,14 @@
 
 		<!-- Summary of Award Winners by Team Group -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-2 text-xl font-semibold text-gray-900">Summary of Award Winners</h2>
+			<div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+				<div>
+					<h2 class="text-xl font-semibold text-gray-900">Summary of Award Winners</h2>
+				</div>
+				<button onclick={openReportDialog} class="primary tiny">
+					Report
+				</button>
+			</div>
 			<p class="mb-6 text-sm text-gray-600">This summary shows all award winners organized by team group.</p>
 
 			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
