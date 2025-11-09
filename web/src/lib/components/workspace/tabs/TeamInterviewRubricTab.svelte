@@ -3,6 +3,7 @@
 	import './rubric.css';
 	import { app, tabs, subscriptions, dialogs } from '$lib/index.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
+	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
@@ -118,6 +119,24 @@
 			return sortByTeamNumber(Object.values(includedTeams));
 		}
 	});
+
+	// Get notebook rubrics submitted by current judge for the selected team
+	const notebookRubricsForTeam = $derived.by(() => {
+		if (!tab.teamId || !currentJudge) return [];
+		
+		const submissionCaches = Object.values(subscriptions.allSubmissionCaches);
+		return submissionCaches
+			.filter((sub) => sub.teamId === tab.teamId && sub.enrId && sub.judgeId === currentJudge.id)
+			.map((sub) => ({
+				id: sub.enrId!,
+				judgeId: sub.judgeId
+			}));
+	});
+
+	function openNotebookRubric(rubricId: string) {
+		const tab = new NotebookRubricTab({ rubricId });
+		tabs.addOrReuseTab(tab);
+	}
 
 	async function saveRubric() {
 		if (!tab.teamId) {
@@ -249,6 +268,13 @@
 			{#if tab.teamId}
 				{@const selectedTeam = includedTeams[tab.teamId]}
 				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
+				{@const devStatus = selectedTeam.notebookDevelopmentStatus}
+				{@const devStatusText =
+					devStatus === 'fully_developed'
+						? 'Fully Developed'
+						: devStatus === 'developing'
+							? 'Developing'
+							: 'Not Submitted/Not Reviewed'}
 				<div class="mb-4 flex flex-row justify-between gap-2 rounded-lg bg-gray-50 p-4">
 					<div class=" text-sm text-gray-800">
 						<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -262,6 +288,26 @@
 								<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
 							{/if}
 						</p>
+						<p>
+							<strong>Notebook Development Status:</strong>
+							<span
+								class:text-green-600={devStatus === 'fully_developed'}
+								class:text-yellow-600={devStatus === 'developing'}
+								class:text-gray-600={devStatus === 'undetermined'}
+							>
+								{devStatusText}
+							</span>
+						</p>
+						{#if notebookRubricsForTeam.length > 0}
+							<p>
+								<strong>Your Notebook Rubrics:</strong>
+								{#each notebookRubricsForTeam as rubric, index}
+									<button onclick={() => openNotebookRubric(rubric.id)} class="text-blue-500 hover:text-blue-600">
+										Rubric {index + 1}
+									</button>{index < notebookRubricsForTeam.length - 1 ? ', ' : ''}
+								{/each}
+							</p>
+						{/if}
 					</div>
 
 					{#if qrCodeDataUrl}
