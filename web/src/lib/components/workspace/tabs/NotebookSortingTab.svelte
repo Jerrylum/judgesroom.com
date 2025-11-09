@@ -36,6 +36,9 @@
 	let showOnlyAssignedTeams = $state(true);
 	const isShowingOnlyAssignedTeams = $derived(isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup);
 
+	// State for showing only fully developed notebooks
+	let showOnlyFullyDeveloped = $state(false);
+
 	// View mode state - stored in preferences
 	const viewMode = $derived(app.getPreferences().get('notebookSortingTabViewMode'));
 
@@ -47,11 +50,19 @@
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived.by(() => {
+		let teams;
 		if (isShowingOnlyAssignedTeams) {
-			return sortByAssignedTeams(includedTeams, currentJudgeGroup!.assignedTeams);
+			teams = sortByAssignedTeams(includedTeams, currentJudgeGroup!.assignedTeams);
 		} else {
-			return sortByTeamNumber(Object.values(includedTeams));
+			teams = sortByTeamNumber(Object.values(includedTeams));
 		}
+
+		// Apply fully developed filter if enabled
+		if (showOnlyFullyDeveloped) {
+			teams = teams.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
+		}
+
+		return teams;
 	});
 
 	// Calculate progress metrics
@@ -163,18 +174,6 @@
 				the doubt and categorized as Fully Developed.
 			</p>
 			<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric.</p>
-
-			<!-- Filter Controls -->
-			{#if isAssignedJudging && currentJudgeGroup}
-				<div>
-					<label class="flex items-start sm:items-center">
-						<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
-						<span class="text-sm text-gray-700">
-							Only show assigned teams for your current judge group ({currentJudgeGroup.name})
-						</span>
-					</label>
-				</div>
-			{/if}
 		</div>
 
 		<!-- Import Section -->
@@ -264,6 +263,27 @@
 								? Math.round((progressMetrics.currentJudgeFinished.count / progressMetrics.currentJudgeFinished.total) * 100)
 								: 0}%
 						</div>
+					</div>
+				</div>
+
+				<!-- Filter Controls -->
+
+				<div class="mt-4 flex flex-col gap-2">
+					{#if isAssignedJudging && currentJudgeGroup}
+						<div>
+							<label class="flex items-start sm:items-center">
+								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+								<span class="text-sm text-gray-700">
+									Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+								</span>
+							</label>
+						</div>
+					{/if}
+					<div>
+						<label class="flex items-start sm:items-center">
+							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+							<span class="text-sm text-gray-700"> Only show fully developed notebooks </span>
+						</label>
 					</div>
 				</div>
 
