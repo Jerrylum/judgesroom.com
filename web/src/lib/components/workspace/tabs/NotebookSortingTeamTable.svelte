@@ -57,12 +57,12 @@
 
 <notebook-sorting-table>
 	<table-header>
-		<team class="bg-gray-200">TEAM</team>
+		<team>TEAM NUMBER</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				<div class="flex min-w-60 max-w-60 flex-col items-center justify-center">NOTEBOOK LINK</div>
 				<div class="flex min-w-40 max-w-40 items-center justify-center">STATUS</div>
-				<div class="flex min-w-40 max-w-40 items-center justify-center">INV AWARD FORM</div>
+				<div class="flex min-w-40 max-w-40 items-center justify-center text-center">INNOVATE AWARD SUBMISSION FORM</div>
 				<div class="min-w-50 flex items-center justify-center">ACTIONS</div>
 			</content>
 		</scroll-container>
