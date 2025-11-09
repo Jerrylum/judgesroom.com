@@ -71,7 +71,7 @@
 			notes = existingRubric.notes;
 			innovateAwardNotes = existingRubric.innovateAwardNotes;
 			timestamp = existingRubric.timestamp;
-			
+
 			// Reset initial state to loaded values
 			initialTeamId = existingRubric.teamId;
 			initialRubricScores = [...(existingRubric.rubric as number[])];
@@ -173,13 +173,13 @@
 			});
 
 			isSubmitted = true;
-			
+
 			// Update initial state to current saved state
 			initialTeamId = tab.teamId;
 			initialRubricScores = [...rubricScores];
 			initialNotes = notes;
 			initialInnovateAwardNotes = innovateAwardNotes;
-			
+
 			app.addSuccessNotice('Notebook rubric saved successfully!');
 		} catch (error) {
 			console.error('Failed to save notebook rubric:', error);
@@ -231,18 +231,30 @@
 		<!-- Header -->
 
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Review</h2>
+			<div class="mb-4 flex items-center justify-between">
+				<h2 class="text-xl font-semibold text-gray-900">Notebook Review</h2>
+				{#if isSubmitted}
+					<button onclick={editRubric} class="secondary tiny">Edit</button>
+				{/if}
+			</div>
 
 			<div class="mb-4">
-				<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-				<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full" disabled={isSubmitted}>
-					<option value="">Select a team...</option>
-					{#each teamsToShow() as team (team.id)}
-						{@const devStatus = team.notebookDevelopmentStatus ?? null}
-						{@const statusText = devStatus === 'fully_developed' ? ' (Fully Developed)' : devStatus === 'developing' ? ' (Developing)' : ''}
-						<option value={team.id}>{team.number}{statusText}</option>
-					{/each}
-				</select>
+				{#if isSubmitted && tab.teamId}
+					<div class="mb-2 mt-1 text-base text-gray-900">
+						<strong>Team #</strong>: {includedTeams[tab.teamId].number}
+					</div>
+				{:else}
+					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
+					<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full">
+						<option value="">Select a team...</option>
+						{#each teamsToShow() as team (team.id)}
+							{@const devStatus = team.notebookDevelopmentStatus ?? null}
+							{@const statusText =
+								devStatus === 'fully_developed' ? ' (Fully Developed)' : devStatus === 'developing' ? ' (Developing)' : ''}
+							<option value={team.id}>{team.number}{statusText}</option>
+						{/each}
+					</select>
+				{/if}
 
 				<!-- Filter Controls -->
 				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}

@@ -48,9 +48,7 @@
 		} else {
 			// Check if any data has changed from initial state
 			const hasChanges =
-				tab.teamId !== initialTeamId ||
-				rubricScores.some((score, idx) => score !== initialRubricScores[idx]) ||
-				notes !== initialNotes;
+				tab.teamId !== initialTeamId || rubricScores.some((score, idx) => score !== initialRubricScores[idx]) || notes !== initialNotes;
 
 			tab._isDataUnsaved = hasChanges;
 		}
@@ -67,7 +65,7 @@
 			rubricScores = existingRubric.rubric as number[];
 			notes = existingRubric.notes;
 			timestamp = existingRubric.timestamp;
-			
+
 			// Reset initial state to loaded values
 			initialTeamId = existingRubric.teamId;
 			initialRubricScores = [...(existingRubric.rubric as number[])];
@@ -159,12 +157,12 @@
 			});
 
 			isSubmitted = true;
-			
+
 			// Update initial state to current saved state
 			initialTeamId = tab.teamId;
 			initialRubricScores = [...rubricScores];
 			initialNotes = notes;
-			
+
 			app.addSuccessNotice('Team interview rubric saved successfully!');
 		} catch (error) {
 			console.error('Failed to save team interview rubric:', error);
@@ -213,16 +211,27 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-4 text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+			<div class="mb-4 flex items-center justify-between">
+				<h2 class="text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+				{#if isSubmitted}
+					<button onclick={editRubric} class="secondary tiny">Edit</button>
+				{/if}
+			</div>
 
 			<div class="mb-4">
-				<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
-				<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full" disabled={isSubmitted}>
-					<option value="">Select a team...</option>
-					{#each teamsToShow() as team (team.id)}
-						<option value={team.id}>{team.number} - {team.name}</option>
-					{/each}
-				</select>
+				{#if isSubmitted && tab.teamId}
+					<div class="mb-2 mt-1 text-base text-gray-900">
+						<strong>Team #</strong>: {includedTeams[tab.teamId].number}
+					</div>
+				{:else}
+					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
+					<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full">
+						<option value="">Select a team...</option>
+						{#each teamsToShow() as team (team.id)}
+							<option value={team.id}>{team.number} - {team.name}</option>
+						{/each}
+					</select>
+				{/if}
 
 				<!-- Filter Controls -->
 				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
