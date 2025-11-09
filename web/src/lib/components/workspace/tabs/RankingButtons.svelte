@@ -155,7 +155,7 @@
 		</div>
 	{:else}
 		<!-- Display mode: show only stars or empty if 0 -->
-		<div class="flex min-h-[1.5rem] items-center justify-center text-lg text-gray-600">
+		<div class="flex min-h-6 items-center justify-center text-lg text-gray-600">
 			{#if ranking > 0}
 				{getStars(ranking)}
 			{/if}

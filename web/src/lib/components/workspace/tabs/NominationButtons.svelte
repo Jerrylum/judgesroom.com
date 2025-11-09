@@ -48,13 +48,11 @@
 	class:cursor-default!={(isDisabled && !isNominated) || showExcellenceAwardWinners}
 	onclick={onClick}
 >
-	<div class="flex min-h-[1.5rem] items-center justify-center text-lg text-gray-300">
+	<div class="flex min-h-6 items-center justify-center text-lg text-gray-300">
 		{getStars(ranking)}
 	</div>
 	{#if showExcellenceAwardWinners}
 		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-lg text-gray-600">Excellence Award</div>
-	{:else if isNominated}
-		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-4xl text-gray-600 hover:text-black">✓</div>
 	{:else if isDisabled}
 		<div class="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
@@ -67,7 +65,8 @@
 				<p>Submission Form Required</p>
 			{/if}
 		</div>
-	{:else}
-		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-4xl opacity-0 group-hover:opacity-30">✓</div>
+	{/if}
+	{#if isNominated}
+		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-4xl text-gray-600 hover:text-black">✓</div>
 	{/if}
 </button>
