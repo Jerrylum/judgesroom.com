@@ -1,17 +1,24 @@
 <script lang="ts">
+	import './teams-rubrics-list.css';
 	import { app, subscriptions, tabs } from '$lib/index.svelte';
+	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import QRCodeButton from './QRCodeButton.svelte';
 
 	const teams = $derived(app.getAllTeamInfoAndData());
 
+	interface SubmissionWithScore extends Submission {
+		score: number | null;
+	}
+
 	interface RubricsAndNotesPerTeam {
-		engineeringNotebookRubrics: Submission[];
-		teamInterviewRubrics: Submission[];
-		teamInterviewNotes: Submission[];
+		engineeringNotebookRubrics: SubmissionWithScore[];
+		teamInterviewRubrics: SubmissionWithScore[];
+		teamInterviewNotes: SubmissionWithScore[];
 	}
 
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
@@ -19,6 +26,10 @@
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 	let showOnlyAssignedTeams = $state(true); // Default to true as requested
+	let showOnlyFullyDeveloped = $state(false);
+	let showOnlyInterviewed = $state(false);
+
+	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
 	const teamList = $derived.by(() => {
 		let teamIdsInOrder: string[] = [];
@@ -29,6 +40,28 @@
 		} else {
 			teamIdsInOrder = sortByTeamNumber(Object.values(includedTeams)).map((team) => team.id);
 		}
+
+		// Apply filters
+		if (showOnlyFullyDeveloped || showOnlyInterviewed) {
+			teamIdsInOrder = teamIdsInOrder.filter((teamId) => {
+				const team = teams[teamId];
+				if (!team) return false;
+
+				let passesFilter = true;
+
+				if (showOnlyFullyDeveloped) {
+					passesFilter = passesFilter && team.notebookDevelopmentStatus === 'fully_developed';
+				}
+
+				if (showOnlyInterviewed) {
+					const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam();
+					passesFilter = passesFilter && teamRubricsAndNotes.teamInterviewRubrics.length > 0;
+				}
+
+				return passesFilter;
+			});
+		}
+
 		return teamIdsInOrder;
 	});
 
@@ -46,19 +79,22 @@
 			if (sub.enrId) {
 				target.engineeringNotebookRubrics.push({
 					id: sub.enrId,
-					judgeId: sub.judgeId
+					judgeId: sub.judgeId,
+					score: sub.score
 				});
 			}
 			if (sub.tiId) {
 				target.teamInterviewRubrics.push({
 					id: sub.tiId,
-					judgeId: sub.judgeId
+					judgeId: sub.judgeId,
+					score: sub.score
 				});
 			}
 			if (sub.tnId) {
 				target.teamInterviewNotes.push({
 					id: sub.tnId,
-					judgeId: sub.judgeId
+					judgeId: sub.judgeId,
+					score: sub.score
 				});
 			}
 			rtn[sub.teamId] = target;
@@ -135,8 +171,8 @@
 	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
 </div>
 
-{#if isAssignedJudging && currentJudgeGroup}
-	<div class="mb-4">
+<div class="mb-4 flex flex-col gap-2">
+	{#if isAssignedJudging && currentJudgeGroup}
 		<label class="flex items-center space-x-2">
 			<input
 				type="checkbox"
@@ -145,8 +181,29 @@
 			/>
 			<span class="text-sm text-gray-700">Only show assigned teams for your current judge group ({currentJudgeGroup.name})</span>
 		</label>
+	{/if}
+
+	<div>
+		<label class="flex items-center space-x-2">
+			<input
+				type="checkbox"
+				bind:checked={showOnlyFullyDeveloped}
+				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+			/>
+			<span class="text-sm text-gray-700">Only show teams with fully developed notebooks</span>
+		</label>
 	</div>
-{/if}
+	<div>
+		<label class="flex items-center space-x-2">
+			<input
+				type="checkbox"
+				bind:checked={showOnlyInterviewed}
+				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+			/>
+			<span class="text-sm text-gray-700">Only show teams that have been interviewed</span>
+		</label>
+	</div>
+</div>
 
 <!-- Progress Indicators -->
 <div class="mb-4">
@@ -187,103 +244,94 @@
 	</div>
 </div>
 
-<div class="space-y-4">
-	{#each teamList as teamId (teamId)}
-		{@const team = teams[teamId]}
-		{@const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam()}
-		{@const notebookStatus = getNotebookStatus(team.notebookDevelopmentStatus)}
-		<div class="rounded-lg border border-gray-200 p-4">
-			<!-- Team Header -->
-			<div class="mb-3 flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-				<div class="flex items-center space-x-2">
-					<div class="flex-1">
-						<h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-semibold text-gray-900">
-							<span>{team.number} - {team.name}</span>
-							{#if team.absent}
-								<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">Absent</span>
-							{/if}
-						</h3>
-						<p class="text-sm text-gray-600">
-							{team.school} • {team.grade}
-						</p>
-					</div>
-				</div>
-				<div class="shrink-0 text-left sm:text-right">
-					<div class="text-sm {notebookStatus.class} font-medium">
-						{notebookStatus.text}
-					</div>
-					{#if team.notebookLink && team.notebookLink.trim() !== ''}
-						<a href={team.notebookLink} target="_blank" class="text-sm text-blue-600 underline hover:text-blue-800 active:text-blue-900">
-							View Notebook
-						</a>
-					{:else}
-						<div class="text-sm text-gray-400">No notebook link</div>
-					{/if}
-				</div>
-			</div>
-
-			<!-- Rubrics Section -->
-			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<!-- Engineering Notebook Rubrics -->
-				<div class="rounded-lg p-3">
-					<h4 class="mb-2 font-medium text-gray-900">Engineering Notebook Rubrics</h4>
-
-					<div class="flex flex-row flex-wrap gap-2">
-						{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
-							<button
-								onclick={() => openNotebookRubric(team.id, rubric.id)}
-								class="rounded-full bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200 active:bg-gray-300"
-							>
-								{getJudgeName(rubric.judgeId)}
-							</button>
-						{/each}
-						<button
-							onclick={() => openNotebookRubric(team.id)}
-							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
-							title="New Notebook Rubric"
-						>
-							+ New Rubric
-						</button>
-					</div>
-				</div>
-
-				<!-- Team Interview Rubrics -->
-				<div class="rounded-lg p-3">
-					<h4 class="mb-2 font-medium text-gray-900">Team Interview Rubrics</h4>
-
-					<div class="flex flex-row flex-wrap gap-2">
-						{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
-							<button
-								onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
-								class="rounded-full bg-gray-100 px-3 py-1 text-left text-sm hover:bg-gray-200 active:bg-gray-300"
-							>
-								{getJudgeName(rubric.judgeId)}
-							</button>
-						{/each}
-						<button
-							onclick={() => openTeamInterviewRubric(team.id)}
-							class="text-sm text-green-600 underline hover:text-green-800 active:text-green-900"
-							title="New Team Interview Rubric"
-						>
-							+ New Rubric
-						</button>
-					</div>
-				</div>
-			</div>
-
-			<!-- Team Interview Notes (if any) -->
-			{#if teamRubricsAndNotes.teamInterviewNotes.length > 0}
-				<div class="mt-3 rounded-lg bg-blue-50 p-3">
-					<h4 class="mb-2 font-medium text-gray-900">Team Interview Notes</h4>
-					<div class="space-y-1">
-						{#each teamRubricsAndNotes.teamInterviewNotes as note}
-							<div class="text-sm text-gray-700">
-								Note by {getJudgeName(note.judgeId)}
-							</div>
-						{/each}
-					</div>
-				</div>
-			{/if}
-		</div>
-	{/each}
+<div class="lg:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
+	<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
+	<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
 </div>
+
+<teams-rubrics-table>
+	<table-header>
+		<team>TEAM NUMBER</team>
+		<scroll-container use:registerScrollContainer class="bg-gray-200">
+			<content>
+				<div class="flex min-w-40 max-w-40 flex-col items-center justify-center">NOTEBOOK LINK</div>
+				<div class="min-w-85 max-w-85 flex items-center justify-center">NOTEBOOK RUBRICS</div>
+				<div class="min-w-85 max-w-85 flex items-center justify-center">TEAM INTERVIEW RUBRICS</div>
+			</content>
+		</scroll-container>
+	</table-header>
+
+	<table-body>
+		{#each teamList as teamId (teamId)}
+			{@const team = teams[teamId]}
+			{@const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam()}
+			{@const notebookStatus = getNotebookStatus(team.notebookDevelopmentStatus)}
+			<row>
+				<team>
+					<div class="flex items-center justify-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap">
+						<span title={team.number}>{team.number}</span>
+						{#if team.absent}
+							<span class="text-xs font-bold text-red-600" title="Absent">ABS</span>
+						{/if}
+					</div>
+				</team>
+				<scroll-container use:registerScrollContainer>
+					<content>
+						<!-- Notebook Link Column -->
+						<div class="flex min-w-40 max-w-40 items-center gap-2 p-2">
+							{#if team.notebookLink}
+								<a
+									href={team.notebookLink}
+									target="_blank"
+									class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+									title={team.notebookLink}
+								>
+									{team.notebookLink.replace(/^https?:\/\//, '')}
+								</a>
+								<QRCodeButton link={team.notebookLink} />
+							{:else}
+								<span class="text-xs text-gray-400">No notebook link</span>
+							{/if}
+						</div>
+
+						<!-- Notebook Rubrics Column -->
+						<div class="min-w-85 max-w-85 flex items-center justify-center overflow-hidden">
+							<div class="flex flex-row justify-center gap-1 p-1">
+								{#if team.notebookDevelopmentStatus === 'fully_developed'}
+									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
+										<button
+											onclick={() => openNotebookRubric(team.id, rubric.id)}
+											title={getJudgeName(rubric.judgeId)}
+											class="flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-gray-100 px-3 text-sm hover:bg-gray-200 active:bg-gray-300"
+										>
+											{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
+										</button>
+									{/each}
+								{:else}
+									<div class="text-xs {notebookStatus.class} px-2 py-0.5">
+										{notebookStatus.text}
+									</div>
+								{/if}
+							</div>
+						</div>
+
+						<!-- Team Interview Rubrics Column -->
+						<div class="min-w-85 max-w-85 flex items-center justify-center overflow-hidden">
+							<div class="flex flex-row justify-center gap-1 p-1">
+								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
+									<button
+										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
+										title={getJudgeName(rubric.judgeId)}
+										class="flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-gray-100 px-3 text-sm hover:bg-gray-200 active:bg-gray-300"
+									>
+										{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
+									</button>
+								{/each}
+							</div>
+						</div>
+					</content>
+				</scroll-container>
+			</row>
+		{/each}
+	</table-body>
+</teams-rubrics-table>

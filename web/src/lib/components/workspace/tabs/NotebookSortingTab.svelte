@@ -218,8 +218,29 @@
 			</h3>
 
 			<div class="mb-4">
+				<!-- Filter Controls -->
+
+				<div class="mt-4 flex flex-col gap-2">
+					{#if isAssignedJudging && currentJudgeGroup}
+						<div>
+							<label class="flex items-start sm:items-center">
+								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+								<span class="text-sm text-gray-700">
+									Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+								</span>
+							</label>
+						</div>
+					{/if}
+					<div>
+						<label class="flex items-start sm:items-center">
+							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+							<span class="text-sm text-gray-700"> Only show fully developed notebooks </span>
+						</label>
+					</div>
+				</div>
+
 				<!-- Progress Indicators -->
-				<div class="grid gap-4 sm:grid-cols-3">
+				<div class="mt-4 grid gap-4 sm:grid-cols-3">
 					<div class="rounded-lg bg-gray-50 p-3">
 						<div class="text-base font-medium text-gray-900">Teams Scanned</div>
 						{#if isShowingOnlyAssignedTeams}
@@ -263,27 +284,6 @@
 								? Math.round((progressMetrics.currentJudgeFinished.count / progressMetrics.currentJudgeFinished.total) * 100)
 								: 0}%
 						</div>
-					</div>
-				</div>
-
-				<!-- Filter Controls -->
-
-				<div class="mt-4 flex flex-col gap-2">
-					{#if isAssignedJudging && currentJudgeGroup}
-						<div>
-							<label class="flex items-start sm:items-center">
-								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
-								<span class="text-sm text-gray-700">
-									Only show assigned teams for your current judge group ({currentJudgeGroup.name})
-								</span>
-							</label>
-						</div>
-					{/if}
-					<div>
-						<label class="flex items-start sm:items-center">
-							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
-							<span class="text-sm text-gray-700"> Only show fully developed notebooks </span>
-						</label>
 					</div>
 				</div>
 
