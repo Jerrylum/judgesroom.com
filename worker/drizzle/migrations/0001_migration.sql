@@ -1,0 +1,1 @@
+ALTER TABLE `JudgeGroupsSubmissionsCache` ADD `score` integer;

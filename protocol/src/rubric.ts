@@ -14,7 +14,8 @@ export const SubmissionCacheSchema = z.object({
 	judgeId: z.uuidv4(),
 	enrId: z.uuidv4().nullable(),
 	tiId: z.uuidv4().nullable(),
-	tnId: z.uuidv4().nullable()
+	tnId: z.uuidv4().nullable(),
+	score: z.number().nullable()
 });
 
 export type SubmissionCache = z.infer<typeof SubmissionCacheSchema>;

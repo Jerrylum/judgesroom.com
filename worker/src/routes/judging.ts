@@ -148,7 +148,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									judgeGroupId: input.judgeGroupId,
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
-									timestamp: input.submission.timestamp
+									timestamp: input.submission.timestamp,
+									score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
 								}
 							})
 							.returning()
@@ -211,7 +212,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									judgeGroupId: input.judgeGroupId,
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
-									timestamp: input.submission.timestamp
+									timestamp: input.submission.timestamp,
+									score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
 								}
 							})
 							.returning()

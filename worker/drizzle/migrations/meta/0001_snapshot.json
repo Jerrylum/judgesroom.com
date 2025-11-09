@@ -1,0 +1,1192 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "0fac0699-e35c-4845-b80c-76404a84cf1f",
+  "prevId": "8a1fa921-fb9b-4ce3-8853-9b71d0dba99a",
+  "tables": {
+    "AwardRankings": {
+      "name": "AwardRankings",
+      "columns": {
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "awardName": {
+          "name": "awardName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ranking": {
+          "name": "ranking",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "award_rankings_judgeGroupId": {
+          "name": "award_rankings_judgeGroupId",
+          "columns": [
+            "judgeGroupId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "AwardRankings_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "AwardRankings_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "AwardRankings",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "AwardRankings_awardName_Awards_name_fk": {
+          "name": "AwardRankings_awardName_Awards_name_fk",
+          "tableFrom": "AwardRankings",
+          "tableTo": "Awards",
+          "columnsFrom": [
+            "awardName"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "AwardRankings_teamId_Teams_id_fk": {
+          "name": "AwardRankings_teamId_Teams_id_fk",
+          "tableFrom": "AwardRankings",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "AwardRankings_judgeGroupId_awardName_teamId_pk": {
+          "columns": [
+            "judgeGroupId",
+            "awardName",
+            "teamId"
+          ],
+          "name": "AwardRankings_judgeGroupId_awardName_teamId_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Awards": {
+      "name": "Awards",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acceptedGrades": {
+          "name": "acceptedGrades",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "winnersCount": {
+          "name": "winnersCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "requireNotebook": {
+          "name": "requireNotebook",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "type": {
+          "name": "type",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "EngineeringNotebookRubrics": {
+      "name": "EngineeringNotebookRubrics",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeId": {
+          "name": "judgeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rubric": {
+          "name": "rubric",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "innovateAwardNotes": {
+          "name": "innovateAwardNotes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "engineering_notebook_rubrics_teamId": {
+          "name": "engineering_notebook_rubrics_teamId",
+          "columns": [
+            "teamId"
+          ],
+          "isUnique": false
+        },
+        "engineering_notebook_rubrics_judgeId": {
+          "name": "engineering_notebook_rubrics_judgeId",
+          "columns": [
+            "judgeId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "EngineeringNotebookRubrics_teamId_Teams_id_fk": {
+          "name": "EngineeringNotebookRubrics_teamId_Teams_id_fk",
+          "tableFrom": "EngineeringNotebookRubrics",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "EngineeringNotebookRubrics_judgeId_Judges_id_fk": {
+          "name": "EngineeringNotebookRubrics_judgeId_Judges_id_fk",
+          "tableFrom": "EngineeringNotebookRubrics",
+          "tableTo": "Judges",
+          "columnsFrom": [
+            "judgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "FinalAwardNominations": {
+      "name": "FinalAwardNominations",
+      "columns": {
+        "awardName": {
+          "name": "awardName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ranking": {
+          "name": "ranking",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "final_award_nominations_awardName_ranking": {
+          "name": "final_award_nominations_awardName_ranking",
+          "columns": [
+            "awardName",
+            "ranking"
+          ],
+          "isUnique": true
+        },
+        "final_award_nominations_awardName_teamId": {
+          "name": "final_award_nominations_awardName_teamId",
+          "columns": [
+            "awardName",
+            "teamId"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "FinalAwardNominations_awardName_Awards_name_fk": {
+          "name": "FinalAwardNominations_awardName_Awards_name_fk",
+          "tableFrom": "FinalAwardNominations",
+          "tableTo": "Awards",
+          "columnsFrom": [
+            "awardName"
+          ],
+          "columnsTo": [
+            "name"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "FinalAwardNominations_teamId_Teams_id_fk": {
+          "name": "FinalAwardNominations_teamId_Teams_id_fk",
+          "tableFrom": "FinalAwardNominations",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "FinalAwardNominations_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "FinalAwardNominations_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "FinalAwardNominations",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroups": {
+      "name": "JudgeGroups",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroupsAssignedTeams": {
+      "name": "JudgeGroupsAssignedTeams",
+      "columns": {
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "JudgeGroupsAssignedTeams_order_unique": {
+          "name": "JudgeGroupsAssignedTeams_order_unique",
+          "columns": [
+            "order"
+          ],
+          "isUnique": true
+        },
+        "assignment": {
+          "name": "assignment",
+          "columns": [
+            "judgeGroupId",
+            "teamId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "JudgeGroupsAssignedTeams_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "JudgeGroupsAssignedTeams_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "JudgeGroupsAssignedTeams",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsAssignedTeams_teamId_Teams_id_fk": {
+          "name": "JudgeGroupsAssignedTeams_teamId_Teams_id_fk",
+          "tableFrom": "JudgeGroupsAssignedTeams",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroupsReviewedTeams": {
+      "name": "JudgeGroupsReviewedTeams",
+      "columns": {
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "JudgeGroupsReviewedTeams_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "JudgeGroupsReviewedTeams_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "JudgeGroupsReviewedTeams",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsReviewedTeams_teamId_Teams_id_fk": {
+          "name": "JudgeGroupsReviewedTeams_teamId_Teams_id_fk",
+          "tableFrom": "JudgeGroupsReviewedTeams",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "JudgeGroupsReviewedTeams_judgeGroupId_teamId_pk": {
+          "columns": [
+            "judgeGroupId",
+            "teamId"
+          ],
+          "name": "JudgeGroupsReviewedTeams_judgeGroupId_teamId_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "JudgeGroupsSubmissionsCache": {
+      "name": "JudgeGroupsSubmissionsCache",
+      "columns": {
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeId": {
+          "name": "judgeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "enrId": {
+          "name": "enrId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tiId": {
+          "name": "tiId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tnId": {
+          "name": "tnId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "judge_groups_submissions_cache_judgeGroupId": {
+          "name": "judge_groups_submissions_cache_judgeGroupId",
+          "columns": [
+            "judgeGroupId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "JudgeGroupsSubmissionsCache_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_teamId_Teams_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_teamId_Teams_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_judgeId_Judges_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_judgeId_Judges_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "Judges",
+          "columnsFrom": [
+            "judgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_enrId_EngineeringNotebookRubrics_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_enrId_EngineeringNotebookRubrics_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "EngineeringNotebookRubrics",
+          "columnsFrom": [
+            "enrId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_tiId_TeamInterviewRubrics_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_tiId_TeamInterviewRubrics_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "TeamInterviewRubrics",
+          "columnsFrom": [
+            "tiId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "JudgeGroupsSubmissionsCache_tnId_TeamInterviewNotes_id_fk": {
+          "name": "JudgeGroupsSubmissionsCache_tnId_TeamInterviewNotes_id_fk",
+          "tableFrom": "JudgeGroupsSubmissionsCache",
+          "tableTo": "TeamInterviewNotes",
+          "columnsFrom": [
+            "tnId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "JudgeGroupsSubmissionsCache_enrId_tiId_tnId_pk": {
+          "columns": [
+            "enrId",
+            "tiId",
+            "tnId"
+          ],
+          "name": "JudgeGroupsSubmissionsCache_enrId_tiId_tnId_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Judges": {
+      "name": "Judges",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "groupId": {
+          "name": "groupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Judges_groupId_JudgeGroups_id_fk": {
+          "name": "Judges_groupId_JudgeGroups_id_fk",
+          "tableFrom": "Judges",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "groupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Metadata": {
+      "name": "Metadata",
+      "columns": {
+        "robotEventsSku": {
+          "name": "robotEventsSku",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "robotEventsEventId": {
+          "name": "robotEventsEventId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "divisionId": {
+          "name": "divisionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "eventName": {
+          "name": "eventName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "program": {
+          "name": "program",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "eventGradeLevel": {
+          "name": "eventGradeLevel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgingMethod": {
+          "name": "judgingMethod",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgingStep": {
+          "name": "judgingStep",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "OfflineDevices": {
+      "name": "OfflineDevices",
+      "columns": {
+        "deviceId": {
+          "name": "deviceId",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "deviceName": {
+          "name": "deviceName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "connectedAt": {
+          "name": "connectedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Subscriptions": {
+      "name": "Subscriptions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeGroupId": {
+          "name": "judgeGroupId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "topic": {
+          "name": "topic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Subscriptions_judgeGroupId_JudgeGroups_id_fk": {
+          "name": "Subscriptions_judgeGroupId_JudgeGroups_id_fk",
+          "tableFrom": "Subscriptions",
+          "tableTo": "JudgeGroups",
+          "columnsFrom": [
+            "judgeGroupId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "Subscriptions_id_judgeGroupId_topic_pk": {
+          "columns": [
+            "id",
+            "judgeGroupId",
+            "topic"
+          ],
+          "name": "Subscriptions_id_judgeGroupId_topic_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "TeamInterviewNotes": {
+      "name": "TeamInterviewNotes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeId": {
+          "name": "judgeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rows": {
+          "name": "rows",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "team_interview_notes_teamId": {
+          "name": "team_interview_notes_teamId",
+          "columns": [
+            "teamId"
+          ],
+          "isUnique": false
+        },
+        "team_interview_notes_judgeId": {
+          "name": "team_interview_notes_judgeId",
+          "columns": [
+            "judgeId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "TeamInterviewNotes_teamId_Teams_id_fk": {
+          "name": "TeamInterviewNotes_teamId_Teams_id_fk",
+          "tableFrom": "TeamInterviewNotes",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "TeamInterviewNotes_judgeId_Judges_id_fk": {
+          "name": "TeamInterviewNotes_judgeId_Judges_id_fk",
+          "tableFrom": "TeamInterviewNotes",
+          "tableTo": "Judges",
+          "columnsFrom": [
+            "judgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "TeamInterviewRubrics": {
+      "name": "TeamInterviewRubrics",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "judgeId": {
+          "name": "judgeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rubric": {
+          "name": "rubric",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "team_interview_rubrics_teamId": {
+          "name": "team_interview_rubrics_teamId",
+          "columns": [
+            "teamId"
+          ],
+          "isUnique": false
+        },
+        "team_interview_rubrics_judgeId": {
+          "name": "team_interview_rubrics_judgeId",
+          "columns": [
+            "judgeId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "TeamInterviewRubrics_teamId_Teams_id_fk": {
+          "name": "TeamInterviewRubrics_teamId_Teams_id_fk",
+          "tableFrom": "TeamInterviewRubrics",
+          "tableTo": "Teams",
+          "columnsFrom": [
+            "teamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "TeamInterviewRubrics_judgeId_Judges_id_fk": {
+          "name": "TeamInterviewRubrics_judgeId_Judges_id_fk",
+          "tableFrom": "TeamInterviewRubrics",
+          "tableTo": "Judges",
+          "columnsFrom": [
+            "judgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Teams": {
+      "name": "Teams",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "shortName": {
+          "name": "shortName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "school": {
+          "name": "school",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "grade": {
+          "name": "grade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "group_": {
+          "name": "group_",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notebookLink": {
+          "name": "notebookLink",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "hasInnovateAwardSubmissionForm": {
+          "name": "hasInnovateAwardSubmissionForm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "notebookDevelopmentStatus": {
+          "name": "notebookDevelopmentStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'undetermined'"
+        },
+        "absent": {
+          "name": "absent",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        }
+      },
+      "indexes": {
+        "teams_number": {
+          "name": "teams_number",
+          "columns": [
+            "number"
+          ],
+          "isUnique": true
+        },
+        "teams_group": {
+          "name": "teams_group",
+          "columns": [
+            "group_"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
