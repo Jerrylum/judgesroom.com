@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { app } from '$lib/index.svelte';
-	import type { AwardNominationTab } from '$lib/tab.svelte';
+	import { app, tabs } from '$lib/index.svelte';
+	import { FinalAwardRankingTab, type AwardNominationTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
 	import AwardNominationTable from './AwardNominationTable.svelte';
 
@@ -28,6 +28,12 @@
 				for each award. Judge groups should share their nominations to create a shortlist for each award. When there are many nominations,
 				the Judge Advisor may ask groups to withdraw weaker candidates based on brief arguments comparing the merits of each nomination
 				against award criteria.
+			</p>
+			<p class="mt-2 text-sm text-gray-600">
+				Excellence Award winners are selected from Design Award finalists. Nominate teams for each award first, then go to <button
+					class="text-blue-500 hover:text-blue-600"
+					onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}>Final Ranking</button
+				> tab to determine the winners.
 			</p>
 
 			<!-- Filter Options -->
