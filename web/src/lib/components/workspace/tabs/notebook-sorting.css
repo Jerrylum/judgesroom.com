@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+notebook-sorting-table {
+	@apply flex flex-col;
+
+	> :first-child {
+		@apply border-t-3;
+	}
+
+	> * {
+		@apply border-b-3;
+	}
+
+	scroll-container {
+		@apply flex grow overflow-x-auto;
+
+		> content {
+			@apply flex grow flex-row justify-start text-left text-sm;
+
+			> * {
+				@apply flex-1 p-2;
+			}
+
+			> :not(:first-child) {
+				@apply border-l;
+			}
+		}
+	}
+
+	team {
+		@apply flex w-28 max-w-28 min-w-28 grow flex-col items-center justify-center p-2 text-center text-sm;
+	}
+
+	table-header {
+		@apply flex flex-row;
+
+		> :first-child {
+			@apply border-l-3;
+		}
+
+		> * {
+			@apply border-r-3;
+		}
+	}
+
+	table-body {
+		@apply flex flex-col;
+
+		> :not(:first-child) {
+			@apply border-t;
+		}
+
+		> row {
+			@apply flex h-12 flex-row;
+
+			> :first-child {
+				@apply border-l-3;
+			}
+
+			> * {
+				@apply grow border-r-3;
+			}
+
+			scroll-container {
+				content {
+					@apply min-h-11;
+				}
+			}
+
+			&:nth-child(even) {
+				@apply bg-gray-100;
+			}
+		}
+	}
+
+	:not(:last-child) {
+		> scroll-container {
+			scrollbar-width: none;
+		}
+	}
+}

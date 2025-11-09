@@ -3,6 +3,9 @@
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
 	import NotebookSortingTeamGrid from './NotebookSortingTeamGrid.svelte';
+	import NotebookSortingTeamTable from './NotebookSortingTeamTable.svelte';
+	import GridViewIcon from '$lib/icon/GridViewIcon.svelte';
+	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
@@ -32,6 +35,9 @@
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
 	const isShowingOnlyAssignedTeams = $derived(isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup);
+
+	// View mode state - default is grid
+	let viewMode = $state<'grid' | 'column'>('grid');
 
 	// Import state
 	let fileInput: HTMLInputElement;
@@ -260,6 +266,30 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- View Toggle Buttons -->
+				<div class="mt-4 flex justify-end gap-2">
+					<button
+						onclick={() => (viewMode = 'grid')}
+						class="tiny flex items-center gap-2"
+						class:primary={viewMode === 'grid'}
+						class:lightweight={viewMode !== 'grid'}
+						title="Switch to grid view"
+					>
+						<GridViewIcon size={16} />
+						Grid
+					</button>
+					<button
+						onclick={() => (viewMode = 'column')}
+						class="tiny flex items-center gap-2"
+						class:primary={viewMode === 'column'}
+						class:lightweight={viewMode !== 'column'}
+						title="Switch to column view"
+					>
+						<ColumnViewIcon size={16} />
+						Column
+					</button>
+				</div>
 			</div>
 
 			{#if teamsToShow.length === 0}
@@ -270,12 +300,14 @@
 						No teams found.
 					{/if}
 				</div>
-			{:else}
+			{:else if viewMode === 'grid'}
 				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 					{#each teamsToShow as team (team.id)}
 						<NotebookSortingTeamGrid {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
 					{/each}
 				</div>
+			{:else}
+				<NotebookSortingTeamTable teams={teamsToShow} {submittedNotebookRubricsOfCurrentJudge} />
 			{/if}
 		</div>
 	</div>
