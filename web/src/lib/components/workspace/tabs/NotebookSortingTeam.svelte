@@ -67,7 +67,7 @@
 				<EditIcon size={16} />
 			</button>
 			{#if team.absent}
-				<span class="text-xs text-red-600" title="Absent">⚠</span>
+				<span class="text-xs font-bold text-red-600" title="Absent">ABS</span>
 			{/if}
 		</div>
 	</div>
