@@ -2,13 +2,15 @@ import type { AppStorage } from './app.svelte';
 
 export interface PreferencesData {
 	isGoogleAnalyticsEnabled: boolean;
+	notebookSortingTabViewMode: 'grid' | 'column';
 }
 
 export class Preferences {
 	private storageKey = 'preferences';
 	private storage: AppStorage;
 	private data: PreferencesData = $state({
-		isGoogleAnalyticsEnabled: true
+		isGoogleAnalyticsEnabled: true,
+		notebookSortingTabViewMode: 'grid'
 	});
 
 	constructor(storage: AppStorage) {
@@ -37,6 +39,7 @@ export class Preferences {
 		const data = this.storage.load<Partial<PreferencesData>>(this.storageKey);
 		if (data) {
 			this.data.isGoogleAnalyticsEnabled = data.isGoogleAnalyticsEnabled ?? true;
+			this.data.notebookSortingTabViewMode = data.notebookSortingTabViewMode ?? 'grid';
 		}
 	}
 }

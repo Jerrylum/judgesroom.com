@@ -36,8 +36,8 @@
 	let showOnlyAssignedTeams = $state(true);
 	const isShowingOnlyAssignedTeams = $derived(isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup);
 
-	// View mode state - default is grid
-	let viewMode = $state<'grid' | 'column'>('grid');
+	// View mode state - stored in preferences
+	const viewMode = $derived(app.getPreferences().get('notebookSortingTabViewMode'));
 
 	// Import state
 	let fileInput: HTMLInputElement;
@@ -270,7 +270,7 @@
 				<!-- View Toggle Buttons -->
 				<div class="mt-4 flex justify-end gap-2">
 					<button
-						onclick={() => (viewMode = 'grid')}
+						onclick={() => app.getPreferences().set('notebookSortingTabViewMode', 'grid')}
 						class="tiny flex items-center gap-2"
 						class:primary={viewMode === 'grid'}
 						class:lightweight={viewMode !== 'grid'}
@@ -280,7 +280,7 @@
 						Grid
 					</button>
 					<button
-						onclick={() => (viewMode = 'column')}
+						onclick={() => app.getPreferences().set('notebookSortingTabViewMode', 'column')}
 						class="tiny flex items-center gap-2"
 						class:primary={viewMode === 'column'}
 						class:lightweight={viewMode !== 'column'}
