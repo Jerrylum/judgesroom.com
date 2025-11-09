@@ -140,7 +140,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								timestamp: input.submission.timestamp,
 								enrId: input.submission.id,
 								tiId: null,
-								tnId: null
+								tnId: null,
+								score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -204,7 +205,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								timestamp: input.submission.timestamp,
 								enrId: null,
 								tiId: input.submission.id,
-								tnId: null
+								tnId: null,
+								score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -267,7 +269,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								timestamp: input.submission.timestamp,
 								enrId: null,
 								tiId: input.submission.id,
-								tnId: null
+								tnId: null,
+								score: null
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
