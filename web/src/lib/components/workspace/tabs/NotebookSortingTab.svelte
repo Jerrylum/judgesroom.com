@@ -2,7 +2,7 @@
 	import { app, subscriptions } from '$lib/index.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
-	import NotebookSortingTeam from './NotebookSortingTeam.svelte';
+	import NotebookSortingTeamGrid from './NotebookSortingTeamGrid.svelte';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
@@ -273,7 +273,7 @@
 			{:else}
 				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 					{#each teamsToShow as team (team.id)}
-						<NotebookSortingTeam {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
+						<NotebookSortingTeamGrid {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
 					{/each}
 				</div>
 			{/if}
