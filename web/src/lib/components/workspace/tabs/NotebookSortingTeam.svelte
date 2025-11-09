@@ -136,7 +136,7 @@
 	</div>
 
 	{#if devStatus === 'fully_developed'}
-		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full">
+		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full" class:bg-green-800!={isSubmitted}>
 			{#if isSubmitted}
 				(You Submitted)
 			{:else}
