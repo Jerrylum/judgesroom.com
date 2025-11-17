@@ -32,6 +32,19 @@ export const WRPCResponseSchema = z.object({
 });
 
 export type WRPCResponse = InferParser<typeof WRPCResponseSchema>;
+
+export const WRPCPingSchema = z.object({
+	kind: z.literal('ping')
+});
+
+export type WRPCPing = InferParser<typeof WRPCPingSchema>;
+
+export const WRPCPongSchema = z.object({
+	kind: z.literal('pong')
+});
+
+export type WRPCPong = InferParser<typeof WRPCPongSchema>;
+
 // Proper discriminated union using the 'kind' field
 
-export const WRPCMessageSchema = z.discriminatedUnion('kind', [WRPCRequestSchema, WRPCResponseSchema]);
+export const WRPCMessageSchema = z.discriminatedUnion('kind', [WRPCRequestSchema, WRPCResponseSchema, WRPCPingSchema, WRPCPongSchema]);

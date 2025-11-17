@@ -1156,4 +1156,236 @@ describe('WebsocketClient', () => {
 			consoleSpy.mockRestore();
 		});
 	});
+
+	describe('ping/pong', () => {
+		beforeEach(() => {
+			vi.useFakeTimers();
+		});
+
+		afterEach(() => {
+			vi.useRealTimers();
+		});
+
+		it('should send ping after 4.5 minutes of inactivity', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			expect(mockWs.send).toHaveBeenCalledTimes(1); // Initial query
+
+			// Advance time by 4.5 minutes
+			await vi.advanceTimersByTimeAsync(4.5 * 60 * 1000);
+
+			// Should have sent ping
+			expect(mockWs.send).toHaveBeenCalledTimes(2);
+			const pingMessage = JSON.parse(mockWs.send.mock.calls[1][0]);
+			expect(pingMessage.kind).toBe('ping');
+		});
+
+		it('should reset ping timer when receiving a message', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			
+			// Advance time by 4 minutes (before ping would be sent)
+			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
+
+			// Receive a message from server
+			const response: WRPCResponse = {
+				kind: 'response',
+				id: mockWs.send.mock.calls[0][0].match(/"id":"([^"]+)"/)?.[1] || 'test-id',
+				result: { type: 'data', data: 'test-data' }
+			};
+			mockWs.simulateMessage(JSON.stringify(response));
+			await vi.advanceTimersByTimeAsync(10);
+
+			// Advance another 4 minutes (total 8 minutes, but timer should have reset)
+			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
+
+			// Ping should not have been sent yet (timer was reset)
+			const calls = mockWs.send.mock.calls;
+			const pingCalls = calls.filter((call: any[]) => {
+				try {
+					const msg = JSON.parse(call[0]);
+					return msg.kind === 'ping';
+				} catch {
+					return false;
+				}
+			});
+			expect(pingCalls.length).toBe(0);
+
+			// Advance another 0.5+ minutes to trigger ping after the reset
+			await vi.advanceTimersByTimeAsync(0.6 * 60 * 1000);
+
+			// Now ping should have been sent
+			const allCalls = mockWs.send.mock.calls;
+			const allPingCalls = allCalls.filter((call: any[]) => {
+				try {
+					const msg = JSON.parse(call[0]);
+					return msg.kind === 'ping';
+				} catch {
+					return false;
+				}
+			});
+			expect(allPingCalls.length).toBe(1);
+		});
+
+		it('should reset ping timer when sending a message', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test1', 'input1').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			
+			// Advance time by 4 minutes
+			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
+
+			// Send another query (outgoing message) (catch to avoid unhandled rejection)
+			const query2Promise = wsClient.query('test2', 'input2').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			// Advance another 4 minutes (total 8 minutes since connection, but timer was reset)
+			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
+
+			// Ping should not have been sent yet
+			const calls = mockWs.send.mock.calls;
+			const pingCalls = calls.filter((call: any[]) => {
+				try {
+					const msg = JSON.parse(call[0]);
+					return msg.kind === 'ping';
+				} catch {
+					return false;
+				}
+			});
+			expect(pingCalls.length).toBe(0);
+
+			// Advance another 0.5+ minutes to trigger ping
+			await vi.advanceTimersByTimeAsync(0.6 * 60 * 1000);
+
+			// Now ping should have been sent
+			const allCalls = mockWs.send.mock.calls;
+			const allPingCalls = allCalls.filter((call: any[]) => {
+				try {
+					const msg = JSON.parse(call[0]);
+					return msg.kind === 'ping';
+				} catch {
+					return false;
+				}
+			});
+			expect(allPingCalls.length).toBe(1);
+		});
+
+		it('should handle incoming ping and respond with pong', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			
+			// Server sends ping
+			mockWs.simulateMessage(JSON.stringify({ kind: 'ping' }));
+			await vi.advanceTimersByTimeAsync(10);
+
+			// Client should respond with pong
+			const lastCall = mockWs.send.mock.calls[mockWs.send.mock.calls.length - 1][0];
+			const pongMessage = JSON.parse(lastCall);
+			expect(pongMessage.kind).toBe('pong');
+		});
+
+		it('should handle incoming pong message', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+
+			// Advance to trigger ping
+			await vi.advanceTimersByTimeAsync(4.5 * 60 * 1000);
+
+			// Server responds with pong
+			mockWs.simulateMessage(JSON.stringify({ kind: 'pong' }));
+			await vi.advanceTimersByTimeAsync(10);
+
+			// Should not throw any errors (pong is handled silently)
+			expect(mockWs.send).toHaveBeenCalled();
+		});
+
+		it('should clear ping timer on disconnect', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			
+			// Disconnect
+			wsClient.disconnect();
+			await vi.advanceTimersByTimeAsync(10);
+
+			const sendCallsBeforeTimer = mockWs.send.mock.calls.length;
+
+			// Advance time past when ping would have been sent
+			await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+
+			// Should not have sent ping after disconnect
+			expect(mockWs.send).toHaveBeenCalledTimes(sendCallsBeforeTimer);
+		});
+
+		it('should clear ping timer on connection close', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+			
+			// Simulate connection close
+			mockWs.simulateClose(1000, 'Normal closure');
+			await vi.advanceTimersByTimeAsync(10);
+
+			const sendCallsBeforeTimer = mockWs.send.mock.calls.length;
+
+			// Advance time past when ping would have been sent
+			await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+
+			// Should not have sent ping after close
+			expect(mockWs.send).toHaveBeenCalledTimes(sendCallsBeforeTimer);
+		});
+
+		it('should restart ping timer after reconnection', async () => {
+			// Trigger connection (catch to avoid unhandled rejection)
+			const queryPromise = wsClient.query('test', 'input').catch(() => {});
+			await vi.advanceTimersByTimeAsync(10);
+
+			const mockWs1 = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
+
+			// Simulate abnormal close (triggers reconnect)
+			mockWs1.simulateClose(1006, 'Abnormal closure');
+			
+			// Wait for exponential backoff delay (1000ms * 2^0 = 1000ms) and connection setup
+			await vi.advanceTimersByTimeAsync(1100);
+
+			// Get the new WebSocket instance after reconnect
+			const mockWs2 = vi.mocked(MockWebSocket).mock.results[1]?.value as any;
+			
+			// Verify connection was re-established
+			expect(mockWs2).toBeDefined();
+
+			// Advance time by 4.5 minutes on new connection
+			await vi.advanceTimersByTimeAsync(4.5 * 60 * 1000);
+
+			// Should have sent ping on new connection
+			const calls = mockWs2.send.mock.calls;
+			const pingCalls = calls.filter((call: any[]) => {
+				try {
+					const msg = JSON.parse(call[0]);
+					return msg.kind === 'ping';
+				} catch {
+					return false;
+				}
+			});
+			expect(pingCalls.length).toBe(1);
+		});
+	});
 });

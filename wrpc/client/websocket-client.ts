@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { AnyProcedure } from '../server/procedure';
 import type { ProcedureResolver } from '../server/procedure-builder';
 import type { AnyRouter } from '../server/router';
-import type { WRPCRequest, WRPCResponse } from '../server/messages';
+import type { WRPCRequest, WRPCResponse, WRPCPing, WRPCPong } from '../server/messages';
 import { parseWRPCMessage } from '../server/utils';
 import { createClientSideSession } from './session';
 import type { ClientOptions, PendingRequest } from './types';
@@ -35,6 +35,8 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	private reconnectDelay = 1000;
 	private clientRouter: TClientRouter;
 	private _connectionState: ConnectionState = 'offline';
+	private pingTimer: ReturnType<typeof setTimeout> | null = null;
+	private readonly PING_INTERVAL = 4.5 * 60 * 1000; // 4.5 minutes in milliseconds
 
 	private set connectionState(state: ConnectionState) {
 		this._connectionState = state;
@@ -54,6 +56,37 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 	private generateRequestId(): string {
 		return `req_${++this.requestId}_${Date.now()}`;
+	}
+
+	private resetPingTimer(): void {
+		// Clear existing timer
+		if (this.pingTimer !== null) {
+			clearTimeout(this.pingTimer);
+			this.pingTimer = null;
+		}
+
+		// Only set up new timer if connected
+		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+			this.pingTimer = setTimeout(() => {
+				this.sendPing();
+			}, this.PING_INTERVAL);
+		}
+	}
+
+	private sendPing(): void {
+		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+			const ping: WRPCPing = { kind: 'ping' };
+			this.ws.send(JSON.stringify(ping));
+			// Reset timer after sending ping to wait for next ping interval
+			this.resetPingTimer();
+		}
+	}
+
+	private clearPingTimer(): void {
+		if (this.pingTimer !== null) {
+			clearTimeout(this.pingTimer);
+			this.pingTimer = null;
+		}
 	}
 
 	private async connect(): Promise<WebSocket> {
@@ -107,6 +140,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 		this.reconnectAttempts = 0;
 		this.connectionState = 'connected';
 		this.connectingPromise = null;
+		this.resetPingTimer(); // Start ping timer on connection
 		this.options.onOpen();
 	}
 
@@ -115,16 +149,29 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 			// Parse and validate the message using Zod
 			const parsedMessage = parseWRPCMessage(data);
 
-			// Handle responses to our requests
-			if (parsedMessage.kind === 'response') {
+			// Reset ping timer on any message received
+			this.resetPingTimer();
+
+			// Handle different message types
+			if (parsedMessage.kind === 'pong') {
+				// Pong received, just reset the timer (already done above)
+				return;
+			} else if (parsedMessage.kind === 'ping') {
+				// Send pong back
+				if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+					const pong: WRPCPong = { kind: 'pong' };
+					this.ws.send(JSON.stringify(pong));
+				}
+				return;
+			} else if (parsedMessage.kind === 'response') {
+				// Handle responses to our requests
 				this.handleResponse(parsedMessage);
 				return;
+			} else {
+				// Handle requests from server
+				const ctx = await this.options.onContext(parsedMessage);
+				await this.handleServerRequest(parsedMessage, ctx);
 			}
-
-			const ctx = await this.options.onContext(parsedMessage);
-
-			// Handle requests from server
-			await this.handleServerRequest(parsedMessage, ctx);
 		} catch (error) {
 			console.error('Error parsing or validating WebSocket message:', error);
 		}
@@ -232,6 +279,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 
 	private async handleClose(event: CloseEvent): Promise<void> {
 		this.ws = null;
+		this.clearPingTimer(); // Clear ping timer on close
 
 		// Reject all pending requests
 		for (const [id, request] of this.pendingRequests) {
@@ -267,6 +315,8 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 				reject
 			});
 			ws.send(JSON.stringify(request));
+			// Reset ping timer on outgoing message
+			this.resetPingTimer();
 
 			// Set timeout for request
 			setTimeout(() => {
@@ -310,6 +360,7 @@ export class WebsocketClient<TClientRouter extends AnyRouter> {
 	 * Disconnect the WebSocket
 	 */
 	disconnect(): void {
+		this.clearPingTimer(); // Clear ping timer on disconnect
 		if (this.ws) {
 			this.ws.close(ConnectionCloseCode.NORMAL, 'Client disconnected peacefully');
 			this.ws = null;

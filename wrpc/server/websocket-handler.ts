@@ -2,7 +2,7 @@
  * WebSocket handler for WRPC, inspired by tRPC's fetchRequestHandler
  */
 import type { AnyRouter } from './router';
-import type { WRPCRequest, WRPCResponse } from './messages';
+import type { WRPCRequest, WRPCResponse, WRPCPong } from './messages';
 import { WRPCError, type InferRouterContext, type RouterProxy, type RouterBroadcastProxy } from './types';
 import type { AnyProcedure } from './procedure';
 import { WebSocketConnectionManager } from './connection-manager';
@@ -129,6 +129,22 @@ export function createWebSocketHandler<TRouter extends AnyRouter>(opts: WebSocke
 
 				// Find clientId if not provided in connectionOpts
 				const clientId = opts.getClientIdByWebSocket(ws);
+
+				// Handle ping messages
+				if (parsedMessage.kind === 'ping') {
+					// Send pong back
+					if (ws.readyState === WebSocket.OPEN) {
+						const pong: WRPCPong = { kind: 'pong' };
+						ws.send(JSON.stringify(pong));
+					}
+					return;
+				}
+
+				// Handle pong messages
+				if (parsedMessage.kind === 'pong') {
+					// Pong received, nothing to do
+					return;
+				}
 
 				// Handle responses from client (for server-to-client calls)
 				if (parsedMessage.kind === 'response') {
