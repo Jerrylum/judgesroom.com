@@ -32,20 +32,10 @@ button.tiny {
 	@apply px-4 py-2 text-sm;
 }
 
-/* button.robotevents {
-	@apply rounded-md bg-slate-200 px-6 py-3 font-medium text-white transition-colors hover:bg-slate-300 disabled:cursor-not-allowed disabled:bg-slate-50;
-	div {
-		background: linear-gradient(135deg, rgba(111, 159, 187, 1) 0%, rgba(87, 92, 104, 1) 100%);
-		color: transparent;
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-} */
-
 input.classic[type='text'],
 input.classic[type='number'],
 input.classic[type='url'],
+textarea.classic,
 select.classic {
 	@apply min-h-10 rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900;
 }
