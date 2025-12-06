@@ -1,3 +1,10 @@
+# See https://nektosact.com/installation/homebrew.html to run the workflow locally.
+# To test the workflow locally, run:
+# echo { "ref": "refs/tags/v0.1.0" } > .event-file.json
+# echo CLOUDFLARE_API_TOKEN="your-token" >> .secrets
+# echo CLOUDFLARE_ACCOUNT_ID="your-account-id" >> .secrets
+# act --secret-file .secrets --eventpath .event-file.json
+
 name: Tagged Deploy Cloudflare Worker
 
 on:
@@ -10,10 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3 # Using Node.js as it is required by Wrangler.
         with:
           node-version: 22
-      - run: npm install -g bun
+      - run: npm install -g bun # Using Bun as it is required by the project.
+        # Removing better-sqlite3 as it takes too long to install and is not needed for the workflow.
       - run: bun remove better-sqlite3
       - run: bun install
       - run: bun run build
