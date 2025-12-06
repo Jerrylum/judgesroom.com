@@ -4,7 +4,7 @@
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '$lib/award.svelte';
-	import AwardWinnersReportDialog from './AwardWinnersReportDialog.svelte';
+	import AwardWinnersReportDialog, { type TeamPresentationConfig } from './AwardWinnersReportDialog.svelte';
 
 	interface Props {
 		tab: AwardWinnerTab;
@@ -55,22 +55,31 @@
 		return team ? `${team.number} - ${team.name}` : 'Unknown Team';
 	}
 
-	// Generate report text
-	function generateReportText(): string {
+	// Format team display based on configuration
+	function formatTeamDisplay(teamId: string, config: TeamPresentationConfig): string {
+		const team = allTeams[teamId];
+		if (!team) return 'Unknown Team';
+
+		const parts: string[] = [];
+		if (config.showTeamNumber) parts.push(team.number);
+		if (config.showTeamName && team.name) parts.push(team.name);
+		if (config.showSchool && team.school) parts.push(team.school);
+		if (config.showCountry && team.country) parts.push(team.country);
+
+		return parts.length > 0 ? parts.join(', ') : team.number;
+	}
+
+	// Generate report text based on configuration
+	function generateReportText(config: TeamPresentationConfig): string {
 		const lines: string[] = [];
 
 		// Iterate through all awards in order
 		for (const award of allAwards) {
 			const winners = allAwardWinners[award.name] || [];
-			const teamNumbers = winners
-				.map((teamId) => {
-					const team = allTeams[teamId];
-					return team ? team.number : null;
-				})
-				.filter((num): num is string => num !== null);
+			const teamDisplays = winners.map((teamId) => formatTeamDisplay(teamId, config)).filter((display) => display !== null);
 
-			if (teamNumbers.length > 0) {
-				lines.push(`${award.name}: ${teamNumbers.join(', ')}`);
+			if (teamDisplays.length > 0) {
+				lines.push(`${award.name}:\n${teamDisplays.map((display) => ` - ${display}`).join('\n')}`);
 			} else {
 				lines.push(`${award.name}: no teams`);
 			}
@@ -81,9 +90,8 @@
 
 	// Open report dialog
 	function openReportDialog() {
-		const reportText = generateReportText();
 		dialogs.showCustom(AwardWinnersReportDialog, {
-			props: { reportText }
+			props: { generateReportText }
 		});
 	}
 </script>
@@ -217,9 +225,7 @@
 				<div>
 					<h2 class="text-xl font-semibold text-gray-900">Summary of Award Winners</h2>
 				</div>
-				<button onclick={openReportDialog} class="primary tiny">
-					Report
-				</button>
+				<button onclick={openReportDialog} class="primary tiny">Report</button>
 			</div>
 			<p class="mb-6 text-sm text-gray-600">This summary shows all award winners organized by team group.</p>
 
