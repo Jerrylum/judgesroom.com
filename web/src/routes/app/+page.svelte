@@ -39,7 +39,7 @@
 		}
 	});
 
-	$inspect(AppUI.appPhase);
+	// $inspect(AppUI.appPhase);
 
 	onMount(async () => {
 		const hash = window.location.hash;
