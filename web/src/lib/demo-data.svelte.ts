@@ -10,6 +10,8 @@ if (typeof window !== 'undefined') {
 		switch (url) {
 			case 'https://www.robotevents.com/api/v2/events?sku[]=RE-VIQRC-24-9999':
 				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchEvents.json'));
+			case 'https://www.robotevents.com/api/v2/events/59999':
+				return resolveDemoData((await import('$lib/demo-data/roboteventsFetchEvents.json')).data[0]);
 			case 'https://www.robotevents.com/api/v2/events/59999/teams?page=1&per_page=250':
 				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchTeams.json'));
 			case 'https://www.robotevents.com/api/v2/events/59999/awards?page=1&per_page=250':
