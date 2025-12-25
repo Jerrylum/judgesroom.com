@@ -147,6 +147,9 @@
 					if (team.absent) {
 						continue;
 					}
+					if (team.number === '26000B' || team.number === '70900C') {
+						continue;
+					}
 					for (const judge of judges) {
 						if (judgeGroups[judge.groupIdx].assignedTeams.includes(team.id) === false) {
 							continue;

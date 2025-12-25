@@ -10,16 +10,26 @@
 		judgeGroupId: string;
 		ranking: number;
 		isNominated: boolean;
+		hasTeamInterview: boolean;
 		bypassAwardRequirements: boolean;
 		showExcellenceAwardWinners: boolean;
 	}
 
-	let { award, team, judgeGroupId, ranking, isNominated, bypassAwardRequirements, showExcellenceAwardWinners }: Props = $props();
+	let { award, team, judgeGroupId, ranking, isNominated, hasTeamInterview, bypassAwardRequirements, showExcellenceAwardWinners }: Props =
+		$props();
 
 	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
+	const isMeetTeamInterviewRequirement = $derived(award.requireTeamInterview ? hasTeamInterview : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isMeetInnovateAwardSubmissionFormRequirement = $derived(award.name !== 'Innovate Award' || team.hasInnovateAwardSubmissionForm);
-	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement || !isMeetInnovateAwardSubmissionFormRequirement);
+	const isDisabled = $derived(
+		bypassAwardRequirements
+			? false
+			: !isMeetNotebookRequirement ||
+					!isMeetTeamInterviewRequirement ||
+					!isMeetGradeRequirement ||
+					!isMeetInnovateAwardSubmissionFormRequirement
+	);
 
 	async function removeNomination() {
 		await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName: award.name, teamId: team.id });
@@ -58,10 +68,13 @@
 			{#if !isMeetNotebookRequirement}
 				<p>Notebook Required</p>
 			{/if}
+			{#if !isMeetTeamInterviewRequirement}
+				<p>Team Interview Required</p>
+			{/if}
 			{#if !isMeetGradeRequirement}
 				<p>{award.acceptedGrades.join(', ')} Required</p>
 			{/if}
-			{#if !isMeetInnovateAwardSubmissionFormRequirement}
+			{#if isMeetNotebookRequirement && !isMeetInnovateAwardSubmissionFormRequirement}
 				<p>Submission Form Required</p>
 			{/if}
 		</div>
