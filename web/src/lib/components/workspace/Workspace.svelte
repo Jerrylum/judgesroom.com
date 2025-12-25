@@ -95,10 +95,11 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
-		const targetJudgeGroupIds = currentJudgeGroupId //
-			? [currentJudgeGroupId]
-			: app.getAllJudgeGroups().map((group) => group.id);
+		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
+		const targetJudgeGroupIds =
+			!currentJudgeGroupId || isViewingAwardNominationTab //
+				? app.getAllJudgeGroups().map((group) => group.id)
+				: [currentJudgeGroupId];
 
 		console.log('Subscribing to reviewed teams', targetJudgeGroupIds);
 
@@ -122,10 +123,11 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor, otherwise listen to the current judge group
-		const targetJudgeGroupIds = currentJudgeGroupId //
-			? [currentJudgeGroupId]
-			: app.getAllJudgeGroups().map((group) => group.id);
+		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
+		const targetJudgeGroupIds =
+			!currentJudgeGroupId || isViewingAwardNominationTab //
+				? app.getAllJudgeGroups().map((group) => group.id)
+				: [currentJudgeGroupId];
 
 		console.log('Subscribing to submission caches', targetJudgeGroupIds);
 
