@@ -12,6 +12,7 @@ export class AwardOptions {
 	public acceptedGrades: Grade[] = $state([]);
 	public possibleWinners: number = $state(0);
 	public requireNotebook: boolean = $state(false);
+	public requireTeamInterview: boolean = $state(false);
 	public isOfficial: boolean;
 	public isSelected: boolean = $state(false);
 
@@ -22,6 +23,7 @@ export class AwardOptions {
 		acceptedGrades: Grade[],
 		possibleWinners: number,
 		requireNotebook: boolean,
+		requireTeamInterview: boolean,
 		isOfficial: boolean,
 		isSelected: boolean
 	) {
@@ -33,6 +35,7 @@ export class AwardOptions {
 		this.acceptedGrades = acceptedGrades;
 		this.possibleWinners = possibleWinners;
 		this.requireNotebook = requireNotebook;
+		this.requireTeamInterview = requireTeamInterview;
 		this.isOfficial = isOfficial;
 		this.isSelected = isSelected;
 	}
@@ -43,7 +46,8 @@ export class AwardOptions {
 			type: this.selectedType,
 			acceptedGrades: this.acceptedGrades,
 			winnersCount: this.possibleWinners,
-			requireNotebook: this.requireNotebook
+			requireNotebook: this.requireNotebook,
+			requireTeamInterview: this.requireTeamInterview
 		};
 	}
 }
@@ -69,6 +73,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['Middle School', 'High School', 'College'],
 			2,
 			false,
+			false,
 			true,
 			true
 		),
@@ -78,6 +83,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['performance'],
 			['Middle School', 'High School', 'College'],
 			2,
+			false,
 			false,
 			true,
 			true
@@ -89,6 +95,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['Middle School', 'High School', 'College'],
 			4,
 			false,
+			false,
 			true,
 			false
 		),
@@ -99,20 +106,72 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['Middle School', 'High School', 'College'],
 			8,
 			false,
+			false,
 			true,
 			false
 		),
-		new AwardOptions('Teamwork Champion Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
-		new AwardOptions('Teamwork 2nd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
-		new AwardOptions('Teamwork 3rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, true),
-		new AwardOptions('Teamwork 4rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, false),
-		new AwardOptions('Teamwork 5rd Place Award', ['VIQRC'], ['performance'], ['Elementary School', 'Middle School'], 2, false, true, false),
+		new AwardOptions(
+			'Teamwork Champion Award',
+			['VIQRC'],
+			['performance'],
+			['Elementary School', 'Middle School'],
+			2,
+			false,
+			false,
+			true,
+			true
+		),
+		new AwardOptions(
+			'Teamwork 2nd Place Award',
+			['VIQRC'],
+			['performance'],
+			['Elementary School', 'Middle School'],
+			2,
+			false,
+			false,
+			true,
+			true
+		),
+		new AwardOptions(
+			'Teamwork 3rd Place Award',
+			['VIQRC'],
+			['performance'],
+			['Elementary School', 'Middle School'],
+			2,
+			false,
+			false,
+			true,
+			true
+		),
+		new AwardOptions(
+			'Teamwork 4rd Place Award',
+			['VIQRC'],
+			['performance'],
+			['Elementary School', 'Middle School'],
+			2,
+			false,
+			false,
+			true,
+			false
+		),
+		new AwardOptions(
+			'Teamwork 5rd Place Award',
+			['VIQRC'],
+			['performance'],
+			['Elementary School', 'Middle School'],
+			2,
+			false,
+			false,
+			true,
+			false
+		),
 		new AwardOptions(
 			'Robot Skills Champion',
 			['VIQRC', 'V5RC', 'VURC'],
 			['performance'],
 			['Elementary School', 'Middle School'],
 			1,
+			false,
 			false,
 			true,
 			true
@@ -124,6 +183,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['Elementary School', 'Middle School'],
 			1,
 			false,
+			false,
 			true,
 			false
 		),
@@ -133,6 +193,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['performance'],
 			['Elementary School', 'Middle School'],
 			1,
+			false,
 			false,
 			true,
 			false
@@ -145,17 +206,19 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			true,
 			true,
+			true,
 			true
 		),
-		new AwardOptions('Excellence Award - High School', ['V5RC'], ['judged'], ['High School'], 1, true, true, false),
-		new AwardOptions('Excellence Award - Middle School', ['VIQRC', 'V5RC'], ['judged'], ['Middle School'], 1, true, true, false),
-		new AwardOptions('Excellence Award - Elementary School', ['VIQRC'], ['judged'], ['Elementary School'], 1, true, true, false),
+		new AwardOptions('Excellence Award - High School', ['V5RC'], ['judged'], ['High School'], 1, true, true, true, false),
+		new AwardOptions('Excellence Award - Middle School', ['VIQRC', 'V5RC'], ['judged'], ['Middle School'], 1, true, true, true, false),
+		new AwardOptions('Excellence Award - Elementary School', ['VIQRC'], ['judged'], ['Elementary School'], 1, true, true, true, false),
 		new AwardOptions(
 			'Design Award',
 			['VIQRC', 'V5RC', 'VURC'],
 			['judged'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
+			true,
 			true,
 			true,
 			true
@@ -168,6 +231,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			true,
 			true,
+			true,
 			true
 		),
 		new AwardOptions(
@@ -176,6 +240,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['judged'],
 			['Elementary School', 'Middle School'],
 			1,
+			true,
 			true,
 			true,
 			false
@@ -188,6 +253,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			true,
 			true,
+			true,
 			false
 		),
 		new AwardOptions(
@@ -196,6 +262,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['judged'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
+			true,
 			true,
 			true,
 			false
@@ -208,6 +275,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			true,
 			true,
+			true,
 			false
 		),
 		new AwardOptions(
@@ -216,6 +284,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['judged'],
 			['Middle School', 'High School', 'College'],
 			1,
+			true,
 			true,
 			true,
 			false
@@ -228,6 +297,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			false,
 			true,
+			true,
 			true
 		),
 		new AwardOptions(
@@ -238,6 +308,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			1,
 			false,
 			true,
+			true,
 			false
 		),
 		new AwardOptions(
@@ -246,6 +317,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['judged', 'volunteer_nominated'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
+			false,
 			false,
 			true,
 			false
@@ -256,6 +328,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			['judged', 'volunteer_nominated'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
+			false,
 			false,
 			true,
 			false
@@ -274,9 +347,10 @@ export function createCustomAwardOptions(
 	type: AwardType,
 	acceptedGrades: Grade[],
 	possibleWinners: number,
-	requireNotebook: boolean
+	requireNotebook: boolean,
+	requireTeamInterview: boolean
 ): AwardOptions {
-	return new AwardOptions(name, [program], [type], acceptedGrades, possibleWinners, requireNotebook, false, true);
+	return new AwardOptions(name, [program], [type], acceptedGrades, possibleWinners, requireNotebook, requireTeamInterview, false, true);
 }
 
 export function separateAwardOptionsByType(officialAwards: AwardOptions[]) {
@@ -328,7 +402,9 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 
 			while (awards[i].name !== y[k]) {
 				const a = awards[i++];
-				rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+				rtn.push(
+					createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook, a.requireTeamInterview)
+				);
 			}
 
 			const o = officialAwards[j++];
@@ -347,7 +423,9 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 		}
 		while (i < awards.length) {
 			const a = awards[i++];
-			rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+			rtn.push(
+				createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook, a.requireTeamInterview)
+			);
 		}
 	} else {
 		for (let i = 0; i < awards.length; i++) {
@@ -359,7 +437,9 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 				o.isSelected = true;
 				rtn.push(o);
 			} else {
-				rtn.push(createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook));
+				rtn.push(
+					createCustomAwardOptions(a.name, program, a.type, a.acceptedGrades, a.winnersCount, a.requireNotebook, a.requireTeamInterview)
+				);
 			}
 		}
 		for (let j = 0; j < officialAwards.length; j++) {

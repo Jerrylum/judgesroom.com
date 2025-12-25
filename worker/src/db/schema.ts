@@ -37,6 +37,7 @@ export const awards = sqliteTable(
 		acceptedGrades: text('acceptedGrades', { mode: 'json' }).notNull(),
 		winnersCount: integer('winnersCount').notNull(),
 		requireNotebook: integer('requireNotebook', { mode: 'boolean' }).notNull(),
+		requireTeamInterview: integer('requireTeamInterview', { mode: 'boolean' }).notNull(),
 		position: integer('position').notNull()
 	},
 	(table) => [index('type').on(table.type)]

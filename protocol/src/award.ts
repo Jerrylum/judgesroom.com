@@ -20,7 +20,8 @@ export const AwardSchema = z.object({
 	type: AwardTypeSchema,
 	acceptedGrades: z.array(GradeSchema),
 	winnersCount: z.number().min(1).max(10000),
-	requireNotebook: z.boolean()
+	requireNotebook: z.boolean(),
+	requireTeamInterview: z.boolean()
 });
 export type Award = z.infer<typeof AwardSchema>;
 

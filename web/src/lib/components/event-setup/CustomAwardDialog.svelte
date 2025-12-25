@@ -18,6 +18,7 @@
 	let customAwardGrades: Grade[] = $state([]);
 	let customAwardWinners = $state(1);
 	let customAwardRequireNotebook = $state(false);
+	let customAwardRequireTeamInterview = $state(false);
 	let customAwardError = $state('');
 	let hasUserInteracted = $state(false);
 	let customAwardNameInput: HTMLInputElement | null = $state(null);
@@ -39,6 +40,7 @@
 		customAwardGrades = [...possibleGrades]; // Pre-select possible grades
 		customAwardWinners = 1;
 		customAwardRequireNotebook = false;
+		customAwardRequireTeamInterview = false;
 		customAwardError = '';
 		hasUserInteracted = false;
 	});
@@ -100,7 +102,8 @@
 				customAwardType,
 				customAwardGrades,
 				customAwardWinners,
-				customAwardRequireNotebook
+				customAwardRequireNotebook,
+				customAwardRequireTeamInterview
 			);
 
 			dialogs.closeDialog(customAward);
@@ -161,6 +164,19 @@
 				<span class="text-sm font-medium text-gray-700">Require Notebook</span>
 			</label>
 			<p class="mt-1 text-xs text-gray-500">Check if this award requires teams to have a notebook</p>
+		</div>
+
+		<div>
+			<label class="flex items-center">
+				<input
+					type="checkbox"
+					bind:checked={customAwardRequireTeamInterview}
+					onchange={() => (hasUserInteracted = true)}
+					class="mr-3 rounded border-gray-300 text-slate-900 focus:ring-slate-900"
+				/>
+				<span class="text-sm font-medium text-gray-700">Require Team Interview</span>
+			</label>
+			<p class="mt-1 text-xs text-gray-500">Check if this award requires teams to have completed a team interview</p>
 		</div>
 
 		<fieldset>

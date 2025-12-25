@@ -185,14 +185,16 @@ describe('Integration Tests', () => {
 					type: 'performance',
 					acceptedGrades: selectedGradeLevel!.grades,
 					winnersCount: 2,
-					requireNotebook: false
+					requireNotebook: false,
+					requireTeamInterview: false
 				},
 				{
 					name: 'Excellence Award',
 					type: 'judged',
 					acceptedGrades: selectedGradeLevel!.grades,
 					winnersCount: 1,
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				}
 			],
 			teamInfos: [

@@ -514,7 +514,8 @@
           "Middle School"
         ],
         "winnersCount": 2,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Teamwork 2nd Place Award",
@@ -524,7 +525,8 @@
           "Middle School"
         ],
         "winnersCount": 2,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Teamwork 3rd Place Award",
@@ -534,7 +536,8 @@
           "Middle School"
         ],
         "winnersCount": 2,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Robot Skills Champion",
@@ -544,7 +547,8 @@
           "Middle School"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Robot Skills 2nd Place",
@@ -554,7 +558,8 @@
           "Middle School"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Robot Skills 3rd Place",
@@ -564,7 +569,8 @@
           "Middle School"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Excellence Award - Middle School",
@@ -573,7 +579,8 @@
           "Middle School"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Excellence Award - Elementary School",
@@ -582,7 +589,8 @@
           "Elementary School"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Design Award",
@@ -594,7 +602,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Innovate Award",
@@ -606,7 +615,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Create Award",
@@ -616,7 +626,8 @@
           "Middle School"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Think Award",
@@ -628,7 +639,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Amaze Award",
@@ -640,7 +652,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Build Award",
@@ -652,7 +665,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": true
+        "requireNotebook": true,
+        "requireTeamInterview": true
       },
       {
         "name": "Judges Award",
@@ -664,7 +678,8 @@
           "College"
         ],
         "winnersCount": 2,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": true
       },
       {
         "name": "Inspire Award",
@@ -676,7 +691,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": true
       },
       {
         "name": "Sportsmanship Award",
@@ -688,7 +704,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       },
       {
         "name": "Energy Award",
@@ -700,7 +717,8 @@
           "College"
         ],
         "winnersCount": 1,
-        "requireNotebook": false
+        "requireNotebook": false,
+        "requireTeamInterview": false
       }
     ]
   },

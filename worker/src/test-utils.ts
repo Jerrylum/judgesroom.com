@@ -107,6 +107,7 @@ export const sampleAwards: AwardInDatabase[] = [
 		acceptedGrades: ['High School', 'Middle School'],
 		winnersCount: 1,
 		requireNotebook: true,
+		requireTeamInterview: true,
 		position: 0
 	},
 	{
@@ -115,6 +116,7 @@ export const sampleAwards: AwardInDatabase[] = [
 		acceptedGrades: ['High School'],
 		winnersCount: 3,
 		requireNotebook: true,
+		requireTeamInterview: true,
 		position: 1
 	},
 	{
@@ -123,6 +125,7 @@ export const sampleAwards: AwardInDatabase[] = [
 		acceptedGrades: ['Middle School', 'High School'],
 		winnersCount: 2,
 		requireNotebook: false,
+		requireTeamInterview: false,
 		position: 2
 	},
 	{
@@ -131,6 +134,7 @@ export const sampleAwards: AwardInDatabase[] = [
 		acceptedGrades: ['Elementary School', 'Middle School', 'High School'],
 		winnersCount: 1,
 		requireNotebook: false,
+		requireTeamInterview: false,
 		position: 3
 	}
 ];

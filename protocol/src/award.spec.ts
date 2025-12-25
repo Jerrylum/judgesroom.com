@@ -90,7 +90,8 @@ describe('Awards Schema Validation', () => {
 				type: 'judged',
 				acceptedGrades: ['High School', 'College'],
 				winnersCount: 1,
-				requireNotebook: true
+				requireNotebook: true,
+				requireTeamInterview: true
 			};
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
@@ -102,7 +103,8 @@ describe('Awards Schema Validation', () => {
 				type: 'judged',
 				acceptedGrades: ['Elementary School', 'Middle School', 'High School', 'College'],
 				winnersCount: 2,
-				requireNotebook: false
+				requireNotebook: false,
+				requireTeamInterview: true
 			};
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
@@ -114,7 +116,8 @@ describe('Awards Schema Validation', () => {
 				type: 'performance',
 				acceptedGrades: ['High School'],
 				winnersCount: 2,
-				requireNotebook: false
+				requireNotebook: false,
+				requireTeamInterview: false
 			};
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
@@ -126,7 +129,8 @@ describe('Awards Schema Validation', () => {
 				type: 'volunteer_nominated',
 				acceptedGrades: ['Middle School'],
 				winnersCount: 1,
-				requireNotebook: false
+				requireNotebook: false,
+				requireTeamInterview: false
 			};
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
@@ -139,35 +143,40 @@ describe('Awards Schema Validation', () => {
 					type: 'judged',
 					acceptedGrades: ['High School'],
 					winnersCount: 1,
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				},
 				{
 					name: 'Excellence Award',
 					type: 'invalid', // invalid type
 					acceptedGrades: ['High School'],
 					winnersCount: 1,
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				},
 				{
 					name: 'Excellence Award',
 					type: 'judged',
 					acceptedGrades: ['Invalid Grade'], // invalid grade
 					winnersCount: 1,
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				},
 				{
 					name: 'Excellence Award',
 					type: 'judged',
 					acceptedGrades: ['High School'],
 					winnersCount: 0, // invalid winners count
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				},
 				{
 					name: 'Excellence Award',
 					type: 'judged',
 					acceptedGrades: ['High School'],
 					winnersCount: 10001, // too many winners
-					requireNotebook: true
+					requireNotebook: true,
+					requireTeamInterview: true
 				}
 			];
 
@@ -182,7 +191,8 @@ describe('Awards Schema Validation', () => {
 				type: 'judged',
 				acceptedGrades: [], // empty array is allowed in current schema
 				winnersCount: 1,
-				requireNotebook: true
+				requireNotebook: true,
+				requireTeamInterview: true
 			};
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
