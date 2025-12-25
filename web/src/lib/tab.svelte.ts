@@ -445,7 +445,7 @@ export class TabController {
 	 * Close all closable tabs
 	 */
 	closeAllTabs(): void {
-		const closableTabs = this.tabs.filter((tab) => tab.isPinned);
+		const closableTabs = this.tabs.filter((tab) => !tab.isPinned);
 		closableTabs.forEach((tab) => this.closeTab(tab.id));
 	}
 
