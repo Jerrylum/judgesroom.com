@@ -4,10 +4,6 @@
 
 <svelte:head>
 	<title>Home | judgesroom.com</title>
-	<meta
-		name="description"
-		content="Streamline VEX Robotics judging with digital rubrics, nominations, and rankings. Open source and fully RECF compliant."
-	/>
 </svelte:head>
 
 <div class="min-h-screen bg-slate-100">
