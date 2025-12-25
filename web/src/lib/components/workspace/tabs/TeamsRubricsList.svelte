@@ -9,6 +9,12 @@
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import QRCodeButton from './QRCodeButton.svelte';
 
+	interface Props {
+		subscriptionScope: 'all_judge_groups' | 'current_judge_group';
+	}
+
+	let { subscriptionScope = $bindable() }: Props = $props();
+
 	const teams = $derived(app.getAllTeamInfoAndData());
 
 	interface SubmissionWithScore extends Submission {
@@ -30,6 +36,10 @@
 	let showOnlyInterviewed = $state(false);
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
+
+	$effect(() => {
+		subscriptionScope = showOnlyAssignedTeams ? 'current_judge_group' : 'all_judge_groups';
+	});
 
 	const teamList = $derived.by(() => {
 		let teamIdsInOrder: string[] = [];

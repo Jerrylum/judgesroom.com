@@ -12,6 +12,28 @@
 	const isJudgingReady = $derived(app.isJudgingReady());
 	const currentJudgeGroupId = $derived(app.getCurrentUserJudgeGroup()?.id ?? null);
 	const isViewingAwardNominationTab = $derived(activeTab?.type === 'award_nomination');
+	const isViewingOverviewTab = $derived(activeTab?.type === 'overview');
+	const overviewTabSubscriptionScope = $derived(tabs.overviewTab.subscriptionScope);
+	let subscriptionScope = $state<'all_judge_groups' | 'current_judge_group'>('current_judge_group');
+	let targetJudgeGroupIds = $state<string[]>([]);
+
+	$effect(() => {
+		if (isViewingOverviewTab) {
+			subscriptionScope = overviewTabSubscriptionScope;
+		} else if (isViewingAwardNominationTab) {
+			subscriptionScope = 'all_judge_groups';
+		} else {
+			subscriptionScope = 'current_judge_group';
+		}
+	});
+
+	$effect(() => {
+		if (!currentJudgeGroupId || subscriptionScope === 'all_judge_groups') {
+			targetJudgeGroupIds = app.getAllJudgeGroups().map((group) => group.id);
+		} else {
+			targetJudgeGroupIds = [currentJudgeGroupId];
+		}
+	});
 
 	// Tab handlers
 	function switchTab(tabId: string) {
@@ -22,7 +44,7 @@
 		console.log('closeTab', tabId);
 
 		const tab = tabs.getTab(tabId);
-		
+
 		// Check if tab has unsaved data
 		if (tab && tab.isDataUnsaved()) {
 			const confirmed = await dialogs.showConfirmation({
@@ -68,13 +90,7 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
-		const targetJudgeGroupIds =
-			!currentJudgeGroupId || isViewingAwardNominationTab //
-				? app.getAllJudgeGroups().map((group) => group.id)
-				: [currentJudgeGroupId];
-
-		console.log('Subscribing to award rankings', targetJudgeGroupIds);
+		console.log('Subscribing to award rankings', $state.snapshot(targetJudgeGroupIds));
 		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsAwardRankings = data.reduce(
 				(acc, curr) => {
@@ -86,7 +102,7 @@
 		});
 
 		return async () => {
-			console.log('Unsubscribing from award rankings', targetJudgeGroupIds);
+			console.log('Unsubscribing from award rankings');
 
 			await app.wrpcClient.judging.unsubscribeAwardRankings.mutation();
 		};
@@ -95,13 +111,7 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
-		const targetJudgeGroupIds =
-			!currentJudgeGroupId || isViewingAwardNominationTab //
-				? app.getAllJudgeGroups().map((group) => group.id)
-				: [currentJudgeGroupId];
-
-		console.log('Subscribing to reviewed teams', targetJudgeGroupIds);
+		console.log('Subscribing to reviewed teams', $state.snapshot(targetJudgeGroupIds));
 
 		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
@@ -114,7 +124,7 @@
 		});
 
 		return async () => {
-			console.log('Unsubscribing from reviewed teams', targetJudgeGroupIds);
+			console.log('Unsubscribing from reviewed teams');
 
 			await app.wrpcClient.judging.unsubscribeReviewedTeams.mutation();
 		};
@@ -123,13 +133,7 @@
 	$effect(() => {
 		if (!isJudgingReady) return;
 
-		// Listen to all judge groups if it is a judge advisor or viewing award nomination tab, otherwise listen to the current judge group
-		const targetJudgeGroupIds =
-			!currentJudgeGroupId || isViewingAwardNominationTab //
-				? app.getAllJudgeGroups().map((group) => group.id)
-				: [currentJudgeGroupId];
-
-		console.log('Subscribing to submission caches', targetJudgeGroupIds);
+		console.log('Subscribing to submission caches', $state.snapshot(targetJudgeGroupIds));
 
 		app.wrpcClient.judging.subscribeSubmissionCaches.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
 			subscriptions.allSubmissionCaches = data.reduce(
@@ -142,7 +146,7 @@
 		});
 
 		return async () => {
-			console.log('Unsubscribing from submission caches', targetJudgeGroupIds);
+			console.log('Unsubscribing from submission caches');
 
 			await app.wrpcClient.judging.unsubscribeSubmissionCaches.mutation();
 		};

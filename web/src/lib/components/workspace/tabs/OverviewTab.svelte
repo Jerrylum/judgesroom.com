@@ -9,16 +9,18 @@
 		NotebookSortingTab,
 		TeamAttendanceTab,
 		TeamInterviewRubricTab,
-		ExcellenceAwardCandidatesTab
+		ExcellenceAwardCandidatesTab,
+		type OverviewTab
 	} from '$lib/tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 	import { gtag } from '$lib/index.svelte';
 
 	interface Props {
+		tab: OverviewTab;
 		isActive: boolean;
 	}
 
-	let { isActive }: Props = $props();
+	let { tab, isActive }: Props = $props();
 
 	const currentUser = $derived(app.getCurrentUser());
 	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
@@ -342,7 +344,7 @@
 		</div>
 		<!-- Teams List with Rubric Submissions -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<TeamsRubricsList />
+			<TeamsRubricsList bind:subscriptionScope={tab.subscriptionScope} />
 		</div>
 	</div>
 </div>

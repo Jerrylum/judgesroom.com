@@ -34,7 +34,8 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 	readonly isPinned = true;
 	readonly type = 'overview';
 	readonly component = OverviewTabComponent;
-	readonly props = {};
+	readonly props = { tab: this };
+	subscriptionScope: 'all_judge_groups' | 'current_judge_group' = $state('current_judge_group');
 
 	get title() {
 		return 'Overview';
@@ -367,10 +368,11 @@ export class TabController {
 	private tabs: Tab[] = $state([]);
 	private activeTabId: string | null = $state(null);
 	private tabChangeHandlers = new SvelteMap<string, (tabId: string | null) => void>();
+	public readonly overviewTab: OverviewTab;
 
 	constructor() {
 		// Initialize with overview tab
-		this.addTab(new OverviewTab());
+		this.addTab((this.overviewTab = new OverviewTab()));
 	}
 
 	get allTabs() {
