@@ -164,7 +164,7 @@ export const judgeGroupsSubmissionsCache = sqliteTable(
 		enrId: text('enrId').references(() => engineeringNotebookRubrics.id, { onDelete: 'cascade' }),
 		tiId: text('tiId').references(() => teamInterviewRubrics.id, { onDelete: 'cascade' }),
 		tnId: text('tnId').references(() => teamInterviewNotes.id, { onDelete: 'cascade' }),
-		score: integer('score') // optional
+		score: integer('score') // optional for backward compatibility, added in 0.2.0
 	},
 	(table) => [
 		primaryKey({ columns: [table.enrId, table.tiId, table.tnId] }),
