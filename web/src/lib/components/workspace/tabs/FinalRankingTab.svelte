@@ -194,18 +194,18 @@
 			</p>
 			{#if hasRobotEventsId && teamEligibilities !== undefined}
 				<p class="mb-2 text-sm text-gray-600">
-					Team numbers in Excellence Award and Design Award columns are color-coded based on Excellence Award eligibility: <span
-						class="font-medium text-green-600">green</span
+					Teams in Excellence Award and Design Award columns display eligibility indicators in the top-right corner: <span
+						class="font-medium text-green-600">&le;40%</span
 					>
-					indicates the team meets the performance criteria (top 40% in qualification rankings, robot skills, and autonomous coding skills),
-					<span class="font-medium text-red-600">red</span> indicates they do not meet the criteria.
+					(green) indicates the team meets the performance criteria (top 40% in qualification rankings, robot skills, and autonomous coding skills),
+					<span class="font-medium text-red-600">&gt;40%</span> (red) indicates they do not meet the criteria.
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
-					Team numbers in Think Award column are color-coded based on Think Award eligibility: <span class="font-medium text-green-600"
-						>green</span
+					Teams in Think Award column display eligibility indicators in the top-right corner: <span class="font-medium text-green-600"
+						>AUTO&check;</span
 					>
-					indicates the team participated in the Autonomous Coding Skills Challenge with a score greater than zero,
-					<span class="font-medium text-red-600">red</span> indicates they do not meet this criteria.
+					(green) indicates the team participated in the Autonomous Coding Skills Challenge with a score greater than zero,
+					<span class="font-medium text-red-600">AUTO&cross;</span> (red) indicates they do not meet this criteria.
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
 					Please make sure to enable the feature to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
@@ -222,7 +222,9 @@
 				</p>
 			{/if}
 			<p class="mb-6 text-sm text-gray-600">
-				Winning teams for each award are marked by <span class="font-medium text-green-600">green</span> border.
+				Winning teams for each award are marked with a colored border: <span class="font-medium text-green-600">green</span> for eligible
+				winners, <span class="font-medium text-red-600">red</span> for ineligible winners, and
+				<span class="font-medium text-slate-600">gray</span> when eligibility data is unavailable.
 			</p>
 
 			<div class="relative space-y-4 overflow-x-auto">

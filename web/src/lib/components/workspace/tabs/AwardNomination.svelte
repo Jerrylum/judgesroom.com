@@ -9,10 +9,13 @@
 		judgeGroup: JudgeGroup | null;
 		isWinner: boolean;
 		isSkipped: boolean;
+		excellenceAwardEligibilityStatus: 'eligible' | 'ineligible' | 'no-data';
+		thinkAwardEligibilityStatus: 'eligible' | 'ineligible' | 'no-data';
 		eligibilityStatus?: 'eligible' | 'ineligible' | 'no-data';
 	}
 
-	const { team, judgeGroup, isWinner, isSkipped, eligibilityStatus = 'no-data' }: Props = $props();
+	const { team, judgeGroup, isWinner, isSkipped, excellenceAwardEligibilityStatus, thinkAwardEligibilityStatus, eligibilityStatus }: Props =
+		$props();
 
 	const gradeLevel = $derived(getGradeLevel(team.grade));
 
@@ -31,32 +34,36 @@
 </script>
 
 <div
-	class="cursor-move rounded-md border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-	class:border-2={isWinner}
-	class:border-green-500={isWinner}
+	class="relative cursor-move rounded-md border-2 border-transparent bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+	class:border-green-500!={isWinner && eligibilityStatus === 'eligible'}
+	class:border-red-500!={isWinner && eligibilityStatus === 'ineligible'}
+	class:border-slate-500!={isWinner && eligibilityStatus === 'no-data'}
 	class:opacity-50={isSkipped}
 >
+	{#if excellenceAwardEligibilityStatus === 'eligible'}
+		<div class="absolute right-2 top-2 text-xs text-green-600">&le;40%</div>
+	{:else if excellenceAwardEligibilityStatus === 'ineligible'}
+		<div class="absolute right-2 top-2 text-xs text-red-600">&gt;40%</div>
+	{/if}
+	{#if thinkAwardEligibilityStatus === 'eligible'}
+		<div class="absolute right-2 top-2 text-xs text-green-600">AUTO&check;</div>
+	{:else if thinkAwardEligibilityStatus === 'ineligible'}
+		<div class="absolute right-2 top-2 text-xs text-red-600">AUTO&cross;</div>
+	{/if}
 	<div class="flex items-center justify-between">
-		<div class="flex items-center space-x-3">
-			<div>
-				<p 
-					class="text-sm font-medium"
-					class:text-green-600={eligibilityStatus === 'eligible'}
-					class:text-red-600={eligibilityStatus === 'ineligible'}
-					class:text-gray-900={eligibilityStatus === 'no-data'}
-				>
-					{team ? team.number : 'Unknown Team'}
-				</p>
-				<p class="text-xs text-gray-500">
-					{gradeLevel}
-					{#if judgeGroup}
-						•
-					{/if}
-					{#if judgeGroup}
-						{judgeGroup.name}
-					{/if}
-				</p>
-			</div>
+		<div>
+			<p class="text-sm font-medium text-gray-900">
+				{team ? team.number : 'Unknown Team'}
+			</p>
+			<p class="text-xs text-gray-500">
+				{gradeLevel}
+				{#if judgeGroup}
+					•
+				{/if}
+				{#if judgeGroup}
+					{judgeGroup.name}
+				{/if}
+			</p>
 		</div>
 	</div>
 </div>

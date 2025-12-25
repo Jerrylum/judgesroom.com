@@ -102,7 +102,7 @@
 	// Create a map of team eligibility status for Excellence Awards
 	const teamEligibilityMap = $derived.by(() => {
 		if (!teamEligibilities) return new Map<string, boolean>();
-		
+
 		const map = new Map<string, boolean>();
 		for (const team of teamEligibilities) {
 			map.set(team.teamNumber, team.isEligible);
@@ -113,32 +113,42 @@
 	// Create a map of team auto skills scores for Think Award
 	const teamAutoSkillsMap = $derived.by(() => {
 		if (!teamEligibilities) return new Map<string, number>();
-		
+
 		const map = new Map<string, number>();
 		for (const team of teamEligibilities) {
 			map.set(team.teamNumber, team.autoSkills.score);
 		}
-
-		console.log(map);
-		
 		return map;
 	});
 
-	// Function to get eligibility status for a team
-	function getEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
+	function getExcellenceAwardEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
 		if (!teamEligibilities) return 'no-data';
-		
-		// For Think Award, check if team has auto skills score > 0
+		if (award.name === 'Design Award' || isExcellenceAward(award.name)) {
+			if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
+			else return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
+		} else {
+			return 'no-data';
+		}
+	}
+
+	function getThinkAwardEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
+		if (!teamEligibilities) return 'no-data';
 		if (award.name === 'Think Award') {
 			if (!teamAutoSkillsMap.has(teamNumber)) return 'no-data';
 			const autoSkillsScore = teamAutoSkillsMap.get(teamNumber) ?? 0;
 			return autoSkillsScore > 0 ? 'eligible' : 'ineligible';
-		} else if (award.name === 'Design Award' || isExcellenceAward(award.name)) {
-			if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
-			return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
 		}
-		
 		return 'no-data';
+	}
+
+	function getEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
+		if (isExcellenceAward(award.name)) {
+			return getExcellenceAwardEligibilityStatus(teamNumber);
+		}
+		if (award.name === 'Think Award') {
+			return getThinkAwardEligibilityStatus(teamNumber);
+		}
+		return 'eligible';
 	}
 </script>
 
@@ -157,7 +167,7 @@
 	</div>
 	<div class="relative">
 		<div
-			class="border min-h-18 flex flex-col gap-1 rounded-lg border-dashed border-gray-300 bg-gray-50 p-1"
+			class="min-h-18 flex flex-col gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-1"
 			use:dndzone={{
 				items: editing,
 				flipDurationMs,
@@ -170,10 +180,13 @@
 			onfinalize={(e) => handleFinalize(e)}
 		>
 			{#each editing as nom, index (nom.id)}
+				{@const team = allTeams[nom.teamId]}
 				{@const isWinner = winners.includes(nom.teamId)}
 				{@const isBeforeLastWinner = winners.length > 0 && editingTeamIds.indexOf(winners[winners.length - 1]) > index}
 				{@const isSkipped = !isWinner && isBeforeLastWinner}
-				{@const team = allTeams[nom.teamId]}
+				<!-- legacy code: not sure the reason of checking team existence here -->
+				{@const excellenceAwardEligibilityStatus = team ? getExcellenceAwardEligibilityStatus(team.number) : 'no-data'}
+				{@const thinkAwardEligibilityStatus = team ? getThinkAwardEligibilityStatus(team.number) : 'no-data'}
 				{@const eligibilityStatus = team ? getEligibilityStatus(team.number) : 'no-data'}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<AwardNominationComponent
@@ -181,6 +194,8 @@
 						judgeGroup={nom.judgeGroupId ? allJudgeGroups[nom.judgeGroupId] : null}
 						{isWinner}
 						{isSkipped}
+						{excellenceAwardEligibilityStatus}
+						{thinkAwardEligibilityStatus}
 						{eligibilityStatus}
 					/>
 				</div>
@@ -196,18 +211,11 @@
 		{#if showAddButton}
 			<button
 				onclick={handleAddNominationClick}
-				class="w-full border-gray-300 text-center text-sm text-green-600 underline hover:text-green-800">+ Add Nomination</button
+				class="w-full border-gray-300 text-center text-sm text-slate-600 underline hover:text-slate-800">+ Add Nomination</button
 			>
 		{/if}
 	</div>
 </div>
 
 <!-- Add Nomination Dialog -->
-<AddNominationDialog
-	open={showAddDialog}
-	{award}
-	{allTeams}
-	{absentTeamIds}
-	onClose={handleDialogClose}
-	onConfirm={handleDialogConfirm}
-/>
+<AddNominationDialog open={showAddDialog} {award} {allTeams} {absentTeamIds} onClose={handleDialogClose} onConfirm={handleDialogConfirm} />
