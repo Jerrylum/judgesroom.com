@@ -336,10 +336,6 @@ export class App {
 		return $state.snapshot(this.essentialData?.teamInfos || []);
 	}
 
-	getTeamCount(): number {
-		return this.essentialData?.teamInfos.length || 0;
-	}
-
 	getAllJudgeGroups(): Readonly<Readonly<JudgeGroup>[]> {
 		return $state.snapshot(this.essentialData?.judgeGroups || []);
 	}
