@@ -85,7 +85,7 @@
 	<title>Role Selection | Judges' Room</title>
 </svelte:head>
 <div class="flex h-screen flex-col bg-slate-100">
-	<div class="flex flex-1 flex-col items-center justify-center p-8">
+	<div class="flex flex-1 flex-col items-center justify-center p-2">
 		<div class="flex w-full max-w-3xl flex-col items-center gap-6">
 			<div class="flex flex-col items-center justify-center gap-2">
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
