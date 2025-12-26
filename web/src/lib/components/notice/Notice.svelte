@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Notice } from "$lib/app.svelte";
+	import type { Notice } from '$lib/app.svelte';
 
 	interface Props {
 		notice: Notice;
@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="min-w-xs flex max-w-sm items-center justify-between rounded-lg p-4 shadow-lg {isError
+	class="min-w-xs max-w-9/10 flex items-center justify-between rounded-lg p-4 shadow-lg {isError
 		? 'bg-red-100 text-red-700'
 		: 'bg-green-100 text-green-700'}"
 >

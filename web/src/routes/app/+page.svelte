@@ -139,7 +139,7 @@
 
 	<!-- Notices -->
 	{#if notices.length > 0}
-		<div class="fixed bottom-4 right-4 z-50 space-y-2">
+		<div class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
 			{#each notices as notice (notice.id)}
 				<Notice {notice} {dismissNotice} />
 			{/each}
