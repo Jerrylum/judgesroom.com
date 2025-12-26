@@ -154,9 +154,12 @@
 					<h2 class="text-lg font-medium text-gray-900">Team Attendance</h2>
 					<p class="mt-2 text-sm text-gray-600">
 						{#if hasRobotEventsId}
-							Attendance is managed through RobotEvents integration. Teams with rankings are considered present.
+							Manage the team attendance is important for the later stages of the judging process. This Judges' Room is connected to
+							RobotEvents. Click the "Refresh from RobotEvents" button to update the team attendance. Please make sure to enable the feature
+							to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
 						{:else}
-							Mark teams as present or absent. Click the top right button to mark a team absent or present.
+							Manage the team attendance is important for the later stages of the judging process. Click the top right button of a team to
+							mark it as present or absent.
 						{/if}
 					</p>
 				</div>
