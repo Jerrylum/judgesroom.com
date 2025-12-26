@@ -144,7 +144,7 @@
 	>
 		<div
 			bind:this={dialogElement}
-			class="max-h-full w-full overflow-auto rounded-lg bg-white p-4 max-md:h-full max-md:max-w-full md:p-6 {innerContainerClass}"
+			class="max-h-full w-full overflow-auto bg-white p-4 max-md:h-full max-md:max-w-full md:rounded-lg md:p-6 {innerContainerClass}"
 			role="document"
 		>
 			{@render children?.()}
