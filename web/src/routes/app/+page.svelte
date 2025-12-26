@@ -29,11 +29,10 @@
 			// Show confirmation dialog and redirect to role selection
 			app.unselectUser();
 			AppUI.appPhase = 'role_selection';
-			dialogs.showConfirmation({
+			dialogs.showAlert({
 				title: 'Role Removed',
 				message: 'Your judge role has been removed from the event setup. Please select a new role.',
 				confirmText: 'OK',
-				cancelText: '',
 				confirmButtonClass: 'primary'
 			});
 		}
