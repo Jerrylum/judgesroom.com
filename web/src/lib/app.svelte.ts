@@ -142,21 +142,6 @@ export class App {
 		// Join the Judges' Room, this will call createWRPCClient
 		const starterKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
 		this.handleEventSetupUpdate(starterKit);
-
-		// Load user from storage
-		const user = this.loadUserFromStorage();
-		if (user) {
-			this.currentUser = user;
-
-			if (user.role === 'judge') {
-				const find = this.allJudges.find((judge) => judge.id === user.judge.id);
-				if (find) {
-					this.currentUser = user;
-				} else {
-					this.clearCurrentUser('judge_deleted');
-				}
-			}
-		}
 	}
 
 	/**
@@ -525,8 +510,7 @@ export class App {
 	}
 
 	async unselectUser(): Promise<void> {
-		this.currentUser = null;
-		this.saveUserToStorage();
+		this.clearCurrentUser();
 	}
 
 	getCurrentUser(): Readonly<User> | null {
@@ -659,7 +643,7 @@ export class App {
 	/**
 	 * Clear current user with reason
 	 */
-	private clearCurrentUser(reason: string): void {
+	private clearCurrentUser(): void {
 		this.currentUser = null;
 		this.clearUserFromStorage();
 	}
