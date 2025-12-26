@@ -23,7 +23,9 @@
 			"assets": {
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
-				"html_handling": "auto-trailing-slash"
+				"html_handling": "auto-trailing-slash",
+				"run_worker_first": ["/ws", "/join"],
+				"binding": "ASSETS"
 			},
 			"durable_objects": {
 				"bindings": [
@@ -38,7 +40,9 @@
 			"assets": {
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
-				"html_handling": "auto-trailing-slash"
+				"html_handling": "auto-trailing-slash",
+				"run_worker_first": ["/ws", "/join"],
+				"binding": "ASSETS"
 			},
 			"durable_objects": {
 				"bindings": [

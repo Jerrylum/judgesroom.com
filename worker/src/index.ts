@@ -7,6 +7,7 @@ import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
 import { broadcastDeviceListUpdate } from './routes/device';
 import { unsubscribeTopics } from './routes/subscriptions';
+import { metadata } from './db/schema';
 
 const IntentionSchema = z.object({
 	roomId: z.uuidv4(),
@@ -69,6 +70,15 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		ctx.blockConcurrencyWhile(async () => {
 			await migrate(this.db, migrations);
 		});
+	}
+
+	async getMetadata() {
+		const metadataRows = await this.db.select().from(metadata).limit(1);
+		if (metadataRows.length === 0) {
+			return null;
+		}
+
+		return metadataRows[0];
 	}
 
 	async fetch(request: Request): Promise<Response> {
@@ -162,6 +172,42 @@ export default {
 
 			// Forward the request to the Durable Object
 			return stub.fetch(request);
+		}
+
+		if (url.pathname === '/join') {
+			const roomId = url.searchParams.get('roomId');
+			const assetResponse = await env.ASSETS.fetch(request);
+
+			if (!roomId) {
+				return assetResponse;
+			}
+
+			// Create a `DurableObjectId` for the WebSocket
+			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
+
+			// Create a stub to open a communication channel with the Durable Object instance
+			const stub = env.WEBSOCKET_HIBERNATION_SERVER.get(id);
+			const metadata = await stub.getMetadata();
+
+			if (!metadata) {
+				return assetResponse;
+			}
+
+			const eventName = metadata.eventName;
+			const sku = metadata.robotEventsSku;
+			const divisionId = metadata.divisionId;
+			let description = `You have been invited to ${eventName}. Division: ${divisionId}`;
+			if (sku) {
+				description += `. Event Code: ${sku}`;
+			}
+
+			return new HTMLRewriter()
+				.on("meta[name='description']", {
+					element(element) {
+						element.setAttribute('content', description);
+					}
+				})
+				.transform(assetResponse);
 		}
 
 		// Handle other requests (health check, etc.)

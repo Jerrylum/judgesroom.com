@@ -4,9 +4,10 @@
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy --env production",
+		"deploy:beta": "wrangler deploy --env beta",
 		"dev": "wrangler dev --env development",
 		"start": "wrangler dev --env development",
-		"cf-typegen": "wrangler types --env development",
+		"cf-typegen": "wrangler types --env production",
 		"format": "prettier --write .",
 		"check": "tsc --noEmit",
 		"lint": "prettier --check . && eslint .",

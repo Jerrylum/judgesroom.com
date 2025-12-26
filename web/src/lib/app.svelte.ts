@@ -197,7 +197,7 @@ export class App {
 		if (!this.permit?.roomId) {
 			throw new Error("CRITICAL: No active Judges' Room");
 		}
-		return `${window.location.origin}${window.location.pathname}#${this.permit.roomId}`;
+		return `${window.location.origin}/join?roomId=${this.permit.roomId}`;
 	}
 
 	/**
