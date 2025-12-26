@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import { app, AppUI, dialogs, googleAnalytics } from '$lib/index.svelte';
 	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
@@ -54,6 +54,12 @@
 				await handleJudgesRoomUrl();
 				return;
 			}
+
+			// Clear URL hash for security using SvelteKit navigation
+			// Use tick() to avoid "cannot call replaceState(...) before router is initialized"
+			tick().then(() => {
+				replaceState('/app', {});
+			});
 		}
 
 		// In other cases, check if we can rejoin a stored permit
