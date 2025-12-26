@@ -12,6 +12,8 @@
 	let selectedJudgeGroupId = $state('');
 	let enableGoogleAnalytics = $state(true);
 
+	const essentialData = $derived(app.getEssentialData());
+
 	// Get all existing judges grouped by judge group
 	const judgesByGroup = $derived(() => app.getExistingJudgesGroupedByGroup());
 
@@ -96,7 +98,7 @@
 				</p>
 			</div>
 
-			{#if !app.hasEssentialData()}
+			{#if !essentialData}
 				<div class="text-center text-gray-500">
 					<p>Loading Judges' Room data...</p>
 				</div>
@@ -111,7 +113,7 @@
 						<div class="space-y-4">
 							<h3 class="text-2xl font-medium text-gray-900">Join Judges' Room</h3>
 							<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
-								You are connected to <strong>{app.getEventName()}</strong>
+								You are connected to <strong>{essentialData.eventName}</strong> (Division {essentialData.divisionId})
 							</p>
 							<p class="mb-2 mt-2 text-sm leading-relaxed text-gray-700">
 								Choose your identity to start participating in the Judges' Room. You can change your role at any time later if needed.
