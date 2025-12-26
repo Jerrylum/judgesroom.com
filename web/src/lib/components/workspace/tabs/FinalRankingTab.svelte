@@ -164,22 +164,20 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Judged Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<div class="mb-2 flex items-start justify-between">
+			<div class="mb-2 flex flex-row items-start justify-between gap-3">
 				<div>
 					<h2 class="mb-2 text-xl font-semibold text-gray-900">Final Ranking</h2>
 				</div>
 				{#if hasRobotEventsId && allExcellenceAwards.length > 0}
-					<div class="flex gap-2">
-						<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
-							{#if isFetching}
-								<RefreshIcon class="h-4 w-4 animate-spin" />
-								Fetching...
-							{:else}
-								<RefreshIcon class="h-4 w-4" />
-								Refresh from RobotEvents
-							{/if}
-						</button>
-					</div>
+					<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
+						{#if isFetching}
+							<RefreshIcon class="h-4 w-4 animate-spin" />
+							<span class="text-nowrap">Fetching...</span>
+						{:else}
+							<RefreshIcon class="h-4 w-4" />
+							<span class="text-nowrap">Refresh from RobotEvents</span>
+						{/if}
+					</button>
 				{/if}
 			</div>
 			<p class="mb-2 text-sm text-gray-600">

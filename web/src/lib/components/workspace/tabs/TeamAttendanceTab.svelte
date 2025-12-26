@@ -149,7 +149,7 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<div class="flex items-start justify-between">
+			<div class="flex flex-col items-start justify-between gap-3 sm:flex-row">
 				<div>
 					<h2 class="text-lg font-medium text-gray-900">Team Attendance</h2>
 					<p class="mt-2 text-sm text-gray-600">
@@ -161,17 +161,15 @@
 					</p>
 				</div>
 				{#if hasRobotEventsId}
-					<div class="flex gap-2">
-						<button onclick={fetchRobotEventsAttendance} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
-							{#if isFetching}
-								<RefreshIcon class="h-4 w-4 animate-spin" />
-								Fetching...
-							{:else}
-								<RefreshIcon class="h-4 w-4" />
-								Refresh from RobotEvents
-							{/if}
-						</button>
-					</div>
+					<button onclick={fetchRobotEventsAttendance} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
+						{#if isFetching}
+							<RefreshIcon class="h-4 w-4 animate-spin" />
+							<span class="text-nowrap">Fetching...</span>
+						{:else}
+							<RefreshIcon class="h-4 w-4" />
+							<span class="text-nowrap">Refresh from RobotEvents</span>
+						{/if}
+					</button>
 				{/if}
 			</div>
 			<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -197,7 +195,7 @@
 
 			{#if hasRobotEventsId && showDifferences}
 				<div class="mt-4 rounded-md bg-yellow-50 p-4">
-					<div class="flex items-start">
+					<div class="flex flex-col items-start gap-3 sm:flex-row">
 						<div class="flex-1">
 							<h3 class="text-sm font-medium text-yellow-800">Attendance Differences Detected</h3>
 							<p class="mt-1 text-sm text-yellow-700">
@@ -207,7 +205,7 @@
 						</div>
 						<button
 							onclick={syncAttendanceWithRobotEvents}
-							class="ml-3 rounded-md bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+							class="rounded-md bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
 						>
 							Sync with RobotEvents
 						</button>
