@@ -114,6 +114,23 @@
 		}
 	});
 
+	$effect(() => {
+		if (tab.teamId) {
+			// If the user is editing a team that is not assigned to them, uncheck the "Only show assigned teams" checkbox
+			// Such that the user can see all the teams in the event
+			showOnlyAssignedTeams = currentJudgeGroup?.assignedTeams.includes(tab.teamId) ?? true;
+		}
+	});
+
+	function handleShowOnlyAssignedTeamsChange(event: { currentTarget: EventTarget & HTMLInputElement }) {
+		const newState = event.currentTarget.checked;
+
+		if (newState && !currentJudgeGroup?.assignedTeams.includes(tab.teamId)) {
+			// Clear the team selection if the user is checking the box and the team is not assigned to them
+			tab.teamId = '';
+		}
+	}
+
 	// Scroll container references for synchronization
 	let mainScrollContainer: HTMLElement;
 
@@ -260,7 +277,12 @@
 				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
 					<div class="mb-4">
 						<label class="flex items-center">
-							<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 rounded border-gray-300" />
+							<input
+								type="checkbox"
+								bind:checked={showOnlyAssignedTeams}
+								class="mr-2 rounded border-gray-300"
+								onchange={handleShowOnlyAssignedTeamsChange}
+							/>
 							<span class="text-sm text-gray-700">
 								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
 							</span>
