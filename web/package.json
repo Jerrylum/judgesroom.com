@@ -18,6 +18,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.38.0",
+		"@inlang/paraglide-js": "^2.6.0",
 		"@judgesroom.com/worker": "workspace:*",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.47.3",
