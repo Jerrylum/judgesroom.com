@@ -1,3 +1,4 @@
+import { m } from '$lib/paraglide/messages.js';
 import type { Component } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -87,8 +88,8 @@ export class DialogController {
 		const dialog: ConfirmationDialog = {
 			id,
 			type: 'confirmation',
-			confirmText: 'Confirm',
-			cancelText: 'Cancel',
+			confirmText: m.confirm(),
+			cancelText: m.cancel(),
 			confirmButtonClass: 'primary',
 			cancelButtonClass: 'secondary',
 			...options

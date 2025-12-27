@@ -99,7 +99,7 @@
 			<div class="rounded-lg bg-slate-50 p-4">
 				<h4 class="mb-2 font-medium text-slate-900">{m.team_summary()}</h4>
 				<div class="space-y-1 text-sm text-slate-800">
-					<p>{m.total_teams({ count: teams.length })}</p>
+					<p>{m.total_teams_count({ count: teams.length })}</p>
 					<p>{m.groups({ count: Object.keys(teamGroups).length })}</p>
 				</div>
 			</div>

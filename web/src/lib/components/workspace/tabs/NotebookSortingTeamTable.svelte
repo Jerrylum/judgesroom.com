@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import './notebook-sorting.css';
 	import { app, dialogs, tabs } from '$lib/index.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
@@ -27,7 +28,7 @@
 				hasInnovateAwardSubmissionForm: isSubmittedNotebook(notebookDevelopmentStatus) ? team.hasInnovateAwardSubmissionForm : false
 			});
 		} catch (error) {
-			app.addErrorNotice('Failed to update notebook status');
+			app.addErrorNotice(m.failed_to_update_notebook_status());
 		}
 	}
 
@@ -35,7 +36,7 @@
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({ ...team, hasInnovateAwardSubmissionForm });
 		} catch (error) {
-			app.addErrorNotice('Failed to update innovate award submission form');
+			app.addErrorNotice(m.failed_to_update_innovate_award_submission_form());
 		}
 	}
 
@@ -51,8 +52,8 @@
 </script>
 
 <div class="lg:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
-	<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
-	<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
+	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
 
 <notebook-sorting-table>
@@ -60,10 +61,10 @@
 		<team>TEAM NUMBER</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex min-w-60 max-w-60 flex-col items-center justify-center">NOTEBOOK LINK</div>
-				<div class="flex min-w-40 max-w-40 items-center justify-center">STATUS</div>
-				<div class="flex min-w-40 max-w-40 items-center justify-center text-center">INNOVATE AWARD SUBMISSION FORM</div>
-				<div class="min-w-50 flex items-center justify-center">ACTIONS</div>
+				<div class="flex min-w-60 max-w-60 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="flex min-w-40 max-w-40 items-center justify-center">{m.notebook_status_table()}</div>
+				<div class="flex min-w-40 max-w-40 items-center justify-center text-center">{m.innovate_award_submission_form_table()}</div>
+				<div class="min-w-50 flex items-center justify-center">{m.actions_table()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -96,7 +97,7 @@
 								</a>
 								<QRCodeButton link={team.notebookLink} />
 							{:else}
-								<span class="text-xs text-gray-400">No notebook link</span>
+								<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
 							{/if}
 						</div>
 
@@ -110,10 +111,10 @@
 								class:border-yellow-500={devStatus === 'developing'}
 								class:border-gray-500={devStatus === 'not_submitted'}
 							>
-								<option value="undetermined">Undetermined</option>
-								<option value="fully_developed">Fully Developed</option>
-								<option value="developing">Developing</option>
-								<option value="not_submitted">Not Submitted</option>
+								<option value="undetermined">{m.undetermined_notebook_status()}</option>
+								<option value="fully_developed">{m.fully_developed_notebook_status()}</option>
+								<option value="developing">{m.developing_notebook_status()}</option>
+								<option value="not_submitted">{m.not_submitted_notebook_status()}</option>
 							</select>
 						</div>
 
@@ -128,7 +129,7 @@
 									onchange={() => updateInnovateAwardSubmissionForm(team, !team.hasInnovateAwardSubmissionForm)}
 								/>
 								<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>
-									{team.hasInnovateAwardSubmissionForm ? 'Provided' : 'Not Provided'}
+									{team.hasInnovateAwardSubmissionForm ? m.provided() : m.not_provided()}
 								</span>
 							</label>
 						</div>
@@ -138,9 +139,9 @@
 							{#if devStatus === 'fully_developed'}
 								<button onclick={() => openNotebookRubric(team.id)} class="primary tiny" class:bg-green-800!={isSubmitted}>
 									{#if isSubmitted}
-										(You Submitted)
+										{m.you_submitted()}
 									{:else}
-										Start Rubric
+										{m.start_rubric()}
 									{/if}
 								</button>
 							{/if}

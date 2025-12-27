@@ -183,7 +183,7 @@
 			<button
 				onclick={() => onDeleteGroup(groupName)}
 				class="ml-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-				title="Delete group"
+				title={m.delete_group()}
 			>
 				<TrashBinIcon />
 			</button>

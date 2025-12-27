@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { ConnectionState } from '@judgesroom.com/wrpc/client';
 
@@ -28,17 +29,17 @@
 
 		switch (state) {
 			case 'connected':
-				return 'Connected';
+				return m.connected();
 			case 'connecting':
-				return 'Connecting...';
+				return m.connecting();
 			case 'reconnecting':
-				return 'Reconnecting...';
+				return m.reconnecting();
 			case 'error':
-				return 'Connection Error';
+				return m.connection_error();
 			case 'offline':
-				return 'Offline';
+				return m.offline();
 			default:
-				return 'Unknown';
+				return m.unknown();
 		}
 	}
 </script>

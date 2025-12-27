@@ -197,7 +197,7 @@
 			{/if}
 		</div>
 
-		<button onclick={confirmDeleteGroup} class="ml-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600" title="Delete group">
+		<button onclick={confirmDeleteGroup} class="ml-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600" title={m.delete_group()}>
 			<TrashBinIcon />
 		</button>
 	</div>

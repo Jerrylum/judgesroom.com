@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, subscriptions } from '$lib/index.svelte';
 	import type { NotebookSortingTab } from '$lib/tab.svelte';
 	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
@@ -7,6 +8,7 @@
 	import GridViewIcon from '$lib/icon/GridViewIcon.svelte';
 	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
+	import { htmlM } from '$lib/i18n';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -147,15 +149,13 @@
 			// Update team data
 			if (teamDataUpdates.length > 0) {
 				await app.wrpcClient.team.updateAllTeamData.mutation(teamDataUpdates);
-				importSuccess =
-					`Successfully updated notebook links for ${updatedCount} teams` +
-					(notFoundCount > 0 ? `. ${notFoundCount} teams were not found in the current event.` : '');
+				importSuccess = m.notebook_links_import_success({ count: updatedCount, notFoundCount: notFoundCount });
 			} else {
-				importError = 'No teams were found matching the Excel data';
+				importError = m.notebook_links_import_error();
 			}
 		} catch (error) {
 			console.error('Error processing notebook links file:', error);
-			importError = `Error processing file: ${error}`;
+			importError = m.notebook_links_import_error_message({ error: error instanceof Error ? error.message : 'Unknown error' });
 		} finally {
 			isImporting = false;
 		}
@@ -166,31 +166,36 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
-			<h2 class="mb-4 text-xl font-semibold text-gray-900">Notebook Sorting</h2>
+			<h2 class="mb-4 text-xl font-semibold text-gray-900">{m.notebook_sorting_title()}</h2>
 			<p class="mb-2 text-sm text-gray-600">
-				Judges perform a quick scan of all the Engineering Notebooks and divide them into three categories:
+				<!-- Judges perform a quick scan of all the Engineering Notebooks and divide them into three categories:
 				<b>Not Submitted</b>, <b>Developing</b>, and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as
 				Developing or Fully Developed, either another Judge can help make that determination or the notebook should be given the benefit of
-				the doubt and categorized as Fully Developed.
+				the doubt and categorized as Fully Developed. -->
+				{@html htmlM.notebook_sorting_description1()}
 			</p>
-			<p class="mb-4 text-sm text-gray-600">Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric.</p>
+			<p class="mb-4 text-sm text-gray-600">
+				<!-- Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric. -->
+				{@html htmlM.notebook_sorting_description2()}
+			</p>
 		</div>
 
 		<!-- Import Section -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
-			<h3 class="mb-4 text-lg font-medium text-gray-900">Import Digital Engineering Notebook Links report</h3>
+			<h3 class="mb-4 text-lg font-medium text-gray-900">{m.notebook_sorting_import_title()}</h3>
 			<p class="mb-4 text-sm text-gray-600">
-				If Engineering Notebooks are submitted digitally, please ask the Event Partner to provide digital notebook links report. This report
+				<!-- If Engineering Notebooks are submitted digitally, please ask the Event Partner to provide digital notebook links report. This report
 				can be downloaded from RobotEvents → Event Admin → "Downloads & Links" → "Download Digital Engineering Notebook Links report".
-				Import the Excel file to this Judges' Room to set notebook links for teams in your event.
+				Import the Excel file to this Judges' Room to set notebook links for teams in your event. -->
+				{m.notebook_sorting_import_description1()}
 			</p>
 
 			<div class="flex items-center gap-4">
 				<button onclick={() => fileInput.click()} disabled={isImporting} class="primary tiny">
 					{#if isImporting}
-						Importing...
+						{m.importing()}
 					{:else}
-						Import
+						{m.import_button()}
 					{/if}
 				</button>
 
@@ -214,7 +219,7 @@
 		<!-- Teams List -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">
-				Teams ({teamsToShow.length})
+				{m.teams_count({ count: teamsToShow.length })}
 			</h3>
 
 			<div class="mb-4">
@@ -226,7 +231,7 @@
 							<label class="flex items-start sm:items-center">
 								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
 								<span class="text-sm text-gray-700">
-									Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+									{m.only_show_assigned_teams_for_your_current_judge_group({ name: currentJudgeGroup.name })}
 								</span>
 							</label>
 						</div>
@@ -234,7 +239,7 @@
 					<div>
 						<label class="flex items-start sm:items-center">
 							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
-							<span class="text-sm text-gray-700"> Only show fully developed notebooks </span>
+							<span class="text-sm text-gray-700">{m.only_show_fully_developed_notebooks()}</span>
 						</label>
 					</div>
 				</div>
@@ -242,11 +247,11 @@
 				<!-- Progress Indicators -->
 				<div class="mt-4 grid gap-4 sm:grid-cols-3">
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-base font-medium text-gray-900">Teams Scanned</div>
+						<div class="text-base font-medium text-gray-900">{m.teams_scanned()}</div>
 						{#if isShowingOnlyAssignedTeams}
-							<div class="mb-2 text-sm text-gray-900">Your judge group ({currentJudgeGroup!.name})</div>
+							<div class="mb-2 text-sm text-gray-900">{m.your_judge_group({ name: currentJudgeGroup!.name })}</div>
 						{:else}
-							<div class="mb-2 text-sm text-gray-900">All judge groups</div>
+							<div class="mb-2 text-sm text-gray-900">{m.all_judge_groups()}</div>
 						{/if}
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.scanned.count} / {progressMetrics.scanned.total}
@@ -257,11 +262,11 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-base font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+						<div class="text-base font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
 						{#if isShowingOnlyAssignedTeams}
-							<div class="mb-2 text-sm text-gray-900">Your judge group ({currentJudgeGroup!.name})</div>
+							<div class="mb-2 text-sm text-gray-900">{m.your_judge_group({ name: currentJudgeGroup!.name })}</div>
 						{:else}
-							<div class="mb-2 text-sm text-gray-900">All judge groups</div>
+							<div class="mb-2 text-sm text-gray-900">{m.all_judge_groups()}</div>
 						{/if}
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.withRubrics.count} / {progressMetrics.withRubrics.total}
@@ -274,8 +279,8 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-base font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
-						<div class="mb-2 text-sm text-gray-900">Your progress</div>
+						<div class="text-base font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
+						<div class="mb-2 text-sm text-gray-900">{m.your_progress()}</div>
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.currentJudgeFinished.count} / {progressMetrics.currentJudgeFinished.total}
 						</div>
@@ -297,7 +302,7 @@
 						title="Switch to grid view"
 					>
 						<GridViewIcon size={16} />
-						Grid
+						{m.grid_view()}
 					</button>
 					<button
 						onclick={() => app.getPreferences().set('notebookSortingTabViewMode', 'column')}
@@ -307,7 +312,7 @@
 						title="Switch to column view"
 					>
 						<ColumnViewIcon size={16} />
-						Column
+						{m.column_view()}
 					</button>
 				</div>
 			</div>
@@ -315,9 +320,9 @@
 			{#if teamsToShow.length === 0}
 				<div class="py-8 text-center text-gray-500">
 					{#if isAssignedJudging && showOnlyAssignedTeams}
-						No teams are assigned to your judge group.
+						{m.no_teams_assigned_to_your_judge_group()}
 					{:else}
-						No teams found.
+						{m.no_teams_found()}
 					{/if}
 				</div>
 			{:else if viewMode === 'grid'}

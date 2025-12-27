@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs, tabs } from '$lib/index.svelte';
 	import EditIcon from '$lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
@@ -26,7 +27,7 @@
 				hasInnovateAwardSubmissionForm: isSubmittedNotebook(notebookDevelopmentStatus) ? team.hasInnovateAwardSubmissionForm : false
 			});
 		} catch (error) {
-			app.addErrorNotice('Failed to update notebook status');
+			app.addErrorNotice(m.failed_to_update_notebook_status());
 		}
 	}
 
@@ -34,7 +35,7 @@
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({ ...team, hasInnovateAwardSubmissionForm });
 		} catch (error) {
-			app.addErrorNotice('Failed to update innovate award submission form');
+			app.addErrorNotice(m.failed_to_update_innovate_award_submission_form());
 		}
 	}
 
@@ -62,7 +63,7 @@
 			<button
 				onclick={() => openEditTeamDataDialog(team)}
 				class="text-gray-400 hover:text-gray-600 active:text-gray-800"
-				title="Edit team data"
+				title={m.edit_team_data({ teamNumber: team.number })}
 			>
 				<EditIcon size={16} />
 			</button>
@@ -87,7 +88,7 @@
 		</div>
 	{:else}
 		<div class="mb-2 flex h-6 items-center">
-			<span class="block text-xs text-gray-400">No notebook link</span>
+			<span class="block text-xs text-gray-400">{m.no_notebook_link()}</span>
 		</div>
 	{/if}
 
@@ -100,7 +101,7 @@
 				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('fully_developed')}
 			/>
-			<span class="text-sm text-gray-700">Fully Developed</span>
+			<span class="text-sm text-gray-700">{m.fully_developed_notebook_status()}</span>
 		</label>
 		<label class="flex items-center gap-2">
 			<input
@@ -110,7 +111,7 @@
 				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('developing')}
 			/>
-			<span class="text-sm text-gray-700">Developing</span>
+			<span class="text-sm text-gray-700">{m.developing_notebook_status()}</span>
 		</label>
 		<label class="flex items-center gap-2">
 			<input
@@ -120,7 +121,7 @@
 				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('not_submitted')}
 			/>
-			<span class="text-sm text-gray-700">Not Submitted</span>
+			<span class="text-sm text-gray-700">{m.not_submitted_notebook_status()}</span>
 		</label>
 		<hr />
 		<label class="flex items-center gap-2">
@@ -131,16 +132,16 @@
 				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateInnovateAwardSubmissionForm(!team.hasInnovateAwardSubmissionForm)}
 			/>
-			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>Innovate Award Submission Form</span>
+			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>{m.innovate_award_submission_form()}</span>
 		</label>
 	</div>
 
 	{#if devStatus === 'fully_developed'}
 		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full" class:bg-green-800!={isSubmitted}>
 			{#if isSubmitted}
-				(You Submitted)
+				{m.you_submitted()}
 			{:else}
-				Start Rubric
+				{m.start_rubric()}
 			{/if}
 		</button>
 	{/if}
@@ -149,11 +150,11 @@
 	{#if devStatus !== 'undetermined'}
 		<div class="absolute right-2 top-2">
 			{#if devStatus === 'fully_developed'}
-				<div class="h-2 w-2 rounded-full bg-green-500" title="Fully Developed"></div>
+				<div class="h-2 w-2 rounded-full bg-green-500" title={m.fully_developed_notebook_status()}></div>
 			{:else if devStatus === 'developing'}
-				<div class="h-2 w-2 rounded-full bg-yellow-500" title="Developing"></div>
+				<div class="h-2 w-2 rounded-full bg-yellow-500" title={m.developing_notebook_status()}></div>
 			{:else}
-				<div class="h-2 w-2 rounded-full bg-gray-400" title="Not Reviewed"></div>
+				<div class="h-2 w-2 rounded-full bg-gray-400" title={m.not_submitted_notebook_status()}></div>
 			{/if}
 		</div>
 	{/if}

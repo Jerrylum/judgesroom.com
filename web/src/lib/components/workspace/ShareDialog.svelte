@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import QRCode from 'qrcode';
 	import { app, dialogs } from '$lib/index.svelte';
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
@@ -8,7 +9,7 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	let qrCodeDataUrl = $state('');
-	let copyButtonText = $state('Copy');
+	let copyButtonText = $state(m.copy());
 
 	const devices = $derived(app.getDevices());
 	const connectionState = $derived(app.getConnectionState());
@@ -50,15 +51,15 @@
 		if (shareableUrl) {
 			try {
 				await navigator.clipboard.writeText(shareableUrl);
-				copyButtonText = 'Copied!';
+				copyButtonText = m.copied();
 				setTimeout(() => {
-					copyButtonText = 'Copy';
+					copyButtonText = m.copy();
 				}, 2000);
 			} catch (error) {
 				console.error('Failed to copy URL:', error);
-				copyButtonText = 'Failed';
+				copyButtonText = m.failed();
 				setTimeout(() => {
-					copyButtonText = 'Copy';
+					copyButtonText = m.copy();
 				}, 2000);
 			}
 		}
@@ -94,7 +95,7 @@
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">
 	<div class="flex flex-col overflow-auto p-2">
 		<div class="mb-4 flex items-center justify-between">
-			<h3 id="dialog-title" class="text-lg font-medium text-gray-900">Judges' Room Management</h3>
+			<h3 id="dialog-title" class="text-lg font-medium text-gray-900">{m.judges_room_management()}</h3>
 			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close dialog">
 				<CloseIcon size={24} />
 			</button>
@@ -103,12 +104,12 @@
 		<div class="flex shrink-0 flex-col gap-6 overflow-hidden md:flex-row">
 			<!-- Left Column: Share Judges' Room -->
 			<div class="max-h-140 flex-1 space-y-6">
-				<h4 class="text-lg font-medium text-gray-900">Share Judges' Room</h4>
+				<h4 class="text-lg font-medium text-gray-900">{m.share_judges_room()}</h4>
 
 				<!-- QR Code Section -->
 				<div class="text-center">
 					<div class="mb-3">
-						<h5 class="text-sm font-medium text-gray-700">Scan QR Code</h5>
+						<h5 class="text-sm font-medium text-gray-700">{m.scan_qr_code()}</h5>
 					</div>
 					<div class="inline-block rounded-lg bg-gray-50 p-4">
 						{#if qrCodeDataUrl}
@@ -121,7 +122,7 @@
 
 				<!-- URL Section -->
 				<div>
-					<label for="judges-room-url" class="mb-2 block text-sm font-medium text-gray-700">Judges' Room Link </label>
+					<label for="judges-room-url" class="mb-2 block text-sm font-medium text-gray-700">{m.judges_room_link()}</label>
 					<div class="flex items-center space-x-2">
 						<input id="judges-room-url" type="text" value={shareableUrl} readonly class="classic flex-1" />
 						<button onclick={copyShareUrl} class="primary tiny">
@@ -133,11 +134,11 @@
 				<!-- Instructions -->
 				<div class="rounded-lg bg-slate-50 p-4">
 					<div class="text-sm text-slate-800">
-						<h5 class="mb-2 font-medium">How to share:</h5>
+						<h5 class="mb-2 font-medium">{m.how_to_share()}</h5>
 						<ul class="space-y-1 text-xs">
-							<li>• Send the link to other judges to invite them to join</li>
-							<li>• Or have them scan the QR code with their phone camera</li>
-							<li>• All participants will see real-time updates</li>
+							<li>• {m.send_the_link_to_other_judges_to_invite_them_to_join()}</li>
+							<li>• {m.or_have_them_scan_the_qr_code_with_their_phone_camera()}</li>
+							<li>• {m.all_participants_will_see_real_time_updates()}</li>
 						</ul>
 					</div>
 				</div>
@@ -145,27 +146,27 @@
 
 			<!-- Right Column: Connected Devices -->
 			<div class="lg:max-h-140 flex flex-1 flex-col space-y-4 overflow-hidden">
-				<h4 class="text-lg font-medium text-gray-900">Connected Devices</h4>
+				<h4 class="text-lg font-medium text-gray-900">{m.connected_devices()}</h4>
 
 				{#if isDisconnectedFromServer}
 					<div class="rounded-lg bg-red-50 p-4">
 						<div class="flex items-center space-x-2 text-red-800">
 							<DenialIcon />
 							<div>
-								<h5 class="font-medium">Connection Error</h5>
-								<p class="text-sm">You are disconnected from the server. This may be due to a network issue.</p>
+								<h5 class="font-medium">{m.connection_error()}</h5>
+								<p class="text-sm">{m.you_are_disconnected_from_the_server()}</p>
 							</div>
 						</div>
 					</div>
 				{:else if devices.length === 0}
 					<div class="py-8 text-center text-gray-500">
 						<ClientsIcon />
-						<p class="mt-2 text-sm">No devices currently connected</p>
+						<p class="mt-2 text-sm">{m.no_devices_currently_connected()}</p>
 					</div>
 				{:else}
 					<!-- Current Device Section -->
 					<div class="space-y-3">
-						<h5 class="text-sm font-medium text-gray-700">Current Device</h5>
+						<h5 class="text-sm font-medium text-gray-700">{m.current_device()}</h5>
 						{#if currentDevice}
 							<div class="flex items-center justify-between rounded-lg bg-blue-50 p-3">
 								<div class="flex items-center space-x-3">
@@ -173,7 +174,8 @@
 									<div>
 										<div class="font-medium text-gray-900">{currentDevice.deviceName}</div>
 										<div class="text-xs text-gray-500">
-											Connected {getConnectionDuration(currentDevice.connectedAt)} ago
+											<!-- Connected {getConnectionDuration(currentDevice.connectedAt)} ago -->
+											 {m.connected_ago({ duration: getConnectionDuration(currentDevice.connectedAt) })}
 										</div>
 									</div>
 								</div>
@@ -184,7 +186,7 @@
 					<!-- Other Devices Section -->
 					{#if otherDevices.length > 0}
 						<div class="flex min-h-0 flex-col space-y-3">
-							<h5 class="text-sm font-medium text-gray-700">Other Devices</h5>
+							<h5 class="text-sm font-medium text-gray-700">{m.other_devices()}</h5>
 
 							<div class="min-h-0 space-y-3 overflow-hidden pr-1 lg:overflow-auto">
 								{#each otherDevices as device (device.deviceId)}
@@ -198,7 +200,8 @@
 											<div>
 												<div class="font-medium text-gray-900">{device.deviceName}</div>
 												<div class="text-xs text-gray-500">
-													Joined {getConnectionDuration(device.connectedAt)} ago
+													<!-- Joined {getConnectionDuration(device.connectedAt)} ago -->
+													{m.joined_ago({ duration: getConnectionDuration(device.connectedAt) })}
 												</div>
 											</div>
 										</div>

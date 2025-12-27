@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import ConnectionStatusIndicator from './ConnectionStatusIndicator.svelte';
 	import UserMenu from './UserMenu.svelte';
@@ -33,13 +34,13 @@
 				</h1>
 				<div class="flex items-center space-x-2 text-sm text-gray-500">
 					{#if currentUser?.role === 'judge_advisor'}
-						<span>Judge Advisor</span>
+						<span>{m.judge_advisor()}</span>
 					{:else if currentUser && currentUser.role === 'judge'}
 						<span>{currentUser.judge.name || 'Unknown'}</span>
 						<span>•</span>
 						<span>{judgeGroupName()}</span>
 					{:else}
-						<span>Unknown</span>
+						<span>{m.unknown()}</span>
 					{/if}
 				</div>
 			</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs, subscriptions, tabs } from '$lib/index.svelte';
 	import {
 		AwardNominationTab,
@@ -66,11 +67,11 @@
 
 	async function startAwardDeliberation() {
 		const confirmed = await dialogs.showConfirmation({
-			title: 'Start Award Deliberation',
+			title: m.start_award_deliberation_title(),
 			message:
-				'This will unlock award deliberation functions for all judges for the last step in the judging process. Rubrics can still be submitted. Please confirm to proceed.',
-			confirmText: 'Start Deliberation',
-			cancelText: 'Cancel',
+				m.start_award_deliberation_message(),
+			confirmText: m.start_award_deliberation_confirm_text(),
+			cancelText: m.cancel(),
 			confirmButtonClass: 'primary'
 		});
 
@@ -91,10 +92,10 @@
 
 		try {
 			await app.wrpcClient.judging.startAwardDeliberation.mutation();
-			app.addSuccessNotice('Award deliberation started! All judges can now access award deliberation functions.');
+			app.addSuccessNotice(m.award_deliberation_started());
 		} catch (error) {
 			console.error('Failed to start award deliberation:', error);
-			app.addErrorNotice('Failed to start award deliberation');
+			app.addErrorNotice(m.failed_to_start_award_deliberation());
 		}
 	}
 </script>
@@ -103,12 +104,12 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Event Overview -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-2 text-lg font-medium text-gray-900">Event Overview</h2>
+			<h2 class="mb-2 text-lg font-medium text-gray-900">{m.event_overview()}</h2>
 			{#if essentialData}
 				<div class="text-sm text-gray-500">
 					<!-- <p>Event Name: {essentialData.eventName}</p> -->
 					<p>
-						Event Code:
+						{m.event_code_colon()}
 						{#if essentialData.robotEventsSku}
 							<a
 								href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
@@ -116,19 +117,19 @@
 								class="text-blue-500 hover:text-blue-600">{essentialData.robotEventsSku}</a
 							>
 						{:else}
-							(Not set)
+							{m.not_set()}
 						{/if}
 					</p>
-					<p>Division: {essentialData.divisionId ?? '(Not set)'}</p>
-					<p>The number of teams: {essentialData.teamInfos.length}</p>
-					<p>The number of judge groups: {essentialData.judgeGroups.length}</p>
-					<p>The number of judges: {app.getJudgeCount()}</p>
+					<p>{m.division_colon()}: {essentialData.divisionId ?? m.not_set()}</p>
+					<p>{m.teams_number_of_colon({ count: essentialData.teamInfos.length })}</p>
+					<p>{m.judge_groups_number_of_colon({ count: essentialData.judgeGroups.length })}</p>
+					<p>{m.judges_number_of_colon({ count: app.getJudgeCount() })}</p>
 				</div>
 			{/if}
 		</div>
 
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="text-lg font-medium text-gray-900">Start</h2>
+			<h2 class="text-lg font-medium text-gray-900">{m.start()}</h2>
 			<div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 				<button
 					onclick={addTeamAttendanceTab}
@@ -142,8 +143,8 @@
 						>
 					</div>
 					<div>
-						<div class="font-medium">Team Attendance</div>
-						<div class="text-sm text-gray-500">Mark teams present or absent</div>
+						<div class="font-medium">{m.team_attendance()}</div>
+						<div class="text-sm text-gray-500">{m.team_attendance_description()}</div>
 					</div>
 				</button>
 
@@ -164,8 +165,8 @@
 						>
 					</div>
 					<div>
-						<div class="font-medium">Notebook Sorting</div>
-						<div class="text-sm text-gray-500">Sort the engineering notebooks</div>
+						<div class="font-medium">{m.notebook_sorting()}</div>
+						<div class="text-sm text-gray-500">{m.notebook_sorting_description()}</div>
 					</div>
 				</button>
 
@@ -186,8 +187,8 @@
 						>
 					</div>
 					<div>
-						<div class="font-medium">Notebook Review</div>
-						<div class="text-sm text-gray-500">Review engineering notebooks</div>
+						<div class="font-medium">{m.notebook_review()}</div>
+						<div class="text-sm text-gray-500">{m.notebook_review_description()}</div>
 					</div>
 				</button>
 
@@ -208,8 +209,8 @@
 						>
 					</div>
 					<div>
-						<div class="font-medium">Team Interview</div>
-						<div class="text-sm text-gray-500">Conduct team interviews</div>
+						<div class="font-medium">{m.team_interview()}</div>
+						<div class="text-sm text-gray-500">{m.team_interview_description()}</div>
 					</div>
 				</button>
 
@@ -230,8 +231,8 @@
 						>
 					</div>
 					<div>
-						<div class="font-medium">Award Ranking</div>
-						<div class="text-sm text-gray-500">Rank teams for awards</div>
+						<div class="font-medium">{m.award_ranking()}</div>
+						<div class="text-sm text-gray-500">{m.award_ranking_description()}</div>
 					</div>
 				</button>
 
@@ -249,8 +250,8 @@
 							>
 						</div>
 						<div>
-							<div class="font-medium">Start Award Deliberation</div>
-							<div class="text-sm text-gray-500">Begin the the last step of judging</div>
+							<div class="font-medium">{m.start_award_deliberation()}</div>
+							<div class="text-sm text-gray-500">{m.start_award_deliberation_description()}</div>
 						</div>
 					</button>
 				{/if}
@@ -274,8 +275,8 @@
 							>
 						</div>
 						<div>
-							<div class="font-medium">Award Nomination</div>
-							<div class="text-sm text-gray-500">Nominate teams for awards</div>
+							<div class="font-medium">{m.award_nomination()}</div>
+							<div class="text-sm text-gray-500">{m.award_nomination_description()}</div>
 						</div>
 					</button>
 
@@ -291,8 +292,8 @@
 							>
 						</div>
 						<div>
-							<div class="font-medium">Excellence Award Candidates</div>
-							<div class="text-sm text-gray-500">Check the eligibility of each team</div>
+							<div class="font-medium">{m.excellence_award_candidates()}</div>
+							<div class="text-sm text-gray-500">{m.excellence_award_candidates_description()}</div>
 						</div>
 					</button>
 
@@ -313,8 +314,8 @@
 							>
 						</div>
 						<div>
-							<div class="font-medium">Final Ranking</div>
-							<div class="text-sm text-gray-500">Final award rankings</div>
+							<div class="font-medium">{m.final_ranking()}</div>
+							<div class="text-sm text-gray-500">{m.final_ranking_description()}</div>
 						</div>
 					</button>
 
@@ -335,8 +336,8 @@
 							>
 						</div>
 						<div>
-							<div class="font-medium">Award Winners</div>
-							<div class="text-sm text-gray-500">View and manage award winners</div>
+							<div class="font-medium">{m.award_winners()}</div>
+							<div class="text-sm text-gray-500">{m.award_winners_description()}</div>
 						</div>
 					</button>
 				{/if}

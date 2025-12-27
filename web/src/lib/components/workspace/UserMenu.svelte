@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, AppUI, dialogs } from '$lib/index.svelte';
 	import GearIcon from '$lib/icon/GearIcon.svelte';
 	import LeaveDoorIcon from '$lib/icon/LeaveDoorIcon.svelte';
@@ -42,10 +43,9 @@
 		closeMenu();
 
 		const confirmed = await dialogs.showConfirmation({
-			title: 'Leave Judges\' Room',
-			message: 'Are you sure you want to leave the Judges\' Room? You will lose connection to other judges.',
-			confirmText: 'Leave Judges\' Room',
-			cancelText: 'Cancel',
+			title: m.leave_judges_room(),
+			message: m.are_you_sure_you_want_to_leave_the_judges_room(),
+			confirmText: m.leave_judges_room(),
 			confirmButtonClass: 'danger'
 		});
 
@@ -59,11 +59,10 @@
 		closeMenu();
 
 		if (!isJudgeAdvisor) {
-			await dialogs.showConfirmation({
-				title: 'Permission Denied',
-				message: 'This action is available for Judge Advisors only.',
+			await dialogs.showAlert({
+				title: m.permission_denied(),
+				message: m.this_action_is_available_for_judge_advisors_only(),
 				confirmText: 'OK',
-				cancelText: '',
 				confirmButtonClass: 'primary'
 			});
 			return;
@@ -80,21 +79,19 @@
 		closeMenu();
 
 		if (!isJudgeAdvisor) {
-			await dialogs.showConfirmation({
-				title: 'Permission Denied',
-				message: 'This action is available for Judge Advisors only.',
+			await dialogs.showAlert({
+				title: m.permission_denied(),
+				message: m.this_action_is_available_for_judge_advisors_only(),
 				confirmText: 'OK',
-				cancelText: '',
 				confirmButtonClass: 'primary'
 			});
 			return;
 		}
 
 		const confirmed = await dialogs.showConfirmation({
-			title: 'Change Event Setup',
-			message: 'Are you sure you want to modify the event setup? This could disrupt ongoing judging activities.',
-			confirmText: 'Continue',
-			cancelText: 'Cancel',
+			title: m.change_event_setup(),
+			message: m.are_you_sure_you_want_to_modify_the_event_setup_this_could_disrupt_ongoing_judging_activities(),
+			confirmText: m.continue_btn(),
 			confirmButtonClass: 'primary'
 		});
 
@@ -142,7 +139,7 @@
 		<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
 		</svg>
-		<span class="sm:inline">Menu</span>
+		<span class="sm:inline">{m.menu()}</span>
 	</button>
 
 	<!-- Context Menu -->
@@ -159,7 +156,7 @@
 				<span class="mr-3">
 					<ShareIcon />
 				</span>
-				<span>Share Judges' Room</span>
+				<span>{m.share_judges_room()}</span>
 			</button>
 
 			<!-- Switch Role -->
@@ -167,7 +164,7 @@
 				<span class="mr-3">
 					<UserIcon />
 				</span>
-				<span>Switch Role</span>
+				<span>{m.switch_role()}</span>
 			</button>
 
 			<!-- Leave Judges' Room -->
@@ -175,7 +172,7 @@
 				<span class="mr-3">
 					<LeaveDoorIcon />
 				</span>
-				<span>Leave Judges' Room</span>
+				<span>{m.leave_judges_room()}</span>
 			</button>
 
 			<!-- Divider -->
@@ -194,7 +191,7 @@
 				<span class="mr-3">
 					<TrashBinIcon />
 				</span>
-				<span>Destroy</span>
+				<span>{m.destroy_judging_data()}</span>
 			</button>
 
 			<!-- Change Event Setup -->
@@ -209,7 +206,7 @@
 				<span class="mr-3">
 					<GearIcon />
 				</span>
-				<span>Change Event Setup</span>
+				<span>{m.change_event_setup()}</span>
 			</button>
 		</div>
 	{/if}

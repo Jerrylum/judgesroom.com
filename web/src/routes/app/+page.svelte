@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { onMount, tick } from 'svelte';
 	import { replaceState } from '$app/navigation';
 	import { app, AppUI, dialogs, googleAnalytics } from '$lib/index.svelte';
@@ -87,8 +88,8 @@
 			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
-				title: 'Failed to Join',
-				message: `Failed to join Judges' Room: ${error}`,
+				title: m.failed_to_join(),
+				message: m.failed_to_join_judges_room({ error: error + '' }),
 				confirmButtonClass: 'primary'
 			});
 		}
@@ -105,8 +106,8 @@
 			console.error('Error rejoining stored permit:', error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
-				title: 'Failed to Rejoin',
-				message: `Failed to rejoin Judges' Room: ${error}`,
+				title: m.failed_to_rejoin(),
+				message: m.failed_to_rejoin_judges_room({ error: error + '' }),
 				confirmButtonClass: 'primary'
 			});
 		}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { dialogs } from '$lib/index.svelte';
 	import QRCodeDialog from './QRCodeDialog.svelte';
 	import QRCodeIcon from '$lib/icon/QRCodeIcon.svelte';
@@ -15,7 +16,7 @@
 </script>
 
 <div class="h-6 w-6">
-	<button onclick={() => openQRCodeDialog(link)} class="block h-6 w-6" title="Open a dialog with a QR code for the link">
+	<button onclick={() => openQRCodeDialog(link)} class="block h-6 w-6" title={m.open_qr_code_dialog()}>
 		<QRCodeIcon />
 	</button>
 </div>

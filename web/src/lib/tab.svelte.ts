@@ -1,3 +1,4 @@
+import { m } from '$lib/paraglide/messages.js';
 import type { Component, ComponentProps } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { generateUUID } from './utils.svelte';
@@ -38,7 +39,7 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 	subscriptionScope: 'all_judge_groups' | 'current_judge_group' = $state('current_judge_group');
 
 	get title() {
-		return 'Overview';
+		return m.overview_tab_title();
 	}
 
 	get hash() {
@@ -66,7 +67,7 @@ export class TeamAttendanceTab implements BaseTab<typeof TeamAttendanceTabCompon
 	readonly props = {};
 
 	get title() {
-		return 'Team Attendance';
+		return m.team_attendance();
 	}
 
 	get hash() {
@@ -94,7 +95,7 @@ export class NotebookSortingTab implements BaseTab<typeof NotebookSortingTabComp
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Notebook Sorting';
+		return m.notebook_sorting();
 	}
 
 	get hash() {
@@ -126,7 +127,7 @@ export class NotebookRubricTab implements BaseTab<typeof NotebookRubricTabCompon
 
 	get title() {
 		const team = app.findTeamById(this.teamId);
-		return team ? `${team.number} Notebook Review` : 'Notebook Review';
+		return team ? `${team.number} ${m.notebook_review()}` : m.notebook_review();
 	}
 
 	get hash() {
@@ -175,7 +176,7 @@ export class TeamInterviewRubricTab implements BaseTab<typeof TeamInterviewRubri
 
 	get title() {
 		const team = app.findTeamById(this.teamId);
-		return team ? `${team.number} Team Interview` : 'Team Interview';
+		return team ? `${team.number} ${m.team_interview()}` : m.team_interview();
 	}
 
 	get hash() {
@@ -220,7 +221,7 @@ export class AwardRankingTab implements BaseTab<typeof AwardRankingTabComponent>
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Award Ranking';
+		return m.award_ranking();
 	}
 
 	get hash() {
@@ -248,7 +249,7 @@ export class AwardNominationTab implements BaseTab<typeof AwardNominationTabComp
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Award Nomination';
+		return m.award_nomination();
 	}
 
 	get hash() {
@@ -276,7 +277,7 @@ export class ExcellenceAwardCandidatesTab implements BaseTab<typeof ExcellenceAw
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Excellence Award Candidates';
+		return m.excellence_award_candidates();
 	}
 
 	get hash() {
@@ -304,7 +305,7 @@ export class FinalAwardRankingTab implements BaseTab<typeof FinalRankingTabCompo
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Final Ranking';
+		return m.final_ranking();
 	}
 
 	get hash() {
@@ -332,7 +333,7 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 	readonly props = { tab: this };
 
 	get title() {
-		return 'Award Winner';
+		return m.award_winner_tab_title();
 	}
 
 	get hash() {

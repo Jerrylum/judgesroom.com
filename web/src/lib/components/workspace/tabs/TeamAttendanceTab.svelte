@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
@@ -56,7 +57,7 @@
 	async function toggleTeamAttendance(team: TeamInfoAndData) {
 		if (hasRobotEventsId) {
 			app.addErrorNotice(
-				'Manual attendance changes are disabled for RobotEvents integrated events. Use the sync button to update from RobotEvents.'
+				m.manual_attendance_changes_disabled_for_robotevents_integrated_events()
 			);
 			return;
 		}
@@ -72,12 +73,12 @@
 			});
 
 			if (newAbsentStatus) {
-				app.addSuccessNotice(`Marked ${team.number} as absent`);
+				app.addSuccessNotice(m.marked_team_as_absent({ teamNumber: team.number }));
 			} else {
-				app.addSuccessNotice(`Marked ${team.number} as present`);
+				app.addSuccessNotice(m.marked_team_as_present({ teamNumber: team.number }));
 			}
 		} catch (error) {
-			app.addErrorNotice(`Failed to update attendance for ${team.number}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			app.addErrorNotice(m.failed_to_update_attendance_for_team({ teamNumber: team.number, error: error instanceof Error ? error.message : 'Unknown error' }));
 		}
 	}
 
@@ -108,14 +109,14 @@
 			showDifferences = hasDifferences;
 
 			if (rankings.length === 0) {
-				app.addErrorNotice('No team rankings found. Please check-in teams in Tournament Manager and generate the match schedule first.');
+				app.addErrorNotice(m.no_team_rankings_found());
 			} else if (hasDifferences) {
-				app.addSuccessNotice(`Found ${rankings.length} teams with rankings. Some attendance differences detected.`);
+				app.addSuccessNotice(m.found_teams_with_rankings_some_attendance_differences_detected({ count: rankings.length }));
 			} else {
-				app.addSuccessNotice(`Found ${rankings.length} teams with rankings. Attendance is synchronized.`);
+				app.addSuccessNotice(m.found_teams_with_rankings_attendance_synchronized({ count: rankings.length }));
 			}
 		} catch (error) {
-			app.addErrorNotice(`Failed to fetch attendance from RobotEvents: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			app.addErrorNotice(m.failed_to_fetch_attendance_from_robotevents({ error: error instanceof Error ? error.message : 'Unknown error' }));
 		} finally {
 			isFetching = false;
 		}
@@ -138,9 +139,9 @@
 			await app.wrpcClient.team.updateAllTeamData.mutation(updates);
 
 			showDifferences = false;
-			app.addSuccessNotice('Team attendance synchronized with RobotEvents!');
+			app.addSuccessNotice(m.team_attendance_synchronized_with_robotevents());
 		} catch (error) {
-			app.addErrorNotice(`Failed to sync attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			app.addErrorNotice(m.failed_to_sync_attendance({ error: error instanceof Error ? error.message : 'Unknown error' }));
 		}
 	}
 </script>
@@ -154,12 +155,9 @@
 					<h2 class="text-lg font-medium text-gray-900">Team Attendance</h2>
 					<p class="mt-2 text-sm text-gray-600">
 						{#if hasRobotEventsId}
-							Manage the team attendance is important for the later stages of the judging process. This Judges' Room is connected to
-							RobotEvents. Click the "Refresh from RobotEvents" button to update the team attendance. Please make sure to enable the feature
-							to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
+							{m.team_attendance_description_robotevents_integrated()}
 						{:else}
-							Manage the team attendance is important for the later stages of the judging process. Click the top right button of a team to
-							mark it as present or absent.
+							{m.team_attendance_description_manual()}
 						{/if}
 					</p>
 				</div>
@@ -167,10 +165,10 @@
 					<button onclick={fetchRobotEventsAttendance} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 						{#if isFetching}
 							<RefreshIcon class="h-4 w-4 animate-spin" />
-							<span class="text-nowrap">Fetching...</span>
+							<span class="text-nowrap">{m.fetching()}</span>
 						{:else}
 							<RefreshIcon class="h-4 w-4" />
-							<span class="text-nowrap">Refresh from RobotEvents</span>
+							<span class="text-nowrap">{m.refresh_from_robotevents()}</span>
 						{/if}
 					</button>
 				{/if}
@@ -180,19 +178,19 @@
 					<div class="text-2xl font-bold text-gray-900">
 						{allTeams.length}
 					</div>
-					<div class="text-sm text-gray-500">Total Teams</div>
+					<div class="text-sm text-gray-500">{m.total_teams()}</div>
 				</div>
 				<div class="rounded-lg bg-green-50 p-4">
 					<div class="text-2xl font-bold text-green-900">
 						{allTeams.filter((team) => !team.absent).length}
 					</div>
-					<div class="text-sm text-green-700">Present</div>
+					<div class="text-sm text-green-700">{m.present()}</div>
 				</div>
 				<div class="rounded-lg bg-red-50 p-4">
 					<div class="text-2xl font-bold text-red-900">
 						{allTeams.filter((team) => team.absent).length}
 					</div>
-					<div class="text-sm text-red-700">Absent</div>
+					<div class="text-sm text-red-700">{m.absent()}</div>
 				</div>
 			</div>
 
@@ -200,17 +198,16 @@
 				<div class="mt-4 rounded-md bg-yellow-50 p-4">
 					<div class="flex flex-col items-start gap-3 sm:flex-row">
 						<div class="flex-1">
-							<h3 class="text-sm font-medium text-yellow-800">Attendance Differences Detected</h3>
+							<h3 class="text-sm font-medium text-yellow-800">{m.attendance_differences_detected()}</h3>
 							<p class="mt-1 text-sm text-yellow-700">
-								Some teams have different attendance status between the judging system and RobotEvents. Teams with flashing borders show the
-								differences.
+								{m.some_teams_have_different_attendance_status()}
 							</p>
 						</div>
 						<button
 							onclick={syncAttendanceWithRobotEvents}
 							class="rounded-md bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
 						>
-							Sync with RobotEvents
+							{m.sync_with_robotevents()}
 						</button>
 					</div>
 				</div>
@@ -219,7 +216,7 @@
 
 		<!-- Teams Grid -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h3 class="mb-4 text-lg font-medium text-gray-900">All Teams</h3>
+			<h3 class="mb-4 text-lg font-medium text-gray-900">{m.all_teams()}</h3>
 			<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 				{#each allTeams as team (team.id)}
 					{@const teamDifference = teamDifferences().get(team.id)}
@@ -253,7 +250,7 @@
 								<button
 									onclick={() => toggleTeamAttendance(team)}
 									class="flex h-6 w-6 items-center justify-center rounded bg-red-100 text-red-600 transition-colors hover:bg-red-200 active:bg-red-300"
-									title="Mark as present"
+									title={m.mark_as_present()}
 								>
 									<CloseIcon class="h-4 w-4" />
 								</button>
@@ -262,7 +259,7 @@
 								<button
 									onclick={() => toggleTeamAttendance(team)}
 									class="flex h-6 w-6 items-center justify-center rounded bg-green-100 text-green-600 transition-colors hover:bg-green-200 active:bg-green-300"
-									title="Mark as absent"
+									title={m.mark_as_absent()}
 								>
 									<CheckIcon class="h-4 w-4" />
 								</button>

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { app, AppUI, dialogs } from '$lib/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { app, dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	let destroyConfirmText = $state('');
@@ -30,10 +31,9 @@
 <Dialog open={true} onClose={handleCancel}>
 	<div class="space-y-6">
 		<div>
-			<h3 id="dialog-title" class="text-lg font-semibold text-gray-900">Destroy Judging Data</h3>
+			<h3 id="dialog-title" class="text-lg font-semibold text-gray-900">{m.destroy_judging_data()}</h3>
 			<p class="mt-2 text-sm text-gray-600">
-				Prior to the award ceremony, the Judge Advisor should secure the Judges' Room and destroy all judging materials. These items are not
-				to be given to the Event Partner for destruction.
+				{m.destroy_judging_data_description()}
 			</p>
 		</div>
 
@@ -50,11 +50,10 @@
 					</svg>
 				</div>
 				<div class="ml-3">
-					<h3 class="text-sm font-medium text-red-800">Warning</h3>
+					<h3 class="text-sm font-medium text-red-800">{m.warning()}</h3>
 					<div class="mt-2 text-sm text-red-700">
 						<p>
-							This action will permanently destroy all judging data including team evaluations, rankings, and notes. Make sure all connected
-							devices have completed judging and all data has been properly collected before proceeding.
+							{m.destroy_judging_data_description_warning()}
 						</p>
 					</div>
 				</div>
@@ -63,16 +62,16 @@
 
 		<!-- Data Destruction Section -->
 		<div class="space-y-3">
-			<p class="text-sm text-gray-600">Type "destroy" below to confirm the permanent destruction of all judging data.</p>
+			<p class="text-sm text-gray-600">{m.destroy_judging_data_confirmation()}</p>
 
 			<div>
-				<label for="destroyConfirm" class="block text-sm font-medium text-gray-700">Confirmation </label>
+				<label for="destroyConfirm" class="block text-sm font-medium text-gray-700">{m.confirmation()}</label>
 				<input
 					id="destroyConfirm"
 					type="text"
 					bind:value={destroyConfirmText}
 					disabled={!canDestroy}
-					placeholder="Type 'destroy' to confirm"
+					placeholder={m.destroy_judging_data_confirmation_placeholder()}
 					class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none disabled:bg-gray-50 disabled:opacity-50"
 				/>
 			</div>
@@ -84,7 +83,7 @@
 				onclick={handleCancel}
 				class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 			>
-				Cancel
+				{m.cancel()}
 			</button>
 			<button
 				onclick={handleDestroy}
@@ -92,9 +91,9 @@
 				class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if isDestroying}
-					Destroying...
+					{m.destroying()}
 				{:else}
-					Destroy All Data
+					{m.destroy_all_data()}
 				{/if}
 			</button>
 		</div>

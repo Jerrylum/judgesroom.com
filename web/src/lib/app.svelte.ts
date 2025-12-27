@@ -1,3 +1,4 @@
+import { m } from '$lib/paraglide/messages.js';
 import {
 	ConnectionCloseCode,
 	createClientManager,
@@ -163,7 +164,7 @@ export class App {
 
 			await this.joinJudgesRoom();
 		} catch (error) {
-			this.addErrorNotice(`Failed to join Judges\' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
 			throw error;
 		}
 	}
@@ -219,7 +220,7 @@ export class App {
 		} catch (error) {
 			this.permit = null;
 			this.clearPermitFromStorage();
-			this.addErrorNotice(`Failed to create Judges' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(m.failed_to_create_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
 			throw error;
 		}
 	}
@@ -278,7 +279,7 @@ export class App {
 		} catch (error) {
 			// Do not clear permit from storage, the user might be able to connect to the Judges' Room again
 			// this.clearPermitFromStorage();
-			this.addErrorNotice(`Failed to reconnect to Judges\' Room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
 			throw error;
 		}
 	}
@@ -397,7 +398,7 @@ export class App {
 		try {
 			await this.wrpcClient.device.kickDevice.mutation({ deviceId });
 		} catch (error) {
-			this.addErrorNotice(`Failed to kick device: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			this.addErrorNotice(m.failed_to_kick_device({ error: error instanceof Error ? error.message : 'Unknown error' }));
 			throw error;
 		}
 	}
@@ -627,10 +628,10 @@ export class App {
 			onOpen: () => {},
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
-					this.addErrorNotice("You have been kicked from the Judges' Room");
+					this.addErrorNotice(m.you_have_been_kicked_from_the_judges_room());
 					AppUI.appPhase = 'leaving';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
-					this.addErrorNotice("The Judges' Room has been destroyed");
+					this.addErrorNotice(m.the_judges_room_has_been_destroyed());
 					AppUI.appPhase = 'leaving';
 				}
 			},

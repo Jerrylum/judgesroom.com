@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import './teams-rubrics-list.css';
 	import { app, subscriptions, tabs } from '$lib/index.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
@@ -123,14 +124,14 @@
 
 	// Get notebook status display
 	function getNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		if (notebookDevelopmentStatus === 'fully_developed') return { text: 'Fully Developed', class: 'text-green-600' };
-		if (notebookDevelopmentStatus === 'developing') return { text: 'Developing', class: 'text-yellow-600' };
-		return { text: 'No Notebook/Not Reviewed', class: 'text-gray-600' };
+		if (notebookDevelopmentStatus === 'fully_developed') return { text: m.fully_developed_notebook_status(), class: 'text-green-600' };
+		if (notebookDevelopmentStatus === 'developing') return { text: m.developing_notebook_status(), class: 'text-yellow-600' };
+		return { text: m.no_notebook_or_not_reviewed(), class: 'text-gray-600' };
 	}
 
 	// Get judge name by ID
 	function getJudgeName(judgeId: string): string {
-		return app.findJudgeById(judgeId)?.name ?? 'Unknown Judge';
+		return app.findJudgeById(judgeId)?.name ?? m.unknown_judge();
 	}
 
 	// Open notebook rubric for a team
@@ -178,7 +179,7 @@
 </script>
 
 <div class="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-	<h2 class="text-lg font-medium text-gray-900">Teams & Rubrics</h2>
+	<h2 class="text-lg font-medium text-gray-900">{m.teams_and_rubrics()}</h2>
 </div>
 
 <div class="mb-4 flex flex-col gap-2">
@@ -189,7 +190,7 @@
 				bind:checked={showOnlyAssignedTeams}
 				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 			/>
-			<span class="text-sm text-gray-700">Only show assigned teams for your current judge group ({currentJudgeGroup.name})</span>
+			<span class="text-sm text-gray-700">{m.only_show_assigned_teams_for_your_current_judge_group({ name: currentJudgeGroup.name })}</span>
 		</label>
 	{/if}
 
@@ -200,7 +201,7 @@
 				bind:checked={showOnlyFullyDeveloped}
 				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 			/>
-			<span class="text-sm text-gray-700">Only show teams with fully developed notebooks</span>
+			<span class="text-sm text-gray-700">{m.only_show_fully_developed_notebooks()}</span>
 		</label>
 	</div>
 	<div>
@@ -210,7 +211,7 @@
 				bind:checked={showOnlyInterviewed}
 				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 			/>
-			<span class="text-sm text-gray-700">Only show teams that have been interviewed</span>
+			<span class="text-sm text-gray-700">{m.only_show_interviewed_teams()}</span>
 		</label>
 	</div>
 </div>
@@ -219,7 +220,7 @@
 <div class="mb-4">
 	<div class="grid gap-4 sm:grid-cols-3">
 		<div class="rounded-lg bg-gray-50 p-3">
-			<div class="text-sm font-medium text-gray-900">Teams Scanned</div>
+			<div class="text-sm font-medium text-gray-900">{m.teams_scanned()}</div>
 			<div class="text-lg font-semibold text-gray-700">
 				{progressMetrics.scanned.count} / {progressMetrics.scanned.total}
 			</div>
@@ -229,7 +230,7 @@
 		</div>
 
 		<div class="rounded-lg bg-gray-50 p-3">
-			<div class="text-sm font-medium text-gray-900">Fully Developed Notebooks Reviewed</div>
+			<div class="text-sm font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
 			<div class="text-lg font-semibold text-gray-700">
 				{progressMetrics.fullyDevelopedWithRubrics.count} / {progressMetrics.fullyDevelopedWithRubrics.total}
 			</div>
@@ -241,7 +242,7 @@
 		</div>
 
 		<div class="rounded-lg bg-gray-50 p-3">
-			<div class="text-sm font-medium text-gray-900">Teams Interviewed</div>
+			<div class="text-sm font-medium text-gray-900">{m.teams_interviewed()}</div>
 			<div class="text-lg font-semibold text-gray-700">
 				{progressMetrics.teamsInterviewed.count} / {progressMetrics.teamsInterviewed.total}
 			</div>
@@ -255,8 +256,8 @@
 </div>
 
 <div class="lg:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
-	<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
-	<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
+	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
 
 <teams-rubrics-table>
@@ -264,9 +265,9 @@
 		<team>TEAM NUMBER</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex min-w-40 max-w-40 flex-col items-center justify-center">NOTEBOOK LINK</div>
-				<div class="min-w-85 max-w-85 flex items-center justify-center">NOTEBOOK RUBRICS</div>
-				<div class="min-w-85 max-w-85 flex items-center justify-center">TEAM INTERVIEW RUBRICS</div>
+				<div class="flex min-w-40 max-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="min-w-85 max-w-85 flex items-center justify-center">{m.notebook_rubrics_table()}</div>
+				<div class="min-w-85 max-w-85 flex items-center justify-center">{m.team_interview_rubrics_table()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -300,7 +301,7 @@
 								</a>
 								<QRCodeButton link={team.notebookLink} />
 							{:else}
-								<span class="text-xs text-gray-400">No notebook link</span>
+								<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
 							{/if}
 						</div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, subscriptions, tabs, dialogs } from '$lib/index.svelte';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
@@ -48,10 +49,10 @@
 		// Check if tab has unsaved data
 		if (tab && tab.isDataUnsaved()) {
 			const confirmed = await dialogs.showConfirmation({
-				title: 'Unsaved Changes',
-				message: 'You have unsaved changes. Are you sure you want to close this tab?',
-				confirmText: 'Close Anyway',
-				cancelText: 'Keep Editing',
+				title: m.unsaved_changes(),
+				message: m.you_have_unsaved_changes(),
+				confirmText: m.close_anyway(),
+				cancelText: m.keep_editing(),
 				confirmButtonClass: 'danger',
 				cancelButtonClass: 'primary'
 			});
@@ -154,7 +155,7 @@
 </script>
 
 <svelte:head>
-	<title>Workspace | Judges' Room</title>
+	<title>{m.workspace()} | Judges' Room</title>
 </svelte:head>
 
 <div class="flex h-screen flex-col bg-slate-100">

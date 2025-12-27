@@ -245,7 +245,7 @@
 													id="judgeName"
 													type="text"
 													bind:value={newJudgeName}
-													placeholder="Enter your name"
+													placeholder={m.enter_your_name()}
 													class="classic mt-1 block w-full"
 												/>
 											</div>

@@ -14,7 +14,7 @@
 
 <div class="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
 	<div class="flex">
-		<div class="flex-shrink-0">
+		<div class="shrink-0">
 			<WarningIcon />
 		</div>
 		<div class="ml-3">
