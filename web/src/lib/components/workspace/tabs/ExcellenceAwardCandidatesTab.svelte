@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import './eligibility-table.css';
 	import type { ExcellenceAwardCandidatesTab } from '$lib/tab.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
@@ -11,6 +12,7 @@
 	} from '$lib/robotevents-source';
 	import { isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
+	import { htmlM } from '$lib/i18n';
 
 	interface Props {
 		tab: ExcellenceAwardCandidatesTab;
@@ -37,7 +39,7 @@
 
 			if (result.error) {
 				console.error('Failed to get event from RobotEvents:', result.error);
-				app.addErrorNotice('Failed to get event from RobotEvents');
+				app.addErrorNotice(m.failed_to_get_event_from_robotevents());
 				return;
 			}
 
@@ -67,49 +69,40 @@
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<div class="mb-2 flex flex-row items-start justify-between gap-3">
 					<div>
-						<h2 class="mb-2 text-xl font-semibold text-gray-900">Excellence Award Candidates</h2>
+						<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.excellence_award_candidates()}</h2>
 					</div>
 					{#if hasRobotEventsId}
 						<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 							{#if isFetching}
 								<RefreshIcon class="h-4 w-4 animate-spin" />
-								<span class="text-nowrap">Fetching...</span>
+								<span class="text-nowrap">{m.fetching()}</span>
 							{:else}
 								<RefreshIcon class="h-4 w-4" />
-								<span class="text-nowrap">Refresh from RobotEvents</span>
+								<span class="text-nowrap">{m.refresh_from_robotevents()}</span>
 							{/if}
 						</button>
 					{/if}
 				</div>
 				<div class="text-sm text-gray-600">
 					<p class="mb-2">
-						This tool helps judges and judge advisors to identify the candidates for Excellence Awards by fetching the latest rankings and
-						skills scores from RobotEvents. Please make sure to enable the feature to publish live results to RobotEvents in the Web Publish
-						Setup page of Tournament Manager.
+						{m.excellence_award_candidates_description1()}
 					</p>
 					<p class="mb-2">
-						For events with a single Excellence Award, percentages are based on the number of teams at the event. For blended grade level
-						events with two grade specific Excellence Awards, percentages are based on the teams in each grade level for each award. Please
-						double-check the type of event. The Judge Advisor can configure the number of Excellence Award winners by clicking the top right
-						menu and selecting "Change Event Setup".
+						{m.excellence_award_candidates_description2()}
 					</p>
 					<p class="mb-2">
-						For most of the events, all teams are in the same default division: Division 1. If your event has multiple divisions, Judges'
-						Room can only calculate Excellence Award(s) for its own division (division specific). If your event has event wide Excellence
-						Award(s), please refer to the "Excellence Award Eligibility" reports from the Reports tab in Tournament Manager.
+						{m.excellence_award_candidates_description3()}
 					</p>
 					<p class="mb-2">
-						Please refer to Guide to Judging for more details regarding the key criteria of the Excellence Award. It is also recommended to
-						use the "Excellence Award Eligibility" reports to verify the results.
+						{m.excellence_award_candidates_description4()}
 					</p>
-					<p class="mb-2">Eligible teams are highlighted in green.</p>
+					<p class="mb-2">{m.excellence_award_candidates_description5()}</p>
 					<p class="mb-2">
-						Event Code:
-						<a
+						{m.event_code_colon()}<a
 							class="text-blue-500 hover:text-blue-600"
 							href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
 							target="_blank">{essentialData.robotEventsSku}</a
-						><br />Division: {essentialData.divisionId}
+						><br />{m.division_colon()}{essentialData.divisionId}
 					</p>
 				</div>
 			</div>
@@ -129,65 +122,96 @@
 					<div class="mb-2 space-y-2 text-sm text-gray-600">
 						{#if isSingleGrade}
 							<p>
-								There are {teamsInGroupCount} teams in the {award.acceptedGrades[0]} grade level <b>in Division {divisionId}</b>. At the
+								<!-- There are {teamsInGroupCount} teams in the {award.acceptedGrades[0]} grade level <b>in Division {divisionId}</b>. At the
 								conclusion of Qualification Matches, teams must be ranked in the top 40% of teams in this group in Qualification Match
 								rankings. This is calculated by {teamsInGroupCount} * 40% = {rankingEligibilityIntermediate} rounded to {rankingEligibilityThreshold}
-								teams.
+								teams. -->
+								{@html htmlM.excellence_award_candidates_description6({
+									teamsInGroupCount,
+									acceptedGrade: award.acceptedGrades[0],
+									divisionId: divisionId ?? 'N/A',
+									rankingEligibilityIntermediate,
+									rankingEligibilityThreshold
+								})}
 							</p>
 							<p>
-								There are {report.joinedTeamsInEventCount} teams in the {award.acceptedGrades[0]} grade level <b>at the event</b>. This is
+								<!-- There are {report.joinedTeamsInEventCount} teams in the {award.acceptedGrades[0]} grade level <b>at the event</b>. This is
 								the number of teams that actually arrived and participated in Qualification Matches. At the conclusion of the Robot Skills
 								Challenge matches, teams must be ranked in the top 40% of all {award.acceptedGrades[0]} teams at the event. This is calculated
-								by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams.
+								by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams. -->
+								{@html htmlM.excellence_award_candidates_description7({
+									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
+									acceptedGrade: award.acceptedGrades[0],
+									skillsEligibilityIntermediate,
+									skillsEligibilityThreshold
+								})}
 							</p>
 							<p>
-								At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
+								<!-- At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
 								top 40% of all {award.acceptedGrades[0]} teams at the event. This is calculated by {report.joinedTeamsInEventCount}
-								* 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams.
+								* 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams. -->
+								{@html htmlM.excellence_award_candidates_description8({
+									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
+									acceptedGrade: award.acceptedGrades[0],
+									skillsEligibilityIntermediate,
+									skillsEligibilityThreshold
+								})}
 							</p>
 						{:else}
 							<p>
-								There are {teamsInGroupCount} teams in all grade levels <b>in Division {divisionId}</b>. At the conclusion of Qualification
+								<!-- There are {teamsInGroupCount} teams in all grade levels <b>in Division {divisionId}</b>. At the conclusion of Qualification
 								Matches, teams must be ranked in the top 40% of teams in this group in Qualification Match rankings. This is calculated by {teamsInGroupCount}
 								* 40% = {rankingEligibilityIntermediate}
-								rounded to {rankingEligibilityThreshold} teams.
+								rounded to {rankingEligibilityThreshold} teams. -->
+								{@html htmlM.excellence_award_candidates_description9({
+									teamsInGroupCount,
+									divisionId: divisionId ?? 'N/A',
+									rankingEligibilityIntermediate,
+									rankingEligibilityThreshold
+								})}
 							</p>
 							<p>
-								There are {report.joinedTeamsInEventCount} teams in all grade levels <b>at the event</b>. This is the number of teams that
+								<!-- There are {report.joinedTeamsInEventCount} teams in all grade levels <b>at the event</b>. This is the number of teams that
 								actually arrived and participated in Qualification Matches. At the conclusion of the Robot Skills Challenge matches, teams
 								must be ranked in the top 40% of all teams at the event. This is calculated by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate}
-								rounded to {skillsEligibilityThreshold} teams.
+								rounded to {skillsEligibilityThreshold} teams. -->
+								{@html htmlM.excellence_award_candidates_description10({
+									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
+									skillsEligibilityIntermediate,
+									skillsEligibilityThreshold
+								})}
 							</p>
 							<p>
-								At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
+								<!-- At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
 								top 40% of all teams at the event. This is calculated by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate}
-								rounded to {skillsEligibilityThreshold} teams.
+								rounded to {skillsEligibilityThreshold} teams. -->
+								{@html htmlM.excellence_award_candidates_description11({
+									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
+									skillsEligibilityIntermediate,
+									skillsEligibilityThreshold
+								})}
 							</p>
 						{/if}
 						{#if eligibleTeams.length > 0}
 							<p>
-								Teams Eligible For Excellence:
-								<!-- {teams.filter((t) => t.isEligible).map((t) => t.teamNumber).join(', ')} -->
-								{#each eligibleTeams as team, index (team.teamNumber)}
+								{m.teams_eligible_for_excellence_colon()}{#each eligibleTeams as team, index (team.teamNumber)}
 									<span class="text-green-500">{team.teamNumber}</span>{#if index < eligibleTeams.length - 1}{', '}
 									{/if}
 								{/each}
 							</p>
 						{:else}
-							<p>No teams are eligible for this award. It should not be given out at the event.</p>
+							<p>{m.no_teams_are_eligible_for_this_award()}</p>
 						{/if}
 					</div>
 					<div>
 						<award-rankings-table>
 							<table-header>
-								<team>TEAM NUMBER</team>
+								<team>{m.team_number()}</team>
 								<scroll-container use:registerScrollContainer class="bg-gray-200">
 									<content>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">Qualification Rank</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">Overall Skills Rank</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">
-											Autonomous Coding Skills Rank
-										</div>
+										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.qualification_rank()}</div>
+										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.overall_skills_rank()}</div>
+										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.autonomous_coding_skills_rank()}</div>
 									</content>
 								</scroll-container>
 							</table-header>
@@ -230,8 +254,7 @@
 		{:else}
 			<div class="flex flex-col items-center justify-center">
 				<p class="text-center text-gray-500">
-					This tool helps judges and judge advisors to identify the candidates for Excellence Awards by fetching the latest rankings and
-					skills scores from RobotEvents. However, this Judges' Room is not connected to RobotEvents.
+					{m.judges_room_not_connected_to_robotevents()}
 				</p>
 			</div>
 		{/if}

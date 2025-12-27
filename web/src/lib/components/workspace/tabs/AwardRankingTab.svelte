@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, subscriptions } from '$lib/index.svelte';
 	import type { AwardRankingTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
@@ -22,12 +23,9 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="text-xl font-semibold text-gray-900">Award Candidate Ranking</h2>
+			<h2 class="text-xl font-semibold text-gray-900">{m.award_candidate_ranking()}</h2>
 			<p class="mt-2 text-sm text-gray-600">
-				Click on any ranking cell, then use the minus (-) and plus (+) buttons to adjust stars, this indicates teams that are strong
-				candidates for awards. In award deliberations, all judge groups will cross-reference their lists to create a final award nomination
-				list. This table is shared and synchronized within your judge group - all judges see updates in real-time without having to refresh
-				the page.
+				{m.award_candidate_ranking_description()}
 			</p>
 
 			<!-- Filter Options -->
@@ -38,7 +36,7 @@
 						bind:checked={showAbsentTeams}
 						class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="text-sm text-gray-700">Show absent teams</span>
+					<span class="text-sm text-gray-700">{m.show_absent_teams()}</span>
 				</label>
 
 				<label class="flex items-center">
@@ -47,7 +45,7 @@
 						bind:checked={bypassAwardRequirements}
 						class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="text-sm text-gray-700">Bypass award requirement checks</span>
+					<span class="text-sm text-gray-700">{m.bypass_award_requirement_checks()}</span>
 				</label>
 			</div>
 		</div>

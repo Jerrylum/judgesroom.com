@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
@@ -12,6 +13,7 @@
 		type ExcellenceAwardTeamEligibility
 	} from '$lib/robotevents-source';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
+	import { htmlM } from '$lib/i18n';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -58,7 +60,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to update judged award nominations:', error);
-			app.addErrorNotice('Failed to update award nominations');
+			app.addErrorNotice(m.failed_to_update_award_nominations());
 		}
 	}
 
@@ -140,14 +142,14 @@
 
 			if (result.error) {
 				console.error('Failed to get event from RobotEvents:', result.error);
-				app.addErrorNotice('Failed to get event from RobotEvents');
+				app.addErrorNotice(m.failed_to_get_event_from_robotevents());
 				return;
 			}
 
 			teamEligibilities = Object.values(result).flatMap((report) => report.teamsInGroup);
 		} catch (error) {
 			console.error('Failed to get event from RobotEvents', error);
-			app.addErrorNotice('Failed to get Excellence Award eligibility data from RobotEvents');
+			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents());
 		} finally {
 			isFetching = false;
 		}
@@ -166,63 +168,65 @@
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-2 flex flex-row items-start justify-between gap-3">
 				<div>
-					<h2 class="mb-2 text-xl font-semibold text-gray-900">Final Ranking</h2>
+					<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.final_ranking()}</h2>
 				</div>
 				{#if hasRobotEventsId && allExcellenceAwards.length > 0}
 					<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 						{#if isFetching}
 							<RefreshIcon class="h-4 w-4 animate-spin" />
-							<span class="text-nowrap">Fetching...</span>
+							<span class="text-nowrap">{m.fetching()}</span>
 						{:else}
 							<RefreshIcon class="h-4 w-4" />
-							<span class="text-nowrap">Refresh from RobotEvents</span>
+							<span class="text-nowrap">{m.refresh_from_robotevents()}</span>
 						{/if}
 					</button>
 				{/if}
 			</div>
 			<p class="mb-2 text-sm text-gray-600">
-				Create the final ranking of award winners from nominated teams. After follow-up interviews are completed, judges who conducted those
-				interviews should deliberate and rank nominees for each award. It's best practice to have first-choice winners plus three or more
-				alternate candidates. Drag and drop teams to reorder nominations.
+				{m.final_ranking_description1()}
 			</p>
 			<p class="mb-2 text-sm text-gray-600">
-				Excellence Award winners are selected from Design Award finalists who also meet Performance Award criteria, which may result in
-				reshuffling other award winners to maintain the one-judged-award-per-team rule. Drag team(s) from the Design Award column to the
-				Excellence Award column(s) to designate Excellence Award winner(s).
+				{m.final_ranking_description2()}
 			</p>
 			{#if hasRobotEventsId && teamEligibilities !== undefined}
 				<p class="mb-2 text-sm text-gray-600">
-					Teams in Excellence Award and Design Award columns display eligibility indicators in the top-right corner: <span
+					<!-- Teams in Excellence Award and Design Award columns display eligibility indicators in the top-right corner: <span
 						class="font-medium text-green-600">&le;40%</span
 					>
 					(green) indicates the team meets the performance criteria (top 40% in qualification rankings, robot skills, and autonomous coding skills),
-					<span class="font-medium text-red-600">&gt;40%</span> (red) indicates they do not meet the criteria.
+					<span class="font-medium text-red-600">&gt;40%</span> (red) indicates they do not meet the criteria. -->
+					{@html htmlM.final_ranking_description3()}
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
-					Teams in Think Award column display eligibility indicators in the top-right corner: <span class="font-medium text-green-600"
+					<!-- Teams in Think Award column display eligibility indicators in the top-right corner: <span class="font-medium text-green-600"
 						>AUTO&check;</span
 					>
 					(green) indicates the team participated in the Autonomous Coding Skills Challenge with a score greater than zero,
-					<span class="font-medium text-red-600">AUTO&cross;</span> (red) indicates they do not meet this criteria.
+					<span class="font-medium text-red-600">AUTO&cross;</span> (red) indicates they do not meet this criteria. -->
+					{@html htmlM.final_ranking_description4()}
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
-					Please make sure to enable the feature to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
-					Click "Refresh from RobotEvents" to update the eligibility status.
+					<!-- Please make sure to enable the feature to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
+					Click "Refresh from RobotEvents" to update the eligibility status. -->
+					{m.final_ranking_description5()}
 				</p>
 			{:else if hasRobotEventsId && teamEligibilities === undefined && !isFetching}
 				<p class="mb-2 text-sm text-gray-600">
-					This Judges' Room failed to fetch the eligibility data from RobotEvents. Please check the Internet connection and try again.
+					<!-- This Judges' Room failed to fetch the eligibility data from RobotEvents. Please check the Internet connection and try again. -->
+					{m.final_ranking_description6()}
 				</p>
 			{:else if !hasRobotEventsId}
 				<p class="mb-2 text-sm text-gray-600">
-					This Judges' Room is not connected to RobotEvents. To enable eligibility checking, please configure the RobotEvents Event ID and
-					Division ID in Event Setup.
+					<!-- This Judges' Room is not connected to RobotEvents. To enable eligibility checking, please configure the RobotEvents Event ID and
+					Division ID in Event Setup. -->
+					{m.final_ranking_description7()}
 				</p>
 			{/if}
 			<p class="mb-6 text-sm text-gray-600">
-				Winning teams for each award are marked with a colored border: <span class="font-medium text-green-600">green</span> for eligible
+				<!-- Winning teams for each award are marked with a colored border: <span class="font-medium text-green-600">green</span> for eligible
 				winners, <span class="font-medium text-red-600">red</span> for ineligible winners, and
-				<span class="font-medium text-slate-600">gray</span> when eligibility data is unavailable.
+				<span class="font-medium text-slate-600">gray</span> when eligibility data is unavailable. -->
+				{@html htmlM.final_ranking_description8()}
 			</p>
 
 			<div class="relative space-y-4 overflow-x-auto">

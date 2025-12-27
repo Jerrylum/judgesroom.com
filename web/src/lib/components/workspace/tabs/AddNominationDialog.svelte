@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
@@ -81,10 +82,10 @@
 
 		const warnings = [];
 		if (award.requireNotebook && !isSubmittedNotebook(selectedTeam.notebookDevelopmentStatus)) {
-			warnings.push('Notebook required');
+			warnings.push(m.notebook_required());
 		}
 		if (!award.acceptedGrades.includes(selectedTeam.grade)) {
-			warnings.push(`Grade must be: ${award.acceptedGrades.join(', ')}`);
+			warnings.push(m.grade_must_be({ grades: award.acceptedGrades.join(', ') }));
 		}
 		return warnings;
 	});
@@ -109,13 +110,13 @@
 </script>
 
 <Dialog {open} onClose={handleClose} innerContainerClass="max-w-md">
-	<h3 class="mb-4 text-lg font-semibold text-gray-900">Add Nomination to {award.name}</h3>
+	<h3 class="mb-4 text-lg font-semibold text-gray-900">{m.add_nomination_to({ awardName: award.name })}</h3>
 
 	<!-- Team Selection -->
 	<div class="mb-4">
-		<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700">Select Team:</label>
+		<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700">{m.select_team()}</label>
 		<select id="team-select" bind:value={selectedTeamId} class="classic block w-full">
-			<option value="">-- Select a team --</option>
+			<option value="">{m.select_a_team()}</option>
 			{#each availableTeamsList as [teamId, team]}
 				<option value={teamId}>{formatTeamDisplay(team)}</option>
 			{/each}
@@ -126,7 +127,7 @@
 	{#if requirementWarningsList.length > 0}
 		<div class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3">
 			<div class="flex">
-				<div class="flex-shrink-0">
+				<div class="shrink-0">
 					<svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
 						<path
 							fill-rule="evenodd"
@@ -136,7 +137,7 @@
 					</svg>
 				</div>
 				<div class="ml-3">
-					<h3 class="text-sm font-medium text-yellow-800">Award Requirements Not Met</h3>
+					<h3 class="text-sm font-medium text-yellow-800">{m.award_requirements_not_met()}</h3>
 					<div class="mt-2 text-sm text-yellow-700">
 						<ul class="list-disc space-y-1 pl-5">
 							{#each requirementWarningsList as warning}
@@ -153,18 +154,18 @@
 	<div class="mb-6 space-y-3">
 		<label class="flex items-center">
 			<input type="checkbox" bind:checked={showAbsentTeams} class="mr-2" />
-			<span class="text-sm text-gray-700">Show absent teams</span>
+			<span class="text-sm text-gray-700">{m.show_absent_teams()}</span>
 		</label>
 
 		<label class="flex items-center">
 			<input type="checkbox" bind:checked={bypassRequirements} class="mr-2" />
-			<span class="text-sm text-gray-700">Bypass award requirement checks</span>
+			<span class="text-sm text-gray-700">{m.bypass_award_requirement_checks()}</span>
 		</label>
 	</div>
 
 	<!-- Buttons -->
 	<div class="flex justify-end space-x-3">
-		<button onclick={handleClose} class="secondary">Cancel</button>
-		<button onclick={handleConfirm} class="primary" disabled={!selectedTeamId}> Add Nomination </button>
+		<button onclick={handleClose} class="secondary">{m.cancel()}</button>
+		<button onclick={handleConfirm} class="primary" disabled={!selectedTeamId}>{m.add_nomination()}</button>
 	</div>
 </Dialog>

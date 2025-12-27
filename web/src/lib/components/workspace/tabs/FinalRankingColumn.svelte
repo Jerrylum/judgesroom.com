@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { isExcellenceAward, type Award } from '@judgesroom.com/protocol/src/award';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
@@ -162,7 +163,7 @@
 			{award.name}
 		</div>
 		<div class="text-xs text-gray-500">
-			{winners.length}/{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
+			{m.winners_count({ winners: winners.length, winnersCount: award.winnersCount })}
 		</div>
 	</div>
 	<div class="relative">
@@ -203,7 +204,7 @@
 		</div>
 		{#if editing.length === 0}
 			<div class="absolute bottom-0 left-0 right-0 top-0 flex h-full min-h-10 items-center justify-center text-gray-500">
-				<p class="text-sm">No nominations yet</p>
+				<p class="text-sm">{m.no_nominations_yet()}</p>
 			</div>
 		{/if}
 	</div>
@@ -211,7 +212,7 @@
 		{#if showAddButton}
 			<button
 				onclick={handleAddNominationClick}
-				class="w-full border-gray-300 text-center text-sm text-slate-600 underline hover:text-slate-800">+ Add Nomination</button
+				class="w-full border-gray-300 text-center text-sm text-slate-600 underline hover:text-slate-800">{m.add_nomination_button()}</button
 			>
 		{/if}
 	</div>

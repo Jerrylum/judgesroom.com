@@ -38,7 +38,7 @@ export const htmlM: HTMLMessages = new Proxy(m, {
 		return (inputs: Record<string, unknown> = {}, ...args: unknown[]) => {
 			const sanitizedInputs = inputs ? sanitizeInputs(inputs) : inputs;
 			const result = originalFn(sanitizedInputs, ...args);
-			return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u'], ALLOWED_ATTR: [] });
+			return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u'], ALLOWED_ATTR: [], ADD_TAGS: ['green', 'red', 'slate'] });
 		};
 	}
 });

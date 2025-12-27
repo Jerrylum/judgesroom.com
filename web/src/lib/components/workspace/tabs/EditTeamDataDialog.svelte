@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
@@ -28,7 +29,7 @@
 			try {
 				new URL(editedTeam.notebookLink.trim());
 			} catch {
-				validationError = 'Please enter a valid URL for the notebook link';
+				validationError = m.please_enter_a_valid_url_for_the_notebook_link();
 				return false;
 			}
 		}
@@ -57,13 +58,13 @@
 				absent: editedTeam.absent
 			});
 
-			app.addSuccessNotice('Team data updated successfully!');
+			app.addSuccessNotice(m.team_data_updated_successfully());
 			validationError = '';
 			dialogs.closeDialog(true);
 		} catch (error) {
 			console.error('Failed to update team data:', error);
-			validationError = 'Failed to save team data. Please try again.';
-			app.addErrorNotice('Failed to save team data');
+			validationError = m.failed_to_save_team_data_please_try_again();
+			app.addErrorNotice(m.failed_to_save_team_data());
 		} finally {
 			isSaving = false;
 		}
@@ -71,7 +72,7 @@
 </script>
 
 <Dialog open={true} onClose={handleCancel} innerContainerClass="max-w-lg">
-	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">Edit Team Data: {team.number}</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">{m.edit_team_data({ teamNumber: team.number })}</h3>
 
 	<!-- Validation Error Message -->
 	{#if validationError}
@@ -89,7 +90,7 @@
 
 		<!-- Notebook Link -->
 		<div>
-			<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700">Notebook Link</label>
+			<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700">{m.notebook_link()}</label>
 			<input
 				id="team-notebook-link"
 				type="url"
@@ -97,14 +98,11 @@
 				class="classic block w-full"
 				placeholder="https://..."
 			/>
-			<p class="mt-1 text-xs text-gray-500">Enter the URL to the team's engineering notebook</p>
+			<p class="mt-1 text-xs text-gray-500">{m.enter_the_url_to_the_team_s_engineering_notebook({ teamNumber: team.number })}</p>
 		</div>
 	</div>
-
 	<div class="mt-6 flex justify-end space-x-3">
-		<button onclick={handleCancel} class="cancel" disabled={isSaving}>Cancel</button>
-		<button onclick={handleSave} class="primary" disabled={isSaving}>
-			{isSaving ? 'Saving...' : 'Save Changes'}
-		</button>
+		<button onclick={handleCancel} class="cancel" disabled={isSaving}>{m.cancel()}</button>
+		<button onclick={handleSave} class="primary" disabled={isSaving}>{isSaving ? m.saving() : m.save_changes()}</button>
 	</div>
 </Dialog>

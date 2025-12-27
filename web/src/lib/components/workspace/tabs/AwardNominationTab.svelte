@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, tabs } from '$lib/index.svelte';
 	import { FinalAwardRankingTab, type AwardNominationTab } from '$lib/tab.svelte';
 	import './award-ranking.css';
@@ -22,18 +23,15 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="text-xl font-semibold text-gray-900">Award Nominations</h2>
+			<h2 class="text-xl font-semibold text-gray-900">{m.award_nominations()}</h2>
 			<p class="mt-2 text-sm text-gray-600">
-				After judge groups complete their team interviews, each group selects their top one or two candidates from their interviewed teams
-				for each award. Judge groups should share their nominations to create a shortlist for each award. When there are many nominations,
-				the Judge Advisor may ask groups to withdraw weaker candidates based on brief arguments comparing the merits of each nomination
-				against award criteria.
+				{m.award_nominations_description()}
 			</p>
 			<p class="mt-2 text-sm text-gray-600">
-				Excellence Award winners are selected from Design Award finalists. Nominate teams for each award first, then go to <button
+				{m.excellence_award_winners_are_selected_from_design_award_finalists()} <button
 					class="text-blue-500 hover:text-blue-600"
-					onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}>Final Ranking</button
-				> tab to determine the winners.
+					onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}>{m.final_ranking()}</button
+				> {m.tab_to_determine_the_winners()}.
 			</p>
 
 			<!-- Filter Options -->
@@ -44,7 +42,7 @@
 						bind:checked={showAbsentTeams}
 						class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="text-sm text-gray-700">Show absent teams</span>
+					<span class="text-sm text-gray-700">{m.show_absent_teams()}</span>
 				</label>
 
 				<label class="flex items-center">
@@ -53,7 +51,7 @@
 						bind:checked={bypassAwardRequirements}
 						class="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="text-sm text-gray-700">Bypass award requirement checks</span>
+					<span class="text-sm text-gray-700">{m.bypass_award_requirement_checks()}</span>
 				</label>
 			</div>
 		</div>

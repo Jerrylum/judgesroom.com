@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
@@ -66,16 +67,16 @@
 	{:else if isDisabled}
 		<div class="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
-				<p>Notebook Required</p>
+				<p>{m.notebook_required_btn()}</p>
 			{/if}
 			{#if !isMeetTeamInterviewRequirement}
-				<p>Team Interview Required</p>
+				<p>{m.team_interview_required_btn()}</p>
 			{/if}
 			{#if !isMeetGradeRequirement}
-				<p>{award.acceptedGrades.join(', ')} Required</p>
+				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>
 			{/if}
 			{#if isMeetNotebookRequirement && !isMeetInnovateAwardSubmissionFormRequirement}
-				<p>Submission Form Required</p>
+				<p>{m.submission_form_required_btn()}</p>
 			{/if}
 		</div>
 	{/if}

@@ -43,3 +43,15 @@ select.classic {
 input[type='checkbox'] {
 	@apply cursor-pointer;
 }
+
+green {
+	@apply font-medium text-green-600;
+}
+
+red {
+	@apply font-medium text-red-600;
+}
+
+slate {
+	@apply font-medium text-slate-600;
+}

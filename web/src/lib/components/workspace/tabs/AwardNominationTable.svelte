@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, subscriptions } from '$lib/index.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
@@ -57,14 +58,14 @@
 <div class="flex flex-row items-center justify-between">
 	<h3 class="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
 	<div class="mb-2 flex flex-row justify-end gap-2 text-sm">
-		<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
-		<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+		<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
+		<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 	</div>
 </div>
 {#if awardRankings}
 	<award-rankings-table>
 		<table-header>
-			<team>TEAM NUMBER</team>
+			<team>{m.team_number()}</team>
 			<scroll-container use:registerScrollContainer class="bg-gray-200">
 				<content>
 					{#each awardRankings.judgedAwards as award}
@@ -111,6 +112,6 @@
 	</award-rankings-table>
 {:else}
 	<div class="flex flex-col items-center justify-center">
-		<p class="text-gray-500">No award rankings found</p>
+		<p class="text-gray-500">{m.no_award_rankings_found()}</p>
 	</div>
 {/if}

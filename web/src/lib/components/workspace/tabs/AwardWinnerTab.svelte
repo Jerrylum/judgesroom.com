@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
 	import type { AwardWinnerTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
@@ -40,7 +41,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to update final rankings:', error);
-			app.addErrorNotice('Failed to update award selections');
+			app.addErrorNotice(m.failed_to_update_award_selections());
 		}
 	}
 
@@ -52,13 +53,13 @@
 	// Get team display name
 	function getTeamDisplayName(teamId: string) {
 		const team = allTeams[teamId];
-		return team ? `${team.number} - ${team.name}` : 'Unknown Team';
+		return team ? `${team.number} - ${team.name}` : m.unknown_team();
 	}
 
 	// Format team display based on configuration
 	function formatTeamDisplay(teamId: string, config: TeamPresentationConfig): string {
 		const team = allTeams[teamId];
-		if (!team) return 'Unknown Team';
+		if (!team) return m.unknown_team();
 
 		const parts: string[] = [];
 		if (config.showTeamNumber) parts.push(team.number);
@@ -100,24 +101,22 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Header -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="text-xl font-semibold text-gray-900">Award Winner</h2>
+			<h2 class="text-xl font-semibold text-gray-900">{m.award_winner_tab_title()}</h2>
 			<p class="mt-2 text-sm text-gray-600">
-				The Judge Advisor should enter all award winners below for final confirmation. Before the award ceremony, the Judge Advisor should
-				enter the result to the Tournament Manager.
+				{m.award_winner_tab_description()}
 			</p>
 		</div>
 
 		<!-- Performance Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-2 text-xl font-semibold text-gray-900">Performance Awards</h2>
+			<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.performance_awards()}</h2>
 			<p class="mb-6 text-sm text-gray-600">
-				Performance Awards are based on robot performance on the competition field in match play and Skills Challenges. These awards do not
-				impact a team's eligibility to earn a Judged Award.
+				{m.award_winner_tab_performance_awards_description()}
 			</p>
 
 			{#if allPerformanceAwards.length === 0}
 				<div class="py-8 text-center">
-					<p class="text-gray-500">No performance awards configured for this event.</p>
+					<p class="text-gray-500">{m.no_performance_awards_configured_for_this_event()}</p>
 				</div>
 			{:else}
 				<div class="space-y-4">
@@ -126,7 +125,7 @@
 							<div class="mb-2 flex flex-wrap items-center justify-between">
 								<h3 class="text-lg font-semibold text-gray-900">{award.name}</h3>
 								<span class="text-sm text-gray-500">
-									{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
+									{m.number_of_winners_count({ count: award.winnersCount })}
 								</span>
 							</div>
 
@@ -144,7 +143,7 @@
 											onchange={(e) => updateInputFinalRankings(award.name, position, (e.target as HTMLSelectElement).value)}
 											class="classic mt-1 block w-full disabled:opacity-50"
 										>
-											<option value="">Select {award.winnersCount === 1 ? 'winner' : `team ${position + 1}`}...</option>
+											<option value="">{m.select_winner({ winnersCount: award.winnersCount, position: position + 1 })}</option>
 											{#if currentSelection && !availableTeams.find((t) => t.id === currentSelection)}
 												<!-- Show currently selected team even if it would normally be filtered out -->
 												<option value={currentSelection}>{getTeamDisplayName(currentSelection)}</option>
@@ -164,17 +163,14 @@
 
 		<!-- Volunteer Nominated Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-2 text-xl font-semibold text-gray-900">Volunteer Nominated Awards</h2>
+			<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.volunteer_nominated_awards()}</h2>
 			<p class="mb-6 text-sm text-gray-600">
-				Volunteer Nominated Awards are a subset of Judged Awards that can be determined by event staff (such as Head Referees, scorekeepers,
-				and emcees) based on observations during the event. These awards, particularly Sportsmanship and Energy Awards, may be determined by
-				volunteer nominations instead of judges. If determined solely by volunteers, teams can still receive these awards even if they've
-				already earned another Judged Award.
+				{m.award_winner_tab_volunteer_nominated_awards_description()}
 			</p>
 
 			{#if allVolunteerNominatedAwards.length === 0}
 				<div class="py-8 text-center">
-					<p class="text-gray-500">No volunteer nominated awards configured for this event.</p>
+					<p class="text-gray-500">{m.no_volunteer_nominated_awards_configured_for_this_event()}</p>
 				</div>
 			{:else}
 				<div class="space-y-4">
@@ -183,7 +179,7 @@
 							<div class="mb-2 flex flex-wrap items-center justify-between">
 								<h3 class="text-lg font-semibold text-gray-900">{award.name}</h3>
 								<span class="text-sm text-gray-500">
-									{award.winnersCount} winner{award.winnersCount > 1 ? 's' : ''}
+									{m.number_of_winners_count({ count: award.winnersCount })}
 								</span>
 							</div>
 
@@ -201,7 +197,7 @@
 											onchange={(e) => updateInputFinalRankings(award.name, position, (e.target as HTMLSelectElement).value)}
 											class="classic mt-1 block w-full disabled:opacity-50"
 										>
-											<option value="">Select {award.winnersCount === 1 ? 'winner' : `team ${position + 1}`}...</option>
+											<option value="">{m.select_winner({ winnersCount: award.winnersCount, position: position + 1 })}</option>
 											{#if currentSelection && !availableTeams.find((t) => t.id === currentSelection)}
 												<!-- Show currently selected team even if it would normally be filtered out -->
 												<option value={currentSelection}>{getTeamDisplayName(currentSelection)}</option>
@@ -223,11 +219,11 @@
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-2 flex flex-wrap items-center justify-between gap-2">
 				<div>
-					<h2 class="text-xl font-semibold text-gray-900">Summary of Award Winners</h2>
+					<h2 class="text-xl font-semibold text-gray-900">{m.summary_of_award_winners()}</h2>
 				</div>
-				<button onclick={openReportDialog} class="primary tiny">Report</button>
+				<button onclick={openReportDialog} class="primary tiny">{m.report()}</button>
 			</div>
-			<p class="mb-6 text-sm text-gray-600">This summary shows all award winners organized by team group.</p>
+			<p class="mb-6 text-sm text-gray-600">{m.award_winner_tab_summary_of_award_winners_description()}</p>
 
 			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 				{#each Object.keys(allAwardWinnersByTeamGroup) as groupId}
