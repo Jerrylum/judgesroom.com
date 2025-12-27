@@ -80,7 +80,7 @@
 	"event_code_setup": "賽事代碼設置",
 	"event_code_setup_description": "如果您的賽事在 RobotEvents.com 上列出，請在下面輸入賽事代碼。賽事代碼可以在 RobotEvents.com 的賽事頁面上找到。",
 	"event_code_setup_description_2": "評審室將自動導入許多設置。此外，請在 Tournament Manager 的 Web Publish Setup 頁面上啟用發佈實時結果到 RobotEvents 的功能。這樣，評審室可以根據最新的排名和技能賽分數自動計算卓越獎和考思獎的隊伍資格。",
-	"event_code_setup_description_3": "如果您的賽事有兩個或更多分組：",
+	"event_code_setup_description_3": "如果您的賽事有兩個或更多分組 (Division)：",
 	"event_code_setup_description_4": "請使用 Tournament Manager 為每個隊伍設置分組，並先發佈分組結果到 RobotEvents。評審室需要在開始前知道哪些隊伍屬於哪個分組。",
 	"event_code_setup_description_5": "每個評審室只能用於一個分組。請使用第二台電腦、另一個瀏覽器或無痕模式來為第二個分組創建另一個評審室。",
 	"event_code_setup_description_6": "評審室只能計算其自身的分組（分組特定）卓越獎。如果您的賽事有全賽事卓越獎，請參閱 Tournament Manager 的 Reports 標籤中的 \"Excellence Award Eligibility\" 報告。",
