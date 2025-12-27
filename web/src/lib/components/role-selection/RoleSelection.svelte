@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
+	import { htmlM } from '$lib/i18n';
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
 	import { app, AppUI } from '$lib/index.svelte';
@@ -87,6 +88,7 @@
 <svelte:head>
 	<title>{m.role_selection()} | Judges' Room</title>
 </svelte:head>
+
 <div class="flex h-screen flex-col bg-slate-100">
 	<div class="flex flex-1 flex-col items-center justify-center p-2">
 		<div class="flex w-full max-w-3xl flex-col items-center gap-6">
@@ -113,10 +115,11 @@
 						<div class="space-y-4">
 							<h3 class="text-2xl font-medium text-gray-900">{m.join_judges_room()}</h3>
 							<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
-								{@html m.you_are_connected_to({ eventName: essentialData.eventName, divisionId: essentialData.divisionId ?? '' })}
+								{@html htmlM.you_are_connected_to({ eventName: essentialData.eventName, divisionId: essentialData.divisionId ?? '' })}
 							</p>
 							<p class="mb-2 mt-2 text-sm leading-relaxed text-gray-700">
-								{m.choose_your_identity_to_start_participating_in_the_judges_room()}</p>
+								{m.choose_your_identity_to_start_participating_in_the_judges_room()}
+							</p>
 							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<label
 									class="flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors"

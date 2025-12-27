@@ -156,7 +156,7 @@
 	"loading_judges_room_data_description": "Loading Judges' Room data...",
 	"connecting_to_judges_room_description": "Connecting to Judges' Room...",
 	"join_judges_room": "Join Judges' Room",
-	"you_are_connected_to": "You are connected to <strong>{eventName}</strong> (Division {divisionId})",
+	"you_are_connected_to": "You are connected to <b>{eventName}</b> (Division {divisionId})",
 	"choose_your_identity_to_start_participating_in_the_judges_room": "Choose your identity to start participating in the Judges' Room. You can change your role at any time later if needed.",
 	"judge": "Judge",
 	"evaluate_teams_and_participate_in_scoring": "Evaluate teams and participate in scoring",
