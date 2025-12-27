@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { dialogs } from '$lib/index.svelte';
 	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
@@ -71,19 +72,19 @@
 		const hasGrades = customAwardGrades.length > 0;
 
 		if (!hasName) {
-			customAwardError = 'Award name is required';
+			customAwardError = m.award_name_is_required();
 		} else if (hasLeadingTrailingWhitespace) {
-			customAwardError = 'Award name must not have leading or trailing whitespace';
+			customAwardError = m.award_name_whitespace_error_message();
 		} else if (isNameTooLong) {
-			customAwardError = 'Award name must be 100 characters or less';
+			customAwardError = m.award_name_too_long_error_message();
 		} else if (!hasUniqueName) {
-			customAwardError = 'Award name must be unique';
+			customAwardError = m.award_name_unique_error_message();
 		} else if (!hasGrades) {
-			customAwardError = 'At least one grade level must be selected';
+			customAwardError = m.at_least_one_grade_level_must_be_selected();
 		} else if (customAwardWinners <= 0) {
-			customAwardError = 'Number of winners must be greater than 0';
+			customAwardError = m.number_of_winners_must_be_greater_than_0();
 		} else if (customAwardWinners > 10000) {
-			customAwardError = 'Number of winners must be 10,000 or less';
+			customAwardError = m.number_of_winners_must_be_10000_or_less();
 		} else {
 			customAwardError = '';
 		}
@@ -121,7 +122,7 @@
 </script>
 
 <Dialog open={true} onClose={handleCancel}>
-	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">Add Custom Award</h3>
+	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">{m.add_custom_award_text()}</h3>
 
 	{#if customAwardError}
 		<div class="mb-4 rounded border border-red-400 bg-red-100 p-3 text-red-700">
@@ -131,7 +132,7 @@
 
 	<div class="space-y-4">
 		<div>
-			<label for="custom-award-name" class="mb-2 block text-sm font-medium text-gray-700">Award Name</label>
+			<label for="custom-award-name" class="mb-2 block text-sm font-medium text-gray-700">{m.award_name()}</label>
 			<input
 				id="custom-award-name"
 				type="text"
@@ -145,7 +146,7 @@
 		</div>
 
 		<div>
-			<label for="custom-award-type" class="mb-2 block text-sm font-medium text-gray-700">Award Type</label>
+			<label for="custom-award-type" class="mb-2 block text-sm font-medium text-gray-700">{m.award_type()}</label>
 			<select id="custom-award-type" bind:value={customAwardType} onchange={() => (hasUserInteracted = true)} class="classic block w-full">
 				{#each AwardTypeSchema.options as type (type)}
 					<option value={type}>{type.replace('_', ' ')}</option>
@@ -161,9 +162,9 @@
 					onchange={() => (hasUserInteracted = true)}
 					class="mr-3 rounded border-gray-300 text-slate-900 focus:ring-slate-900"
 				/>
-				<span class="text-sm font-medium text-gray-700">Require Notebook</span>
+				<span class="text-sm font-medium text-gray-700">{m.require_notebook()}</span>
 			</label>
-			<p class="mt-1 text-xs text-gray-500">Check if this award requires teams to have a notebook</p>
+			<p class="mt-1 text-xs text-gray-500">{m.require_notebook_option_description()}</p>
 		</div>
 
 		<div>
@@ -174,13 +175,13 @@
 					onchange={() => (hasUserInteracted = true)}
 					class="mr-3 rounded border-gray-300 text-slate-900 focus:ring-slate-900"
 				/>
-				<span class="text-sm font-medium text-gray-700">Require Team Interview</span>
+				<span class="text-sm font-medium text-gray-700">{m.require_team_interview()}</span>
 			</label>
-			<p class="mt-1 text-xs text-gray-500">Check if this award requires teams to have completed a team interview</p>
+			<p class="mt-1 text-xs text-gray-500">{m.require_team_interview_option_description()}</p>
 		</div>
 
 		<fieldset>
-			<legend class="mb-2 block text-sm font-medium text-gray-700">Accepted Grades</legend>
+			<legend class="mb-2 block text-sm font-medium text-gray-700">{m.accepted_grades()}</legend>
 			<div class="space-y-2 overflow-y-auto">
 				{#each possibleGrades as grade (grade)}
 					<label class="flex items-center py-1">
@@ -197,7 +198,7 @@
 		</fieldset>
 
 		<div>
-			<label for="custom-award-winners" class="mb-2 block text-sm font-medium text-gray-700">Number of Winners</label>
+			<label for="custom-award-winners" class="mb-2 block text-sm font-medium text-gray-700">{m.number_of_winners_text()}</label>
 			<input
 				id="custom-award-winners"
 				type="number"
@@ -211,7 +212,7 @@
 	</div>
 
 	<div class="mt-6 flex justify-end space-x-3">
-		<button onclick={handleCancel} class="cancel tiny">Cancel</button>
+		<button onclick={handleCancel} class="cancel tiny">{m.cancel()}</button>
 		<button
 			onclick={addCustomAward}
 			disabled={!canSubmitCustomAward()}

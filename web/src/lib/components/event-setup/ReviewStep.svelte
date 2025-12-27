@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 
 	interface Props {
@@ -25,20 +26,20 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Review & Confirm</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.review_and_confirm()}</h2>
 
 	<div class="space-y-4 text-sm text-gray-700">
 		<div class="space-y-2">
 			<p>
-				This software is licensed under the GNU General Public License v3 (GPLv3). Join our <a
-					href="https://discord.gg/BpSDTgq7Zm"
-					target="_blank"
-					class="text-slate-600 underline hover:text-slate-800">Discord Support</a
+				{m.review_license_description1()}
+				<a href="https://discord.gg/BpSDTgq7Zm" target="_blank" class="text-slate-600 underline hover:text-slate-800"
+					>{m.discord_support()}</a
 				>
-				server or visit our
+				{m.review_license_description2()}
 				<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank" class="text-slate-600 underline hover:text-slate-800"
-					>GitHub repository</a
-				> for more information.
+					>{m.github_repository()}</a
+				>
+				{m.review_license_description3()}
 			</p>
 		</div>
 	</div>
@@ -46,14 +47,13 @@
 	<label class="flex cursor-pointer items-start space-x-3">
 		<input type="checkbox" bind:checked={enableGoogleAnalytics} class="mt-1" disabled={isLoading} />
 		<div class="flex-1">
-			<div class="font-medium text-gray-900">Enable Google Analytics</div>
+			<div class="font-medium text-gray-900">{m.enable_google_analytics()}</div>
 			<p class="mt-1 text-sm text-gray-600">
-				Help us improve judgesroom.com by sharing anonymous usage data. This includes metrics like number of teams, judges, and devices. No
-				judging content or personal information is collected. See our <a
-					href="./privacy"
-					target="_blank"
-					class="text-slate-600 underline hover:text-slate-800">Data Protection and Privacy Policy</a
-				> for more information.
+				{m.help_us_improve_judgesroom_com()}
+				<a href="./privacy" target="_blank" class="text-slate-600 underline hover:text-slate-800"
+					>{m.data_protection_and_privacy_policy()}</a
+				>
+				{m.help_us_improve_judgesroom_com_description()}
 			</p>
 		</div>
 	</label>
@@ -61,14 +61,14 @@
 	<div class="flex justify-between pt-4">
 		{#if !isLoading}
 			<div class="flex space-x-3">
-				<button onclick={onPrev} class="secondary">Back</button>
+				<button onclick={onPrev} class="secondary">{m.back()}</button>
 				{#if isJudgesRoomJoined}
 					<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-						Cancel
+						{m.cancel()}
 					</button>
 				{/if}
 			</div>
-			<button onclick={handleComplete} class="success">Complete Setup</button>
+			<button onclick={handleComplete} class="success">{m.complete_setup()}</button>
 		{:else}
 			<div></div>
 			<button disabled class="success cursor-not-allowed opacity-75">

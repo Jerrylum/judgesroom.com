@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { AwardOptions } from '$lib/award.svelte';
 
 	interface Props {
@@ -10,11 +11,11 @@
 
 {#if 'isDndShadowItem' in award}
 	<div
-		class="flex min-h-15 cursor-move flex-row items-center justify-between rounded-lg border p-4 pr-1 opacity-5 transition-all duration-200 hover:shadow-md"
+		class="min-h-15 flex cursor-move flex-row items-center justify-between rounded-lg border p-4 pr-1 opacity-5 transition-all duration-200 hover:shadow-md"
 	></div>
 {:else}
 	<div
-		class="flex min-h-15 cursor-move flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
+		class="min-h-15 flex cursor-move flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
 		class:opacity-40={!award.isSelected}
 		class:opacity-100={award.isSelected}
 	>
@@ -26,14 +27,14 @@
 					bind:checked={award.isSelected}
 					class="h-5 w-5 rounded border-gray-300 text-slate-800 focus:ring-slate-800"
 				/>
-				<span class="sr-only">Select {award.name} award</span>
+				<span class="sr-only">{m.select_award({ award: award.name })}</span>
 			</label>
 
 			<!-- Center: Award name -->
 			<div class="flex-1">
 				<h4 class="text-sm font-medium text-slate-900">{award.name}</h4>
 				{#if !award.isOfficial}
-					<span class="text-xs text-gray-500 italic">Custom Award</span>
+					<span class="text-xs italic text-gray-500">{m.custom_award()}</span>
 				{/if}
 			</div>
 
@@ -47,7 +48,7 @@
 							bind:value={award.possibleWinners}
 							min="1"
 							class="w-10 rounded border-gray-300 px-0 py-1 text-center text-xs focus:border-slate-800 focus:ring-slate-800"
-							title="Number of winners"
+							title={m.number_of_winners()}
 						/>
 					</div>
 				</div>

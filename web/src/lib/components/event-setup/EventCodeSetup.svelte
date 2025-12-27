@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { AppUI, dialogs, gtag } from '$lib/index.svelte';
 	import type { AwardOptions } from '$lib/award.svelte';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
@@ -83,8 +84,8 @@
 
 				importedData = null;
 				dialogs.showConfirmation({
-					title: 'No Divisions Found in RobotEvents',
-					message: 'No divisions found in RobotEvents. Please select a division manually.',
+					title: m.no_divisions_found_in_robotevents(),
+					message: m.no_divisions_found_in_robotevents_message(),
 					confirmText: 'OK',
 					cancelButtonClass: 'hidden'
 				});
@@ -114,8 +115,8 @@
 			});
 
 			dialogs.showConfirmation({
-				title: 'Successfully Imported Event',
-				message: `Successfully imported event "${data.eventName}"`,
+				title: m.successfully_imported_event(),
+				message: m.successfully_imported_event_message({ eventName: data.eventName }),
 				confirmText: 'OK',
 				cancelButtonClass: 'hidden'
 			});
@@ -124,7 +125,7 @@
 			gtag('event', 'error_importing_from_robotevents', { isEditingEventSetup });
 
 			dialogs.showConfirmation({
-				title: 'Error Importing from RobotEvents',
+				title: m.error_importing_from_robotevents(),
 				message: `${error instanceof Error ? error.message : 'Unknown error'}`,
 				confirmText: 'OK',
 				cancelButtonClass: 'hidden'
@@ -176,7 +177,7 @@
 						isImporting = false;
 						console.error('Error getting event division rankings:', error);
 						dialogs.showConfirmation({
-							title: 'Error Getting Event Teams in Division',
+							title: m.error_getting_event_teams_in_division(),
 							message: `${error instanceof Error ? error.message : 'Unknown error'}`,
 							confirmText: 'OK',
 							cancelButtonClass: 'hidden'
@@ -202,29 +203,24 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Event Code Setup</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.event_code_setup()}</h2>
 	<div class="space-y-2">
 		<p class="text-sm text-gray-600">
-			If your event is listed on RobotEvents.com, enter the event code below which can be found in the event page on RobotEvents.com.
+			{m.event_code_setup_description()}
 		</p>
 		<p class="text-sm text-gray-600">
-			Judges' Room will automatically import many settings for your event. In addition, please enable the feature to publish live results to
-			RobotEvents in the Web Publish Setup page of Tournament Manager. This way, Judges' Room can automatically calculate the team
-			eligibility for Excellence Awards and Think Award based on the latest rankings and skills scores.
+			{m.event_code_setup_description_2()}
 		</p>
-		<p class="text-sm text-gray-600">If your event will have two or more divisions:</p>
+		<p class="text-sm text-gray-600">{m.event_code_setup_description_3()}</p>
 		<ul class="list-disc pl-5 text-sm text-gray-600">
 			<li>
-				Please use Tournament Manager to set the division for each team and publish the division results to RobotEvents first. Judges' Room
-				needs to know which teams belong to which division before it starts.
+				{m.event_code_setup_description_4()}
 			</li>
 			<li>
-				Each Judges' Room can only be used for one division. Please use a second computer, another browser or incognito mode to create
-				another Judges' Room for the second division.
+				{m.event_code_setup_description_5()}
 			</li>
 			<li>
-				Judges' Room can only calculate Excellence Award(s) for its own division (division specific). If your event has event wide
-				Excellence Award(s), please refer to the "Excellence Award Eligibility" reports from the Reports tab in Tournament Manager.
+				{m.event_code_setup_description_6()}
 			</li>
 		</ul>
 	</div>
@@ -240,8 +236,8 @@
 					bind:group={importMethod}
 				/>
 				<div>
-					<div class="font-medium">Official Event</div>
-					<div class="text-sm text-gray-600">Connect to RobotEvents and determine the team eligibility based on the live results.</div>
+					<div class="font-medium">{m.official_event()}</div>
+					<div class="text-sm text-gray-600">{m.official_event_description()}</div>
 				</div>
 			</label>
 
@@ -255,8 +251,8 @@
 					class="mt-0.5"
 				/>
 				<div>
-					<div class="font-medium">Unofficial Event</div>
-					<div class="text-sm text-gray-600">Continue without connecting to RobotEvents.</div>
+					<div class="font-medium">{m.unofficial_event()}</div>
+					<div class="text-sm text-gray-600">{m.unofficial_event_description()}</div>
 				</div>
 			</label>
 		</div>
@@ -267,7 +263,7 @@
 		<div class="flex items-end gap-2">
 			<div>
 				<!-- For public, it is called "Event Code" -->
-				<label for="robotevents-sku" class="mb-2 block text-sm font-medium text-gray-700">Event Code</label>
+				<label for="robotevents-sku" class="mb-2 block text-sm font-medium text-gray-700">{m.event_code()}</label>
 				<input
 					type="text"
 					id="robotevents-sku"
@@ -285,9 +281,9 @@
 			>
 				{#if isImporting}
 					<RefreshIcon class="h-4 w-4 animate-spin" />
-					Importing...
+					{m.importing()}
 				{:else}
-					Import Event
+					{m.import_event()}
 				{/if}
 			</button>
 		</div>
@@ -295,7 +291,7 @@
 			<div class="flex items-end gap-2">
 				<div>
 					<!-- For public, it is called "Event Code" -->
-					<label for="division" class="mb-2 block text-sm font-medium text-gray-700">Division</label>
+					<label for="division" class="mb-2 block text-sm font-medium text-gray-700">{m.division()}</label>
 					<select id="division" bind:value={inputDivisionId} class="classic block w-80" disabled={isImporting}>
 						{#each importedData.divisionInfos as division (division.id)}
 							<option value={division.id}>{division.id}: {division.name}</option>
@@ -303,13 +299,13 @@
 					</select>
 				</div>
 				<div class="flex h-10 items-center">
-					<p>{teams.length} teams</p>
+					<p>{teams.length} {m.teams()}</p>
 				</div>
 			</div>
 		{:else if robotEventsSku && robotEventsEventId && divisionId}
 			<div>
-				<p class="mb-2 text-sm text-gray-600">Division</p>
-				<p>Division {divisionId}</p>
+				<p class="mb-2 text-sm text-gray-600">{m.division()}</p>
+				<p>{m.division()} {divisionId}</p>
 			</div>
 		{/if}
 	{/if}
@@ -318,19 +314,19 @@
 		<div class="flex space-x-3">
 			{#if isEditingEventSetup}
 				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-					Cancel
+					{m.cancel()}
 				</button>
 			{:else}
 				<button
 					onclick={handleBackToBegin}
 					class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 				>
-					Back to Begin
+					{m.back_to_begin()}
 				</button>
 			{/if}
 		</div>
 		<button onclick={onNext} class="primary" class:opacity-50={!canProceed} class:cursor-not-allowed={!canProceed} disabled={!canProceed}>
-			Next: Competition Setup
+			{m.next_competition_setup()}
 		</button>
 	</div>
 </div>

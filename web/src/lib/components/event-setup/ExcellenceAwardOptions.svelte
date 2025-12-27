@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { AwardOptions } from '$lib/award.svelte';
 
 	interface Props {
@@ -25,13 +26,13 @@
 </script>
 
 <div
-	class="flex min-h-15 flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
+	class="min-h-15 flex flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
 >
 	<div class="flex flex-1 items-center justify-between gap-4">
 		<!-- Left side: Large checkbox -->
 		<label class="flex cursor-pointer items-center">
 			<input type="checkbox" checked={true} disabled class="h-5 w-5 rounded border-gray-300 text-slate-800 focus:ring-slate-800" />
-			<span class="sr-only">Select Excellence Award award</span>
+			<span class="sr-only">{m.select_excellence_award_award()}</span>
 		</label>
 
 		<!-- Center: Award name -->
@@ -50,7 +51,7 @@
 					max={isMultiGrades ? 2 : 1}
 					onchange={onChange}
 					class="w-10 rounded border-gray-300 px-0 py-1 text-center text-xs focus:border-slate-800 focus:ring-slate-800"
-					title="Number of winners"
+					title={m.number_of_winners()}
 				/>
 			</div>
 		</div>

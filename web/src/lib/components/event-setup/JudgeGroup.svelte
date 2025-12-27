@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import JudgeCard from './JudgeCard.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
@@ -203,7 +204,7 @@
 
 	<!-- Judges Section -->
 	<div class="mb-4 space-y-3">
-		<h4 class="text-sm font-medium text-gray-800">Judges ({judges.length})</h4>
+		<h4 class="text-sm font-medium text-gray-800">{m.judges({ count: judges.length })}</h4>
 
 		{#if judges.length > 0}
 			<div class="space-y-2">
@@ -216,11 +217,11 @@
 		<div class="space-y-2">
 			<textarea
 				bind:value={newJudgesText}
-				placeholder="Enter judge names (one per line)"
+				placeholder={m.enter_judge_names_placeholder()}
 				rows="2"
 				class="w-full resize-none rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
 			></textarea>
-			<button onclick={addJudges} disabled={!newJudgesText.trim()} class="primary tiny"> Add Judges </button>
+			<button onclick={addJudges} disabled={!newJudgesText.trim()} class="primary tiny"> {m.add_judges()}</button>
 		</div>
 	</div>
 
@@ -228,7 +229,7 @@
 	{#if showAssignedTeams}
 		<div class="space-y-3">
 			<h4 class="text-sm font-medium text-gray-800">
-				Assigned Teams ({judgeGroup.assignedTeams.length})
+				{m.assigned_teams({ count: judgeGroup.assignedTeams.length })}
 			</h4>
 
 			<div class="relative">
@@ -262,7 +263,7 @@
 				{#if judgeGroup.assignedTeams.length === 0}
 					<div class="absolute inset-0 select-none">
 						<div class="flex h-full items-center justify-center text-gray-400">
-							<p class="text-sm">Drop teams here</p>
+							<p class="text-sm">{m.drop_teams_here()}</p>
 						</div>
 					</div>
 				{/if}

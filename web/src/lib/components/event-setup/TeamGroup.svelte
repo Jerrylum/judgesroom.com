@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import TeamPlate from './TeamPlate.svelte';
-	import { dialogs } from '$lib/index.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
@@ -223,7 +223,7 @@
 		{#if teamList.length === 0}
 			<div class="absolute inset-0 select-none">
 				<div class="flex h-full items-center justify-center text-gray-400">
-					<p class="text-sm">Drop teams here</p>
+					<p class="text-sm">{m.drop_teams_here()}</p>
 				</div>
 			</div>
 		{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 
@@ -15,7 +16,7 @@
 	<button
 		onclick={() => onRemoveJudge(judge.id)}
 		class="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-		title="Remove judge"
+		title={m.remove_judge()}
 	>
 		<TrashBinIcon class="h-3 w-3" />
 	</button>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import TeamGroup from './TeamGroup.svelte';
 	import { EditingTeamList, type TeamInfoAndData, groupTeamsByGroup } from '$lib/team.svelte';
 	import { gtag } from '$lib/index.svelte';
@@ -58,20 +59,19 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Team Groups</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.team_groups()}</h2>
 
 	<div class="space-y-6">
 		<div class="flex items-center justify-between">
-			<h3 class="text-lg font-medium text-gray-800">Organize Teams</h3>
+			<h3 class="text-lg font-medium text-gray-800">{m.organize_teams()}</h3>
 			<div class="flex items-center gap-2">
 				<input type="text" bind:value={newGroupName} placeholder="New group name" maxlength="100" class="classic" />
-				<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny">Create Group</button>
+				<button onclick={createNewGroup} disabled={!newGroupName.trim()} class="primary tiny">{m.create_group()}</button>
 			</div>
 		</div>
 
 		<p class="text-sm text-gray-600">
-			Drag and drop teams between groups to organize them. Right click to select multiple teams. Team groups are useful when determining the
-			final ranking of award winners.
+			{m.organize_teams_description()}
 		</p>
 
 		{#if Object.keys(teamGroups).length > 0}
@@ -90,24 +90,24 @@
 			</div>
 		{:else}
 			<div class="rounded-lg bg-gray-50 p-8 text-center">
-				<p class="text-gray-500">No teams available. Please import teams in the previous step.</p>
+				<p class="text-gray-500">{m.no_teams_available()}</p>
 			</div>
 		{/if}
 
 		<!-- Summary -->
 		{#if teams.length > 0}
 			<div class="rounded-lg bg-slate-50 p-4">
-				<h4 class="mb-2 font-medium text-slate-900">Team Summary</h4>
+				<h4 class="mb-2 font-medium text-slate-900">{m.team_summary()}</h4>
 				<div class="space-y-1 text-sm text-slate-800">
-					<p>Total Teams: {teams.length}</p>
-					<p>Groups: {Object.keys(teamGroups).length}</p>
+					<p>{m.total_teams({ count: teams.length })}</p>
+					<p>{m.groups({ count: Object.keys(teamGroups).length })}</p>
 				</div>
 			</div>
 		{/if}
 	</div>
 
 	<div class="flex justify-between pt-6">
-		<button onclick={onPrev} class="secondary">Back</button>
-		<button onclick={onNext} class="primary">Next: Judge Setup</button>
+		<button onclick={onPrev} class="secondary">{m.back()}</button>
+		<button onclick={onNext} class="primary">{m.next_judge_setup()}</button>
 	</div>
 </div>

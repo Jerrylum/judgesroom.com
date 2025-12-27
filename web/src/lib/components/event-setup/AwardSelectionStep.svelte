@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
 	import { dialogs } from '$lib/index.svelte';
 	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
@@ -150,18 +151,17 @@
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-semibold text-gray-900">Awards Setup</h2>
-		<button onclick={openCustomAwardDialog} class="success tiny">+ Add Custom Award</button>
+		<h2 class="text-xl font-semibold text-gray-900">{m.awards_setup()}</h2>
+		<button onclick={openCustomAwardDialog} class="success tiny">{m.add_custom_award()}</button>
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 		<!-- Performance Awards -->
 		<div class="space-y-3">
 			<div>
-				<h3 class="text-base font-semibold text-gray-800">Performance Awards</h3>
+				<h3 class="text-base font-semibold text-gray-800">{m.performance_awards()}</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Based on robot performance in matches and skills challenges. Default order follows Qualifying Criteria precedence &lt;AW1&gt;.
-					Drag to reorder if needed.
+					{m.performance_awards_description()}
 				</p>
 			</div>
 			<div class="space-y-2 border-t pt-3">
@@ -177,10 +177,9 @@
 		<!-- Judged Awards -->
 		<div class="space-y-3">
 			<div>
-				<h3 class="text-base font-semibold text-gray-800">Judged Awards</h3>
+				<h3 class="text-base font-semibold text-gray-800">{m.judged_awards()}</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Determined by judges based on award criteria. Default order follows Qualifying Criteria precedence &lt;AW2&gt;. Drag to reorder if
-					needed.
+					{m.judged_awards_description()}
 				</p>
 			</div>
 			<div class="space-y-2 border-t pt-3">
@@ -197,9 +196,9 @@
 		<!-- Volunteer Nominated Awards -->
 		<div class="space-y-3">
 			<div>
-				<h3 class="text-base font-semibold text-gray-800">Volunteer Nominated Awards</h3>
+				<h3 class="text-base font-semibold text-gray-800">{m.volunteer_nominated_awards()}</h3>
 				<p class="mb-3 text-xs text-gray-600">
-					Determined by volunteer staff and not by Judges. Sportsmanship Award and Energy Award can be dragged to this section.
+					{m.volunteer_nominated_awards_description()}
 				</p>
 			</div>
 			<div class="space-y-2 border-t pt-3">
@@ -219,14 +218,14 @@
 				submit();
 				onPrev();
 			}}
-			class="secondary">Back</button
+			class="secondary">{m.back()}</button
 		>
 		<button
 			onclick={() => {
 				submit();
 				onNext();
 			}}
-			class="primary">Next: Review</button
+			class="primary">{m.next_review()}</button
 		>
 	</div>
 </div>

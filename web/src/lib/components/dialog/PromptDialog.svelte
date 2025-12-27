@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { PromptDialog } from '$lib/dialog.svelte';
 	import { dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
@@ -63,7 +64,7 @@
 	<!-- Buttons -->
 	<div class="flex justify-end space-x-3">
 		<button onclick={handleCancel} class="secondary">
-			{dialog.cancelText || 'Cancel'}
+			{dialog.cancelText || m.cancel()}
 		</button>
 		<button onclick={handleConfirm} class="primary">
 			{dialog.confirmText || 'OK'}

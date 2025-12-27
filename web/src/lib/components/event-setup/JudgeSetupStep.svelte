@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import JudgeGroup from './JudgeGroup.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
@@ -157,10 +158,10 @@
 	async function deleteJudgeGroup(groupId: string) {
 		if (isEditingEventSetup) {
 			const confirmed = await dialogs.showConfirmation({
-				title: 'Delete Judge Group',
-				message: `Are you sure you want to delete this judge group? If this judge group has been used for judging, all related rubrics and award rankings will be lost forever. This action cannot be undone.`,
-				confirmText: 'Delete Group',
-				cancelText: 'Cancel',
+				title: m.delete_judge_group(),
+				message: m.delete_judge_group_message(),
+				confirmText: m.delete_group(),
+				cancelText: m.cancel(),
 				confirmButtonClass: 'danger'
 			});
 
@@ -191,10 +192,10 @@
 		// add warning
 		if (isEditingEventSetup) {
 			const confirmed = await dialogs.showConfirmation({
-				title: 'Remove Judge',
-				message: `Are you sure you want to remove this judge? If this judge submitted any rubrics, they will be lost forever.`,
-				confirmText: 'Remove Judge',
-				cancelText: 'Cancel',
+				title: m.remove_judge(),
+				message: m.remove_judge_message(),
+				confirmText: m.remove_judge(),
+				cancelText: m.cancel(),
 				confirmButtonClass: 'danger'
 			});
 
@@ -224,7 +225,7 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Judge Setup</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.judge_setup()}</h2>
 
 	<!-- Judging Method Selection -->
 	<div class="space-y-4">
@@ -239,8 +240,8 @@
 					bind:group={judgingMethod}
 				/>
 				<div>
-					<div class="font-medium">Walk-in Judging</div>
-					<div class="text-sm text-gray-600">Teams queue up and are assigned to judge groups randomly.</div>
+					<div class="font-medium">{m.walk_in_judging()}</div>
+					<div class="text-sm text-gray-600">{m.walk_in_judging_description()}</div>
 				</div>
 			</label>
 
@@ -254,9 +255,9 @@
 					class="mt-0.5"
 				/>
 				<div>
-					<div class="font-medium">Pre-assigned Judging</div>
+					<div class="font-medium">{m.pre_assigned_judging()}</div>
 					<div class="text-sm text-gray-600">
-						Teams are pre-assigned to specific judge groups. Judges find their assigned teams in their team pits for interviews.
+						{m.pre_assigned_judging_description()}
 					</div>
 				</div>
 			</label>
@@ -266,11 +267,11 @@
 	<!-- Judge Groups Section -->
 	<div class="space-y-4">
 		<div class="flex items-center justify-between">
-			<h3 class="text-lg font-medium text-gray-800">Judge Groups</h3>
+			<h3 class="text-lg font-medium text-gray-800">{m.judge_groups()}</h3>
 			<div class="flex items-center gap-2">
-				<button onclick={() => addJudgeGroup()} class="primary tiny">Add Group</button>
+				<button onclick={() => addJudgeGroup()} class="primary tiny">{m.add_group()}</button>
 				{#if judgingMethod === 'assigned'}
-					<button onclick={randomlyAssignTeams} class="primary tiny">Randomly Assign Teams</button>
+					<button onclick={randomlyAssignTeams} class="primary tiny">{m.randomly_assign_teams()}</button>
 				{/if}
 			</div>
 		</div>
@@ -300,13 +301,13 @@
 	{#if judgingMethod === 'assigned'}
 		<div class="space-y-4">
 			<h3 class="text-lg font-medium text-gray-800">
-				Available Teams ({unassignedTeams.length})
+				{m.available_teams({ count: unassignedTeams.length })}
 			</h3>
 
 			{#if unassignedTeams.length > 0}
-				<div class="text-sm text-gray-600">Drag and drop teams from here to judge groups. Right-click to select multiple teams.</div>
+				<div class="text-sm text-gray-600">{m.drag_and_drop_teams_description()}</div>
 			{:else}
-				<div class="rounded-lg bg-green-50 p-4 text-green-700">✓ All active teams are assigned to judge groups</div>
+				<div class="rounded-lg bg-green-50 p-4 text-green-700">✓ {m.all_active_teams_assigned_to_judge_groups()}</div>
 			{/if}
 
 			<div
@@ -336,7 +337,7 @@
 
 				{#if unassignedTeams.length === 0}
 					<div class="flex h-full items-center justify-center text-gray-500">
-						<p class="text-sm">All teams are assigned to judge groups</p>
+						<p class="text-sm">{m.all_teams_assigned_to_judge_groups()}</p>
 					</div>
 				{/if}
 			</div>
@@ -346,16 +347,16 @@
 	{#if !canProceed()}
 		<div class="rounded border border-yellow-400 bg-yellow-100 px-4 py-3 text-yellow-700">
 			{#if judgingMethod === 'walk_in'}
-				Please create at least one judge group to continue.
+				{m.please_create_at_least_one_judge_group()}
 			{:else}
-				Please assign all active teams to judge groups to continue.
+				{m.please_assign_all_active_teams()}
 			{/if}
 		</div>
 	{/if}
 
 	<!-- Action Buttons -->
 	<div class="flex justify-between">
-		<button onclick={onPrev} class="secondary">Previous</button>
+		<button onclick={onPrev} class="secondary">{m.back()}</button>
 
 		<button
 			onclick={onNext}
@@ -364,7 +365,7 @@
 			class:opacity-50={!canProceed()}
 			class:cursor-not-allowed={!canProceed()}
 		>
-			Awards Setup
+			{m.next_awards_setup()}
 		</button>
 	</div>
 </div>

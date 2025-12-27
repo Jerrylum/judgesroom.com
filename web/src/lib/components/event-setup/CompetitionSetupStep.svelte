@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import { type Program, ProgramSchema } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
@@ -79,7 +80,7 @@
 	function readFile(file: File) {
 		if (!file.name.endsWith('.csv')) {
 			uploadSuccess = '';
-			uploadError = 'Please upload a CSV file from RobotEvents or Tournament Manager';
+			uploadError = m.upload_csv_again();
 			return;
 		}
 
@@ -91,7 +92,7 @@
 			processManualTeamData();
 		};
 		reader.onerror = () => {
-			uploadError = 'Error reading file';
+			uploadError = m.error_reading_file();
 		};
 		reader.readAsText(file);
 	}
@@ -99,7 +100,7 @@
 	async function processManualTeamData() {
 		if (!csvContent.trim()) {
 			uploadSuccess = '';
-			uploadError = 'Please upload a CSV file first';
+			uploadError = m.upload_csv_first();
 			return;
 		}
 
@@ -132,11 +133,10 @@
 			});
 
 			teams = newTeams;
-			uploadSuccess = `Successfully imported ${newTeams.length} teams`;
+			uploadSuccess = m.successfully_imported_teams({ count: newTeams.length });
 			uploadError = '';
 		} catch (error) {
-			console.error('Error processing data', error);
-			uploadError = `Error processing data: ${error}`;
+			uploadError = m.error_processing_data({ error: (error as Error).message });
 			uploadSuccess = '';
 		}
 	}
@@ -169,14 +169,14 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">Competition Setup</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.competition_setup()}</h2>
 
 	<!-- Event Information -->
 	<div class="space-y-4">
-		<h3 class="text-lg font-medium text-gray-800">Event Information</h3>
+		<h3 class="text-lg font-medium text-gray-800">{m.event_information()}</h3>
 
 		<div>
-			<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700">Event Name</label>
+			<label for="event-name" class="mb-2 block text-sm font-medium text-gray-700">{m.event_name()}</label>
 			<input
 				type="text"
 				id="event-name"
@@ -185,20 +185,20 @@
 				class="classic block w-full"
 				class:border-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
 				class:focus:ring-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
-				placeholder="Enter event name"
+				placeholder={m.enter_event_name()}
 				disabled={!isEditable}
 			/>
 			{#if !isEventNameValid}
-				<p class="mt-1 text-sm text-red-600">Event name is required</p>
+				<p class="mt-1 text-sm text-red-600">{m.event_name_is_required()}</p>
 			{:else if hasLeadingTrailingWhitespace}
-				<p class="mt-1 text-sm text-red-600">Event name must not have leading or trailing whitespace</p>
+				<p class="mt-1 text-sm text-red-600">{m.event_name_whitespace_error_message()}</p>
 			{:else if isEventNameTooLong}
-				<p class="mt-1 text-sm text-red-600">Event name must be 100 characters or less</p>
+				<p class="mt-1 text-sm text-red-600">{m.event_name_too_long_error_message()}</p>
 			{/if}
 		</div>
 
 		<div>
-			<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">Program</label>
+			<label for="competition-type" class="mb-2 block text-sm font-medium text-gray-700">{m.program()}</label>
 			<select id="competition-type" bind:value={selectedProgram} class="classic block w-full" disabled={!isEditable}>
 				{#each ProgramSchema.options as type (type)}
 					<option value={type}>{type}</option>
@@ -207,7 +207,7 @@
 		</div>
 
 		<div>
-			<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700">Grade Level</label>
+			<label for="grade-level" class="mb-2 block text-sm font-medium text-gray-700">{m.grade_level()}</label>
 			<select id="grade-level" bind:value={selectedEventGradeLevel} class="classic block w-full" disabled={!isEditable}>
 				{#each gradeOptions as option (option.value)}
 					<option value={option.value}>{option.label}</option>
@@ -219,13 +219,13 @@
 	<!-- Manual Import Section (for unofficial events) -->
 	{#if isEditable}
 		<div class="space-y-4">
-			<h3 class="text-lg font-medium text-gray-800">Team Import</h3>
+			<h3 class="text-lg font-medium text-gray-800">{m.team_import()}</h3>
 			<div class="space-y-2">
-				<p class="text-sm text-gray-600">Import teams using CSV files from RobotEvents or Tournament Manager.</p>
+				<p class="text-sm text-gray-600">{m.team_import_description()}</p>
 				<p class="text-sm text-gray-600">
-					Download CSV from RobotEvents: Event Admin → "Downloads & Links" → "Download Tournament Manager Import Data"
+					{m.download_csv_from_robotevents()}
 				</p>
-				<p class="text-sm text-gray-600">Download CSV from Tournament Manager: File → Export → "Team List for Event"</p>
+				<p class="text-sm text-gray-600">{m.download_csv_from_tournament_manager()}</p>
 			</div>
 
 			<div
@@ -249,9 +249,9 @@
 						/>
 					</svg>
 					<button onclick={() => fileInput?.click()} class="cursor-pointer font-medium text-blue-600 hover:text-blue-500">
-						Upload CSV
+						{m.upload_csv()}
 					</button>
-					<p class="text-xs text-gray-500">or drag and drop</p>
+					<p class="text-xs text-gray-500">{m.or_drag_and_drop()}</p>
 				</div>
 			</div>
 
@@ -274,16 +274,16 @@
 	<!-- Team Summary -->
 	{#if teams.length > 0}
 		<div class="rounded-lg bg-slate-50 p-4">
-			<h4 class="mb-2 font-medium text-slate-900">Team Summary</h4>
+			<h4 class="mb-2 font-medium text-slate-900">{m.team_summary()}</h4>
 			<div class="space-y-1 text-sm text-slate-800">
-				<p>Total Teams: {teams.length}</p>
+				<p>{m.total_teams({ count: teams.length })}</p>
 			</div>
 		</div>
 	{/if}
 
 	<div class="flex justify-between pt-4">
 		<div class="flex space-x-3">
-			<button onclick={onPrev} class="secondary">Back</button>
+			<button onclick={onPrev} class="secondary">{m.back()}</button>
 		</div>
 		<button
 			onclick={handleNext}
@@ -292,7 +292,7 @@
 			class:cursor-not-allowed={!canProceed}
 			disabled={!canProceed}
 		>
-			Next: Team Groups
+			{m.next_team_groups()}
 		</button>
 	</div>
 </div>

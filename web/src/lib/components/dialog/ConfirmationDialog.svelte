@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { ConfirmationDialog } from '$lib/dialog.svelte';
 	import { dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
@@ -28,14 +29,14 @@
 	<!-- Buttons -->
 	<div class="flex justify-end space-x-3">
 		<button onclick={handleCancel} class={dialog.cancelButtonClass || 'cancel'}>
-			{dialog.cancelText || 'Cancel'}
+			{dialog.cancelText || m.cancel()}
 		</button>
 		<button 
 			onclick={handleConfirm} 
 			class={dialog.confirmButtonClass || 'primary'}
 			onkeydown={(e) => e.key === 'Enter' && handleConfirm()}
 		>
-			{dialog.confirmText || 'Confirm'}
+			{dialog.confirmText || m.confirm()}
 		</button>
 	</div>
 </Dialog>

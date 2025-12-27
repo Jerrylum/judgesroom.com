@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import CompetitionSetupStep from './CompetitionSetupStep.svelte';
 	import AwardSelectionStep from './AwardSelectionStep.svelte';
 	import TeamGroupsStep from './TeamGroupsStep.svelte';
@@ -227,7 +228,7 @@
 </script>
 
 <svelte:head>
-	<title>Event Setup | Judges' Room</title>
+	<title>{m.event_setup()} | Judges' Room</title>
 </svelte:head>
 
 <div class="h-full overflow-auto bg-slate-100 p-2 md:p-6">
@@ -236,7 +237,7 @@
 		<div class="mb-4 md:mb-8">
 			<!-- Mobile: Simple text indicator -->
 			<div class="flex items-center justify-between md:hidden">
-				<h1 class="text-xl font-bold text-gray-900">Event Setup</h1>
+				<h1 class="text-xl font-bold text-gray-900">{m.event_setup()}</h1>
 				<div class="text-sm font-medium text-gray-600">
 					Step {currentStep} of {totalSteps}
 				</div>
@@ -244,7 +245,7 @@
 
 			<!-- Desktop: Full visual indicator -->
 			<div class="hidden items-center justify-between md:flex">
-				<h1 class="text-3xl font-bold text-gray-900">Event Setup</h1>
+				<h1 class="text-3xl font-bold text-gray-900">{m.event_setup()}</h1>
 				<div class="flex items-center">
 					{#each Array(totalSteps) as _, i (i)}
 						<div class="flex items-center">
@@ -319,12 +320,7 @@
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 6}
-				<ReviewStep
-					onPrev={prevStep}
-					onComplete={completeSetup}
-					onCancel={cancelSetup}
-					isJudgesRoomJoined={app.isJudgesRoomJoined()}
-				/>
+				<ReviewStep onPrev={prevStep} onComplete={completeSetup} onCancel={cancelSetup} isJudgesRoomJoined={app.isJudgesRoomJoined()} />
 			{/if}
 		</div>
 	</div>
