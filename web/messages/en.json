@@ -1,4 +1,20 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from en!"
+	"hello_world": "Hello, {name} from en!",
+	"quaint_stock_seahorse_fetch": "An open-source judging system designed for judges and judge advisors to evaluate teams and conduct award deliberations for the VEX Robotics Competition.",
+	"begin": "Begin",
+	"minor_early_hedgehog_amuse": "Join Judges' Room",
+	"still_honest_koala_dance": "You could join by clicking the invite link directly or pasting the link below and clicking \"Join\".",
+	"mean_icy_albatross_drip": "Join",
+	"round_heavy_turtle_explore": "Or start a new one",
+	"gray_major_earthworm_reside": "Source Code",
+	"salty_cozy_goat_pet": "License",
+	"stock_lazy_poodle_explore": "Data Protection and Privacy",
+	"yummy_such_donkey_skip": "Discord Support",
+	"blue_just_raven_conquer": "YouTube Channel",
+	"direct_brave_pug_boil": "Paste the invite link here...",
+	"white_these_swan_attend": "Invalid URL",
+	"knotty_brave_nils_ascend": "Please enter a Judges' Room URL",
+	"nimble_fine_sheep_bubble": "Failed to Join",
+	"fine_game_firefox_spin": "Failed to join Judges' Room: {error}"
 }

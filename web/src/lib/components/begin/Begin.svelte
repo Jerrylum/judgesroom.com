@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
 	import { app, AppUI, dialogs } from '$lib/index.svelte';
 
 	let judgesRoomUrl = $state('');
@@ -10,8 +12,8 @@
 	async function handleJoinJudgesRoom() {
 		if (!judgesRoomUrl.trim()) {
 			dialogs.showAlert({
-				title: 'Invalid URL',
-				message: "Please enter a Judges' Room URL"
+				title: m.white_these_swan_attend(),
+				message: m.knotty_brave_nils_ascend()
 			});
 			return;
 		}
@@ -26,15 +28,21 @@
 			console.error("Error joining Judges' Room:", error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
-				title: 'Failed to Join',
-				message: `Failed to join Judges' Room: ${error}`
+				title: m.nimble_fine_sheep_bubble(),
+				message: m.fine_game_firefox_spin({ error: error + '' })
 			});
 		}
+	}
+
+	function handleLanguageChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		const language = target.value;
+		setLocale(language as Locale, { reload: true });
 	}
 </script>
 
 <svelte:head>
-	<title>Begin | Judges' Room</title>
+	<title>{m.begin()} | Judges' Room</title>
 </svelte:head>
 
 <div class="flex h-screen flex-col bg-slate-100">
@@ -44,28 +52,26 @@
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
 
 				<p class="text-center text-gray-700">
-					An open-source judging system designed for judges and judge advisors to evaluate teams and conduct award deliberations for the VEX
-					Robotics Competition.
+					{m.quaint_stock_seahorse_fetch()}
 				</p>
 			</div>
 
 			<div class="max-w-lg rounded-2xl bg-white p-4 shadow-sm sm:p-6">
-				<h3 class="text-2xl font-medium text-gray-900">Join Judges' Room</h3>
+				<h3 class="text-2xl font-medium text-gray-900">{m.minor_early_hedgehog_amuse()}</h3>
 				<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
-					You could join by clicking the invite link directly or pasting the link below and clicking "Join".
+					{m.still_honest_koala_dance()}
 				</p>
 				<div class="mb-6 space-y-4">
-					<input type="text" bind:value={judgesRoomUrl} placeholder="Paste the invite link here..." class="classic w-full" />
-					<button onclick={handleJoinJudgesRoom} class="primary w-full">Join</button>
+					<input type="text" bind:value={judgesRoomUrl} placeholder={m.direct_brave_pug_boil()} class="classic w-full" />
+					<button onclick={handleJoinJudgesRoom} class="primary w-full">{m.mean_icy_albatross_drip()}</button>
 				</div>
 				<p class="text-gray-700"></p>
 				<div class="mt-4 flex justify-center">
 					<button
 						class="cursor-pointer text-center text-sm text-gray-500 underline hover:text-gray-800 active:text-gray-900"
 						onclick={handleStartNewEvent}
-						aria-label="Start a new one"
 					>
-						Or start a new one
+						{m.round_heavy_turtle_explore()}
 					</button>
 				</div>
 			</div>
@@ -75,15 +81,22 @@
 		> -->
 		<div class="mt-4 flex max-w-2xl flex-row flex-wrap justify-center gap-2 text-sm text-gray-500">
 			<!-- <a href="./privacy" target="_blank"> See how your data and judging materials are managed... </a> -->
-			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">Source Code</a>
+			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">{m.gray_major_earthworm_reside()}</a>
 			|
-			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">License</a>
+			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">{m.salty_cozy_goat_pet()}</a>
 			|
-			<a href="./privacy" target="_blank">Data Protection and Privacy</a> |
-			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">Discord Support</a> |
-			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">YouTube Channel</a>
+			<a href="./privacy" target="_blank">{m.stock_lazy_poodle_explore()}</a> |
+			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">{m.yummy_such_donkey_skip()}</a> |
+			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.blue_just_raven_conquer()}</a>
 		</div>
 	</div>
+</div>
+
+<div class="fixed right-4 top-4 p-1">
+	<select onchange={handleLanguageChange} value={getLocale()}>
+		<option value="en">English</option>
+		<option value="zh-hk">繁體中文 (香港)</option>
+	</select>
 </div>
 
 <style lang="postcss">

@@ -1,0 +1,20 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"hello_world": "Hello, {name} from zh-hk!",
+	"quaint_stock_seahorse_fetch": "一個開源、專為 VEX 機器人競賽而設計的評審系統，讓評判和評判顧問可以更高效地評估隊伍並進行獎項決議。",
+	"begin": "開始",
+	"minor_early_hedgehog_amuse": "加入評審室",
+	"still_honest_koala_dance": "你可以通過直接點擊邀請鏈接或粘貼鏈接並點擊「加入」來加入評審室。",
+	"mean_icy_albatross_drip": "加入",
+	"round_heavy_turtle_explore": "或建立新的評審室",
+	"gray_major_earthworm_reside": "源代碼",
+	"salty_cozy_goat_pet": "許可證",
+	"stock_lazy_poodle_explore": "數據保護和隱私",
+	"yummy_such_donkey_skip": "Discord 支持",
+	"blue_just_raven_conquer": "YouTube 頻道",
+	"direct_brave_pug_boil": "請將邀請鏈接粘貼到這裡...",
+	"white_these_swan_attend": "無效的鏈接",
+	"knotty_brave_nils_ascend": "請輸入評審室鏈接",
+	"nimble_fine_sheep_bubble": "加入失敗",
+	"fine_game_firefox_spin": "加入評審室失敗: {error}"
+}
