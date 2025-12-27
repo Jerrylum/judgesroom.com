@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
 	import { app, AppUI } from '$lib/index.svelte';
@@ -84,7 +85,7 @@
 </script>
 
 <svelte:head>
-	<title>Role Selection | Judges' Room</title>
+	<title>{m.role_selection()} | Judges' Room</title>
 </svelte:head>
 <div class="flex h-screen flex-col bg-slate-100">
 	<div class="flex flex-1 flex-col items-center justify-center p-2">
@@ -93,31 +94,29 @@
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
 
 				<p class="text-center text-gray-700">
-					An open-source judging system designed for judges and judge advisors to evaluate teams and conduct award deliberations for the VEX
-					Robotics Competition.
+					{m.quaint_stock_seahorse_fetch()}
 				</p>
 			</div>
 
 			{#if !essentialData}
 				<div class="text-center text-gray-500">
-					<p>Loading Judges' Room data...</p>
+					<p>{m.loading_judges_room_data_description()}</p>
 				</div>
 			{:else if connectionState === 'connecting' || connectionState === 'reconnecting'}
 				<div class="rounded-lg bg-yellow-50 p-4 text-center text-yellow-700">
-					<p>Connecting to Judges' Room...</p>
+					<p>{m.connecting_to_judges_room_description()}</p>
 				</div>
 			{:else}
 				<div class="max-w-2xl rounded-2xl bg-white p-4 shadow-sm sm:p-6">
 					<!-- Role Selection -->
 					<div class="space-y-6">
 						<div class="space-y-4">
-							<h3 class="text-2xl font-medium text-gray-900">Join Judges' Room</h3>
+							<h3 class="text-2xl font-medium text-gray-900">{m.join_judges_room()}</h3>
 							<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
-								You are connected to <strong>{essentialData.eventName}</strong> (Division {essentialData.divisionId})
+								{@html m.you_are_connected_to({ eventName: essentialData.eventName, divisionId: essentialData.divisionId ?? '' })}
 							</p>
 							<p class="mb-2 mt-2 text-sm leading-relaxed text-gray-700">
-								Choose your identity to start participating in the Judges' Room. You can change your role at any time later if needed.
-							</p>
+								{m.choose_your_identity_to_start_participating_in_the_judges_room()}</p>
 							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<label
 									class="flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors"
@@ -133,8 +132,8 @@
 										class="text-slate-600 focus:ring-slate-500"
 									/>
 									<div>
-										<div class="font-medium text-gray-900">Judge</div>
-										<div class="text-sm text-gray-500">Evaluate teams and participate in scoring</div>
+										<div class="font-medium text-gray-900">{m.judge()}</div>
+										<div class="text-sm text-gray-500">{m.evaluate_teams_and_participate_in_scoring()}</div>
 									</div>
 								</label>
 
@@ -152,8 +151,8 @@
 										class="text-slate-600 focus:ring-slate-500"
 									/>
 									<div>
-										<div class="font-medium text-gray-900">Judge Advisor</div>
-										<div class="text-sm text-gray-500">Manage the Judges' Room and oversee judges</div>
+										<div class="font-medium text-gray-900">{m.judge_advisor()}</div>
+										<div class="text-sm text-gray-500">{m.manage_the_judges_room_and_oversee_judges()}</div>
 									</div>
 								</label>
 							</div>
@@ -172,7 +171,7 @@
 											class:text-gray-900={!showNameInput}
 											class:text-gray-500={showNameInput}
 										>
-											Find My Name
+											{m.find_my_name()}
 										</button>
 										<button
 											onclick={toggleNameInput}
@@ -181,7 +180,7 @@
 											class:text-gray-900={showNameInput}
 											class:text-gray-500={!showNameInput}
 										>
-											Can't Find Your Name?
+											{m.cant_find_your_name()}
 										</button>
 									</div>
 								</div>
@@ -191,8 +190,8 @@
 									<div class="space-y-4">
 										{#if Object.keys(judgesByGroup()).length === 0}
 											<div class="py-8 text-center text-gray-500">
-												<p>No judges have been set up yet.</p>
-												<p class="text-sm">You can add your name instead.</p>
+												<p>{m.no_judges_have_been_set_up_yet()}</p>
+												<p class="text-sm">{m.you_can_add_your_name_instead()}</p>
 											</div>
 										{:else}
 											<div class="space-y-4">
@@ -202,7 +201,7 @@
 														<h4 class="mb-2 font-medium text-gray-900">{group.name}</h4>
 
 														{#if judges.length === 0}
-															<p class="text-sm text-gray-500">No judges in this group</p>
+															<p class="text-sm text-gray-500">{m.no_judges_in_this_group()}</p>
 														{:else}
 															<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
 																{#each judges as judge (judge.id)}
@@ -228,7 +227,7 @@
 													disabled={!selectedJudgeId}
 													class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
 												>
-													Continue as Selected Judge
+													{m.continue_as_selected_judge()}
 												</button>
 											</div>
 										{/if}
@@ -238,7 +237,7 @@
 									<div class="space-y-4">
 										<div class="space-y-4">
 											<div>
-												<label for="judgeName" class="block text-sm font-medium text-gray-700">Your Name </label>
+												<label for="judgeName" class="block text-sm font-medium text-gray-700">{m.your_name()}</label>
 												<input
 													id="judgeName"
 													type="text"
@@ -249,7 +248,7 @@
 											</div>
 
 											<div>
-												<label for="judgeGroup" class="block text-sm font-medium text-gray-700">Judge Group </label>
+												<label for="judgeGroup" class="block text-sm font-medium text-gray-700">{m.judge_group()}</label>
 												<select id="judgeGroup" bind:value={selectedJudgeGroupId} class="classic mt-1 block w-full">
 													{#each judgeGroups as group (group.id)}
 														<option value={group.id}>{group.name}</option>
@@ -263,7 +262,7 @@
 													disabled={!newJudgeName.trim() || !selectedJudgeGroupId}
 													class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
 												>
-													Continue with This Name
+													{m.continue_with_this_name()}
 												</button>
 											</div>
 										</div>
@@ -274,16 +273,16 @@
 							<!-- Judge Advisor Selection -->
 							<div class="space-y-4">
 								<div class="rounded-lg border bg-slate-50 p-4 text-center">
-									<h4 class="font-medium text-gray-900">Judge Advisor</h4>
+									<h4 class="font-medium text-gray-900">{m.judge_advisor()}</h4>
 									<p class="mt-2 text-sm text-gray-600">
-										As a Judge Advisor, you can manage the Judges' Room, oversee all judges, and access all judging data.
+										{m.as_a_judge_advisor_you_can()}
 									</p>
 									<div class="mt-4">
 										<button
 											onclick={selectJudgeAdvisor}
 											class="rounded-md bg-slate-600 px-6 py-2 text-white transition-colors hover:bg-slate-700"
 										>
-											Continue as Judge Advisor
+											{m.continue_as_judge_advisor()}
 										</button>
 									</div>
 								</div>
@@ -292,9 +291,9 @@
 						<label class="flex cursor-pointer items-start space-x-3">
 							<input type="checkbox" bind:checked={enableGoogleAnalytics} class="mt-1" />
 							<div class="flex-1">
-								<div class="text-sm font-medium text-gray-900">Enable Google Analytics</div>
+								<div class="text-sm font-medium text-gray-900">{m.enable_google_analytics()}</div>
 								<p class="mt-1 text-xs text-gray-600">
-									Help us improve judgesroom.com by sharing anonymous usage data. No judging content or personal information is collected.
+									{m.help_us_improve_judgesroom_com_short()}
 								</p>
 							</div>
 						</label>
@@ -304,13 +303,13 @@
 		</div>
 
 		<div class="mt-4 flex max-w-2xl flex-row flex-wrap justify-center gap-2 text-sm text-gray-500">
-			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">Source Code</a>
+			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">{m.source_code()}</a>
 			|
-			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">License</a>
+			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">{m.license()}</a>
 			|
-			<a href="./privacy" target="_blank">Data Protection and Privacy</a> |
-			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">Discord Support</a> |
-			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">YouTube Channel</a>
+			<a href="./privacy" target="_blank">{m.data_protection_and_privacy()}</a> |
+			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">{m.discord_support()}</a> |
+			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.youtube_channel()}</a>
 		</div>
 	</div>
 </div>

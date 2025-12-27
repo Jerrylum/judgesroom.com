@@ -81,13 +81,13 @@
 		> -->
 		<div class="mt-4 flex max-w-2xl flex-row flex-wrap justify-center gap-2 text-sm text-gray-500">
 			<!-- <a href="./privacy" target="_blank"> See how your data and judging materials are managed... </a> -->
-			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">{m.gray_major_earthworm_reside()}</a>
+			<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank">{m.source_code()}</a>
 			|
-			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">{m.salty_cozy_goat_pet()}</a>
+			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">{m.license()}</a>
 			|
-			<a href="./privacy" target="_blank">{m.stock_lazy_poodle_explore()}</a> |
-			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">{m.yummy_such_donkey_skip()}</a> |
-			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.blue_just_raven_conquer()}</a>
+			<a href="./privacy" target="_blank">{m.data_protection_and_privacy()}</a> |
+			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">{m.discord_support()}</a> |
+			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.youtube_channel()}</a>
 		</div>
 	</div>
 </div>
