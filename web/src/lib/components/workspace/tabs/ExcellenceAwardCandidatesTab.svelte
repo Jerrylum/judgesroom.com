@@ -12,7 +12,7 @@
 	} from '$lib/robotevents-source';
 	import { isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import { htmlM } from '$lib/i18n';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
 		tab: ExcellenceAwardCandidatesTab;
@@ -126,7 +126,7 @@
 								conclusion of Qualification Matches, teams must be ranked in the top 40% of teams in this group in Qualification Match
 								rankings. This is calculated by {teamsInGroupCount} * 40% = {rankingEligibilityIntermediate} rounded to {rankingEligibilityThreshold}
 								teams. -->
-								{@html htmlM.excellence_award_candidates_description6({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description6, {
 									teamsInGroupCount,
 									acceptedGrade: award.acceptedGrades[0],
 									divisionId: divisionId ?? 'N/A',
@@ -139,7 +139,7 @@
 								the number of teams that actually arrived and participated in Qualification Matches. At the conclusion of the Robot Skills
 								Challenge matches, teams must be ranked in the top 40% of all {award.acceptedGrades[0]} teams at the event. This is calculated
 								by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams. -->
-								{@html htmlM.excellence_award_candidates_description7({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description7, {
 									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
 									acceptedGrade: award.acceptedGrades[0],
 									skillsEligibilityIntermediate,
@@ -150,7 +150,7 @@
 								<!-- At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
 								top 40% of all {award.acceptedGrades[0]} teams at the event. This is calculated by {report.joinedTeamsInEventCount}
 								* 40% = {skillsEligibilityIntermediate} rounded to {skillsEligibilityThreshold} teams. -->
-								{@html htmlM.excellence_award_candidates_description8({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description8, {
 									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
 									acceptedGrade: award.acceptedGrades[0],
 									skillsEligibilityIntermediate,
@@ -163,7 +163,7 @@
 								Matches, teams must be ranked in the top 40% of teams in this group in Qualification Match rankings. This is calculated by {teamsInGroupCount}
 								* 40% = {rankingEligibilityIntermediate}
 								rounded to {rankingEligibilityThreshold} teams. -->
-								{@html htmlM.excellence_award_candidates_description9({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description9, {
 									teamsInGroupCount,
 									divisionId: divisionId ?? 'N/A',
 									rankingEligibilityIntermediate,
@@ -175,7 +175,7 @@
 								actually arrived and participated in Qualification Matches. At the conclusion of the Robot Skills Challenge matches, teams
 								must be ranked in the top 40% of all teams at the event. This is calculated by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate}
 								rounded to {skillsEligibilityThreshold} teams. -->
-								{@html htmlM.excellence_award_candidates_description10({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description10, {
 									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
 									skillsEligibilityIntermediate,
 									skillsEligibilityThreshold
@@ -185,7 +185,7 @@
 								<!-- At the conclusion of the Autonomous Coding Skills Challenge matches, teams must be with a score above 0 and ranked in the
 								top 40% of all teams at the event. This is calculated by {report.joinedTeamsInEventCount} * 40% = {skillsEligibilityIntermediate}
 								rounded to {skillsEligibilityThreshold} teams. -->
-								{@html htmlM.excellence_award_candidates_description11({
+								{@html sanitizeHTMLMessage(m.excellence_award_candidates_description11, {
 									joinedTeamsInEventCount: report.joinedTeamsInEventCount,
 									skillsEligibilityIntermediate,
 									skillsEligibilityThreshold
@@ -210,8 +210,12 @@
 								<scroll-container use:registerScrollContainer class="bg-gray-200">
 									<content>
 										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.qualification_rank()}</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.overall_skills_rank()}</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.autonomous_coding_skills_rank()}</div>
+										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">
+											{m.overall_skills_rank()}
+										</div>
+										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">
+											{m.autonomous_coding_skills_rank()}
+										</div>
 									</content>
 								</scroll-container>
 							</table-header>

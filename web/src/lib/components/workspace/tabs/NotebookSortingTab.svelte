@@ -8,7 +8,7 @@
 	import GridViewIcon from '$lib/icon/GridViewIcon.svelte';
 	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
-	import { htmlM } from '$lib/i18n';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -172,11 +172,11 @@
 				<b>Not Submitted</b>, <b>Developing</b>, and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as
 				Developing or Fully Developed, either another Judge can help make that determination or the notebook should be given the benefit of
 				the doubt and categorized as Fully Developed. -->
-				{@html htmlM.notebook_sorting_description1()}
+				{@html sanitizeHTMLMessage(m.notebook_sorting_description1)}
 			</p>
 			<p class="mb-4 text-sm text-gray-600">
 				<!-- Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric. -->
-				{@html htmlM.notebook_sorting_description2()}
+				{@html sanitizeHTMLMessage(m.notebook_sorting_description2)}
 			</p>
 		</div>
 

@@ -1,4 +1,4 @@
-import { m } from './paraglide/messages.js';
+// import { m } from './paraglide/messages.js';
 import DOMPurify from 'dompurify';
 
 // Escape HTML entities to prevent XSS
@@ -23,22 +23,16 @@ function sanitizeInputs<T extends Record<string, unknown>>(inputs: T): T {
 	return sanitized;
 }
 
-type HTMLMessages = {
-	[K in keyof typeof m]: (typeof m)[K];
-};
+type FirstParameter<T extends (...args: any) => any> = T extends (arg: infer P, ...args: any[]) => any ? P : never;
 
-export const htmlM: HTMLMessages = new Proxy(m, {
-	get(target, prop: string) {
-		const originalFn = target[prop as keyof typeof target] as (...args: unknown[]) => string;
+type OtherParameters<T extends (...args: any) => any> = T extends (arg: any, ...args: infer P) => any ? P : never;
 
-		if (typeof originalFn !== 'function') {
-			return originalFn;
-		}
-
-		return (inputs: Record<string, unknown> = {}, ...args: unknown[]) => {
-			const sanitizedInputs = inputs ? sanitizeInputs(inputs) : inputs;
-			const result = originalFn(sanitizedInputs, ...args);
-			return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u'], ALLOWED_ATTR: [], ADD_TAGS: ['green', 'red', 'slate'] });
-		};
-	}
-});
+export function sanitizeHTMLMessage<Fn extends (...args: any[]) => any>(
+	fn: Fn,
+	inputs?: FirstParameter<Fn>,
+	...args: OtherParameters<Fn>
+): string {
+	const sanitizedInputs = inputs ? sanitizeInputs(inputs) : inputs;
+	const result = fn(sanitizedInputs, ...args);
+	return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u'], ALLOWED_ATTR: [], ADD_TAGS: ['green', 'red', 'slate'] });
+}

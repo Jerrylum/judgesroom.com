@@ -13,7 +13,7 @@
 		type ExcellenceAwardTeamEligibility
 	} from '$lib/robotevents-source';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import { htmlM } from '$lib/i18n';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -195,7 +195,7 @@
 					>
 					(green) indicates the team meets the performance criteria (top 40% in qualification rankings, robot skills, and autonomous coding skills),
 					<span class="font-medium text-red-600">&gt;40%</span> (red) indicates they do not meet the criteria. -->
-					{@html htmlM.final_ranking_description3()}
+					{@html sanitizeHTMLMessage(m.final_ranking_description3)}
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
 					<!-- Teams in Think Award column display eligibility indicators in the top-right corner: <span class="font-medium text-green-600"
@@ -203,7 +203,7 @@
 					>
 					(green) indicates the team participated in the Autonomous Coding Skills Challenge with a score greater than zero,
 					<span class="font-medium text-red-600">AUTO&cross;</span> (red) indicates they do not meet this criteria. -->
-					{@html htmlM.final_ranking_description4()}
+					{@html sanitizeHTMLMessage(m.final_ranking_description4)}
 				</p>
 				<p class="mb-2 text-sm text-gray-600">
 					<!-- Please make sure to enable the feature to publish live results to RobotEvents in the Web Publish Setup page of Tournament Manager.
@@ -226,7 +226,7 @@
 				<!-- Winning teams for each award are marked with a colored border: <span class="font-medium text-green-600">green</span> for eligible
 				winners, <span class="font-medium text-red-600">red</span> for ineligible winners, and
 				<span class="font-medium text-slate-600">gray</span> when eligibility data is unavailable. -->
-				{@html htmlM.final_ranking_description8()}
+				{@html sanitizeHTMLMessage(m.final_ranking_description8)}
 			</p>
 
 			<div class="relative space-y-4 overflow-x-auto">

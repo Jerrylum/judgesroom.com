@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { htmlM } from '$lib/i18n';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
 	import { app, AppUI } from '$lib/index.svelte';
@@ -115,7 +115,10 @@
 						<div class="space-y-4">
 							<h3 class="text-2xl font-medium text-gray-900">{m.join_judges_room()}</h3>
 							<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
-								{@html htmlM.you_are_connected_to({ eventName: essentialData.eventName, divisionId: essentialData.divisionId ?? '' })}
+								{@html sanitizeHTMLMessage(m.you_are_connected_to, {
+									eventName: essentialData.eventName,
+									divisionId: essentialData.divisionId ?? ''
+								})}
 							</p>
 							<p class="mb-2 mt-2 text-sm leading-relaxed text-gray-700">
 								{m.choose_your_identity_to_start_participating_in_the_judges_room()}
