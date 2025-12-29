@@ -449,5 +449,6 @@
 	"failed_to_reconnect_to_judges_room": "重新連接到評審室失敗：{error}",
 	"failed_to_kick_device": "踢出設備失敗：{error}",
 	"you_have_been_kicked_from_the_judges_room": "你已被踢出評審室",
-	"the_judges_room_has_been_destroyed": "評審室已被銷毀"
+	"the_judges_room_has_been_destroyed": "評審室已被銷毀",
+	"step_of": "步驟 {current}/{total}"
 }

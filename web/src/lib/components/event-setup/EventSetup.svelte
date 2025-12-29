@@ -239,7 +239,7 @@
 			<div class="flex items-center justify-between md:hidden">
 				<h1 class="text-xl font-bold text-gray-900">{m.event_setup()}</h1>
 				<div class="text-sm font-medium text-gray-600">
-					Step {currentStep} of {totalSteps}
+					{m.step_of({ current: currentStep, total: totalSteps })}
 				</div>
 			</div>
 

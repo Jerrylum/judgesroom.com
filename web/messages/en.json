@@ -446,5 +446,6 @@
 	"failed_to_reconnect_to_judges_room": "Failed to reconnect to Judges' Room: {error}",
 	"failed_to_kick_device": "Failed to kick device: {error}",
 	"you_have_been_kicked_from_the_judges_room": "You have been kicked from the Judges' Room",
-	"the_judges_room_has_been_destroyed": "The Judges' Room has been destroyed"
+	"the_judges_room_has_been_destroyed": "The Judges' Room has been destroyed",
+	"step_of": "Step {current} of {total}"
 }
