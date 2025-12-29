@@ -68,8 +68,7 @@
 	async function startAwardDeliberation() {
 		const confirmed = await dialogs.showConfirmation({
 			title: m.start_award_deliberation_title(),
-			message:
-				m.start_award_deliberation_message(),
+			message: m.start_award_deliberation_message(),
 			confirmText: m.start_award_deliberation_confirm_text(),
 			cancelText: m.cancel(),
 			confirmButtonClass: 'primary'
@@ -109,18 +108,17 @@
 				<div class="text-sm text-gray-500">
 					<!-- <p>Event Name: {essentialData.eventName}</p> -->
 					<p>
-						{m.event_code_colon()}
 						{#if essentialData.robotEventsSku}
-							<a
+							{m.event_code_colon()}<a
 								href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
 								target="_blank"
 								class="text-blue-500 hover:text-blue-600">{essentialData.robotEventsSku}</a
 							>
 						{:else}
-							{m.not_set()}
+							{m.event_code_colon()}{m.not_set()}
 						{/if}
 					</p>
-					<p>{m.division_colon()}: {essentialData.divisionId ?? m.not_set()}</p>
+					<p>{m.division_colon()}{essentialData.divisionId ?? m.not_set()}</p>
 					<p>{m.teams_number_of_colon({ count: essentialData.teamInfos.length })}</p>
 					<p>{m.judge_groups_number_of_colon({ count: essentialData.judgeGroups.length })}</p>
 					<p>{m.judges_number_of_colon({ count: app.getJudgeCount() })}</p>
