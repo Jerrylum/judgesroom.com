@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import ScoringButtons from './ScoringButtons.svelte';
 
@@ -24,27 +26,27 @@
 </script>
 
 <div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
-	<button class="lightweight tiny" onclick={scrollLeft}>Scroll Left</button>
-	<button class="lightweight tiny" onclick={scrollRight}>Scroll Right</button>
+	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
+	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
 <rubric-table>
 	<rubric-header>
-		<criteria class="max-w-42 min-w-42 bg-gray-400">CRITERIA</criteria>
+		<criteria class="max-w-42 min-w-42 bg-gray-400">{m.rubric_criteria()}</criteria>
 		<scroll-container use:registerScrollContainer>
 			<content class="min-w-120 flex-col! gap-2 bg-gray-200">
-				<div class="p-0! pt-1 text-center text-base font-bold">PROFICIENCY LEVEL</div>
+				<div class="p-0! pt-1 text-center text-base font-bold">{m.rubric_proficiency_level()}</div>
 				<div class="border-0! p-0! flex text-center">
 					<div class="flex-1 border-r pb-1">
-						<p class="font-bold">EXPERT</p>
-						<p class="text-xs">(4-5 POINTS)</p>
+						<p class="font-bold">{m.rubric_expert()}</p>
+						<p class="text-xs">{m.rubric_points_4_5()}</p>
 					</div>
 					<div class="flex-1 pb-1">
-						<p class="font-bold">PROFICIENT</p>
-						<p class="text-xs">(2-3 POINTS)</p>
+						<p class="font-bold">{m.rubric_proficient()}</p>
+						<p class="text-xs">{m.rubric_points_2_3()}</p>
 					</div>
 					<div class="flex-1 border-l pb-1">
-						<p class="font-bold">EMERGING</p>
-						<p class="text-xs">(0-1 POINTS)</p>
+						<p class="font-bold">{m.rubric_emerging()}</p>
+						<p class="text-xs">{m.rubric_points_0_1()}</p>
 					</div>
 				</div>
 			</content>
@@ -52,24 +54,21 @@
 		<scoring class="flex-col! min-w-14 bg-gray-200">
 			<div class="pt-1">&nbsp;</div>
 			<div class="flex items-center p-1 font-bold">
-				<span>POINTS</span>
+				<span>{m.rubric_points()}</span>
 			</div>
 		</scoring>
 	</rubric-header>
 	<rubric-body>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">ENGINEERING DESIGN PROCESS</p>
-				<i class="text-xs text-gray-500">All Awards</i>
+				<p class="text-sm font-bold">{m.rubric_ti_engineering_design_process()}</p>
+				<i class="text-xs text-gray-500">{m.rubric_all_awards()}</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>
-						Team shows evidence of independent inquiry <u>from the beginning stages</u> of their design process. This includes brainstorming,
-						testing, and exploring alternative solutions.
-					</div>
-					<div>Team shows evidence of independent inquiry for <u>some elements</u> of their design process.</div>
-					<div>Team <u>shows little to no evidence</u> of independent inquiry in their design process.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_engineering_design_process_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_engineering_design_process_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_engineering_design_process_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -82,14 +81,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">GAME STRATEGY</p>
+				<p class="text-sm font-bold">{m.rubric_ti_game_strategy()}</p>
 				<i class="text-xs text-gray-500">Design, Innovate, Create, Amaze</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team can fully explain their <u>entire</u> game strategy including game analysis.</div>
-					<div>Team can explain their current strategy with <u>limited evidence of game analysis</u>.</div>
-					<div>Team <u>did not explain</u> game strategy, or strategy is not student-directed.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_game_strategy_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_game_strategy_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_game_strategy_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -102,16 +101,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">ROBOT DESIGN</p>
-				<i class="text-xs text-gray-500">Design, Innovate, Build Create, Amaze</i>
+				<p class="text-sm font-bold">{m.rubric_ti_robot_design()}</p>
+				<i class="text-xs text-gray-500">Design, Innovate, Build, Create, Amaze</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team can <u>fully explain</u> the evolution of their robot design to the current design.</div>
-					<div>
-						Team can provide a <u>limited description</u> of why the current robot design was chosen, but shows limited evolution.
-					</div>
-					<div>Team <u>did not explain</u> robot design, or design is not student-directed.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_design_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_design_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_design_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -124,14 +121,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">ROBOT BUILD</p>
+				<p class="text-sm font-bold">{m.rubric_ti_robot_build()}</p>
 				<i class="text-xs text-gray-500">Innovate, Build, Create, Amaze</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team can <u>fully explain</u> their robot construction. Ownership of the robot build is evident.</div>
-					<div>Team can describe why the current robot design was chosen, but with <u>limited explanation</u>.</div>
-					<div>Team <u>did not explain</u> robot build, or build is not student-directed.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_build_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_build_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_build_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -144,17 +141,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">ROBOT PROGRAMMING</p>
+				<p class="text-sm font-bold">{m.rubric_ti_robot_programming()}</p>
 				<i class="text-xs text-gray-500">Design, Innovate, Think, Amaze</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team can <u>fully explain</u> the evolution of their programming.</div>
-					<div>
-						Team can describe how the current programs work, but with
-						<u>limited evolution</u>.
-					</div>
-					<div>Team <u>did not explain</u> programming, or programming is not student-directed.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_programming_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_programming_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_robot_programming_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -167,14 +161,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">CREATIVITY / ORIGINALITY</p>
+				<p class="text-sm font-bold">{m.rubric_ti_creativity_originality()}</p>
 				<i class="text-xs text-gray-500">Innovate, Create</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team can describe creative aspect(s) of their robot with clarity and detail.</div>
-					<div>Team can describe a creative solution but the answer lacks detail.</div>
-					<div>Team has difficulty describing a creative solution or gives minimal response.</div>
+					<div>{m.rubric_ti_creativity_originality_expert()}</div>
+					<div>{m.rubric_ti_creativity_originality_proficient()}</div>
+					<div>{m.rubric_ti_creativity_originality_emerging()}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -187,19 +181,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">TEAM AND PROJECT MANAGEMENT</p>
-				<i class="text-xs text-gray-500">All Awards</i>
+				<p class="text-sm font-bold">{m.rubric_ti_team_project_management()}</p>
+				<i class="text-xs text-gray-500">{m.rubric_all_awards()}</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>
-						Team can explain <u>how team progress was tracked against an overall project timeline</u>. Team can explain management of
-						material and personnel resources.
-					</div>
-					<div>
-						Team can explain <u>how team progress was monitored</u>, and some degree of management of material and personnel resources.
-					</div>
-					<div>Team <u>cannot explain how team progress was monitored</u> or how resources were managed.</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_team_project_management_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_team_project_management_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_team_project_management_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -212,20 +201,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">TEAMWORK, COMMUNICATION, PROFESSIONALISM</p>
-				<i class="text-xs text-gray-500">All Awards</i>
+				<p class="text-sm font-bold">{m.rubric_ti_teamwork_communication()}</p>
+				<i class="text-xs text-gray-500">{m.rubric_all_awards()}</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>
-						<u>Most or all team members contribute to explanations</u> of the design process, game strategy, and other work done by the team.
-					</div>
-					<div>
-						<u>Some team members contribute to explanations</u> of the design process, game strategy, and other work done by the team.
-					</div>
-					<div>
-						<u>Few team members contribute to explanations</u> of the design process, game strategy, and other work done by the team.
-					</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_teamwork_communication_expert)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_teamwork_communication_proficient)}</div>
+					<div>{@html sanitizeHTMLMessage(m.rubric_ti_teamwork_communication_emerging)}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -238,14 +221,14 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">RESPECT, COURTESY, POSITIVITY</p>
-				<i class="text-xs text-gray-500">All Awards</i>
+				<p class="text-sm font-bold">{m.rubric_ti_respect_courtesy()}</p>
+				<i class="text-xs text-gray-500">{m.rubric_all_awards()}</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
-					<div>Team consistently interacts respectfully, courteously, and positively in their interview.</div>
-					<div>Team interactions show signs of respect and courtesy, but there is room for improvement.</div>
-					<div>Team interactions lack respectful and courteous behavior.</div>
+					<div>{m.rubric_ti_respect_courtesy_expert()}</div>
+					<div>{m.rubric_ti_respect_courtesy_proficient()}</div>
+					<div>{m.rubric_ti_respect_courtesy_emerging()}</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14">
@@ -258,23 +241,20 @@
 		</row>
 		<row>
 			<criteria class="max-w-42 min-w-42">
-				<p class="text-sm font-bold">SPECIAL ATTRIBUTES & OVERALL IMPRESSIONS</p>
+				<p class="text-sm font-bold">{m.rubric_ti_special_attributes()}</p>
 				<i class="text-xs text-gray-500">Judges, Inspire</i>
 			</criteria>
 			<scroll-container use:registerScrollContainer>
 				<content class="min-w-120">
 					<div>
-						<p>
-							Does the team have any special attributes, accomplishments, or exemplary effort in overcoming challenges at this event? Did
-							anything stand out about this team in their interview? Please describe:
-						</p>
+						<p>{m.rubric_ti_special_attributes_description()}</p>
 						<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes} readonly={isSubmitted}
 						></textarea>
 					</div>
 				</content>
 			</scroll-container>
 			<scoring class="min-w-14 gap-2">
-				<p>TOTAL<br />SCORE</p>
+				<p>{m.rubric_total_score()}</p>
 				<p class="text-lg">{totalScore}</p>
 			</scoring>
 		</row>
