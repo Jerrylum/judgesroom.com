@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import QRCode from 'qrcode';
 	import './rubric.css';
 	import { app, tabs, subscriptions, dialogs } from '$lib/index.svelte';
@@ -11,6 +12,7 @@
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
 	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
+	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -73,7 +75,7 @@
 			initialNotes = existingRubric.notes;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
-			app.addErrorNotice('Failed to load existing rubric');
+			app.addErrorNotice(m.failed_to_load_existing_rubric());
 		}
 	}
 
@@ -157,7 +159,7 @@
 
 	async function saveRubric() {
 		if (!tab.teamId) {
-			app.addErrorNotice('Please select a team');
+			app.addErrorNotice(m.please_select_a_team());
 			// Scroll to top to help user select team
 			mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 			return;
@@ -172,7 +174,7 @@
 		const missingScores = rubricScores.some((score) => score === -1);
 		if (missingScores) {
 			showValidationErrors = true;
-			app.addErrorNotice('Please complete all scoring sections before submitting the rubric.');
+			app.addErrorNotice(m.please_complete_all_scoring_sections());
 			return;
 		}
 
@@ -199,10 +201,10 @@
 			initialRubricScores = [...rubricScores];
 			initialNotes = notes;
 
-			app.addSuccessNotice('Team interview rubric saved successfully!');
+			app.addSuccessNotice(m.team_interview_rubric_saved_successfully());
 		} catch (error) {
 			console.error('Failed to save team interview rubric:', error);
-			app.addErrorNotice('Failed to save team interview rubric');
+			app.addErrorNotice(m.failed_to_save_team_interview_rubric());
 		}
 	}
 
@@ -248,21 +250,21 @@
 		<!-- Header -->
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-4 flex items-center justify-between">
-				<h2 class="text-xl font-semibold text-gray-900">Team Interview Rubric</h2>
+				<h2 class="text-xl font-semibold text-gray-900">{m.team_interview_rubric()}</h2>
 				{#if isSubmitted}
-					<button onclick={editRubric} class="secondary tiny">Edit</button>
+					<button onclick={editRubric} class="secondary tiny">{m.edit()}</button>
 				{/if}
 			</div>
 
 			<div class="mb-4">
 				{#if isSubmitted && tab.teamId}
 					<div class="mb-2 mt-1 text-base text-gray-900">
-						<strong>Team #</strong>: {includedTeams[tab.teamId].number}
+						<strong>{m.team_hash()}</strong>: {includedTeams[tab.teamId].number}
 					</div>
 				{:else}
-					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>Team #</strong></label>
+					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>{m.team_hash()}</strong></label>
 					<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full">
-						<option value="">Select a team...</option>
+						<option value="">{m.select_a_team()}</option>
 						{#each teamsToShow() as team (team.id)}
 							<option value={team.id}>{team.number} - {team.name}</option>
 						{/each}
@@ -280,7 +282,7 @@
 								onchange={handleShowOnlyAssignedTeamsChange}
 							/>
 							<span class="text-sm text-gray-700">
-								Only show assigned teams for your current judge group ({currentJudgeGroup.name})
+								{m.only_show_assigned_teams_for_your_current_judge_group({ name: currentJudgeGroup.name })}
 							</span>
 						</label>
 					</div>
@@ -295,20 +297,20 @@
 					devStatus === 'fully_developed' ? 'Fully Developed' : devStatus === 'developing' ? 'Developing' : 'Not Submitted/Not Reviewed'}
 				<div class="mb-4 flex flex-row justify-between gap-2 rounded-lg bg-gray-50 p-4">
 					<div class=" text-sm text-gray-800">
-						<p><strong>Team #{selectedTeam.number}:</strong> {selectedTeam.name}</p>
-						<p><strong>School:</strong> {selectedTeam.school}</p>
-						<p><strong>Grade Level:</strong> {selectedTeam.grade}</p>
+						<p><strong>{m.team_hash()}{selectedTeam.number}:</strong> {selectedTeam.name}</p>
+						<p><strong>{m.school_colon()}</strong>{selectedTeam.school}</p>
+						<p><strong>{m.grade_level_colon()}</strong>{selectedTeam.grade}</p>
 						<p>
-							<strong>Notebook Link:</strong>
 							{#if notebookLink === '(Not provided)'}
-								{notebookLink}
+								<strong>{m.notebook_link_colon()}</strong>{notebookLink}
 							{:else}
-								<a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank">{notebookLink}</a>
+								<strong>{m.notebook_link_colon()}</strong><a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank"
+									>{notebookLink}</a
+								>
 							{/if}
 						</p>
 						<p>
-							<strong>Notebook Development Status:</strong>
-							<span
+							<strong>{m.notebook_development_status_colon()}</strong><span
 								class:text-green-600={devStatus === 'fully_developed'}
 								class:text-yellow-600={devStatus === 'developing'}
 								class:text-gray-600={devStatus === 'undetermined'}
@@ -318,8 +320,7 @@
 						</p>
 						{#if notebookRubricsForTeam.length > 0}
 							<p>
-								<strong>Your Notebook Rubrics:</strong>
-								{#each notebookRubricsForTeam as rubric, index}
+								<strong>{m.your_notebook_rubrics_colon()}</strong>{#each notebookRubricsForTeam as rubric, index}
 									<button onclick={() => openNotebookRubric(rubric.id)} class="text-blue-500 hover:text-blue-600">
 										Rubric {index + 1}
 									</button>{index < notebookRubricsForTeam.length - 1 ? ', ' : ''}
@@ -334,8 +335,8 @@
 				</div>
 
 				{#if selectedTeam.absent}
-					<WarningSign title="Absent Team">
-						<p>This team has been marked as absent. They are not eligible for any Judged Awards.</p>
+					<WarningSign title={m.absent_team()}>
+						<p>{m.absent_team_description()}</p>
 					</WarningSign>
 				{/if}
 			{/if}
@@ -343,42 +344,40 @@
 			<!-- Current Judge Information (Read-only) -->
 			<div class="mt-2 text-sm text-gray-700">
 				{#if judgeId}
-					<p><strong>Judge Name:{' '}</strong>{app.findJudgeById(judgeId)?.name}</p>
+					<p><strong>{m.judge_name_colon()}</strong>{app.findJudgeById(judgeId)?.name}</p>
 				{:else}
 					<p>
-						(Please switch to a judge in order to submit the rubric){' '}<button
-							onclick={switchToJudge}
-							class="text-blue-500 hover:text-blue-600">Switch to Judge</button
+						{m.please_switch_to_a_judge()}{' '}<button onclick={switchToJudge} class="text-blue-500 hover:text-blue-600"
+							>{m.switch_to_judge()}</button
 						>
 					</p>
 				{/if}
 				<!-- Submission Timestamp -->
 				{#if tab.rubricId}
 					<div class="text-sm text-gray-700">
-						<p><strong>Submitted at:</strong> {new Date(timestamp).toLocaleString('en-us')}</p>
+						<p><strong>{m.submitted_at_colon()}</strong>{new Date(timestamp).toLocaleString('en-us')}</p>
 					</div>
 				{/if}
 			</div>
 		</div>
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<p class="mb-6 text-sm text-gray-600">
-				<strong>Directions:</strong> Determine a point value that best characterizes the content of the Team Interview for that criterion.
+				{@html sanitizeHTMLMessage(m.team_interview_rubric_directions)}
 			</p>
 
 			<TeamInterviewRubricTable bind:rubricScores bind:notes {isSubmitted} {showValidationErrors} />
 
 			<p class="mt-2 text-center text-xs italic">
-				All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at
-				the end of the event.
+				{m.judging_materials_strictly_confidential_description()}
 			</p>
 
 			<div class="mt-6 flex justify-center gap-4">
 				{#if isSubmitted}
-					<button onclick={editRubric} class="secondary">Edit Rubric</button>
-					<button onclick={closeRubric} class="secondary">Close Rubric</button>
-					<button onclick={newRubric} class="primary">New Rubric</button>
+					<button onclick={editRubric} class="secondary">{m.edit_rubric()}</button>
+					<button onclick={closeRubric} class="secondary">{m.close_rubric()}</button>
+					<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
 				{:else}
-					<button onclick={saveRubric} class="primary" disabled={!judgeId}>Submit Rubric</button>
+					<button onclick={saveRubric} class="primary" disabled={!judgeId}>{m.submit_rubric()}</button>
 				{/if}
 			</div>
 		</div>
@@ -386,11 +385,9 @@
 		<!-- Award Rankings Section -->
 		{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
 			<div class="rounded-lg bg-white p-6 shadow-sm">
-				<h3 class="mb-4 text-lg font-semibold text-gray-900">Award Candidate Ranking</h3>
+				<h3 class="mb-4 text-lg font-semibold text-gray-900">{m.award_candidate_ranking()}</h3>
 				<p class="mb-4 text-sm text-gray-600">
-					Rate this team for specific awards based on your team interview by clicking on the boxes below. Indicate how strong a candidate
-					this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all
-					judges see updates in real-time without having to refresh the page.
+					{m.rubric_award_candidate_ranking_description()}
 				</p>
 				<AwardRankingTable
 					title=""
