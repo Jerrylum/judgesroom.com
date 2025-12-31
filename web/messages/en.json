@@ -473,5 +473,12 @@
 	"close_rubric": "Close Rubric",
 	"new_rubric": "New Rubric",
 	"submit_rubric": "Submit Rubric",
-	"rubric_award_candidate_ranking_description": "Rate this team for specific awards based on your team interview by clicking on the boxes below. Indicate how strong a candidate this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all judges see updates in real-time without having to refresh the page."
+	"rubric_award_candidate_ranking_description": "Rate this team for specific awards based on your team interview by clicking on the boxes below. Indicate how strong a candidate this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all judges see updates in real-time without having to refresh the page.",
+	"notebook_rubric_saved_successfully": "Notebook rubric saved successfully!",
+	"failed_to_save_notebook_rubric": "Failed to save notebook rubric",
+	"notebook_development_status": "Notebook Development Status",
+	"notebook_development_status_warning": "Only <strong>Fully Developed</strong> notebooks will be completed the Engineering Notebook Rubric. This notebook will be marked as <strong>Fully Developed</strong> if the rubric is submitted.",
+	"notebook_rubric_directions": "<b>Directions:</b> Determine the point value that best characterizes the content of the Engineering Notebook for that criterion. Write that value in the column to the right. This rubric is to be used for all Engineering Notebooks regardless of format (physical or digital). Please refer to Section 5 of the Guide to Judging for information on how to use this rubric.",
+	"notebook_rubric_notes": "<b>Notes:</b> Any student-centered or academic honesty concerns, such as plagiarism, should be brought to the attention of the Judge Advisor and/or Event Partner.",
+	"notebook_rubric_award_candidate_ranking_description": "Rate this team for specific awards based on your notebook review by clicking on the boxes below. Indicate how strong a candidate this team is for each award using the star system (0-5 stars). This table is shared and synchronized within your judge group - all judges see updates in real-time without having to refresh the page."
 }

@@ -470,11 +470,18 @@
 	"please_switch_to_a_judge": "(請切換到評判以提交評分表)",
 	"switch_to_judge": "切換到評判",
 	"submitted_at_colon": "提交於：",
-	"team_interview_rubric_directions": "<b>指引：</b>為每個評分標準決定一個最佳描述團隊面談內容的分數。",
+	"team_interview_rubric_directions": "<b>指引：</b>為每個評分標準給予一個最佳描述團隊面談內容的分數。",
 	"judging_materials_strictly_confidential_description": "所有評審材料都必須受嚴格保密。它們不應被分享給評判和評判顧問以外的任何人士，並且應在賽事結束後銷毀。",
 	"edit_rubric": "編輯評分表",
 	"close_rubric": "關閉評分表",
 	"new_rubric": "新評分表",
 	"submit_rubric": "提交評分表",
-	"rubric_award_candidate_ranking_description": "為這個隊伍在特定獎項上的表現打分，點擊下面的方框。使用星星（0-5星）來表示這個隊伍在每個獎項上的有多大機會能夠競逐獎項。這個表格在評判組內共享和同步 - 所有評判都能實時看到更新，無需刷新頁面。"
+	"rubric_award_candidate_ranking_description": "為這個隊伍在特定獎項上的表現打分，點擊下面的方框。使用星星（0-5星）來表示這個隊伍在每個獎項上的有多大機會能夠競逐獎項。這個表格在評判組內共享和同步 - 所有評判都能實時看到更新，無需刷新頁面。",
+	"notebook_rubric_saved_successfully": "已成功儲存工程筆記評分表！",
+	"failed_to_save_notebook_rubric": "儲存工程筆記評分表失敗",
+	"notebook_development_status": "工程筆記開發狀態",
+	"notebook_development_status_warning": "只有<strong>完全開發</strong>的工程筆記才能完成工程筆記評分表。如果評分表被提交，這本工程筆記將被標記為<strong>完全開發</strong>。",
+	"notebook_rubric_directions": "<b>指引：</b>為每個評分標準給予一個最佳描述工程筆記內容的分數。將該分數填寫在右側的欄位中。無論工程筆記的格式為何（紙本或電子），都應使用此評分表。請參閱評判指南第5節以了解如何使用此評分表的資訊。",
+	"notebook_rubric_notes": "<b>注意：</b>任何以學生為中心或學術誠信的問題，如抄襲，應向評判顧問和/或賽事合作夥伴報告。",
+	"notebook_rubric_award_candidate_ranking_description": "為這個隊伍在特定獎項上的表現打分（基於你的工程筆記評分），點擊下面的方框。使用星星（0-5星）來表示這個隊伍在每個獎項上的有多大機會能夠競逐獎項。這個表格在評判組內共享和同步 - 所有評判都能實時看到更新，無需刷新頁面。"
 }

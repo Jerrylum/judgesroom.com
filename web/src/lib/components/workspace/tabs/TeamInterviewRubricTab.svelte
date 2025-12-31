@@ -43,6 +43,8 @@
 	let initialRubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let initialNotes = $state('');
 
+	let teamsSelectElement: HTMLSelectElement | null = $state(null);
+
 	// Track unsaved changes
 	$effect(() => {
 		if (isSubmitted) {
@@ -111,12 +113,23 @@
 	});
 
 	$effect(() => {
-		if (tab.teamId) {
+		if (!teamsSelectElement) return;
+		// Update the select element to the current team id
+		teamsSelectElement.value = tab.teamId;
+	});
+
+	$effect(() => {
+		if (tab.teamId && !currentJudgeGroup?.assignedTeams.includes(tab.teamId)) {
 			// If the user is editing a team that is not assigned to them, uncheck the "Only show assigned teams" checkbox
 			// Such that the user can see all the teams in the event
-			showOnlyAssignedTeams = currentJudgeGroup?.assignedTeams.includes(tab.teamId) ?? true;
+			showOnlyAssignedTeams = false;
 		}
 	});
+
+	function handleTeamSelectChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		tab.teamId = target.value;
+	}
 
 	function handleShowOnlyAssignedTeamsChange(event: { currentTarget: EventTarget & HTMLInputElement }) {
 		const newState = event.currentTarget.checked;
@@ -131,11 +144,15 @@
 	let mainScrollContainer: HTMLElement;
 
 	// Get teams to display based on filter
-	const teamsToShow = $derived(() => {
+	const teamsToShow = $derived.by(() => {
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
-			return sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+			const rtn = sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+			console.log('rtn', rtn);
+			return rtn;
 		} else {
-			return sortByTeamNumber(Object.values(includedTeams));
+			const rtn = sortByTeamNumber(Object.values(includedTeams));
+			console.log('rtn', rtn);
+			return rtn;
 		}
 	});
 
@@ -263,10 +280,10 @@
 					</div>
 				{:else}
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>{m.team_hash()}</strong></label>
-					<select id="team-select" bind:value={tab.teamId} class="classic mb-2 mt-1 block w-full">
+					<select id="team-select" bind:this={teamsSelectElement} class="classic mb-2 mt-1 block w-full" onchange={handleTeamSelectChange}>
 						<option value="">{m.select_a_team()}</option>
-						{#each teamsToShow() as team (team.id)}
-							<option value={team.id}>{team.number} - {team.name}</option>
+						{#each teamsToShow as team (team.id)}
+							<option value={team.id} selected={team.id === tab.teamId}>{team.number} - {team.name}</option>
 						{/each}
 					</select>
 				{/if}
