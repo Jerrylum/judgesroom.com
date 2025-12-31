@@ -15,6 +15,7 @@
 	import { parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
 	import Leaving from '$lib/components/leaving/Leaving.svelte';
+	import I18n from '$lib/components/i18n/I18n.svelte';
 
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
@@ -120,6 +121,8 @@
 		app.clearNotice(id);
 	}
 </script>
+
+<I18n />
 
 <div class="min-h-screen">
 	{#if AppUI.appPhase === 'loading'}
