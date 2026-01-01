@@ -25,7 +25,7 @@
 	});
 </script>
 
-<div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
+<div class="md:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
 	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
