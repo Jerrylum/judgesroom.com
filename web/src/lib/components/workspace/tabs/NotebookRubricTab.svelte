@@ -12,6 +12,7 @@
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
 	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { getLocale } from '$lib/paraglide/runtime';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -359,7 +360,7 @@
 			<!-- Submission Timestamp -->
 			{#if tab.rubricId}
 				<div class="text-sm text-gray-700">
-					<p><strong>{m.submitted_at_colon()}</strong>{new Date(timestamp).toLocaleString('en-us')}</p>
+					<p><strong>{m.submitted_at_colon()}</strong>{new Date(timestamp).toLocaleString(getLocale())}</p>
 				</div>
 			{/if}
 		</div>
