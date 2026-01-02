@@ -577,5 +577,7 @@
 	"rubric_nb_team_project_management_expert": "Provides a <u>complete record of team and project assignments;</u> contains team meeting notes including goals, decisions, and building/programming accomplishments; design cycles are easily identified. Resource constraints including time and materials are noted throughout. Notebook has evidence that documentation was done in sequence with the design process. Entries include dates and names of contributing students.",
 	"rubric_nb_team_project_management_proficient": "Records <u>most of the information listed</u> at the left. Level of detail is inconsistent, or some aspects are missing. There are significant gaps in the overall record of the design process. Notebook may have inconsistent evidence of dates of entries and student contributions.",
 	"rubric_nb_team_project_management_emerging": "<u>Does not record the design process in a way that shows team progress.</u> There are significant gaps or missing information for key design aspects. Notebook has little evidence of dates of entries and student contributions.",
-	"rubric_nb_innovate_award_notes": "INNOVATE AWARD NOTES (optional):"
+	"rubric_nb_innovate_award_notes": "INNOVATE AWARD NOTES (optional):",
+	"preferences": "Preferences",
+	"language": "Language"
 }

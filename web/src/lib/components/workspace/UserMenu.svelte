@@ -3,12 +3,14 @@
 	import { app, AppUI, dialogs } from '$lib/index.svelte';
 	import GearIcon from '$lib/icon/GearIcon.svelte';
 	import LeaveDoorIcon from '$lib/icon/LeaveDoorIcon.svelte';
+	import SettingsIcon from '$lib/icon/SettingsIcon.svelte';
 	import ShareIcon from '$lib/icon/ShareIcon.svelte';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import UserIcon from '$lib/icon/UserIcon.svelte';
 	import DestroyDialog from './DestroyDialog.svelte';
 	import ShareDialog from './ShareDialog.svelte';
 	import RoleSelectionDialog from './RoleSelectionDialog.svelte';
+	import PreferencesDialog from './PreferencesDialog.svelte';
 	import { onMount } from 'svelte';
 
 	let isOpen = $state(false);
@@ -37,6 +39,11 @@
 	function handleSwitchRole() {
 		closeMenu();
 		dialogs.showCustom(RoleSelectionDialog, { props: {} });
+	}
+
+	function handlePreferences() {
+		closeMenu();
+		dialogs.showCustom(PreferencesDialog, { props: {} });
 	}
 
 	async function handleLeaveJudgesRoom() {
@@ -165,6 +172,14 @@
 					<UserIcon />
 				</span>
 				<span>{m.switch_role()}</span>
+			</button>
+
+			<!-- Preferences -->
+			<button onclick={handlePreferences} class="menu-item" role="menuitem">
+				<span class="mr-3">
+					<SettingsIcon />
+				</span>
+				<span>{m.preferences()}</span>
 			</button>
 
 			<!-- Leave Judges' Room -->

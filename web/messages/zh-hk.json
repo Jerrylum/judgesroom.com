@@ -580,5 +580,7 @@
 	"rubric_nb_team_project_management_expert": "提供<u>完整的團隊和項目分配記錄；</u>包含團隊會議記錄，包括目標、決策和建造/編程成就；設計週期易於識別。資源約束（包括時間和材料）在整個過程中都有記錄。筆記本有證據表明文檔是按照設計過程的順序完成的。條目包括日期和貢獻學生的姓名。",
 	"rubric_nb_team_project_management_proficient": "記錄<u>左側列出的大部分資訊</u>。細節程度不一致，或某些方面缺失。設計過程的整體記錄有重大缺口。筆記本可能有不一致的條目日期和學生貢獻證據。",
 	"rubric_nb_team_project_management_emerging": "<u>沒有以顯示團隊進度的方式記錄設計過程。</u>關鍵設計方面有重大缺口或缺失資訊。筆記本幾乎沒有條目日期和學生貢獻的證據。",
-	"rubric_nb_innovate_award_notes": "創新獎備註（可選）："
+	"rubric_nb_innovate_award_notes": "創新獎備註（可選）：",
+	"preferences": "偏好設定",
+	"language": "語言"
 }
