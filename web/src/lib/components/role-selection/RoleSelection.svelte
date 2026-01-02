@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { createJudgeFromString } from '$lib/judging.svelte';
 	import { type User } from '$lib/user.svelte';
@@ -83,6 +84,12 @@
 	$effect(() => {
 		app.getPreferences().set('isGoogleAnalyticsEnabled', enableGoogleAnalytics);
 	});
+
+	function handleLanguageChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		const language = target.value;
+		setLocale(language as Locale, { reload: true });
+	}
 </script>
 
 <svelte:head>
@@ -318,6 +325,13 @@
 			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.youtube_channel()}</a>
 		</div>
 	</div>
+</div>
+
+<div class="fixed right-4 top-4 p-1">
+	<select onchange={handleLanguageChange} value={getLocale()}>
+		<option value="en">English</option>
+		<option value="zh-hk">繁體中文 (香港)</option>
+	</select>
 </div>
 
 <style lang="postcss">
