@@ -58,7 +58,7 @@
 
 <notebook-sorting-table>
 	<table-header>
-		<team>TEAM NUMBER</team>
+		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				<div class="flex min-w-60 max-w-60 flex-col items-center justify-center">{m.notebook_link_table()}</div>

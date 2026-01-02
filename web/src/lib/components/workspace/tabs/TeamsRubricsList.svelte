@@ -262,7 +262,7 @@
 
 <teams-rubrics-table>
 	<table-header>
-		<team>TEAM NUMBER</team>
+		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				<div class="flex min-w-40 max-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
