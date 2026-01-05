@@ -1,9 +1,18 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
+
 	const props = $props();
+
+	function handleLanguageChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		const language = target.value;
+		setLocale(language as Locale, { reload: true });
+	}
 </script>
 
 <svelte:head>
-	<title>Home | judgesroom.com</title>
+	<title>{m.home()} | judgesroom.com</title>
 </svelte:head>
 
 <div class="min-h-screen bg-slate-100">
@@ -12,17 +21,16 @@
 		<div class="mx-auto max-w-6xl px-6 py-16 md:py-24">
 			<div class="text-center">
 				<h1 class="mb-6 text-5xl font-bold md:text-6xl">judgesroom.com</h1>
-				<p class="mb-8 text-xl text-slate-300 md:text-2xl">A Digital Judging Room for VEX Robotics Competitions</p>
+				<p class="mb-8 text-xl text-slate-300 md:text-2xl">{m.home_hero_subtitle()}</p>
 				<p class="mx-auto mb-10 max-w-3xl text-lg leading-relaxed text-slate-200">
-					Streamline the judging process with digital rubrics, nominations, and rankings. Keep confidential materials secure and comply with
-					RECF "Guide To Judging" standards.
+					{m.home_hero_description()}
 				</p>
 				<div class="flex flex-col justify-center gap-4 sm:flex-row">
 					<a href="/app">
-						<button class="primary w-full sm:w-auto">Get Started</button>
+						<button class="primary w-full sm:w-auto">{m.home_get_started()}</button>
 					</a>
 					<a href="https://github.com/Jerrylum/judgesroom.com" target="_blank" rel="noopener noreferrer">
-						<button class="lightweight w-full sm:w-auto">View on GitHub</button>
+						<button class="lightweight w-full sm:w-auto">{m.home_view_on_github()}</button>
 					</a>
 				</div>
 			</div>
@@ -32,8 +40,8 @@
 	<!-- Introduction Video Section -->
 	<div class="mx-auto max-w-6xl px-6 py-16">
 		<div class="mb-12 text-center">
-			<h2 class="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">Introduction</h2>
-			<p class="mx-auto max-w-2xl text-lg text-gray-600">Learn how judgesroom.com transforms the judging experience</p>
+			<h2 class="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">{m.home_introduction()}</h2>
+			<p class="mx-auto max-w-2xl text-lg text-gray-600">{m.home_introduction_description()}</p>
 		</div>
 
 		<div class="rounded-lg bg-white p-4 shadow-lg md:p-8">
@@ -41,7 +49,7 @@
 				<iframe
 					class="h-full w-full"
 					src="https://www.youtube.com/embed/iNEQAdeVgOM"
-					title="judgesroom.com Introduction"
+					title={m.home_introduction()}
 					frameborder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					allowfullscreen
@@ -54,8 +62,8 @@
 	<div class="bg-white py-16">
 		<div class="mx-auto max-w-6xl px-6">
 			<div class="mb-12 text-center">
-				<h2 class="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">Training Resources</h2>
-				<p class="mx-auto max-w-2xl text-lg text-gray-600">Comprehensive training for judges and judge advisors</p>
+				<h2 class="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">{m.home_training_resources()}</h2>
+				<p class="mx-auto max-w-2xl text-lg text-gray-600">{m.home_training_resources_description()}</p>
 			</div>
 
 			<div class="grid gap-8 md:grid-cols-2">
@@ -72,11 +80,10 @@
 								></path>
 							</svg>
 						</div>
-						<h3 class="text-2xl font-semibold text-slate-900">Judges Training</h3>
+						<h3 class="text-2xl font-semibold text-slate-900">{m.home_judges_training()}</h3>
 					</div>
 					<p class="mb-6 text-gray-600">
-						Learn how to use judgesroom.com effectively as a judge. This training covers digital rubrics, team interviews, and the
-						nomination process.
+						{m.home_judges_training_description()}
 					</p>
 					<a
 						onclick={() => {
@@ -85,7 +92,7 @@
 						href="/"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
-						<span>Watch Training Video</span>
+						<span>{m.home_watch_training_video()}</span>
 						<svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 						</svg>
@@ -105,11 +112,10 @@
 								></path>
 							</svg>
 						</div>
-						<h3 class="text-2xl font-semibold text-slate-900">Judge Advisor Training</h3>
+						<h3 class="text-2xl font-semibold text-slate-900">{m.home_judge_advisor_training()}</h3>
 					</div>
 					<p class="mb-6 text-gray-600">
-						Learn how to use judgesroom.com effectively as a judge advisor. This training covers everything from event setup, managing
-						judges, award deliberations, and more.
+						{m.home_judge_advisor_training_description()}
 					</p>
 					<a
 						onclick={() => {
@@ -118,7 +124,7 @@
 						href="/"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
-						<span>Watch Training Video</span>
+						<span>{m.home_watch_training_video()}</span>
 						<svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 						</svg>
@@ -185,14 +191,14 @@
 	<!-- CTA Section -->
 	<div class="bg-slate-800 py-16 text-white">
 		<div class="mx-auto max-w-4xl px-6 text-center">
-			<h2 class="mb-4 text-3xl font-bold md:text-4xl">Ready to Transform Your Judging Process?</h2>
-			<p class="mb-8 text-lg text-slate-300">Start using judgesroom.com today or explore our open source project on GitHub.</p>
+			<h2 class="mb-4 text-3xl font-bold md:text-4xl">{m.home_cta_title()}</h2>
+			<p class="mb-8 text-lg text-slate-300">{m.home_cta_description()}</p>
 			<div class="flex flex-col justify-center gap-4 sm:flex-row">
 				<a href="/app">
-					<button class="primary w-full sm:w-auto">Launch Application</button>
+					<button class="primary w-full sm:w-auto">{m.home_launch_application()}</button>
 				</a>
 				<a href="/privacy">
-					<button class="lightweight w-full sm:w-auto">Privacy & Security</button>
+					<button class="lightweight w-full sm:w-auto">{m.home_privacy_security()}</button>
 				</a>
 			</div>
 		</div>
@@ -214,7 +220,7 @@
 							d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"
 						></path>
 					</svg>
-					<span>Discord Support</span>
+					<span>{m.home_discord_support()}</span>
 				</a>
 
 				<!-- YouTube Channel -->
@@ -229,7 +235,7 @@
 							d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
 						></path>
 					</svg>
-					<span>YouTube Channel</span>
+					<span>{m.home_youtube_channel()}</span>
 				</a>
 
 				<!-- GitHub -->
@@ -251,6 +257,14 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<!-- Language Selector -->
+<div class="fixed right-4 top-4 p-1">
+	<select onchange={handleLanguageChange} value={getLocale()} class="rounded border border-slate-300 bg-white/90 px-2 py-1 text-sm text-slate-700 shadow-sm backdrop-blur-sm">
+		<option value="en">English</option>
+		<option value="zh-hk">繁體中文 (香港)</option>
+	</select>
 </div>
 
 <style lang="postcss">
