@@ -508,7 +508,7 @@
 	"rubric_ti_robot_design_proficient": "隊伍能夠就選擇現有機器人設計作出<u>有限描述</u>，但對演變過程的說明有限。",
 	"rubric_ti_robot_design_emerging": "隊伍<u>未能解釋</u>機器人設計，或設計不是由學生主導的。",
 	"rubric_ti_robot_build": "機器人建造",
-	"rubric_ti_robot_build_expert": "隊伍能夠<u>完整解釋</u>其機器人建造過程。機器人建造的所有權明顯。",
+	"rubric_ti_robot_build_expert": "隊伍能夠<u>完整解釋</u>其機器人建造過程。機器人建造明顯由學生主導完成。",
 	"rubric_ti_robot_build_proficient": "隊伍能夠描述選擇當前機器人設計的原因，但<u>解釋有限</u>。",
 	"rubric_ti_robot_build_emerging": "隊伍<u>未能解釋</u>機器人建造，或建造不是由學生主導的。",
 	"rubric_ti_robot_programming": "機器人編程",
