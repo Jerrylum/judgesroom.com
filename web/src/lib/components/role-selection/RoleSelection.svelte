@@ -96,7 +96,14 @@
 	<title>{m.role_selection()} | Judges' Room</title>
 </svelte:head>
 
-<div class="flex h-screen flex-col bg-slate-100">
+<div class="relative flex h-screen flex-col bg-slate-100">
+	<!-- Language Selector -->
+	<div class="absolute right-4 top-4 p-1">
+		<select onchange={handleLanguageChange} value={getLocale()}>
+			<option value="en">English</option>
+			<option value="zh-hk">繁體中文 (香港)</option>
+		</select>
+	</div>
 	<div class="flex flex-1 flex-col items-center justify-center p-2">
 		<div class="flex w-full max-w-3xl flex-col items-center gap-6">
 			<div class="flex flex-col items-center justify-center gap-2">
@@ -325,13 +332,6 @@
 			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.youtube_channel()}</a>
 		</div>
 	</div>
-</div>
-
-<div class="fixed right-4 top-4 p-1">
-	<select onchange={handleLanguageChange} value={getLocale()}>
-		<option value="en">English</option>
-		<option value="zh-hk">繁體中文 (香港)</option>
-	</select>
 </div>
 
 <style lang="postcss">

@@ -15,7 +15,18 @@
 	<title>{m.home()} | judgesroom.com</title>
 </svelte:head>
 
-<div class="min-h-screen bg-slate-100">
+<div class="relative min-h-screen bg-slate-100">
+	<!-- Language Selector -->
+	<div class="absolute right-4 top-4 p-1">
+		<select
+			onchange={handleLanguageChange}
+			value={getLocale()}
+			class="rounded border border-slate-300 bg-white/90 px-2 py-1 text-sm text-slate-700 shadow-sm backdrop-blur-sm"
+		>
+			<option value="en">English</option>
+			<option value="zh-hk">繁體中文 (香港)</option>
+		</select>
+	</div>
 	<!-- Hero Section -->
 	<div class="bg-linear-to-br from-slate-800 to-slate-900 text-white">
 		<div class="mx-auto max-w-6xl px-6 py-16 md:py-24">
@@ -257,14 +268,6 @@
 			</div>
 		</div>
 	</div>
-</div>
-
-<!-- Language Selector -->
-<div class="fixed right-4 top-4 p-1">
-	<select onchange={handleLanguageChange} value={getLocale()} class="rounded border border-slate-300 bg-white/90 px-2 py-1 text-sm text-slate-700 shadow-sm backdrop-blur-sm">
-		<option value="en">English</option>
-		<option value="zh-hk">繁體中文 (香港)</option>
-	</select>
 </div>
 
 <style lang="postcss">
