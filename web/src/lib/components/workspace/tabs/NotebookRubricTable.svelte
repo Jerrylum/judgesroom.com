@@ -335,7 +335,7 @@
 				></textarea>
 			</div>
 			<scoring class="flex-col! min-w-14 max-w-14 gap-2">
-				<p>{m.rubric_total_score()}</p>
+				<p>{@html sanitizeHTMLMessage(m.rubric_total_score)}</p>
 				<p class="text-lg">{totalScore}</p>
 			</scoring>
 		</row>
