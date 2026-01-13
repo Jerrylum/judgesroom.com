@@ -107,7 +107,7 @@ export class App {
 	private allJudges: readonly Judge[] = $state([]);
 	private allDevices: readonly DeviceInfo[] = $state([]);
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
-	public readonly version: string = '1.0.0';
+	public readonly version: string = '1.0.1';
 
 	// Error handling
 	private notices: Notice[] = $state([]);
