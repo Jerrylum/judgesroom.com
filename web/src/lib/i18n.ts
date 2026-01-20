@@ -34,5 +34,5 @@ export function sanitizeHTMLMessage<Fn extends (...args: any[]) => any>(
 ): string {
 	const sanitizedInputs = inputs ? sanitizeInputs(inputs) : inputs;
 	const result = fn(sanitizedInputs, ...args);
-	return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u'], ALLOWED_ATTR: [], ADD_TAGS: ['green', 'red', 'slate'] });
+	return DOMPurify.sanitize(result, { ALLOWED_TAGS: ['b', 'i', 'u', 'br'], ALLOWED_ATTR: [], ADD_TAGS: ['green', 'red', 'slate'] });
 }
