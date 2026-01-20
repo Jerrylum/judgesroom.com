@@ -605,5 +605,7 @@
 	"home_youtube_channel": "YouTube 頻道",
 	"rubric_print_license": "根據 GPLv3 授權。judgesroom.com 是一個自由開源軟件。",
 	"rubric_print_version": "版本 {version}",
-	"page_size": "頁面尺寸"
+	"page_size": "頁面尺寸",
+	"notebook_rubric": "工程筆記評分表",
+	"notebook_rubric_page_1_of_2": "工程筆記評分表（第 1 頁，共 2 頁）"
 }

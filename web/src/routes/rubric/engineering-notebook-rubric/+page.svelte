@@ -1,14 +1,15 @@
 <script lang="ts">
 	import '$lib/components/workspace/tabs/rubric.css';
-	import TeamInterviewRubricTable from '$lib/components/workspace/tabs/TeamInterviewRubricTable.svelte';
+	import NotebookRubricTable from '$lib/components/workspace/tabs/NotebookRubricTable.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
 
 	// Default values for the rubric
-	let rubricScores = $state([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
 	let notes = $state('');
+	let innovateAwardNotes = $state('');
 	let isSubmitted = $state(false);
 	let showValidationErrors = $state(false);
 
@@ -24,14 +25,14 @@
 </script>
 
 <svelte:head>
-	<title>Team Interview Rubric - Print | judgesroom.com</title>
+	<title>Engineering Notebook Rubric - Print | judgesroom.com</title>
 </svelte:head>
 
 <div class="min-h-screen">
 	<!-- Print Button - Hidden during printing -->
 	<div class="no-print sticky top-0 z-10 mb-6 border-b bg-white px-6 py-4 shadow-sm">
 		<div class="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
-			<h1 class="text-2xl font-bold text-gray-800">{m.team_interview_rubric()}</h1>
+			<h1 class="text-2xl font-bold text-gray-800">{m.notebook_rubric()}</h1>
 			<div class="flex flex-wrap items-center gap-3">
 				<!-- Language Selector -->
 				<select
@@ -64,9 +65,9 @@
 	<div class="flex justify-center">
 		<div class="paper-content max-w-full bg-white">
 			<div class="mx-auto max-w-4xl">
-				<!-- Team Information Section - Visible only in print -->
+				<!-- Team Information Section -->
 				<div class="pb-4">
-					<h2 class="text-center text-2xl font-bold">{m.team_interview_rubric()}</h2>
+					<h2 class="text-center text-2xl font-bold">{m.notebook_rubric_page_1_of_2()}</h2>
 					<div class="rubric-metadata">
 						<div>
 							<span class="font-semibold">{m.team_hash()}</span>
@@ -92,10 +93,13 @@
 				</div>
 
 				<!-- Rubric Table -->
-				<p class="mb-2 text-sm text-gray-600">
-					{@html sanitizeHTMLMessage(m.team_interview_rubric_directions)}
-				</p>
-				<TeamInterviewRubricTable bind:rubricScores bind:notes {isSubmitted} {showValidationErrors} />
+				<div class="mb-2 text-sm text-gray-600">
+					{@html sanitizeHTMLMessage(m.notebook_rubric_directions)}
+				</div>
+				<div class="mb-2 text-sm text-gray-600">
+					{@html sanitizeHTMLMessage(m.notebook_rubric_notes)}
+				</div>
+				<NotebookRubricTable bind:rubricScores bind:notes bind:innovateAwardNotes {isSubmitted} {showValidationErrors} />
 				<p class="mt-2 text-center text-xs italic">
 					{m.judging_materials_strictly_confidential_description()}
 				</p>
@@ -163,6 +167,11 @@
 		/* Make sure the rubric table prints correctly */
 		:global(rubric-table) {
 			/* page-break-inside: avoid; */
+			/* font-size: 10px !important; */
+		}
+
+		:global(rubric-table:nth-child(2)) {
+			/* @apply ; */
 		}
 
 		/* Avoid page breaks inside rows */

@@ -602,5 +602,7 @@
 	"home_youtube_channel": "YouTube Channel",
 	"rubric_print_license": "Licensed under GPLv3. judgesroom.com is a free and open-source project.",
 	"rubric_print_version": "Version {version}",
-	"page_size": "Page Size"
+	"page_size": "Page Size",
+	"notebook_rubric": "Engineering Notebook Rubric",
+	"notebook_rubric_page_1_of_2": "Engineering Notebook Rubric (Page 1 of 2)"
 }

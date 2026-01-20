@@ -268,7 +268,7 @@
 		<!-- Header -->
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-4 flex items-center justify-between">
-				<h2 class="text-xl font-semibold text-gray-900">{m.team_interview_rubric()}</h2>
+				<h2 class="text-xl font-semibold text-gray-900">{m.team_interview()}</h2>
 				{#if isSubmitted}
 					<button onclick={editRubric} class="secondary tiny">{m.edit()}</button>
 				{/if}

@@ -3,6 +3,9 @@
 rubric-table {
 	@apply flex flex-col;
 
+	page-break-inside: avoid;
+	break-inside: avoid;
+
 	> :first-child {
 		@apply border-t-3;
 	}
