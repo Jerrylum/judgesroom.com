@@ -255,7 +255,7 @@
 			</scroll-container>
 			<scoring class="min-w-14 gap-2">
 				<p>{@html sanitizeHTMLMessage(m.rubric_total_score)}</p>
-				<p class="text-lg">{totalScore}</p>
+				<p id="total-score" class="text-lg">{totalScore}</p>
 			</scoring>
 		</row>
 	</rubric-body>
