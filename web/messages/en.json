@@ -599,5 +599,8 @@
 	"home_launch_application": "Launch Application",
 	"home_privacy_security": "Privacy & Security",
 	"home_discord_support": "Discord Support",
-	"home_youtube_channel": "YouTube Channel"
+	"home_youtube_channel": "YouTube Channel",
+	"rubric_print_license": "Licensed under GPLv3. judgesroom.com is a free and open-source project.",
+	"rubric_print_version": "Version {version}",
+	"page_size": "Page Size"
 }

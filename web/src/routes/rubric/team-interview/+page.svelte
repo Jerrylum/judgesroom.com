@@ -4,6 +4,7 @@
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
 
 	// Default values for the rubric
 	let rubricScores = $state([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
@@ -14,6 +15,12 @@
 	function handlePrint() {
 		window.print();
 	}
+
+	function handleLanguageChange(event: Event) {
+		const target = event.target as HTMLSelectElement;
+		const language = target.value;
+		setLocale(language as Locale);
+	}
 </script>
 
 <svelte:head>
@@ -23,19 +30,33 @@
 <div class="min-h-screen">
 	<!-- Print Button - Hidden during printing -->
 	<div class="no-print sticky top-0 z-10 mb-6 border-b bg-white px-6 py-4 shadow-sm">
-		<div class="mx-auto flex max-w-6xl items-center justify-between">
+		<div class="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
 			<h1 class="text-2xl font-bold text-gray-800">{m.team_interview_rubric()}</h1>
-			<button class="primary" onclick={handlePrint}>
-				<svg class="mr-2 inline-block h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-					></path>
-				</svg>
-				Print
-			</button>
+			<div class="flex flex-wrap items-center gap-3">
+				<!-- Language Selector -->
+				<select
+					id="language-select"
+					onchange={handleLanguageChange}
+					value={getLocale()}
+					class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+				>
+					<option value="en">English</option>
+					<option value="zh-hk">繁體中文</option>
+				</select>
+
+				<!-- Print Button -->
+				<button class="primary" onclick={handlePrint}>
+					<svg class="mr-2 inline-block h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+						></path>
+					</svg>
+					Print
+				</button>
+			</div>
 		</div>
 	</div>
 
@@ -79,7 +100,7 @@
 					{m.judging_materials_strictly_confidential_description()}
 				</p>
 				<p class="mt-2 text-xs text-gray-500">
-					Licensed under GPLv3. judgesroom.com is a free and open-source project.<br />Version {app.version}
+					{m.rubric_print_license()}<br />{m.rubric_print_version({ version: app.version })}
 				</p>
 			</div>
 		</div>
@@ -118,9 +139,8 @@
 				'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif !important;
 		}
 
-		/* Page setup for A4/Letter */
+		/* Page setup */
 		@page {
-			size: A4;
 			margin: 0.5cm;
 		}
 

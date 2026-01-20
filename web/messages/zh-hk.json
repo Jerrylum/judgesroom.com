@@ -602,5 +602,8 @@
 	"home_launch_application": "啟動應用程式",
 	"home_privacy_security": "私隱與安全",
 	"home_discord_support": "Discord 支援",
-	"home_youtube_channel": "YouTube 頻道"
+	"home_youtube_channel": "YouTube 頻道",
+	"rubric_print_license": "根據 GPLv3 授權。judgesroom.com 是一個自由開源軟件。",
+	"rubric_print_version": "版本 {version}",
+	"page_size": "頁面尺寸"
 }
