@@ -1,12 +1,12 @@
 {
   "meta": {
     "current_page": 1,
-    "first_page_url": "https:\/\/www.robotevents.com\/api\/v2\/events\/59999\/skills?page=1",
+    "first_page_url": "https:\/\/events.vex.com\/api\/v2\/events\/59999\/skills?page=1",
     "from": 1,
     "last_page": 1,
-    "last_page_url": "https:\/\/www.robotevents.com\/api\/v2\/events\/59999\/skills?page=1",
+    "last_page_url": "https:\/\/events.vex.com\/api\/v2\/events\/59999\/skills?page=1",
     "next_page_url": null,
-    "path": "https:\/\/www.robotevents.com\/api\/v2\/events\/59999\/skills",
+    "path": "https:\/\/events.vex.com\/api\/v2\/events\/59999\/skills",
     "per_page": 250,
     "prev_page_url": null,
     "to": 48,
