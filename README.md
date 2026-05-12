@@ -51,8 +51,10 @@ You can always return to the same room from the saved permit on your device.
 
 Prerequisites:
 
-- Bun
-- Node.js (required by Wrangler)
+- Bun (from [bun.sh](https://bun.sh/))
+- Node.js (required by Wrangler. )
+    - Preferably use a version manager like [NVM](https://www.nvmnode.com/guide/download.html)
+    - Follow the [usage guide](https://www.nvmnode.com/guide/usage.html) to install a version
 
 Steps:
 
