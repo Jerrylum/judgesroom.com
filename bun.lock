@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "judgesroom.com",
@@ -34,9 +35,9 @@
         "crypto-js": "^4.2.0",
         "dompurify": "^3.3.1",
         "events": "^3.3.0",
+        "events.vex": "^7.0.0",
         "papaparse": "^5.5.3",
         "qrcode": "^1.5.4",
-        "robotevents": "^6.0.4",
         "svelte-dnd-action": "^0.9.65",
         "uuid": "^13.0.0",
         "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
@@ -632,6 +633,8 @@
 
     "events": ["events@3.3.0", "", {}, "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q=="],
 
+    "events.vex": ["events.vex@7.0.0", "", { "dependencies": { "openapi-fetch": "^0.11.1" } }, "sha512-6T72R8tdtXW0+8/f4CXfjvposmdTT6/b6CPrdqHWQbPUFj/fCSsUQGSBvf53DzAU0ocuF8rjDczDwl/0cbTLmg=="],
+
     "exit-hook": ["exit-hook@2.2.1", "", {}, "sha512-eNTPlAD67BmP31LDINZ3U7HSF8l57TxOY2PmBJ1shpCvpnxBF93mWCE8YHBnXs8qiUZJc9WDcWIeC3a2HIAMfw=="],
 
     "expand-template": ["expand-template@2.0.3", "", {}, "sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg=="],
@@ -895,8 +898,6 @@
     "resolve-pkg-maps": ["resolve-pkg-maps@1.0.0", "", {}, "sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw=="],
 
     "reusify": ["reusify@1.1.0", "", {}, "sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw=="],
-
-    "robotevents": ["robotevents@6.0.4", "", { "dependencies": { "openapi-fetch": "^0.11.1" }, "bin": { "wrappers": "out/wrappers", "utils": "out/utils", "types.js.map": "out/types.js.map", "types.js": "out/types.js", "types.d.ts": "out/types.d.ts", "main.js.map": "out/main.js.map", "main.js": "out/main.js", "main.d.ts": "out/main.d.ts", "generated": "out/generated", "endpoints": "out/endpoints", "Team.js.map": "out/wrappers/Team.js.map", "Team.js": "out/wrappers/Team.js", "Team.d.ts": "out/wrappers/Team.d.ts", "Match.js.map": "out/wrappers/Match.js.map", "Match.js": "out/wrappers/Match.js", "Match.d.ts": "out/wrappers/Match.d.ts", "Event.js.map": "out/wrappers/Event.js.map", "Event.js": "out/wrappers/Event.js", "Event.d.ts": "out/wrappers/Event.d.ts", "client.js.map": "out/utils/client.js.map", "client.js": "out/utils/client.js", "client.d.ts": "out/utils/client.d.ts", "teams.js.map": "out/endpoints/teams.js.map", "teams.js": "out/endpoints/teams.js", "teams.d.ts": "out/endpoints/teams.d.ts", "seasons.js.map": "out/endpoints/seasons.js.map", "seasons.js": "out/endpoints/seasons.js", "seasons.d.ts": "out/endpoints/seasons.d.ts", "programs.js.map": "out/endpoints/programs.js.map", "programs.js": "out/endpoints/programs.js", "programs.d.ts": "out/endpoints/programs.d.ts", "events.js.map": "out/endpoints/events.js.map", "events.js": "out/endpoints/events.js", "events.d.ts": "out/endpoints/events.d.ts", "shim.js.map": "out/generated/shim.js.map", "shim.js": "out/generated/shim.js", "shim.d.ts": "out/generated/shim.d.ts", "robotevents.js.map": "out/generated/robotevents.js.map", "robotevents.js": "out/generated/robotevents.js", "robotevents.d.ts": "out/generated/robotevents.d.ts" } }, "sha512-TK+pRG9bkCETEpBWS/MkmTz1gdaP3i1fNvbP+ui0wsx5+PP62ItxyQSYvNYNahnM9GNtKUz62Z1h3NV7RVId+w=="],
 
     "rollup": ["rollup@4.52.4", "", { "dependencies": { "@types/estree": "1.0.8" }, "optionalDependencies": { "@rollup/rollup-android-arm-eabi": "4.52.4", "@rollup/rollup-android-arm64": "4.52.4", "@rollup/rollup-darwin-arm64": "4.52.4", "@rollup/rollup-darwin-x64": "4.52.4", "@rollup/rollup-freebsd-arm64": "4.52.4", "@rollup/rollup-freebsd-x64": "4.52.4", "@rollup/rollup-linux-arm-gnueabihf": "4.52.4", "@rollup/rollup-linux-arm-musleabihf": "4.52.4", "@rollup/rollup-linux-arm64-gnu": "4.52.4", "@rollup/rollup-linux-arm64-musl": "4.52.4", "@rollup/rollup-linux-loong64-gnu": "4.52.4", "@rollup/rollup-linux-ppc64-gnu": "4.52.4", "@rollup/rollup-linux-riscv64-gnu": "4.52.4", "@rollup/rollup-linux-riscv64-musl": "4.52.4", "@rollup/rollup-linux-s390x-gnu": "4.52.4", "@rollup/rollup-linux-x64-gnu": "4.52.4", "@rollup/rollup-linux-x64-musl": "4.52.4", "@rollup/rollup-openharmony-arm64": "4.52.4", "@rollup/rollup-win32-arm64-msvc": "4.52.4", "@rollup/rollup-win32-ia32-msvc": "4.52.4", "@rollup/rollup-win32-x64-gnu": "4.52.4", "@rollup/rollup-win32-x64-msvc": "4.52.4", "fsevents": "~2.3.2" }, "bin": { "rollup": "dist/bin/rollup" } }, "sha512-CLEVl+MnPAiKh5pl4dEWSyMTpuflgNQiLGhMv8ezD5W/qP8AKvmYpCOKRRNOh7oRKnauBZ4SyeYkMS+1VSyKwQ=="],
 

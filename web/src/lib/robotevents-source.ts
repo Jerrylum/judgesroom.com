@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 import type { Award, Program } from '@judgesroom.com/protocol/src/award';
-import { Client, type Division, type Event, type Grade, type RobotEventsClient, type Team, type TeamData } from 'robotevents';
+import { Client, type Division, type Event, type Grade, type TeamData, type VexEventsClient } from 'events.vex';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
 import { getEventGradeLevelOptions } from './event.svelte';
@@ -67,7 +67,7 @@ export interface RobotEventsImportedData {
 	divisionInfos: DivisionInfo[];
 }
 
-export function getRobotEventsClient(): RobotEventsClient {
+export function getRobotEventsClient(): VexEventsClient {
 	return Client({
 		authorization: { token: ROBOTEVENTS_TOKEN }
 	});
@@ -89,7 +89,7 @@ export function getRobotEventsClient(): RobotEventsClient {
  * @param evtId
  * @returns The joined teams at the event
  */
-export async function getEventJoinedTeams(client: RobotEventsClient, evtId: number): Promise<TeamData[]> {
+export async function getEventJoinedTeams(client: VexEventsClient, evtId: number): Promise<TeamData[]> {
 	const result = await client.api.PaginatedGET('/events/{id}/teams', {
 		params: {
 			path: {
@@ -142,7 +142,7 @@ export async function getEventRankings(evt: Event): Promise<TeamQualRanking[]> {
  * @param divisionId The division ID
  * @returns The rankings of all teams in the division, ordered by rank, from the first place to the last place
  */
-export async function getEventDivisionRankings(client: RobotEventsClient, evtId: number, divisionId: number): Promise<TeamQualRanking[]> {
+export async function getEventDivisionRankings(client: VexEventsClient, evtId: number, divisionId: number): Promise<TeamQualRanking[]> {
 	const result = await client.api.PaginatedGET('/events/{id}/divisions/{div}/rankings', {
 		params: {
 			path: {
@@ -172,7 +172,7 @@ export async function getEventDivisionRankings(client: RobotEventsClient, evtId:
  * @param evtId The event ID
  * @returns The skills records of all teams at the event, ordered by rank, from the first place to the last place
  */
-export async function getEventSkills(client: RobotEventsClient, evtId: number): Promise<TeamSkillsRecord[]> {
+export async function getEventSkills(client: VexEventsClient, evtId: number): Promise<TeamSkillsRecord[]> {
 	const resultSkills = await client.api.PaginatedGET('/events/{id}/skills', {
 		params: {
 			path: {
@@ -334,7 +334,7 @@ export function getExcellenceAwardCandidatesReport(
  * @returns The Excellence Award candidates report
  */
 export async function getEventDivisionExcellenceAwardCandidatesReport(
-	client: RobotEventsClient,
+	client: VexEventsClient,
 	evtId: number,
 	divisionId: number,
 	excellenceAwards: Award[]
@@ -355,7 +355,10 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 
 		const allTargetGradesRankingsInGroup = filterRankingsOrRecordsBySubset(allGradesRankingsInGroup, allTargetGradesTeamsRegistered);
 
-		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(allGradesOverallSkillsInEvent, allTargetGradesTeamsRegistered);
+		const allTargetGradesOverallSkillsInGroup = filterRankingsOrRecordsBySubset(
+			allGradesOverallSkillsInEvent,
+			allTargetGradesTeamsRegistered
+		);
 
 		rtn[award.name] = getExcellenceAwardCandidatesReport(
 			allTargetGradesRankingsInGroup,
@@ -388,7 +391,7 @@ export function getEventGradeLevel(teams: TeamData[]): EventGradeLevel {
 	return 'Blended';
 }
 
-export async function importFromRobotEvents(client: RobotEventsClient, evtSku: string): Promise<RobotEventsImportedData> {
+export async function importFromRobotEvents(client: VexEventsClient, evtSku: string): Promise<RobotEventsImportedData> {
 	const resultEvt = await client.events.getBySKU(evtSku);
 	if (!resultEvt.data) throw new Error('Event not found');
 

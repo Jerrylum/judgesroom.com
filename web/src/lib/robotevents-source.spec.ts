@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeEach } from 'vitest';
-import { type RobotEventsClient } from 'robotevents';
+import { type VexEventsClient } from 'events.vex';
 import {
 	getEventRankings,
 	getEventJoinedTeams,
@@ -15,7 +15,7 @@ import {
 } from './robotevents-source';
 
 describe('RobotEventsSource', () => {
-	let client: RobotEventsClient;
+	let client: VexEventsClient;
 
 	beforeEach(() => {
 		client = getRobotEventsClient();
@@ -26,9 +26,9 @@ describe('RobotEventsSource', () => {
 		// RE-V5RC-25-0139
 		// RE-VIQRC-25-0140
 
-		// https://www.robotevents.com/robot-competitions/vex-robotics-competition/RE-VRC-23-1488.html#results-
+		// https://events.vex.com/RE-VRC-23-1488.html#results-
 		// const resultEvt = await client.events.getBySKU('RE-VRC-23-1488');
-		// https://www.robotevents.com/robot-competitions/vex-iq-competition/RE-VIQRC-24-8288.html#results-
+		// https://events.vex.com/RE-VIQRC-24-8288.html#results-
 		const resultEvt = await client.events.getBySKU('RE-VIQRC-24-8288'); // 58288
 
 		if (!resultEvt.data) throw new Error('Event not found');
