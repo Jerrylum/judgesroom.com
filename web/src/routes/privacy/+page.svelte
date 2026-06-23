@@ -55,7 +55,7 @@
 						<p class="leading-relaxed text-gray-700">
 							General usage data also helps us improve the interface and workflow efficiency, making the judging process smoother for all
 							users. All data collection is designed to improve the application without compromising the confidentiality principles required
-							by Guide to Judging.
+							by the GRSF VEX Competition judging guidelines.
 						</p>
 					</div>
 
@@ -143,9 +143,9 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Compliance</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							In accordance with the Robotics Education & Competition Foundation's "Guide to Judging" confidentiality principles, <strong
-								>all judging materials are strictly confidential</strong
-							>. We treat all data stored in the judges' room as highly sensitive information that must be protected at all times.
+							In accordance with the Global Robotics &amp; Science Foundation (GRSF) VEX Competition judging guidelines confidentiality
+							principles, <strong>all judging materials are strictly confidential</strong>. We treat all data stored in the judges' room as
+							highly sensitive information that must be protected at all times.
 						</p>
 
 						<div class="mb-6 border-l-4 border-slate-400 bg-slate-50 p-4">
@@ -170,10 +170,10 @@
 						</p>
 
 						<p class="leading-relaxed text-gray-700">
-							This approach ensures complete compliance with the judging confidentiality requirements outlined in principles JP1
-							(Confidentiality) and AD7 (Collection and Treatment of Judging Materials) of the "Guide to Judging." judgesroom.com is
-							designed to fully comply with all RECF requirements, particularly regarding confidentiality, impartiality, and proper handling
-							of judging materials.
+							This approach ensures complete compliance with the judging confidentiality requirements outlined in the Confidential principle
+							for judges and the Secure materials step of judging deliberations in the GRSF judging guidelines. judgesroom.com is designed
+							to fully comply with GRSF requirements, particularly regarding confidentiality, impartiality, and proper handling of judging
+							materials.
 						</p>
 					</div>
 
@@ -197,7 +197,7 @@
 					</div>
 
 					<div class="border-t pt-4 text-center text-sm text-gray-500">
-						<p>Last updated: October 2025</p>
+						<p>Last updated: June 2026</p>
 					</div>
 				</div>
 			</div>
