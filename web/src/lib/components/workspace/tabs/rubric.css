@@ -35,7 +35,7 @@ rubric-table {
 	}
 
 	scoring {
-		@apply flex flex-0 flex-row flex-wrap content-center justify-center text-center text-xs;
+		@apply flex max-w-28 min-w-28 flex-0 flex-row flex-wrap content-center justify-center text-center text-xs;
 	}
 
 	rubric-header {
@@ -47,6 +47,39 @@ rubric-table {
 
 		> * {
 			@apply border-r-3;
+		}
+	}
+
+	&.notebook-rubric {
+		> rubric-body:first-child {
+			@apply border-t-0;
+		}
+
+		rubric-body {
+			> row.section-title-row {
+				@apply border-t-3 bg-white;
+			}
+
+			> row.section-header-row {
+				@apply border-t bg-gray-200;
+
+				criteria,
+				scoring {
+					@apply items-center justify-center;
+				}
+
+				> scroll-container content {
+					@apply min-h-10;
+				}
+			}
+
+			> row.criteria-row > scroll-container content {
+				@apply min-h-21;
+			}
+
+			> row.footer-row > div {
+				@apply grow border-r-3 border-l-3;
+			}
 		}
 	}
 
@@ -72,10 +105,6 @@ rubric-table {
 				content {
 					@apply min-h-23;
 				}
-			}
-
-			&:nth-child(even) {
-				@apply bg-gray-100;
 			}
 		}
 	}

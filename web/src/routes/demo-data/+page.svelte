@@ -4,7 +4,8 @@
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 	import type { TeamData } from '@judgesroom.com/protocol/src/team';
-	import type { AwardNomination, AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
+	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
+	import { generateNotebookRubricScores, generateTeamInterviewRubricScores } from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
@@ -122,7 +123,7 @@
 								id: uuidv4(),
 								teamId: team.id,
 								judgeId: judge.id,
-								rubric: generateRubricScores(11),
+								rubric: generateNotebookRubricScores(),
 								notes: '',
 								innovateAwardNotes: '',
 								timestamp: Date.now()
@@ -160,7 +161,7 @@
 								id: uuidv4(),
 								teamId: team.id,
 								judgeId: judge.id,
-								rubric: generateRubricScores(9),
+								rubric: generateTeamInterviewRubricScores(),
 								notes: '',
 								timestamp: Date.now()
 							}
@@ -197,11 +198,6 @@
 			}
 		}
 	];
-
-	function generateRubricScores(len: number): number[] {
-		return Array.from({ length: len }, () => Math.floor(Math.random() * 5) + 1);
-	}
-
 	async function executeStep(stepIndex: number) {
 		if (stepIndex < 0 || stepIndex >= steps.length) return;
 

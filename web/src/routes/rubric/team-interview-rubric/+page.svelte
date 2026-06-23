@@ -5,9 +5,10 @@
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
+	import { createEmptyTeamInterviewRubricScores } from '@judgesroom.com/protocol/src/rubric';
 
 	// Default values for the rubric
-	let rubricScores = $state([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state(createEmptyTeamInterviewRubricScores());
 	let notes = $state('');
 	let isSubmitted = $state(false);
 	let showValidationErrors = $state(false);

@@ -7,6 +7,7 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
+	import { createEmptyNotebookRubricScores, NOTEBOOK_RUBRIC_CRITERIA_COUNT } from '@judgesroom.com/protocol/src/rubric';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
@@ -34,14 +35,14 @@
 	let isSubmitted = $state(tab.rubricId !== null);
 
 	let judgeId = $state<string | null>(null); // Store judge ID for existing rubrics
-	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state<number[]>(createEmptyNotebookRubricScores());
 	let notes = $state('');
 	let innovateAwardNotes = $state('');
 	let timestamp = $state(0);
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
-	let initialRubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let initialRubricScores = $state<number[]>(createEmptyNotebookRubricScores());
 	let initialNotes = $state('');
 	let initialInnovateAwardNotes = $state('');
 
@@ -72,7 +73,10 @@
 			const existingRubric = await app.wrpcClient.judging.getEngineeringNotebookRubrics.query({ id: tab.rubricId! });
 			tab.teamId = existingRubric.teamId;
 			judgeId = existingRubric.judgeId;
-			rubricScores = existingRubric.rubric as number[];
+			rubricScores =
+				existingRubric.rubric.length === NOTEBOOK_RUBRIC_CRITERIA_COUNT
+					? (existingRubric.rubric as number[])
+					: createEmptyNotebookRubricScores();
 			notes = existingRubric.notes;
 			innovateAwardNotes = existingRubric.innovateAwardNotes;
 			timestamp = existingRubric.timestamp;
@@ -238,7 +242,7 @@
 		tab.teamId = '';
 		tab.rubricId = null;
 		judgeId = null;
-		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+		rubricScores = createEmptyNotebookRubricScores();
 		notes = '';
 		innovateAwardNotes = '';
 		showValidationErrors = false;
@@ -246,7 +250,7 @@
 
 		// Reset initial state to empty
 		initialTeamId = '';
-		initialRubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+		initialRubricScores = createEmptyNotebookRubricScores();
 		initialNotes = '';
 		initialInnovateAwardNotes = '';
 

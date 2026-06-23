@@ -5,9 +5,10 @@
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
+	import { createEmptyNotebookRubricScores } from '@judgesroom.com/protocol/src/rubric';
 
 	// Default values for the rubric
-	let rubricScores = $state([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state(createEmptyNotebookRubricScores());
 	let notes = $state('');
 	let innovateAwardNotes = $state('');
 	let isSubmitted = $state(false);
@@ -67,7 +68,7 @@
 			<div class="mx-auto max-w-4xl">
 				<!-- Team Information Section -->
 				<div class="pb-4">
-					<h2 class="text-center text-2xl font-bold">{m.notebook_rubric_page_1_of_2()}</h2>
+					<h2 class="text-center text-2xl font-bold">{m.notebook_rubric()}</h2>
 					<div class="rubric-metadata">
 						<div>
 							<span class="font-semibold">{m.team_hash()}</span>

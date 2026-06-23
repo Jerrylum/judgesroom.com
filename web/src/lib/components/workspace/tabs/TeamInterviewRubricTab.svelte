@@ -8,6 +8,10 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
+	import {
+		createEmptyTeamInterviewRubricScores,
+		TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT
+	} from '@judgesroom.com/protocol/src/rubric';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
@@ -35,13 +39,13 @@
 	let isSubmitted = $state(tab.rubricId !== null);
 
 	let judgeId = $state<string | null>(null);
-	let rubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let rubricScores = $state<number[]>(createEmptyTeamInterviewRubricScores());
 	let notes = $state('');
 	let timestamp = $state(0);
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
-	let initialRubricScores = $state<number[]>([-1, -1, -1, -1, -1, -1, -1, -1, -1]);
+	let initialRubricScores = $state<number[]>(createEmptyTeamInterviewRubricScores());
 	let initialNotes = $state('');
 
 	let teamsSelectElement: HTMLSelectElement | null = $state(null);
@@ -68,7 +72,10 @@
 			const existingRubric = await app.wrpcClient.judging.getTeamInterviewRubrics.query({ id: tab.rubricId });
 			tab.teamId = existingRubric.teamId;
 			judgeId = existingRubric.judgeId;
-			rubricScores = existingRubric.rubric as number[];
+			rubricScores =
+				existingRubric.rubric.length === TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT
+					? (existingRubric.rubric as number[])
+					: createEmptyTeamInterviewRubricScores();
 			notes = existingRubric.notes;
 			timestamp = existingRubric.timestamp;
 
@@ -244,14 +251,14 @@
 		tab.teamId = '';
 		tab.rubricId = null;
 		judgeId = currentJudge?.id ?? null;
-		rubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
+		rubricScores = createEmptyTeamInterviewRubricScores();
 		notes = '';
 		showValidationErrors = false;
 		isSubmitted = false;
 
 		// Reset initial state to empty
 		initialTeamId = '';
-		initialRubricScores = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
+		initialRubricScores = createEmptyTeamInterviewRubricScores();
 		initialNotes = '';
 
 		// Scroll to top
