@@ -56,9 +56,7 @@
 
 	async function toggleTeamAttendance(team: TeamInfoAndData) {
 		if (hasRobotEventsId) {
-			app.addErrorNotice(
-				m.manual_attendance_changes_disabled_for_robotevents_integrated_events()
-			);
+			app.addErrorNotice(m.manual_attendance_changes_disabled_for_robotevents_integrated_events());
 			return;
 		}
 
@@ -78,7 +76,9 @@
 				app.addSuccessNotice(m.marked_team_as_present({ teamNumber: team.number }));
 			}
 		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_attendance_for_team({ teamNumber: team.number, error: error instanceof Error ? error.message : 'Unknown error' }));
+			app.addErrorNotice(
+				m.failed_to_update_attendance_for_team({ teamNumber: team.number, error: error instanceof Error ? error.message : 'Unknown error' })
+			);
 		}
 	}
 
@@ -116,7 +116,9 @@
 				app.addSuccessNotice(m.found_teams_with_rankings_attendance_synchronized({ count: rankings.length }));
 			}
 		} catch (error) {
-			app.addErrorNotice(m.failed_to_fetch_attendance_from_robotevents({ error: error instanceof Error ? error.message : 'Unknown error' }));
+			app.addErrorNotice(
+				m.failed_to_fetch_attendance_from_robotevents({ error: error instanceof Error ? error.message : 'Unknown error' })
+			);
 		} finally {
 			isFetching = false;
 		}
@@ -205,7 +207,7 @@
 						</div>
 						<button
 							onclick={syncAttendanceWithRobotEvents}
-							class="rounded-md bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+							class="rounded-md bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-800 hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
 						>
 							{m.sync_with_robotevents()}
 						</button>
@@ -221,7 +223,7 @@
 				{#each allTeams as team (team.id)}
 					{@const teamDifference = teamDifferences().get(team.id)}
 					<div
-						class="team-info min-h-19 relative rounded border bg-white p-3 shadow-sm transition-all hover:shadow-md
+						class="team-info relative min-h-19 rounded border bg-white p-3 shadow-sm transition-all hover:shadow-md
 							{team.absent ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'}
 							{teamDifference === 'should-be-present' ? 'animate-pulse border-2 border-green-400' : ''}
 							{teamDifference === 'should-be-absent' ? 'animate-pulse border-2 border-red-400' : ''}"
@@ -231,7 +233,7 @@
 							<div class="truncate text-xs {team.absent ? 'text-red-600' : 'text-gray-600'}">{team.name}</div>
 							<div class="text-xs {team.absent ? 'text-red-500' : 'text-gray-500'}">{team.grade}</div>
 						</div>
-						<div class="absolute right-2 top-2">
+						<div class="absolute top-2 right-2">
 							{#if hasRobotEventsId}
 								<!-- RobotEvents managed - show status only -->
 								<div

@@ -255,7 +255,7 @@
 	</div>
 </div>
 
-<div class="lg:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm lg:hidden!">
 	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
@@ -265,9 +265,9 @@
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex min-w-40 max-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
-				<div class="min-w-85 max-w-85 flex items-center justify-center">{m.notebook_rubrics_table()}</div>
-				<div class="min-w-85 max-w-85 flex items-center justify-center">{m.team_interview_rubrics_table()}</div>
+				<div class="flex max-w-40 min-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="flex max-w-85 min-w-85 items-center justify-center">{m.notebook_rubrics_table()}</div>
+				<div class="flex max-w-85 min-w-85 items-center justify-center">{m.team_interview_rubrics_table()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -289,12 +289,12 @@
 				<scroll-container use:registerScrollContainer>
 					<content>
 						<!-- Notebook Link Column -->
-						<div class="flex min-w-40 max-w-40 items-center gap-2 p-2">
+						<div class="flex max-w-40 min-w-40 items-center gap-2 p-2">
 							{#if team.notebookLink}
 								<a
 									href={team.notebookLink}
 									target="_blank"
-									class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+									class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
 									title={team.notebookLink}
 								>
 									{team.notebookLink.replace(/^https?:\/\//, '')}
@@ -306,14 +306,14 @@
 						</div>
 
 						<!-- Notebook Rubrics Column -->
-						<div class="min-w-85 max-w-85 flex items-center justify-center overflow-hidden">
+						<div class="flex max-w-85 min-w-85 items-center justify-center overflow-hidden">
 							<div class="flex flex-row justify-center gap-1 p-1">
 								{#if team.notebookDevelopmentStatus === 'fully_developed'}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
 										<button
 											onclick={() => openNotebookRubric(team.id, rubric.id)}
 											title={getJudgeName(rubric.judgeId)}
-											class="flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-gray-100 px-3 text-sm hover:bg-gray-200 active:bg-gray-300"
+											class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
 										>
 											{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
 										</button>
@@ -327,13 +327,13 @@
 						</div>
 
 						<!-- Team Interview Rubrics Column -->
-						<div class="min-w-85 max-w-85 flex items-center justify-center overflow-hidden">
+						<div class="flex max-w-85 min-w-85 items-center justify-center overflow-hidden">
 							<div class="flex flex-row justify-center gap-1 p-1">
 								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
 									<button
 										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
 										title={getJudgeName(rubric.judgeId)}
-										class="flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-gray-100 px-3 text-sm hover:bg-gray-200 active:bg-gray-300"
+										class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
 									>
 										{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
 									</button>

@@ -145,7 +145,7 @@
 			</div>
 
 			<!-- Right Column: Connected Devices -->
-			<div class="lg:max-h-140 flex flex-1 flex-col space-y-4 overflow-hidden">
+			<div class="flex flex-1 flex-col space-y-4 overflow-hidden lg:max-h-140">
 				<h4 class="text-lg font-medium text-gray-900">{m.connected_devices()}</h4>
 
 				{#if isDisconnectedFromServer}
@@ -175,7 +175,7 @@
 										<div class="font-medium text-gray-900">{currentDevice.deviceName}</div>
 										<div class="text-xs text-gray-500">
 											<!-- Connected {getConnectionDuration(currentDevice.connectedAt)} ago -->
-											 {m.connected_ago({ duration: getConnectionDuration(currentDevice.connectedAt) })}
+											{m.connected_ago({ duration: getConnectionDuration(currentDevice.connectedAt) })}
 										</div>
 									</div>
 								</div>

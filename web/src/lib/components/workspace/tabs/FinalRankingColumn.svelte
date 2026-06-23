@@ -153,7 +153,7 @@
 	}
 </script>
 
-<div class="flex min-w-40 max-w-40 flex-col gap-1">
+<div class="flex max-w-40 min-w-40 flex-col gap-1">
 	<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
 		<div
 			class="max-w-full overflow-hidden text-ellipsis"
@@ -168,7 +168,7 @@
 	</div>
 	<div class="relative">
 		<div
-			class="min-h-18 flex flex-col gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-1"
+			class="flex min-h-18 flex-col gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-1"
 			use:dndzone={{
 				items: editing,
 				flipDurationMs,
@@ -203,7 +203,7 @@
 			{/each}
 		</div>
 		{#if editing.length === 0}
-			<div class="absolute bottom-0 left-0 right-0 top-0 flex h-full min-h-10 items-center justify-center text-gray-500">
+			<div class="absolute top-0 right-0 bottom-0 left-0 flex h-full min-h-10 items-center justify-center text-gray-500">
 				<p class="text-sm">{m.no_nominations_yet()}</p>
 			</div>
 		{/if}

@@ -53,7 +53,7 @@
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				{#each awardRankings.judgedAwards as award}
-					<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">{award}</div>
+					<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">{award}</div>
 				{/each}
 			</content>
 		</scroll-container>

@@ -7,7 +7,7 @@ export class GoogleAnalytics {
 	private loadGA() {
 		if (this.loaded) return;
 
-    this.loaded = true;
+		this.loaded = true;
 
 		if (window.dataLayer !== undefined) return;
 		window.dataLayer = window.dataLayer || [];

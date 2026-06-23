@@ -212,7 +212,9 @@
 									</div>
 
 									<div class="flex justify-end">
-										<button onclick={selectExistingJudge} disabled={!selectedJudgeId} class="primary">{m.continue_as_selected_judge()}</button>
+										<button onclick={selectExistingJudge} disabled={!selectedJudgeId} class="primary"
+											>{m.continue_as_selected_judge()}</button
+										>
 									</div>
 								{/if}
 							</div>

@@ -51,7 +51,7 @@
 	}
 </script>
 
-<div class="lg:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm lg:hidden!">
 	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
@@ -61,10 +61,10 @@
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex min-w-60 max-w-60 flex-col items-center justify-center">{m.notebook_link_table()}</div>
-				<div class="flex min-w-40 max-w-40 items-center justify-center">{m.notebook_status_table()}</div>
-				<div class="flex min-w-40 max-w-40 items-center justify-center text-center">{m.innovate_award_submission_form_table()}</div>
-				<div class="min-w-50 flex items-center justify-center">{m.actions_table()}</div>
+				<div class="flex max-w-60 min-w-60 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="flex max-w-40 min-w-40 items-center justify-center">{m.notebook_status_table()}</div>
+				<div class="flex max-w-40 min-w-40 items-center justify-center text-center">{m.innovate_award_submission_form_table()}</div>
+				<div class="flex min-w-50 items-center justify-center">{m.actions_table()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -85,12 +85,12 @@
 				<scroll-container use:registerScrollContainer>
 					<content>
 						<!-- Notebook Link Column -->
-						<div class="flex min-w-60 max-w-60 items-center gap-2 p-2">
+						<div class="flex max-w-60 min-w-60 items-center gap-2 p-2">
 							{#if team.notebookLink}
 								<a
 									href={team.notebookLink}
 									target="_blank"
-									class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+									class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
 									title={team.notebookLink}
 								>
 									{team.notebookLink.replace(/^https?:\/\//, '')}
@@ -102,7 +102,7 @@
 						</div>
 
 						<!-- Development Status Dropdown -->
-						<div class="flex min-w-40 max-w-40 items-center justify-center p-2">
+						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
 							<select
 								value={devStatus}
 								onchange={(e) => updateNotebookStatus(team, e.currentTarget.value as NotebookDevelopmentStatus)}
@@ -119,7 +119,7 @@
 						</div>
 
 						<!-- Innovate Award Submission Form Checkbox -->
-						<div class="flex min-w-40 max-w-40 items-center justify-center p-2">
+						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
 							<label class="flex items-center gap-2">
 								<input
 									type="checkbox"
@@ -135,7 +135,7 @@
 						</div>
 
 						<!-- Actions Column -->
-						<div class="min-w-50 flex items-center justify-center gap-2 p-2">
+						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
 							{#if devStatus === 'fully_developed'}
 								<button onclick={() => openNotebookRubric(team.id)} class="primary tiny" class:bg-green-800!={isSubmitted}>
 									{#if isSubmitted}

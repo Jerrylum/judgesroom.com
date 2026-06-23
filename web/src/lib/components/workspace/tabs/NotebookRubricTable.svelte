@@ -33,20 +33,20 @@
 	});
 </script>
 
-<div class="md:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
 	<button class="lightweight tiny" onclick={sl1}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={sr1}>{m.scroll_right()}</button>
 </div>
 <rubric-table>
 	<rubric-header>
-		<div class="max-w-42 min-w-42 flex grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
-			<div class="border-b-3 flex-1 grow bg-gray-200">{m.rubric_criteria()}</div>
-			<div class="pb-1 pt-1 leading-none">{m.rubric_ti_engineering_design_process()}</div>
+		<div class="flex max-w-42 min-w-42 grow flex-col items-stretch justify-center bg-gray-400 p-0 text-center font-bold">
+			<div class="flex-1 grow border-b-3 bg-gray-200">{m.rubric_criteria()}</div>
+			<div class="pt-1 pb-1 leading-none">{m.rubric_ti_engineering_design_process()}</div>
 		</div>
 		<scroll-container use:rsc1>
 			<content class="min-w-120 flex-col! gap-2 bg-gray-200">
 				<div class="p-0! pt-1 text-center text-base font-bold">{m.rubric_proficiency_level()}</div>
-				<div class="border-0! p-0! flex text-center">
+				<div class="flex border-0! p-0! text-center">
 					<div class="flex-1 border-r pb-1">
 						<p class="font-bold">{m.rubric_expert()}</p>
 						<p class="text-xs">{m.rubric_points_4_5()}</p>
@@ -62,7 +62,7 @@
 				</div>
 			</content>
 		</scroll-container>
-		<scoring class="flex-col! min-w-14 bg-gray-200">
+		<scoring class="min-w-14 flex-col! bg-gray-200">
 			<div class="pt-1">&nbsp;</div>
 			<div class="flex items-center p-1 font-bold">
 				<span>{m.rubric_points()}</span>
@@ -81,7 +81,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_identify_problem_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[0]}</p>
 				{:else}
@@ -100,7 +100,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_brainstorm_solutions_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[1]}</p>
 				{:else}
@@ -119,7 +119,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_select_best_solution_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[2]}</p>
 				{:else}
@@ -138,7 +138,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_build_program_solution_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[3]}</p>
 				{:else}
@@ -157,7 +157,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_original_testing_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[4]}</p>
 				{:else}
@@ -176,7 +176,7 @@
 					<div>{@html sanitizeHTMLMessage(m.rubric_nb_repeat_design_process_emerging)}</div>
 				</content>
 			</scroll-container>
-			<scoring class="min-w-14 max-w-14">
+			<scoring class="max-w-14 min-w-14">
 				{#if isSubmitted}
 					<p class="text-lg">{rubricScores[5]}</p>
 				{:else}
@@ -189,18 +189,18 @@
 				<p class="text-sm font-bold">{m.rubric_notes()}</p>
 				<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes} readonly={isSubmitted}></textarea>
 			</div>
-			<scoring class="min-w-14 max-w-14"></scoring>
+			<scoring class="max-w-14 min-w-14"></scoring>
 		</row>
 	</rubric-body>
 </rubric-table>
 <!-- Second rubric table -->
-<div class="md:hidden! mt-6 flex flex-row items-center justify-end gap-2 text-sm">
+<div class="mt-6 flex flex-row items-center justify-end gap-2 text-sm md:hidden!">
 	<button class="lightweight tiny" onclick={sl2}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={sr2}>{m.scroll_right()}</button>
 </div>
 <rubric-table class="mt-2 md:mt-6">
 	<rubric-header>
-		<div class="max-h-42 flex min-h-20 grow items-center justify-center text-center text-2xl font-bold">
+		<div class="flex max-h-42 min-h-20 grow items-center justify-center text-center text-2xl font-bold">
 			{m.rubric_nb_page_2_of_2()}
 		</div>
 	</rubric-header>
@@ -210,7 +210,7 @@
 		</criteria>
 		<scroll-container use:rsc2 class="flex items-stretch bg-gray-200">
 			<content class="min-w-120 flex-col! gap-2">
-				<div class="border-0! p-0! flex text-center">
+				<div class="flex border-0! p-0! text-center">
 					<div class="flex flex-1 flex-col justify-center border-r">
 						<p class="font-bold">{m.rubric_expert()}</p>
 						<p class="text-xs">{m.rubric_points_4_5()}</p>
@@ -334,7 +334,7 @@
 				<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={innovateAwardNotes} readonly={isSubmitted}
 				></textarea>
 			</div>
-			<scoring class="flex-col! min-w-14 max-w-14 gap-2">
+			<scoring class="max-w-14 min-w-14 flex-col! gap-2">
 				<p>{@html sanitizeHTMLMessage(m.rubric_total_score)}</p>
 				<p class="text-lg">{totalScore}</p>
 			</scoring>

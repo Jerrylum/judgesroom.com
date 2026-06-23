@@ -38,7 +38,7 @@
 					id="language-select"
 					onchange={handleLanguageChange}
 					value={getLocale()}
-					class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+					class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:outline-none"
 				>
 					<option value="en">English</option>
 					<option value="zh-hk">繁體中文</option>

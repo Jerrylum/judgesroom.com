@@ -98,7 +98,7 @@
 
 <div class="relative flex h-screen flex-col bg-slate-100">
 	<!-- Language Selector -->
-	<div class="absolute right-4 top-4 p-1">
+	<div class="absolute top-4 right-4 p-1">
 		<select onchange={handleLanguageChange} value={getLocale()}>
 			<option value="en">English</option>
 			<option value="zh-hk">繁體中文 (香港)</option>
@@ -128,13 +128,13 @@
 					<div class="space-y-6">
 						<div class="space-y-4">
 							<h3 class="text-2xl font-medium text-gray-900">{m.join_judges_room()}</h3>
-							<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
+							<p class="mt-4 mb-2 text-sm leading-relaxed text-gray-700">
 								{@html sanitizeHTMLMessage(m.you_are_connected_to, {
 									eventName: essentialData.eventName,
 									divisionId: essentialData.divisionId ?? ''
 								})}
 							</p>
-							<p class="mb-2 mt-2 text-sm leading-relaxed text-gray-700">
+							<p class="mt-2 mb-2 text-sm leading-relaxed text-gray-700">
 								{m.choose_your_identity_to_start_participating_in_the_judges_room()}
 							</p>
 							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

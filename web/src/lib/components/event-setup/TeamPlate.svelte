@@ -9,7 +9,7 @@
 	let { team, showGrade = true }: Props = $props();
 </script>
 
-<div class="team-info min-h-19 0 cursor-move rounded bg-white p-3 shadow-sm transition-all hover:shadow-md">
+<div class="team-info 0 min-h-19 cursor-move rounded bg-white p-3 shadow-sm transition-all hover:shadow-md">
 	<div class="flex items-start">
 		<div class="flex-1">
 			<div class="text-sm font-medium">{team.number}</div>

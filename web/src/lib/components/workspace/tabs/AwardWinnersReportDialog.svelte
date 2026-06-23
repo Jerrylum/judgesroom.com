@@ -70,7 +70,11 @@
 	<div class="flex flex-col">
 		<div class="mb-4 flex items-center justify-between">
 			<h3 id="dialog-title" class="text-lg font-semibold text-gray-900">{m.award_winners_report()}</h3>
-			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label={m.close_dialog()}>
+			<button
+				onclick={handleClose}
+				class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+				aria-label={m.close_dialog()}
+			>
 				<CloseIcon size={24} />
 			</button>
 		</div>

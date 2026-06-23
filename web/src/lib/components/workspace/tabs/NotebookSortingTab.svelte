@@ -229,7 +229,7 @@
 					{#if isAssignedJudging && currentJudgeGroup}
 						<div>
 							<label class="flex items-start sm:items-center">
-								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+								<input type="checkbox" bind:checked={showOnlyAssignedTeams} class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0" />
 								<span class="text-sm text-gray-700">
 									{m.only_show_assigned_teams_for_your_current_judge_group({ name: currentJudgeGroup.name })}
 								</span>
@@ -238,7 +238,7 @@
 					{/if}
 					<div>
 						<label class="flex items-start sm:items-center">
-							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0" />
+							<input type="checkbox" bind:checked={showOnlyFullyDeveloped} class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0" />
 							<span class="text-sm text-gray-700">{m.only_show_fully_developed_notebooks()}</span>
 						</label>
 					</div>

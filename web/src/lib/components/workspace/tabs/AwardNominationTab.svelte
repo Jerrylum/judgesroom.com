@@ -28,10 +28,11 @@
 				{m.award_nominations_description()}
 			</p>
 			<p class="mt-2 text-sm text-gray-600">
-				{m.excellence_award_winners_are_selected_from_design_award_finalists()} <button
-					class="text-blue-500 hover:text-blue-600"
-					onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}>{m.final_ranking()}</button
-				> {m.tab_to_determine_the_winners()}.
+				{m.excellence_award_winners_are_selected_from_design_award_finalists()}
+				<button class="text-blue-500 hover:text-blue-600" onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}
+					>{m.final_ranking()}</button
+				>
+				{m.tab_to_determine_the_winners()}.
 			</p>
 
 			<!-- Filter Options -->

@@ -100,7 +100,7 @@
 </script>
 
 <div
-	class="relative min-w-40 max-w-40 cursor-pointer select-none p-2 text-center"
+	class="relative max-w-40 min-w-40 cursor-pointer p-2 text-center select-none"
 	role="button"
 	tabindex="0"
 	onmouseenter={handleMouseEnter}
@@ -110,7 +110,7 @@
 	onkeydown={(e) => e.key === 'Enter' && handleTouch()}
 >
 	{#if isDisabled}
-		<div class="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
+		<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
 				<p>{m.notebook_required_btn()}</p>
 			{/if}

@@ -28,7 +28,7 @@
 		<div class="flex items-center space-x-4">
 			<div>
 				<h1
-					class="w-[calc(100vw-220px)] overflow-hidden text-ellipsis text-nowrap text-xl font-semibold text-gray-900 md:w-[calc(100vw-240px)]"
+					class="w-[calc(100vw-220px)] overflow-hidden text-xl font-semibold text-nowrap text-ellipsis text-gray-900 md:w-[calc(100vw-240px)]"
 				>
 					{app.getEventName() || "Judges' Room"}
 				</h1>

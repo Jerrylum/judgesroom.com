@@ -55,7 +55,7 @@
 </script>
 
 <button
-	class="group relative min-w-40 max-w-40 select-none p-2 text-center"
+	class="group relative max-w-40 min-w-40 p-2 text-center select-none"
 	class:cursor-default!={(isDisabled && !isNominated) || showExcellenceAwardWinners}
 	onclick={onClick}
 >
@@ -63,9 +63,9 @@
 		{getStars(ranking)}
 	</div>
 	{#if showExcellenceAwardWinners}
-		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-lg text-gray-600">Excellence Award</div>
+		<div class="absolute top-0 left-0 flex h-full w-full items-center justify-center text-lg text-gray-600">Excellence Award</div>
 	{:else if isDisabled}
-		<div class="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
+		<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
 				<p>{m.notebook_required_btn()}</p>
 			{/if}
@@ -81,6 +81,6 @@
 		</div>
 	{/if}
 	{#if isNominated}
-		<div class="absolute left-0 top-0 flex h-full w-full items-center justify-center text-4xl text-gray-600 hover:text-black">✓</div>
+		<div class="absolute top-0 left-0 flex h-full w-full items-center justify-center text-4xl text-gray-600 hover:text-black">✓</div>
 	{/if}
 </button>

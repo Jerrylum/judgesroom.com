@@ -51,7 +51,7 @@
 </script>
 
 <div
-	class="min-h-67 relative flex flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
+	class="relative flex min-h-67 flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
 	class:border-green-500={devStatus === 'fully_developed'}
 	class:border-yellow-500={devStatus === 'developing'}
 	class:border-gray-500={devStatus === 'not_submitted'}
@@ -79,7 +79,7 @@
 			<a
 				href={team.notebookLink}
 				target="_blank"
-				class="absolute left-0 w-[calc(100%-30px)] overflow-hidden text-ellipsis whitespace-nowrap text-xs text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+				class="absolute left-0 w-[calc(100%-30px)] overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
 				title={team.notebookLink}
 			>
 				{team.notebookLink.replace(/^https?:\/\//, '')}
@@ -98,7 +98,7 @@
 				type="radio"
 				checked={devStatus === 'fully_developed'}
 				value="fully_developed"
-				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
+				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('fully_developed')}
 			/>
 			<span class="text-sm text-gray-700">{m.fully_developed_notebook_status()}</span>
@@ -108,7 +108,7 @@
 				type="radio"
 				checked={devStatus === 'developing'}
 				value="developing"
-				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
+				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('developing')}
 			/>
 			<span class="text-sm text-gray-700">{m.developing_notebook_status()}</span>
@@ -118,7 +118,7 @@
 				type="radio"
 				checked={devStatus === 'not_submitted'}
 				value="not_submitted"
-				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
+				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus('not_submitted')}
 			/>
 			<span class="text-sm text-gray-700">{m.not_submitted_notebook_status()}</span>
@@ -129,7 +129,7 @@
 				type="checkbox"
 				disabled={!isSubmittedNotebookStatus}
 				checked={team.hasInnovateAwardSubmissionForm}
-				class="mr-2 mt-0.5 rounded border-gray-300 sm:mt-0"
+				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateInnovateAwardSubmissionForm(!team.hasInnovateAwardSubmissionForm)}
 			/>
 			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>{m.innovate_award_submission_form()}</span>
@@ -148,7 +148,7 @@
 
 	<!-- Status Indicator -->
 	{#if devStatus !== 'undetermined'}
-		<div class="absolute right-2 top-2">
+		<div class="absolute top-2 right-2">
 			{#if devStatus === 'fully_developed'}
 				<div class="h-2 w-2 rounded-full bg-green-500" title={m.fully_developed_notebook_status()}></div>
 			{:else if devStatus === 'developing'}

@@ -73,7 +73,7 @@ export function parseJudgesRoomUrl(url: string): string | null {
 		const hash = new SvelteURL(url).hash.substring(1);
 		return z.uuidv4().parse(hash);
 	} catch (error) {
-		console.error('Failed to parse Judges\' Room URL:', error);
+		console.error("Failed to parse Judges' Room URL:", error);
 		return null;
 	}
 }

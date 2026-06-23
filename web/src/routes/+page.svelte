@@ -17,7 +17,7 @@
 
 <div class="relative min-h-screen bg-slate-100">
 	<!-- Language Selector -->
-	<div class="absolute right-4 top-4 p-1">
+	<div class="absolute top-4 right-4 p-1">
 		<select
 			onchange={handleLanguageChange}
 			value={getLocale()}

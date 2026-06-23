@@ -110,7 +110,7 @@
 					<p>
 						{#if essentialData.robotEventsSku}
 							{m.event_code_colon()}<a
-								href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
+								href={`https://events.vex.com/${essentialData.robotEventsSku}.html`}
 								target="_blank"
 								class="text-blue-500 hover:text-blue-600">{essentialData.robotEventsSku}</a
 							>

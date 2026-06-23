@@ -381,7 +381,7 @@
 		}
 
 		:global(&[data-selected-items-count]::after) {
-			@apply absolute -right-3 -top-3 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
+			@apply absolute -top-3 -right-3 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-500 p-1 text-xs font-bold text-white content-[attr(data-selected-items-count)];
 		}
 	}
 </style>

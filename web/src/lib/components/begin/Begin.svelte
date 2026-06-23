@@ -47,7 +47,7 @@
 
 <div class="relative flex h-screen flex-col bg-slate-100">
 	<!-- Language Selector -->
-	<div class="absolute right-4 top-4 p-1">
+	<div class="absolute top-4 right-4 p-1">
 		<select onchange={handleLanguageChange} value={getLocale()}>
 			<option value="en">English</option>
 			<option value="zh-hk">繁體中文 (香港)</option>
@@ -65,7 +65,7 @@
 
 			<div class="max-w-lg rounded-2xl bg-white p-4 shadow-sm sm:p-6">
 				<h3 class="text-2xl font-medium text-gray-900">{m.minor_early_hedgehog_amuse()}</h3>
-				<p class="mb-2 mt-4 text-sm leading-relaxed text-gray-700">
+				<p class="mt-4 mb-2 text-sm leading-relaxed text-gray-700">
 					{m.still_honest_koala_dance()}
 				</p>
 				<div class="mb-6 space-y-4">

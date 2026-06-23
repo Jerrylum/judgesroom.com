@@ -34,24 +34,24 @@
 	</p>
 
 	<!-- Choice Buttons -->
-	<div class="space-y-4 mb-6">
+	<div class="mb-6 space-y-4">
 		<!-- Import Teams -->
-		<button 
+		<button
 			onclick={handleTeams}
-			class="w-full text-left p-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			class="w-full rounded-lg border border-gray-300 p-4 text-left hover:bg-gray-50 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 		>
-			<div class="font-medium text-gray-900 mb-2">{m.import_teams()}</div>
+			<div class="mb-2 font-medium text-gray-900">{m.import_teams()}</div>
 			<div class="text-sm text-gray-600">
 				{m.import_teams_description()}
 			</div>
 		</button>
 
 		<!-- Import Full Setup -->
-		<button 
+		<button
 			onclick={handleFullSetup}
-			class="w-full text-left p-4 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			class="w-full rounded-lg border border-gray-300 p-4 text-left hover:bg-gray-50 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
 		>
-			<div class="font-medium text-gray-900 mb-2">{m.import_full_setup()}</div>
+			<div class="mb-2 font-medium text-gray-900">{m.import_full_setup()}</div>
 			<div class="text-sm text-gray-600">
 				{m.import_full_setup_description()}
 			</div>

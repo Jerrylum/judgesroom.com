@@ -31,11 +31,7 @@
 		<button onclick={handleCancel} class={dialog.cancelButtonClass || 'cancel'}>
 			{dialog.cancelText || m.cancel()}
 		</button>
-		<button 
-			onclick={handleConfirm} 
-			class={dialog.confirmButtonClass || 'primary'}
-			onkeydown={(e) => e.key === 'Enter' && handleConfirm()}
-		>
+		<button onclick={handleConfirm} class={dialog.confirmButtonClass || 'primary'} onkeydown={(e) => e.key === 'Enter' && handleConfirm()}>
 			{dialog.confirmText || m.confirm()}
 		</button>
 	</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getLocale } from '$lib/paraglide/runtime';
+	import { getLocale } from '$lib/paraglide/runtime';
 </script>
 
 <svelte:head>

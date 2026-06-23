@@ -70,9 +70,9 @@
 				<content>
 					{#each awardRankings.judgedAwards as award}
 						{#if award !== 'Design Award'}
-							<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">{award}</div>
+							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">{award}</div>
 						{:else}
-							<div class="flex min-h-14 min-w-40 max-w-40 items-center justify-center p-2 text-center">Design Award / Excellence Award</div>
+							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">Design Award / Excellence Award</div>
 						{/if}
 					{/each}
 				</content>

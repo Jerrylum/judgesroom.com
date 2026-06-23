@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="min-h-15 flex flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
+	class="flex min-h-15 flex-row items-center justify-between rounded-lg border border-slate-500 bg-slate-300 p-4 pr-1 transition-all duration-200 hover:shadow-md"
 	class:opacity-40={!award.isSelected}
 	class:opacity-100={award.isSelected}
 >
@@ -30,7 +30,7 @@
 		<div class="flex-1">
 			<h4 class="text-sm font-medium text-slate-900">{award.name}</h4>
 			{#if !award.isOfficial}
-				<span class="text-xs italic text-gray-500">{m.custom_award()}</span>
+				<span class="text-xs text-gray-500 italic">{m.custom_award()}</span>
 			{/if}
 		</div>
 

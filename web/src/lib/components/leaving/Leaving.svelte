@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 
 	// This app phase is important to trigger unmounting before calling leaveJudgesRoom
-  // However, the unsubscribe request might not be sent successfully, it does not matter much
+	// However, the unsubscribe request might not be sent successfully, it does not matter much
 
 	onMount(async () => {
 		await app.leaveJudgesRoom();

@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="min-w-xs max-w-9/10 flex items-center justify-between rounded-lg p-4 shadow-lg {isError
+	class="flex max-w-9/10 min-w-xs items-center justify-between rounded-lg p-4 shadow-lg {isError
 		? 'bg-red-100 text-red-700'
 		: 'bg-green-100 text-green-700'}"
 >

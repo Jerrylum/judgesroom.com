@@ -47,10 +47,10 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Why We Collect Data</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							The anonymous usage data we collect through Google Analytics to improve the application.
-							Understanding usage patterns helps us identify and fix performance bottlenecks, ensuring optimal performance during critical
-							judging periods. Anonymous metrics guide us in developing features that benefit the judging community and help us monitor
-							application stability to ensure consistent service when judge advisors need it most.
+							The anonymous usage data we collect through Google Analytics to improve the application. Understanding usage patterns helps us
+							identify and fix performance bottlenecks, ensuring optimal performance during critical judging periods. Anonymous metrics
+							guide us in developing features that benefit the judging community and help us monitor application stability to ensure
+							consistent service when judge advisors need it most.
 						</p>
 						<p class="leading-relaxed text-gray-700">
 							General usage data also helps us improve the interface and workflow efficiency, making the judging process smoother for all

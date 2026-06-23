@@ -276,12 +276,12 @@
 
 			<div class="mb-4">
 				{#if isSubmitted && tab.teamId}
-					<div class="mb-2 mt-1 text-base text-gray-900">
+					<div class="mt-1 mb-2 text-base text-gray-900">
 						<strong>{m.team_hash()}</strong>: {includedTeams[tab.teamId].number}
 					</div>
 				{:else}
 					<label for="team-select" class="mb-2 block text-sm font-medium text-gray-700"><strong>{m.team_hash()}</strong></label>
-					<select id="team-select" bind:this={teamsSelectElement} class="classic mb-2 mt-1 block w-full" onchange={handleTeamSelectChange}>
+					<select id="team-select" bind:this={teamsSelectElement} class="classic mt-1 mb-2 block w-full" onchange={handleTeamSelectChange}>
 						<option value="">{m.select_a_team()}</option>
 						{#each teamsToShow as team (team.id)}
 							<option value={team.id} selected={team.id === tab.teamId}>{team.number} - {team.name}</option>

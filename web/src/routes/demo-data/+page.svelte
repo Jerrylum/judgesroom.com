@@ -305,18 +305,10 @@
 
 			<!-- Control Buttons -->
 			<div class="mb-8 flex gap-4">
-				<button
-					onclick={() => executeAllSteps()}
-					class="primary"
-					disabled={stepStatus.some((status) => status === 'running')}
-				>
+				<button onclick={() => executeAllSteps()} class="primary" disabled={stepStatus.some((status) => status === 'running')}>
 					Execute All Steps
 				</button>
-				<button
-					onclick={() => resetSteps()}
-					class="secondary"
-					disabled={stepStatus.some((status) => status === 'running')}
-				>
+				<button onclick={() => resetSteps()} class="secondary" disabled={stepStatus.some((status) => status === 'running')}>
 					Reset All Steps
 				</button>
 			</div>

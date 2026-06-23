@@ -40,14 +40,14 @@
 	class:opacity-50={isSkipped}
 >
 	{#if excellenceAwardEligibilityStatus === 'eligible'}
-		<div class="absolute right-2 top-2 text-xs text-green-600">&le;40%</div>
+		<div class="absolute top-2 right-2 text-xs text-green-600">&le;40%</div>
 	{:else if excellenceAwardEligibilityStatus === 'ineligible'}
-		<div class="absolute right-2 top-2 text-xs text-red-600">&gt;40%</div>
+		<div class="absolute top-2 right-2 text-xs text-red-600">&gt;40%</div>
 	{/if}
 	{#if thinkAwardEligibilityStatus === 'eligible'}
-		<div class="absolute right-2 top-2 text-xs text-green-600">AUTO&check;</div>
+		<div class="absolute top-2 right-2 text-xs text-green-600">AUTO&check;</div>
 	{:else if thinkAwardEligibilityStatus === 'ineligible'}
-		<div class="absolute right-2 top-2 text-xs text-red-600">AUTO&cross;</div>
+		<div class="absolute top-2 right-2 text-xs text-red-600">AUTO&cross;</div>
 	{/if}
 	<div class="flex items-center justify-between">
 		<div>

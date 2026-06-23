@@ -100,7 +100,7 @@
 					<p class="mb-2">
 						{m.event_code_colon()}<a
 							class="text-blue-500 hover:text-blue-600"
-							href={`https://robotevents.com/robot-competitions/link-to/${essentialData.robotEventsSku}.html`}
+							href={`https://events.vex.com/${essentialData.robotEventsSku}.html`}
 							target="_blank">{essentialData.robotEventsSku}</a
 						><br />{m.division_colon()}{essentialData.divisionId}
 					</p>
@@ -209,11 +209,11 @@
 								<team>{m.team_number()}</team>
 								<scroll-container use:registerScrollContainer class="bg-gray-200">
 									<content>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">{m.qualification_rank()}</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">
+										<div class="flex min-h-14 max-w-1/3 min-w-40 items-center justify-center p-2 text-center">{m.qualification_rank()}</div>
+										<div class="flex min-h-14 max-w-1/3 min-w-40 items-center justify-center p-2 text-center">
 											{m.overall_skills_rank()}
 										</div>
-										<div class="max-w-1/3 flex min-h-14 min-w-40 items-center justify-center p-2 text-center">
+										<div class="flex min-h-14 max-w-1/3 min-w-40 items-center justify-center p-2 text-center">
 											{m.autonomous_coding_skills_rank()}
 										</div>
 									</content>

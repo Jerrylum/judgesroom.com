@@ -12,9 +12,9 @@
 	let { tab, isActive, onClose, isDragging = false }: Props = $props();
 </script>
 
-<div class="group relative flex h-8 flex-1 select-none items-start justify-start px-2.5 text-xs transition-colors">
+<div class="group relative flex h-8 flex-1 items-start justify-start px-2.5 text-xs transition-colors select-none">
 	<div class="z-30 flex h-7 flex-1 flex-row items-center justify-between">
-		<span class="overflow-hidden truncate text-ellipsis whitespace-nowrap text-left text-slate-900">{tab.title}</span>
+		<span class="truncate overflow-hidden text-left text-ellipsis whitespace-nowrap text-slate-900">{tab.title}</span>
 		{#if !tab.isPinned}
 			<div class="relative">
 				<button
@@ -38,9 +38,9 @@
 		{/if}
 	</div>
 	{#if isActive}
-		<div class="absolute -left-4 -right-4 top-0 h-8" class:z-10={isActive}>
+		<div class="absolute top-0 -right-4 -left-4 h-8" class:z-10={isActive}>
 			<div
-				class="absolute left-4 right-4 top-0 h-8 rounded-tl-lg rounded-tr-lg border-l border-r border-t border-transparent bg-slate-100"
+				class="absolute top-0 right-4 left-4 h-8 rounded-tl-lg rounded-tr-lg border-t border-r border-l border-transparent bg-slate-100"
 			></div>
 			<svg
 				class="absolute bottom-0 left-0 h-4 w-4 fill-slate-100"
@@ -58,7 +58,7 @@
 				<rect x="50" y="50" width="50" height="50" mask="url(#Mask)" />
 			</svg>
 			<svg
-				class="absolute bottom-0 right-0 h-4 w-4 fill-slate-100"
+				class="absolute right-0 bottom-0 h-4 w-4 fill-slate-100"
 				version="1.1"
 				xmlns="http://www.w3.org/2000/svg"
 				xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -74,8 +74,8 @@
 			</svg>
 		</div>
 	{:else}
-		<div class="absolute -left-2 -right-2 top-0 z-20 h-8">
-			<div class="absolute left-2 right-2 top-0 h-7 rounded-md group-hover:bg-zinc-300"></div>
+		<div class="absolute top-0 -right-2 -left-2 z-20 h-8">
+			<div class="absolute top-0 right-2 left-2 h-7 rounded-md group-hover:bg-zinc-300"></div>
 		</div>
 	{/if}
 </div>

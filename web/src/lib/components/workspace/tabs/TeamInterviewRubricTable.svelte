@@ -25,7 +25,7 @@
 	});
 </script>
 
-<div class="md:hidden! mb-2 flex flex-row justify-end gap-2 text-sm">
+<div class="mb-2 flex flex-row justify-end gap-2 text-sm md:hidden!">
 	<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
 	<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 </div>
@@ -35,7 +35,7 @@
 		<scroll-container use:registerScrollContainer>
 			<content class="min-w-120 flex-col! gap-2 bg-gray-200">
 				<div class="p-0! pt-1 text-center text-base font-bold">{m.rubric_proficiency_level()}</div>
-				<div class="border-0! p-0! flex text-center">
+				<div class="flex border-0! p-0! text-center">
 					<div class="flex-1 border-r pb-1">
 						<p class="font-bold">{m.rubric_expert()}</p>
 						<p class="text-xs">{m.rubric_points_4_5()}</p>
@@ -51,7 +51,7 @@
 				</div>
 			</content>
 		</scroll-container>
-		<scoring class="flex-col! min-w-14 bg-gray-200">
+		<scoring class="min-w-14 flex-col! bg-gray-200">
 			<div class="pt-1">&nbsp;</div>
 			<div class="flex items-center p-1 font-bold">
 				<span>{m.rubric_points()}</span>
