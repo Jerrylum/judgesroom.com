@@ -448,6 +448,10 @@ export async function importFromRobotEvents(client: VexEventsClient, evtSku: str
 			a.isSelected = eventGradeLevel !== 'Blended';
 		} else if (a.name.startsWith('Excellence Award')) {
 			a.isSelected = eventGradeLevel === 'Blended';
+		} else if (a.name === 'Design Award') {
+			a.isSelected = eventGradeLevel !== 'Blended';
+		} else if (a.name.startsWith('Design Award')) {
+			a.isSelected = eventGradeLevel === 'Blended';
 		} else {
 			a.isSelected = awardTitles.some((b) => b.includes(a.name));
 		}

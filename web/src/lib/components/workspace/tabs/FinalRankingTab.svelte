@@ -3,7 +3,7 @@
 	import { app } from '$lib/index.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-	import { isExcellenceAward, type Award } from '@judgesroom.com/protocol/src/award';
+	import { isExcellenceAward, getDesignExcellenceSwapZone, isDesignExcellenceSwapZone, type Award } from '@judgesroom.com/protocol/src/award';
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
 	import { tick } from 'svelte';
 	import { getJudgedAwardWinners } from '$lib/award.svelte';
@@ -91,7 +91,7 @@
 	}
 
 	async function handleJudgedAwardDrop(award: Award, zone: string, e: DropEvent) {
-		if (zone === 'Design Award') {
+		if (isDesignExcellenceSwapZone(zone)) {
 			const originalState = allFinalAwardNominations[award.name] || [];
 			const proposedState = e.detail.items;
 			if (originalState.length === proposedState.length) {
@@ -235,12 +235,11 @@
 						{#each allExcellenceAwards as award (award.name)}
 							<FinalRankingColumn
 								{award}
-								zone="Design Award"
+								zone={getDesignExcellenceSwapZone(award.name)}
 								{allTeams}
 								{allJudgeGroups}
 								{allFinalAwardNominations}
 								onFinalize={handleJudgedAwardDrop}
-								showFullAwardName
 								dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}

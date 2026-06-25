@@ -293,6 +293,20 @@ describe('getOfficialAwardOptionsList', () => {
 			const semifinalists = awards.find((a) => a.name === 'Tournament Semifinalists');
 			expect(semifinalists?.isSelected).toBe(false);
 		});
+
+		it('should mark Judges Award as selected by default', () => {
+			const awards = getOfficialAwardOptionsList('V5RC', ['High School']);
+
+			const judgesAward = awards.find((a) => a.name === 'Judges Award');
+			expect(judgesAward?.isSelected).toBe(true);
+		});
+
+		it('should mark Inspire Award as selected by default', () => {
+			const awards = getOfficialAwardOptionsList('V5RC', ['High School']);
+
+			const inspireAward = awards.find((a) => a.name === 'Inspire Award');
+			expect(inspireAward?.isSelected).toBe(true);
+		});
 	});
 
 	describe('Award Properties', () => {
@@ -349,6 +363,12 @@ describe('getOfficialAwardOptionsList', () => {
 
 			const msExcellence = awards.find((a) => a.name === 'Excellence Award - Middle School');
 			expect(msExcellence).toBeDefined();
+
+			const hsDesign = awards.find((a) => a.name === 'Design Award - High School');
+			expect(hsDesign).toBeDefined();
+
+			const msDesign = awards.find((a) => a.name === 'Design Award - Middle School');
+			expect(msDesign).toBeDefined();
 		});
 
 		it('should exclude grade-specific awards when only single grade provided', () => {
@@ -357,6 +377,9 @@ describe('getOfficialAwardOptionsList', () => {
 			// Should exclude grade-specific awards when single grade (filter logic excludes single-grade awards for single grade)
 			const hsExcellence = awards.find((a) => a.name === 'Excellence Award - High School');
 			expect(hsExcellence).toBeUndefined();
+
+			const hsDesign = awards.find((a) => a.name === 'Design Award - High School');
+			expect(hsDesign).toBeUndefined();
 		});
 	});
 });

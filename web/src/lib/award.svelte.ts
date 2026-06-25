@@ -223,6 +223,9 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			true,
 			true
 		),
+		new AwardOptions('Design Award - High School', ['V5RC'], ['judged'], ['High School'], 1, true, true, true, false),
+		new AwardOptions('Design Award - Middle School', ['VIQRC', 'V5RC'], ['judged'], ['Middle School'], 1, true, true, true, false),
+		new AwardOptions('Design Award - Elementary School', ['VIQRC'], ['judged'], ['Elementary School'], 1, true, true, true, false),
 		new AwardOptions(
 			'Innovate Award',
 			['VIQRC', 'V5RC', 'VURC'],
@@ -309,7 +312,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			false,
 			true,
 			true,
-			false
+			true
 		),
 		new AwardOptions(
 			'Sportsmanship Award',

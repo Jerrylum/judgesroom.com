@@ -100,8 +100,8 @@
 				"name": "Super Awesome Robotics Tournament - VIQRC",
 				"code": "RE-VIQRC-24-9999"
 			},
-			"order": 196,
-			"title": "Design Award (VIQRC)",
+			"order": 195,
+			"title": "Design Award - Middle School (VIQRC)",
 			"qualifications": [],
 			"designation": null,
 			"classification": null,
@@ -115,6 +115,34 @@
 					"team": {
 						"id": 160800,
 						"name": "6600A",
+						"code": null
+					}
+				}
+			],
+			"individualWinners": []
+		},
+		{
+			"id": 231976,
+			"event": {
+				"id": 59999,
+				"name": "Super Awesome Robotics Tournament - VIQRC",
+				"code": "RE-VIQRC-24-9999"
+			},
+			"order": 196,
+			"title": "Design Award - Elementary School (VIQRC)",
+			"qualifications": [],
+			"designation": null,
+			"classification": null,
+			"teamWinners": [
+				{
+					"division": {
+						"id": 1,
+						"name": "Division 1",
+						"code": null
+					},
+					"team": {
+						"id": 129402,
+						"name": "3000A",
 						"code": null
 					}
 				}

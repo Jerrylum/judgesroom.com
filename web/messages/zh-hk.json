@@ -97,6 +97,7 @@
 	"next_competition_setup": "下一步：競賽設置",
 	"event_setup": "賽事設置",
 	"select_excellence_award_award": "選擇卓越獎獎項",
+	"select_design_award_award": "選擇設計獎獎項",
 	"remove_judge": "移除評判",
 	"judges": "評判 ({count})",
 	"add_judges": "添加評判",

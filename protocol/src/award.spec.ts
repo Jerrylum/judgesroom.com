@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { ProgramSchema, AwardTypeSchema, GradeSchema, AwardNameSchema, AwardSchema, type Award } from './award';
+import {
+	ProgramSchema,
+	AwardTypeSchema,
+	GradeSchema,
+	AwardNameSchema,
+	AwardSchema,
+	type Award,
+	isDesignAward,
+	isExcellenceAward,
+	getPairedExcellenceAwardName,
+	getDesignExcellenceSwapZone,
+	isDesignExcellenceSwapZone
+} from './award';
 
 describe('Awards Schema Validation', () => {
 	describe('ProgramSchema', () => {
@@ -197,5 +209,32 @@ describe('Awards Schema Validation', () => {
 
 			expect(() => AwardSchema.parse(validAward)).not.toThrow();
 		});
+	});
+});
+
+describe('Design Award helpers', () => {
+	it('should identify design award names', () => {
+		expect(isDesignAward('Design Award')).toBe(true);
+		expect(isDesignAward('Design Award - Middle School')).toBe(true);
+		expect(isDesignAward('Excellence Award')).toBe(false);
+	});
+
+	it('should pair design awards with excellence awards', () => {
+		expect(getPairedExcellenceAwardName('Design Award')).toBe('Excellence Award');
+		expect(getPairedExcellenceAwardName('Design Award - Middle School')).toBe('Excellence Award - Middle School');
+	});
+
+	it('should map design-excellence swap zones', () => {
+		expect(getDesignExcellenceSwapZone('Excellence Award')).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Excellence Award - Middle School')).toBe('Design Award - Middle School');
+		expect(getDesignExcellenceSwapZone('Design Award - Elementary School')).toBe('Design Award - Elementary School');
+		expect(isDesignExcellenceSwapZone('Design Award')).toBe(true);
+		expect(isDesignExcellenceSwapZone('Design Award - High School')).toBe(true);
+		expect(isDesignExcellenceSwapZone('Innovate Award')).toBe(false);
+	});
+
+	it('should not confuse excellence and design awards', () => {
+		expect(isExcellenceAward('Design Award')).toBe(false);
+		expect(isDesignAward('Excellence Award - Middle School')).toBe(false);
 	});
 });

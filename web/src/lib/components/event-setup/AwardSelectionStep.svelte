@@ -3,11 +3,11 @@
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
 	import { dialogs } from '$lib/index.svelte';
 	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
-	import { isExcellenceAward, type AwardType, type Program } from '@judgesroom.com/protocol/src/award';
+	import { isExcellenceAward, isDesignAward, type AwardType, type Program } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
-	import FixedAwardOptions from './FixedAwardOptions.svelte';
 	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
+	import DesignAwardOptions from './DesignAwardOptions.svelte';
 	import AwardSelectionColumn from './AwardSelectionColumn.svelte';
 	import { tick, untrack } from 'svelte';
 	import { gtag } from '$lib/index.svelte';
@@ -30,7 +30,7 @@
 	const possibleGrades = $derived(gradeOptions.find((g) => g.value === selectedEventGradeLevel)?.grades ?? []);
 
 	let excellenceAward = $state<AwardOptions[]>([]);
-	let designAward = $state<AwardOptions | null>(null);
+	let designAward = $state<AwardOptions[]>([]);
 	let localState = $state<Record<AwardType, AwardOptions[]>>({
 		performance: [],
 		judged: [],
@@ -47,10 +47,10 @@
 		untrack(() => {
 			const j = using.filter((award) => award.selectedType === 'judged');
 			excellenceAward = j.filter((award) => isExcellenceAward(award.name));
-			designAward = j.find((award) => award.name === 'Design Award')!;
+			designAward = j.filter((award) => isDesignAward(award.name));
 			localState = {
 				performance: using.filter((award) => award.selectedType === 'performance'),
-				judged: j.filter((award) => !isExcellenceAward(award.name) && award.name !== 'Design Award'),
+				judged: j.filter((award) => !isExcellenceAward(award.name) && !isDesignAward(award.name)),
 				volunteer_nominated: using.filter((award) => award.selectedType === 'volunteer_nominated')
 			};
 		});
@@ -142,7 +142,7 @@
 		allAwardOptions = [
 			...localState.performance,
 			...excellenceAward,
-			designAward!,
+			...designAward,
 			...localState.judged,
 			...localState.volunteer_nominated
 		];
@@ -186,8 +186,8 @@
 				{#if excellenceAward.length > 0}
 					<ExcellenceAwardOptions bind:awards={excellenceAward} />
 				{/if}
-				{#if designAward}
-					<FixedAwardOptions bind:award={designAward} />
+				{#if designAward.length > 0}
+					<DesignAwardOptions bind:awards={designAward} />
 				{/if}
 				<AwardSelectionColumn type="judged" zone="others" awardOptions={localState.judged} onFinalize={handleAwardOptionsFinalize} />
 			</div>

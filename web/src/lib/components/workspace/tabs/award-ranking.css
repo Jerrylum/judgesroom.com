@@ -12,7 +12,7 @@ award-rankings-table {
 	}
 
 	scroll-container {
-		@apply flex flex-grow overflow-x-auto;
+		@apply flex flex-grow overflow-x-auto overflow-y-hidden;
 
 		> content {
 			@apply flex flex-grow flex-row justify-start text-left text-sm;

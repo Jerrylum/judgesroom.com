@@ -133,3 +133,33 @@ describe('RobotEventsSource', () => {
 		expect(result).toMatchSnapshot();
 	});
 });
+
+describe('getExcellenceAwardCandidatesReport auto skills eligibility', () => {
+	it('should require autonomous coding skills score greater than zero', () => {
+		const rankings = [
+			{ teamNumber: '1A', divisionId: 1, rank: 1 },
+			{ teamNumber: '2A', divisionId: 1, rank: 2 },
+			{ teamNumber: '3A', divisionId: 1, rank: 3 },
+			{ teamNumber: '4A', divisionId: 1, rank: 4 },
+			{ teamNumber: '5A', divisionId: 1, rank: 5 }
+		];
+		const overallSkills = [
+			{ teamNumber: '1A', rank: 1, overallScore: 100, programmingScore: 50, driverScore: 50 },
+			{ teamNumber: '2A', rank: 2, overallScore: 90, programmingScore: 0, driverScore: 90 },
+			{ teamNumber: '3A', rank: 3, overallScore: 80, programmingScore: 10, driverScore: 70 },
+			{ teamNumber: '4A', rank: 4, overallScore: 70, programmingScore: 5, driverScore: 65 },
+			{ teamNumber: '5A', rank: 5, overallScore: 60, programmingScore: 1, driverScore: 59 }
+		];
+
+		const result = getExcellenceAwardCandidatesReport(rankings, overallSkills, rankings.length);
+
+		const team1A = result.teamsInGroup.find((team) => team.teamNumber === '1A');
+		expect(team1A?.autoSkills.result).toBe('eligible');
+		expect(team1A?.isEligible).toBe(true);
+
+		const team2A = result.teamsInGroup.find((team) => team.teamNumber === '2A');
+		expect(team2A?.autoSkills.result).toBe('ineligible');
+		expect(team2A?.autoSkills.score).toBe(0);
+		expect(team2A?.isEligible).toBe(false);
+	});
+});

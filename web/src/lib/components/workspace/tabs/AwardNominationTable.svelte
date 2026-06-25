@@ -4,7 +4,7 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import { ExcellenceAwardNameSchema, type ExcellenceAwardName } from '@judgesroom.com/protocol/src/award';
+	import { getPairedExcellenceAwardName, isDesignAward } from '@judgesroom.com/protocol/src/award';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
 
@@ -17,16 +17,10 @@
 
 	let { title, judgeGroup, showAbsentTeams, bypassAwardRequirements }: Props = $props();
 
-	const allExcellenceAwardNames = Object.keys(ExcellenceAwardNameSchema.enum) as ExcellenceAwardName[];
-
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
 	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]) as AwardRankingsFullUpdate | undefined;
-
-	const allExcellenceAwardWinners = $derived(
-		allExcellenceAwardNames.flatMap((awardName) => finalAwardNominations[awardName]?.map((nom) => nom.teamId) ?? [])
-	);
 
 	// Teams that have completed a team interview (have at least one tiId in submission caches)
 	const teamsWithTeamInterview = $derived.by(() => {
@@ -69,10 +63,12 @@
 			<scroll-container use:registerScrollContainer class="bg-gray-200">
 				<content>
 					{#each awardRankings.judgedAwards as award}
-						{#if award !== 'Design Award'}
-							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">{award}</div>
+						{#if isDesignAward(award)}
+							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">
+								{award} / {getPairedExcellenceAwardName(award)}
+							</div>
 						{:else}
-							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">Design Award / Excellence Award</div>
+							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">{award}</div>
 						{/if}
 					{/each}
 				</content>
@@ -100,7 +96,9 @@
 										{isNominated}
 										{hasTeamInterview}
 										{bypassAwardRequirements}
-										showExcellenceAwardWinners={awardName === 'Design Award' && allExcellenceAwardWinners.includes(teamId)}
+										showExcellenceAwardWinners={isDesignAward(awardName) &&
+											(finalAwardNominations[getPairedExcellenceAwardName(awardName)]?.some((nomination) => nomination.teamId === teamId) ??
+												false)}
 									/>
 								{/if}
 							{/each}

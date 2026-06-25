@@ -97,6 +97,7 @@
 	"next_competition_setup": "Next: Competition Setup",
 	"event_setup": "Event Setup",
 	"select_excellence_award_award": "Select Excellence Award award",
+	"select_design_award_award": "Select Design Award award",
 	"remove_judge": "Remove judge",
 	"judges": "Judges ({count})",
 	"add_judges": "Add Judges",

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { isExcellenceAward, type Award } from '@judgesroom.com/protocol/src/award';
+	import { isExcellenceAward, isDesignAward, type Award } from '@judgesroom.com/protocol/src/award';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
@@ -19,7 +19,6 @@
 		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
 		onFinalize?: (award: Award, zone: string, e: DropEvent) => void;
 		onAddNomination?: (awardName: string, teamId: string) => void;
-		showFullAwardName?: boolean;
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
 		winners: string[];
@@ -51,7 +50,6 @@
 		onConsider,
 		onFinalize,
 		onAddNomination,
-		showFullAwardName,
 		dropFromOthersDisabled,
 		showAddButton,
 		winners,
@@ -124,7 +122,7 @@
 
 	function getExcellenceAwardEligibilityStatus(teamNumber: string): 'eligible' | 'ineligible' | 'no-data' {
 		if (!teamEligibilities) return 'no-data';
-		if (award.name === 'Design Award' || isExcellenceAward(award.name)) {
+		if (isDesignAward(award.name) || isExcellenceAward(award.name)) {
 			if (!teamEligibilityMap.has(teamNumber)) return 'no-data';
 			else return teamEligibilityMap.get(teamNumber) ? 'eligible' : 'ineligible';
 		} else {
@@ -154,12 +152,8 @@
 </script>
 
 <div class="flex max-w-40 min-w-40 flex-col gap-1">
-	<div class="flex flex-col flex-nowrap items-center justify-center p-2 text-center">
-		<div
-			class="max-w-full overflow-hidden text-ellipsis"
-			class:whitespace-initial={showFullAwardName}
-			class:whitespace-nowrap={!showFullAwardName}
-		>
+	<div class="flex min-h-14 flex-col items-center justify-center p-2 text-center">
+		<div class="max-w-full wrap-break-word min-h-12">
 			{award.name}
 		</div>
 		<div class="text-xs text-gray-500">
