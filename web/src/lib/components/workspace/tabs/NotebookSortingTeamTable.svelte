@@ -136,7 +136,7 @@
 
 						<!-- Actions Column -->
 						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
-							{#if devStatus === 'fully_developed'}
+							{#if isSubmittedNotebookStatus}
 								<button onclick={() => openNotebookRubric(team.id)} class="primary tiny" class:bg-green-800!={isSubmitted}>
 									{#if isSubmitted}
 										{m.you_submitted()}

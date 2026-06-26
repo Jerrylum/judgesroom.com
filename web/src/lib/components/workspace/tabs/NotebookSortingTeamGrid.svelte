@@ -136,7 +136,7 @@
 		</label>
 	</div>
 
-	{#if devStatus === 'fully_developed'}
+	{#if isSubmittedNotebookStatus}
 		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full" class:bg-green-800!={isSubmitted}>
 			{#if isSubmitted}
 				{m.you_submitted()}

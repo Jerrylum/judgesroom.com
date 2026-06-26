@@ -8,10 +8,10 @@
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
 	import { createEmptyNotebookRubricScores, NOTEBOOK_RUBRIC_CRITERIA_COUNT } from '@judgesroom.com/protocol/src/rubric';
-	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
 	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
+	import WarningSign from './WarningSign.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
 
@@ -162,6 +162,10 @@
 		}
 	});
 
+	function showNoNotebookSubmittedWarning(team: (typeof includedTeams)[string]): boolean {
+		return !isSubmitted && (team.notebookDevelopmentStatus === 'not_submitted' || team.notebookDevelopmentStatus === 'undetermined');
+	}
+
 	async function saveRubric() {
 		if (!tab.teamId) {
 			app.addErrorNotice(m.please_select_a_team());
@@ -185,11 +189,10 @@
 
 		try {
 			const selectedTeam = includedTeams[tab.teamId];
-			// If the notebook is developing or not reviewed, mark it as fully developed
-			if (selectedTeam.notebookDevelopmentStatus !== 'fully_developed') {
+			if (selectedTeam.notebookDevelopmentStatus === 'not_submitted' || selectedTeam.notebookDevelopmentStatus === 'undetermined') {
 				await app.wrpcClient.team.updateTeamData.mutation({
 					...selectedTeam,
-					notebookDevelopmentStatus: 'fully_developed'
+					notebookDevelopmentStatus: 'developing'
 				});
 			}
 
@@ -314,7 +317,6 @@
 			{#if tab.teamId}
 				{@const selectedTeam = includedTeams[tab.teamId]}
 				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
-				{@const devStatus = selectedTeam.notebookDevelopmentStatus}
 				<div class="mb-4 flex flex-row justify-between gap-2 rounded-lg bg-gray-50 p-4">
 					<div class="text-sm text-gray-800">
 						<p><strong>{m.team_hash()}{selectedTeam.number}:</strong> {selectedTeam.name}</p>
@@ -336,7 +338,7 @@
 					{/if}
 				</div>
 
-				{#if devStatus !== 'fully_developed'}
+				{#if showNoNotebookSubmittedWarning(selectedTeam)}
 					<WarningSign title={m.notebook_development_status()}>
 						<p>
 							{@html sanitizeHTMLMessage(m.notebook_development_status_warning)}

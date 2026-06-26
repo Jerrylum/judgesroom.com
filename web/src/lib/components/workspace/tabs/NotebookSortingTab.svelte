@@ -7,7 +7,7 @@
 	import NotebookSortingTeamTable from './NotebookSortingTeamTable.svelte';
 	import GridViewIcon from '$lib/icon/GridViewIcon.svelte';
 	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
-	import type { TeamData } from '@judgesroom.com/protocol/src/team';
+	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
@@ -73,21 +73,21 @@
 		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
 		const totalTeams = teamsToShow.length;
 
-		// 2. Teams with submitted notebook rubrics / teams with fully developed notebooks
-		const fullyDevelopedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
-		const fullyDevelopedCount = fullyDevelopedTeams.length;
+		// 2. Teams with submitted notebook rubrics / evaluable notebooks (Developing + Fully Developed)
+		const evaluableTeams = teamsToShow.filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus));
+		const evaluableCount = evaluableTeams.length;
 
-		const teamsWithSubmittedRubrics = fullyDevelopedTeams.filter((team) => {
+		const teamsWithSubmittedRubrics = evaluableTeams.filter((team) => {
 			return Object.values(subscriptions.allSubmissionCaches).some((sub) => sub.enrId && sub.teamId === team.id);
 		}).length;
 
-		// 3. Teams current judge finished / teams with fully developed notebooks
-		const currentJudgeFinishedCount = fullyDevelopedTeams.filter((team) => submittedNotebookRubricsOfCurrentJudge.includes(team.id)).length;
+		// 3. Teams current judge finished / evaluable notebooks
+		const currentJudgeFinishedCount = evaluableTeams.filter((team) => submittedNotebookRubricsOfCurrentJudge.includes(team.id)).length;
 
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
-			withRubrics: { count: teamsWithSubmittedRubrics, total: fullyDevelopedCount },
-			currentJudgeFinished: { count: currentJudgeFinishedCount, total: fullyDevelopedCount }
+			withRubrics: { count: teamsWithSubmittedRubrics, total: evaluableCount },
+			currentJudgeFinished: { count: currentJudgeFinishedCount, total: evaluableCount }
 		};
 	});
 
@@ -174,9 +174,11 @@
 				the doubt and categorized as Fully Developed. -->
 				{@html sanitizeHTMLMessage(m.notebook_sorting_description1)}
 			</p>
-			<p class="mb-4 text-sm text-gray-600">
-				<!-- Only <b>Fully Developed</b> notebooks will be able to start the Engineering Notebook Rubric. -->
+			<p class="mb-2 text-sm text-gray-600">
 				{@html sanitizeHTMLMessage(m.notebook_sorting_description2)}
+			</p>
+			<p class="mb-4 text-sm text-gray-600">
+				{@html sanitizeHTMLMessage(m.notebook_sorting_description3)}
 			</p>
 		</div>
 
@@ -262,7 +264,7 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-base font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
+						<div class="text-base font-medium text-gray-900">{m.notebooks_rubric_completed()}</div>
 						{#if isShowingOnlyAssignedTeams}
 							<div class="mb-2 text-sm text-gray-900">{m.your_judge_group({ name: currentJudgeGroup!.name })}</div>
 						{:else}
@@ -279,7 +281,7 @@
 					</div>
 
 					<div class="rounded-lg bg-gray-50 p-3">
-						<div class="text-base font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
+						<div class="text-base font-medium text-gray-900">{m.notebooks_rubric_completed()}</div>
 						<div class="mb-2 text-sm text-gray-900">{m.your_progress()}</div>
 						<div class="text-lg font-semibold text-gray-700">
 							{progressMetrics.currentJudgeFinished.count} / {progressMetrics.currentJudgeFinished.total}

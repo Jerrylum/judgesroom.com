@@ -7,7 +7,7 @@
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
-	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import QRCodeButton from './QRCodeButton.svelte';
 
 	interface Props {
@@ -154,11 +154,11 @@
 		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
 		const totalTeams = teamsToShow.length;
 
-		// 2. Teams with submitted notebook rubrics / teams with fully developed notebooks
-		const fullyDevelopedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus === 'fully_developed');
-		const fullyDevelopedCount = fullyDevelopedTeams.length;
+		// 2. Teams with submitted notebook rubrics / evaluable notebooks (Developing + Fully Developed)
+		const evaluableTeams = teamsToShow.filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus));
+		const evaluableCount = evaluableTeams.length;
 
-		const fullyDevelopedWithRubrics = fullyDevelopedTeams.filter((team) => {
+		const evaluableWithRubrics = evaluableTeams.filter((team) => {
 			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
 			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
 		}).length;
@@ -172,7 +172,7 @@
 
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
-			fullyDevelopedWithRubrics: { count: fullyDevelopedWithRubrics, total: fullyDevelopedCount },
+			evaluableWithRubrics: { count: evaluableWithRubrics, total: evaluableCount },
 			teamsInterviewed: { count: teamsInterviewed, total: presentTeams }
 		};
 	});
@@ -230,13 +230,13 @@
 		</div>
 
 		<div class="rounded-lg bg-gray-50 p-3">
-			<div class="text-sm font-medium text-gray-900">{m.fully_developed_notebooks_reviewed()}</div>
+			<div class="text-sm font-medium text-gray-900">{m.notebooks_rubric_completed()}</div>
 			<div class="text-lg font-semibold text-gray-700">
-				{progressMetrics.fullyDevelopedWithRubrics.count} / {progressMetrics.fullyDevelopedWithRubrics.total}
+				{progressMetrics.evaluableWithRubrics.count} / {progressMetrics.evaluableWithRubrics.total}
 			</div>
 			<div class="text-xs text-gray-600">
-				{progressMetrics.fullyDevelopedWithRubrics.total > 0
-					? Math.round((progressMetrics.fullyDevelopedWithRubrics.count / progressMetrics.fullyDevelopedWithRubrics.total) * 100)
+				{progressMetrics.evaluableWithRubrics.total > 0
+					? Math.round((progressMetrics.evaluableWithRubrics.count / progressMetrics.evaluableWithRubrics.total) * 100)
 					: 0}%
 			</div>
 		</div>
@@ -308,7 +308,7 @@
 						<!-- Notebook Rubrics Column -->
 						<div class="flex max-w-85 min-w-85 items-center justify-center overflow-hidden">
 							<div class="flex flex-row justify-center gap-1 p-1">
-								{#if team.notebookDevelopmentStatus === 'fully_developed'}
+								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
 										<button
 											onclick={() => openNotebookRubric(team.id, rubric.id)}

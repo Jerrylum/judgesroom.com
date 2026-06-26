@@ -3,7 +3,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
-	import type { TeamData } from '@judgesroom.com/protocol/src/team';
+	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import { generateNotebookRubricScores, generateTeamInterviewRubricScores } from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
@@ -96,7 +96,7 @@
 
 				const teams = app.getAllTeamInfoAndData();
 				const attendingTeams = Object.values(teams).filter((team) => !team.absent).length;
-				const teamsWithNotebooks = Object.values(teams).filter((team) => team.notebookDevelopmentStatus === 'fully_developed').length;
+				const teamsWithNotebooks = Object.values(teams).filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus)).length;
 
 				return `Updated ${attendingTeams} attending teams, ${teamsWithNotebooks} with completed notebooks.`;
 			}
@@ -110,7 +110,7 @@
 				let submissionCount = 0;
 
 				for (const team of Object.values(teams)) {
-					if (team.notebookDevelopmentStatus !== 'fully_developed') {
+					if (!isSubmittedNotebook(team.notebookDevelopmentStatus)) {
 						continue;
 					}
 					for (const judge of judges) {
