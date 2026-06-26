@@ -5,6 +5,7 @@
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
+	import { REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM } from '$lib/award.svelte';
 
 	interface Props {
 		awardIndex: number;
@@ -24,9 +25,14 @@
 
 	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
+	// OBSOLETE (GRSF): Innovate Award Submission Form is no longer required. Legacy check retained for reference.
 	const isMeetInnovateAwardSubmissionFormRequirement = $derived(award.name !== 'Innovate Award' || team.hasInnovateAwardSubmissionForm);
 	const isDisabled = $derived(
-		bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement || !isMeetInnovateAwardSubmissionFormRequirement
+		bypassAwardRequirements
+			? false
+			: !isMeetNotebookRequirement ||
+					!isMeetGradeRequirement ||
+					(REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM && !isMeetInnovateAwardSubmissionFormRequirement)
 	);
 
 	// Handle ranking update
@@ -117,7 +123,7 @@
 			{#if !isMeetGradeRequirement}
 				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>
 			{/if}
-			{#if !isMeetInnovateAwardSubmissionFormRequirement}
+			{#if REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM && !isMeetInnovateAwardSubmissionFormRequirement}
 				<p>{m.submission_form_required_btn()}</p>
 			{/if}
 		</div>

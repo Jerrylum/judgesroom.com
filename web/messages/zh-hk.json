@@ -305,6 +305,7 @@
 	"notebook_sorting_description1": "評判對所有工程筆記進行快速掃描，並將其分為三個類別：<b>未提交</b>、<b>開發中</b>和<b>完全開發</b>。如果對於一個筆記是否應該歸類為開發中或完全開發存在不確定性，可以由另一個評判來幫助確定，或者給予筆記以最大的信任並歸類為完全開發。",
 	"notebook_sorting_description2": "分類後，使用工程筆記評分表評估所有<b>開發中</b>和<b>完全開發</b>的筆記。",
 	"notebook_sorting_description3": "根據 GRSF，<b>完全開發</b>狀態仍然是設計獎、創新獎和卓越獎的資格要求。",
+	"notebook_sorting_description4": "根據 GRSF，工程筆記排序期間<b>不</b>追蹤創新獎提交表單，創新獎資格也<b>不</b>需要提交表單。",
 	"notebook_sorting_import_title": "導入網上工程筆記連結報告",
 	"notebook_sorting_import_description1": "如果工程筆記是網上提交的，請要求賽事合作夥伴提供網上工程筆記連結報告。這個報告可以從 RobotEvents → Event Admin → \"Downloads & Links\" → \"Download Digital Engineering Notebook Links report\" 下載。導入 Excel 文件到這個評審室，以設置賽事中隊伍的工程筆記連結。",
 	"import_button": "導入",

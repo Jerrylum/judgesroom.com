@@ -24,19 +24,10 @@
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({
 				...team,
-				notebookDevelopmentStatus,
-				hasInnovateAwardSubmissionForm: isSubmittedNotebook(notebookDevelopmentStatus) ? team.hasInnovateAwardSubmissionForm : false
+				notebookDevelopmentStatus
 			});
 		} catch (error) {
 			app.addErrorNotice(m.failed_to_update_notebook_status());
-		}
-	}
-
-	async function updateInnovateAwardSubmissionForm(team: TeamInfoAndData, hasInnovateAwardSubmissionForm: boolean) {
-		try {
-			await app.wrpcClient.team.updateTeamData.mutation({ ...team, hasInnovateAwardSubmissionForm });
-		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_innovate_award_submission_form());
 		}
 	}
 
@@ -61,9 +52,8 @@
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex max-w-60 min-w-60 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="flex max-w-90 min-w-90 flex-col items-center justify-center">{m.notebook_link_table()}</div>
 				<div class="flex max-w-40 min-w-40 items-center justify-center">{m.notebook_status_table()}</div>
-				<div class="flex max-w-40 min-w-40 items-center justify-center text-center">{m.innovate_award_submission_form_table()}</div>
 				<div class="flex min-w-50 items-center justify-center">{m.actions_table()}</div>
 			</content>
 		</scroll-container>
@@ -85,7 +75,7 @@
 				<scroll-container use:registerScrollContainer>
 					<content>
 						<!-- Notebook Link Column -->
-						<div class="flex max-w-60 min-w-60 items-center gap-2 p-2">
+						<div class="flex max-w-90 min-w-90 items-center gap-2 p-2">
 							{#if team.notebookLink}
 								<a
 									href={team.notebookLink}
@@ -116,22 +106,6 @@
 								<option value="developing">{m.developing_notebook_status()}</option>
 								<option value="not_submitted">{m.not_submitted_notebook_status()}</option>
 							</select>
-						</div>
-
-						<!-- Innovate Award Submission Form Checkbox -->
-						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
-							<label class="flex items-center gap-2">
-								<input
-									type="checkbox"
-									disabled={!isSubmittedNotebookStatus}
-									checked={team.hasInnovateAwardSubmissionForm}
-									class="rounded border-gray-300"
-									onchange={() => updateInnovateAwardSubmissionForm(team, !team.hasInnovateAwardSubmissionForm)}
-								/>
-								<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>
-									{team.hasInnovateAwardSubmissionForm ? m.provided() : m.not_provided()}
-								</span>
-							</label>
 						</div>
 
 						<!-- Actions Column -->

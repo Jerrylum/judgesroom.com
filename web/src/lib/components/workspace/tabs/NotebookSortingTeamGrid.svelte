@@ -23,19 +23,10 @@
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({
 				...team,
-				notebookDevelopmentStatus,
-				hasInnovateAwardSubmissionForm: isSubmittedNotebook(notebookDevelopmentStatus) ? team.hasInnovateAwardSubmissionForm : false
+				notebookDevelopmentStatus
 			});
 		} catch (error) {
 			app.addErrorNotice(m.failed_to_update_notebook_status());
-		}
-	}
-
-	async function updateInnovateAwardSubmissionForm(hasInnovateAwardSubmissionForm: boolean) {
-		try {
-			await app.wrpcClient.team.updateTeamData.mutation({ ...team, hasInnovateAwardSubmissionForm });
-		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_innovate_award_submission_form());
 		}
 	}
 
@@ -51,7 +42,7 @@
 </script>
 
 <div
-	class="relative flex min-h-67 flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
+	class="relative flex min-h-53 flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
 	class:border-green-500={devStatus === 'fully_developed'}
 	class:border-yellow-500={devStatus === 'developing'}
 	class:border-gray-500={devStatus === 'not_submitted'}
@@ -122,17 +113,6 @@
 				onchange={() => updateNotebookStatus('not_submitted')}
 			/>
 			<span class="text-sm text-gray-700">{m.not_submitted_notebook_status()}</span>
-		</label>
-		<hr />
-		<label class="flex items-center gap-2">
-			<input
-				type="checkbox"
-				disabled={!isSubmittedNotebookStatus}
-				checked={team.hasInnovateAwardSubmissionForm}
-				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
-				onchange={() => updateInnovateAwardSubmissionForm(!team.hasInnovateAwardSubmissionForm)}
-			/>
-			<span class="text-sm text-gray-700" class:opacity-50={!isSubmittedNotebookStatus}>{m.innovate_award_submission_form()}</span>
 		</label>
 	</div>
 

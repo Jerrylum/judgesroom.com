@@ -304,6 +304,7 @@
 	"notebook_sorting_description1": "Judges perform a quick scan of all the Engineering Notebooks and divide them into three categories: <b>Not Submitted</b>, <b>Developing</b>, and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as Developing or Fully Developed, either another Judge can help make that determination or the notebook should be given the benefit of the doubt and categorized as Fully Developed.",
 	"notebook_sorting_description2": "After sorting, evaluate all <b>Developing</b> and <b>Fully Developed</b> notebooks using the Engineering Notebook Rubric.",
 	"notebook_sorting_description3": "Under GRSF, <b>Fully Developed</b> status is still required for Design, Innovate, and Excellence Award eligibility.",
+	"notebook_sorting_description4": "Under GRSF, the Innovate Award Submission Form is <b>not</b> tracked during notebook sorting and is <b>not</b> required for Innovate Award eligibility.",
 	"notebook_sorting_import_title": "Import Digital Engineering Notebook Links report",
 	"notebook_sorting_import_description1": "If Engineering Notebooks are submitted digitally, please ask the Event Partner to provide digital notebook links report. This report can be downloaded from RobotEvents → Event Admin → \"Downloads & Links\" → \"Download Digital Engineering Notebook Links report\". Import the Excel file to this Judges' Room to set notebook links for teams in your event.",
 	"import_button": "Import",

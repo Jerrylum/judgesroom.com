@@ -3,6 +3,17 @@ import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 
+/** GRSF: Innovate Award Submission Form is no longer required. */
+export const REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM = false;
+
+export function meetsInnovateAwardSubmissionFormRequirement(
+	awardName: string,
+	hasInnovateAwardSubmissionForm: boolean
+): boolean {
+	if (!REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM) return true;
+	return awardName !== 'Innovate Award' || hasInnovateAwardSubmissionForm;
+}
+
 export class AwardOptions {
 	public readonly id: string;
 	public name: string = $state('');

@@ -177,8 +177,11 @@
 			<p class="mb-2 text-sm text-gray-600">
 				{@html sanitizeHTMLMessage(m.notebook_sorting_description2)}
 			</p>
-			<p class="mb-4 text-sm text-gray-600">
+			<p class="mb-2 text-sm text-gray-600">
 				{@html sanitizeHTMLMessage(m.notebook_sorting_description3)}
+			</p>
+			<p class="mb-2 text-sm text-gray-600">
+				{@html sanitizeHTMLMessage(m.notebook_sorting_description4)}
 			</p>
 		</div>
 
