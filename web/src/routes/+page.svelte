@@ -194,7 +194,7 @@
 					</svg>
 				</div>
 				<h3 class="mb-2 text-xl font-semibold text-slate-900">Confidentiality</h3>
-				<p class="text-gray-600">Keep all judging materials secure and easily destroy them after the event, ensuring RECF compliance.</p>
+				<p class="text-gray-600">Keep all judging materials secure and easily destroy them after the event, ensuring GRSF compliance.</p>
 			</div>
 		</div>
 	</div> -->
