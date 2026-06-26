@@ -644,7 +644,7 @@
 			},
 			{
 				"name": "Sportsmanship Award",
-				"type": "judged",
+				"type": "volunteer_nominated",
 				"acceptedGrades": ["Elementary School", "Middle School", "High School", "College"],
 				"winnersCount": 1,
 				"requireNotebook": false,
@@ -652,7 +652,7 @@
 			},
 			{
 				"name": "Energy Award",
-				"type": "judged",
+				"type": "volunteer_nominated",
 				"acceptedGrades": ["Elementary School", "Middle School", "High School", "College"],
 				"winnersCount": 1,
 				"requireNotebook": false,

@@ -294,6 +294,13 @@ describe('getOfficialAwardOptionsList', () => {
 			expect(semifinalists?.isSelected).toBe(false);
 		});
 
+		it('should not mark Innovate or Inspire as selected by default', () => {
+			const awards = getOfficialAwardOptionsList('V5RC', ['High School']);
+
+			expect(awards.find((a) => a.name === 'Innovate Award')?.isSelected).toBe(false);
+			expect(awards.find((a) => a.name === 'Inspire Award')?.isSelected).toBe(false);
+		});
+
 		it('should mark Judges Award as selected by default', () => {
 			const awards = getOfficialAwardOptionsList('V5RC', ['High School']);
 
@@ -301,11 +308,17 @@ describe('getOfficialAwardOptionsList', () => {
 			expect(judgesAward?.isSelected).toBe(true);
 		});
 
-		it('should mark Inspire Award as selected by default', () => {
+		it('should order Create Award after Think Award for VIQRC', () => {
+			const awards = getOfficialAwardOptionsList('VIQRC', ['Middle School']);
+			const names = awards.map((a) => a.name);
+			expect(names.indexOf('Think Award')).toBeLessThan(names.indexOf('Create Award'));
+		});
+
+		it('should type Sportsmanship and Energy as volunteer_nominated only', () => {
 			const awards = getOfficialAwardOptionsList('V5RC', ['High School']);
 
-			const inspireAward = awards.find((a) => a.name === 'Inspire Award');
-			expect(inspireAward?.isSelected).toBe(true);
+			expect(awards.find((a) => a.name === 'Sportsmanship Award')?.possibleTypes).toEqual(['volunteer_nominated']);
+			expect(awards.find((a) => a.name === 'Energy Award')?.possibleTypes).toEqual(['volunteer_nominated']);
 		});
 	});
 

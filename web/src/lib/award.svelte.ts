@@ -64,16 +64,14 @@ export class AwardOptions {
 }
 
 /**
- * IMPORTANT: According to RECF Guide to Judging 2025_06-30
+ * GRSF judged-award precedence (Event Qualification Guide / Awards and Recognition Structure).
  *
- * <AW2>:
- * The precedence of Judged Awards is as follows, and aligns with Appendices A, B, and C in the Qualifying Criteria:
- * - For VIQRC: Excellence Award, Design Award, Innovate Award, Create Award, Think
- *   Award, Amaze Award, Build Award, Judges Award, Inspire Award, Sportsmanship
- *   Award, Energy Award.
- * - For all other programs: Excellence Award, Design Award, Innovate Award, Think
- *   Award, Amaze Award, Build Award, Create Award, Judges Award, Inspire Award,
- *   Sportsmanship Award, Energy Award.
+ * Same order for all programs (VIQRC, V5RC, VURC):
+ * Excellence Award → Design Award → Innovate Award → Think Award → Amaze Award →
+ * Build Award → Create Award → Judges Award → Inspire Award.
+ *
+ * Sportsmanship and Energy are volunteer-nominated awards, not part of judged precedence.
+ * Minimum required judged awards when judging: Excellence, Design, Judges.
  */
 export function getOfficialAwardOptionsList(program: Program, possibleGrades: Grade[]): AwardOptions[] {
 	return [
@@ -246,17 +244,6 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			true,
 			true,
 			true,
-			true
-		),
-		new AwardOptions(
-			'Create Award',
-			['VIQRC'], // IMPORTANT: This option is only available for VIQRC
-			['judged'],
-			['Elementary School', 'Middle School'],
-			1,
-			true,
-			true,
-			true,
 			false
 		),
 		new AwardOptions(
@@ -294,6 +281,17 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 		),
 		new AwardOptions(
 			'Create Award',
+			['VIQRC'], // IMPORTANT: This option is only available for VIQRC
+			['judged'],
+			['Elementary School', 'Middle School'],
+			1,
+			true,
+			true,
+			true,
+			false
+		),
+		new AwardOptions(
+			'Create Award',
 			['V5RC', 'VURC'], // IMPORTANT: This option is hidden for non-VIQRC
 			['judged'],
 			['Middle School', 'High School', 'College'],
@@ -323,12 +321,12 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 			false,
 			true,
 			true,
-			true
+			false
 		),
 		new AwardOptions(
 			'Sportsmanship Award',
 			['VIQRC', 'V5RC', 'VURC'],
-			['judged', 'volunteer_nominated'],
+			['volunteer_nominated'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
 			false,
@@ -339,7 +337,7 @@ export function getOfficialAwardOptionsList(program: Program, possibleGrades: Gr
 		new AwardOptions(
 			'Energy Award',
 			['VIQRC', 'V5RC', 'VURC'],
-			['judged', 'volunteer_nominated'],
+			['volunteer_nominated'],
 			['Elementary School', 'Middle School', 'High School', 'College'],
 			1,
 			false,
