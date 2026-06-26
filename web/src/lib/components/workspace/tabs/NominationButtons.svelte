@@ -3,8 +3,12 @@
 	import { app } from '$lib/index.svelte';
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
-	import { meetsInnovateAwardSubmissionFormRequirement, REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM } from '$lib/award.svelte';
+	import {
+		meetsAwardNotebookRequirement,
+		meetsInnovateAwardSubmissionFormRequirement,
+		REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM,
+		requiresFullyDevelopedNotebook
+	} from '$lib/award.svelte';
 
 	interface Props {
 		award: Award;
@@ -20,7 +24,8 @@
 	let { award, team, judgeGroupId, ranking, isNominated, hasTeamInterview, bypassAwardRequirements, showExcellenceAwardWinners }: Props =
 		$props();
 
-	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
+	const isMeetNotebookRequirement = $derived(meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus));
+	const needsFullyDevelopedNotebook = $derived(requiresFullyDevelopedNotebook(award.name));
 	const isMeetTeamInterviewRequirement = $derived(award.requireTeamInterview ? hasTeamInterview : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isMeetInnovateAwardSubmissionFormRequirement = $derived(
@@ -70,7 +75,11 @@
 	{:else if isDisabled}
 		<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
-				<p>{m.notebook_required_btn()}</p>
+				{#if needsFullyDevelopedNotebook}
+					<p>{m.fully_developed_required_btn()}</p>
+				{:else}
+					<p>{m.notebook_required_btn()}</p>
+				{/if}
 			{/if}
 			{#if !isMeetTeamInterviewRequirement}
 				<p>{m.team_interview_required_btn()}</p>

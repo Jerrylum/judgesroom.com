@@ -1,7 +1,14 @@
-import { type Program, type AwardType, type Grade, type Award } from '@judgesroom.com/protocol/src/award';
+import {
+	type Program,
+	type AwardType,
+	type Grade,
+	type Award,
+	isExcellenceAward,
+	isDesignAward
+} from '@judgesroom.com/protocol/src/award';
 import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
+import { type TeamInfo, type NotebookDevelopmentStatus, isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
 
 /** GRSF: Innovate Award Submission Form is no longer required. */
 export const REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM = false;
@@ -12,6 +19,21 @@ export function meetsInnovateAwardSubmissionFormRequirement(
 ): boolean {
 	if (!REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM) return true;
 	return awardName !== 'Innovate Award' || hasInnovateAwardSubmissionForm;
+}
+
+export function requiresFullyDevelopedNotebook(awardName: string): boolean {
+	return isExcellenceAward(awardName) || isDesignAward(awardName) || awardName === 'Innovate Award';
+}
+
+export function meetsAwardNotebookRequirement(
+	award: Pick<Award, 'name' | 'requireNotebook'>,
+	notebookDevelopmentStatus: NotebookDevelopmentStatus
+): boolean {
+	if (!award.requireNotebook) return true;
+	if (requiresFullyDevelopedNotebook(award.name)) {
+		return notebookDevelopmentStatus === 'fully_developed';
+	}
+	return isSubmittedNotebook(notebookDevelopmentStatus);
 }
 
 export class AwardOptions {

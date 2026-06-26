@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { AwardOptions, getOfficialAwardOptionsList, createCustomAwardOptions } from './award.svelte';
+import {
+	AwardOptions,
+	getOfficialAwardOptionsList,
+	createCustomAwardOptions,
+	requiresFullyDevelopedNotebook,
+	meetsAwardNotebookRequirement
+} from './award.svelte';
 import { AwardSchema, type Program, type Grade } from '@judgesroom.com/protocol/src/award';
 
 describe('AwardOptions Class', () => {
@@ -508,5 +514,40 @@ describe('Integration Tests', () => {
 		awards.forEach((award) => {
 			expect(award.acceptedGrades.some((grade) => mixedGrades.includes(grade))).toBe(true);
 		});
+	});
+});
+
+describe('Fully Developed notebook eligibility', () => {
+	const designAward = { name: 'Design Award', requireNotebook: true };
+	const innovateAward = { name: 'Innovate Award', requireNotebook: true };
+	const excellenceAward = { name: 'Excellence Award - Middle School', requireNotebook: true };
+	const thinkAward = { name: 'Think Award', requireNotebook: true };
+	const judgesAward = { name: 'Judges Award', requireNotebook: false };
+
+	it('requiresFullyDevelopedNotebook identifies Design, Innovate, and Excellence awards', () => {
+		expect(requiresFullyDevelopedNotebook('Design Award')).toBe(true);
+		expect(requiresFullyDevelopedNotebook('Design Award - Elementary School')).toBe(true);
+		expect(requiresFullyDevelopedNotebook('Innovate Award')).toBe(true);
+		expect(requiresFullyDevelopedNotebook('Excellence Award')).toBe(true);
+		expect(requiresFullyDevelopedNotebook('Excellence Award - Middle School')).toBe(true);
+		expect(requiresFullyDevelopedNotebook('Think Award')).toBe(false);
+		expect(requiresFullyDevelopedNotebook('Judges Award')).toBe(false);
+	});
+
+	it('meetsAwardNotebookRequirement rejects developing for Design, Innovate, and Excellence', () => {
+		for (const award of [designAward, innovateAward, excellenceAward]) {
+			expect(meetsAwardNotebookRequirement(award, 'developing')).toBe(false);
+			expect(meetsAwardNotebookRequirement(award, 'fully_developed')).toBe(true);
+		}
+	});
+
+	it('meetsAwardNotebookRequirement accepts developing for other notebook-required awards', () => {
+		expect(meetsAwardNotebookRequirement(thinkAward, 'developing')).toBe(true);
+		expect(meetsAwardNotebookRequirement(thinkAward, 'fully_developed')).toBe(true);
+		expect(meetsAwardNotebookRequirement(thinkAward, 'not_submitted')).toBe(false);
+	});
+
+	it('meetsAwardNotebookRequirement skips notebook check when not required', () => {
+		expect(meetsAwardNotebookRequirement(judgesAward, 'not_submitted')).toBe(true);
 	});
 });

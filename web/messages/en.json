@@ -286,6 +286,7 @@
 	"final_ranking_description7": "This Judges' Room is not connected to RobotEvents. To enable eligibility checking, please configure the RobotEvents Event ID and Division ID in Event Setup.",
 	"final_ranking_description8": "Winning teams for each award are marked with a colored border: <green>green</green> for eligible winners, <red>red</red> for ineligible winners, and <slate>gray</slate> when eligibility data is unavailable.",
 	"notebook_required_btn": "Notebook Required",
+	"fully_developed_required_btn": "Fully Developed Required",
 	"team_interview_required_btn": "Team Interview Required",
 	"grade_must_be_btn": "{grades} Required",
 	"submission_form_required_btn": "Submission Form Required",

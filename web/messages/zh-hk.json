@@ -287,6 +287,7 @@
 	"final_ranking_description7": "這個評審室未連接到 RobotEvents。要啟用資格檢查，請在賽事設置中配置 RobotEvents 賽事代碼和分組編號。",
 	"final_ranking_description8": "每個獎項的得獎者以彩色邊框標記：<green>綠色</green>表示符合資格的得獎者，<red>紅色</red>表示不符合資格的得獎者，<slate>灰色</slate>表示資格數據不可用。",
 	"notebook_required_btn": "需要工程筆記",
+	"fully_developed_required_btn": "需要完全開發的筆記",
 	"team_interview_required_btn": "需要團隊面談",
 	"grade_must_be_btn": "必須是 {grades}",
 	"submission_form_required_btn": "需要創新獎提交表單",
