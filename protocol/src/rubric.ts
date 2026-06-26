@@ -145,12 +145,22 @@ export function createEmptyTeamInterviewRubricScores(): number[] {
 	return Array(TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT).fill(-1);
 }
 
+/** Normalize a score to one decimal place. */
+export function roundRubricScore(score: number): number {
+	return Math.round(score * 10) / 10;
+}
+
+function randomRubricScore(maxPoints: number): number {
+	const tenths = Math.floor(Math.random() * (maxPoints * 10 + 1));
+	return tenths / 10;
+}
+
 export function generateNotebookRubricScores(): number[] {
-	return notebookRubricConfig.map((row) => Math.round(Math.random() * row.maxPoints * 10) / 10);
+	return notebookRubricConfig.map((row) => randomRubricScore(row.maxPoints));
 }
 
 export function generateTeamInterviewRubricScores(): number[] {
-	return teamInterviewRubricConfig.map((row) => Math.round(Math.random() * row.maxPoints * 10) / 10);
+	return teamInterviewRubricConfig.map((row) => randomRubricScore(row.maxPoints));
 }
 
 export function formatRubricScore(score: number): string {
@@ -158,7 +168,8 @@ export function formatRubricScore(score: number): string {
 }
 
 export function sumRubricScores(scores: number[]): number {
-	return scores.reduce((sum, score) => sum + score, 0);
+	const totalTenths = scores.reduce((sum, score) => sum + Math.round(score * 10), 0);
+	return totalTenths / 10;
 }
 
 function validateRubricArray(scores: number[], config: RubricRowConfig[], path: string, ctx: z.RefinementCtx) {
@@ -181,7 +192,7 @@ function validateRubricArray(scores: number[], config: RubricRowConfig[], path: 
 				message: `Score must be between 0 and ${maxPoints}`
 			});
 		}
-		const rounded = Math.round(score * 10) / 10;
+		const rounded = roundRubricScore(score);
 		if (Math.abs(score - rounded) > 0.001) {
 			ctx.addIssue({
 				code: 'custom',

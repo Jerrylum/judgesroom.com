@@ -6,7 +6,8 @@ import {
 	EngineeringNotebookRubricSchema,
 	SubmissionCacheSchema,
 	TeamInterviewNoteSchema,
-	TeamInterviewRubricSchema
+	TeamInterviewRubricSchema,
+	sumRubricScores
 } from '@judgesroom.com/protocol/src/rubric';
 import type {
 	AwardNomination,
@@ -141,7 +142,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								enrId: input.submission.id,
 								tiId: null,
 								tnId: null,
-								score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
+								score: sumRubricScores(input.submission.rubric)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -150,7 +151,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
 									timestamp: input.submission.timestamp,
-									score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
+									score: sumRubricScores(input.submission.rubric)
 								}
 							})
 							.returning()
@@ -206,7 +207,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								enrId: null,
 								tiId: input.submission.id,
 								tnId: null,
-								score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
+								score: sumRubricScores(input.submission.rubric)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -215,7 +216,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
 									timestamp: input.submission.timestamp,
-									score: input.submission.rubric.reduce((acc, curr) => acc + curr, 0)
+									score: sumRubricScores(input.submission.rubric)
 								}
 							})
 							.returning()
