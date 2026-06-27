@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import QRCode from 'qrcode';
+	import { generateQrCodeDataUrl } from '$lib/qrcode';
 	import './rubric.css';
 	import { app, tabs, subscriptions, dialogs } from '$lib/index.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
@@ -105,7 +105,7 @@
 					qrCodeDataUrl = null;
 					return;
 				}
-				qrCodeDataUrl = await QRCode.toDataURL(notebookLink, {
+				qrCodeDataUrl = await generateQrCodeDataUrl(notebookLink, {
 					margin: 2,
 					color: {
 						dark: '#000000',

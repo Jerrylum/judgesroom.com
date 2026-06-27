@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import QRCode from 'qrcode';
+	import { generateQrCodeDataUrl } from '$lib/qrcode';
 	import { dialogs } from '$lib/index.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 
@@ -15,7 +15,7 @@
 	$effect(() => {
 		if (link) {
 			(async () => {
-				qrCodeDataUrl = await QRCode.toDataURL(link, { width: 20, margin: 0 });
+				qrCodeDataUrl = await generateQrCodeDataUrl(link, { width: 20, margin: 0 });
 			})();
 		}
 	});

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import QRCode from 'qrcode';
+	import { generateQrCodeDataUrl } from '$lib/qrcode';
 	import { app, dialogs } from '$lib/index.svelte';
 	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
@@ -34,7 +34,7 @@
 	$effect(() => {
 		if (shareableUrl) {
 			(async () => {
-				qrCodeDataUrl = await QRCode.toDataURL(shareableUrl, {
+				qrCodeDataUrl = await generateQrCodeDataUrl(shareableUrl, {
 					width: (41 + 2 + 2) * 4,
 					margin: 2,
 					color: {
