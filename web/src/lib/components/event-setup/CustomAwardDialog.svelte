@@ -119,6 +119,17 @@
 			customAwardGrades = [...customAwardGrades, grade];
 		}
 	}
+
+	function awardTypeLabel(type: AwardType): string {
+		switch (type) {
+			case 'performance':
+				return m.performance_awards();
+			case 'judged':
+				return m.judged_awards();
+			case 'volunteer_nominated':
+				return m.volunteer_nominated_awards();
+		}
+	}
 </script>
 
 <Dialog open={true} onClose={handleCancel}>
@@ -149,7 +160,7 @@
 			<label for="custom-award-type" class="mb-2 block text-sm font-medium text-gray-700">{m.award_type()}</label>
 			<select id="custom-award-type" bind:value={customAwardType} onchange={() => (hasUserInteracted = true)} class="classic block w-full">
 				{#each AwardTypeSchema.options as type (type)}
-					<option value={type}>{type.replace('_', ' ')}</option>
+					<option value={type}>{awardTypeLabel(type)}</option>
 				{/each}
 			</select>
 		</div>

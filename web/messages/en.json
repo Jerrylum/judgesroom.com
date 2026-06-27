@@ -26,10 +26,10 @@
 	"add_custom_award": "+ Add Custom Award",
 	"performance_awards_description": "Based on robot performance in matches and skills challenges. Default order follows Qualifying Criteria precedence <AW1>. Drag to reorder if needed.",
 	"judged_awards_description": "Determined by judges based on award criteria. Default order follows Qualifying Criteria precedence <AW2>. Drag to reorder if needed.",
-	"volunteer_nominated_awards_description": "Determined by volunteer staff and not by Judges. Sportsmanship Award and Energy Award can be dragged to this section.",
+	"volunteer_nominated_awards_description": "Optional awards determined by nominations from event volunteers and judges, outside the main Judged Award deliberation flow.",
 	"performance_awards": "Performance Awards",
 	"judged_awards": "Judged Awards",
-	"volunteer_nominated_awards": "Volunteer Nominated Awards",
+	"volunteer_nominated_awards": "Nominated Awards",
 	"back": "Back",
 	"next_review": "Next: Review",
 	"upload_csv_again": "Please upload a CSV file from RobotEvents or Tournament Manager",
@@ -230,7 +230,8 @@
 			}
 		}
 	],
-	"award_winner_tab_volunteer_nominated_awards_description": "Volunteer Nominated Awards are a subset of Judged Awards that can be determined by event staff (such as Head Referees, scorekeepers, and emcees) based on observations during the event. These awards, particularly Sportsmanship and Energy Awards, may be determined by volunteer nominations instead of judges. If determined solely by volunteers, teams can still receive these awards even if they've already earned another Judged Award.",
+	"award_winner_tab_volunteer_nominated_awards_description": "Nominated Awards are determined by nominations from event staff and judges based on observations during the event. These awards are outside the Judged Award deliberation flow. Teams may receive a Nominated Award in addition to a Judged Award.",
+	"no_volunteer_nominated_awards_configured_for_this_event": "No Nominated Awards configured for this event.",
 	"summary_of_award_winners": "Summary of Award Winners",
 	"report": "Report",
 	"award_winner_tab_summary_of_award_winners_description": "This summary shows all award winners organized by team group.",

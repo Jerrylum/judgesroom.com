@@ -193,7 +193,7 @@
 			</div>
 		</div>
 
-		<!-- Volunteer Nominated Awards -->
+		<!-- Nominated Awards -->
 		<div class="space-y-3">
 			<div>
 				<h3 class="text-base font-semibold text-gray-800">{m.volunteer_nominated_awards()}</h3>

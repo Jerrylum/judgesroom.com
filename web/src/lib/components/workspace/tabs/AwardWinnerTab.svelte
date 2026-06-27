@@ -161,7 +161,7 @@
 			{/if}
 		</div>
 
-		<!-- Volunteer Nominated Awards -->
+		<!-- Nominated Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.volunteer_nominated_awards()}</h2>
 			<p class="mb-6 text-sm text-gray-600">

@@ -26,10 +26,10 @@
 	"add_custom_award": "+ 添加自定義獎項",
 	"performance_awards_description": "基於機器人在比賽和技能挑戰中的表現。默認順序遵循資格賽優先級 <AW1>。拖動以重新排序（如果需要）。",
 	"judged_awards_description": "由評判根據獎項標準確定。默認順序遵循資格賽優先級 <AW2>。拖動以重新排序（如果需要）。",
-	"volunteer_nominated_awards_description": "由志願者決定，而不是由評判。體育精神獎和活力獎可以拖動到此部分。",
+	"volunteer_nominated_awards_description": "可選獎項，由賽事志願者和評判提名，不在主要評判獎項審議流程內。",
 	"performance_awards": "表現獎項",
 	"judged_awards": "評判獎項",
-	"volunteer_nominated_awards": "志願者提名獎項",
+	"volunteer_nominated_awards": "提名獎項",
 	"back": "返回",
 	"next_review": "下一步：確認",
 	"upload_csv_again": "請上傳 RobotEvents 或 Tournament Manager 的 CSV 文件",
@@ -230,8 +230,8 @@
 			}
 		}
 	],
-	"award_winner_tab_volunteer_nominated_awards_description": "志願者提名獎項是評判獎項的子集，可以由賽事工作人員（如主裁判、計分裁判和主持人）根據賽事期間的觀察來確定。這些獎項，特別是體育精神獎和活力獎，可能由志願者提名而不是評判。如果僅由志願者確定，即使隊伍已經獲得其他評判獎項，也可以獲得這些獎項。",
-	"no_volunteer_nominated_awards_configured_for_this_event": "沒有配置志願者提名獎項。",
+	"award_winner_tab_volunteer_nominated_awards_description": "提名獎項由賽事工作人員和評判根據賽事期間的觀察提名。這些獎項不在評判獎項審議流程內。隊伍可在獲得評判獎項之外再獲得提名獎項。",
+	"no_volunteer_nominated_awards_configured_for_this_event": "沒有配置提名獎項。",
 	"summary_of_award_winners": "獎項得獎者摘要",
 	"report": "報告",
 	"award_winner_tab_summary_of_award_winners_description": "這個摘要按隊伍分組顯示所有獎項得獎者。",
