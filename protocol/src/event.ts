@@ -10,7 +10,7 @@ export const RobotEventsSkuSchema = z
 	.min(12)
 	.max(20)
 	.regex(/^[a-zA-Z0-9-]+$/, {
-		message: 'Robot Events SKU must only contain English letters, numbers, and hyphens'
+		message: 'VEX Events SKU must only contain English letters, numbers, and hyphens'
 	});
 export const RobotEventsEventIdSchema = z.number();
 

@@ -10,7 +10,7 @@ judgesroom.com is an open source project aligned with the GRSF VEX Competition j
 
 This system is aligned with the GRSF VEX Competition judging guidelines, mapping app features directly to each judging activity in a typical event.
 
-### Import teams and event info from RobotEvents, set up awards and divisions
+### Import teams and event info from VEX Events, set up awards and divisions
 
 <!-- [placeholder: screenshot-import-and-setup.png] -->
 ![Import and setup](/docs/assets/screenshot-import-and-setup.png)
