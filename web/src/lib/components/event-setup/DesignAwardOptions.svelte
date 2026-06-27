@@ -2,24 +2,38 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import type { AwardOptions } from '$lib/award.svelte';
 
+	const GENERIC_AWARD_NAME = 'Design Award';
+
 	interface Props {
 		awards: AwardOptions[];
 	}
 
 	let { awards = $bindable() }: Props = $props();
 
-	const isOneAward = $derived(awards[0].isSelected);
-	const isMultiGrades = $derived(awards.length > 1);
+	const genericAward = $derived(awards.find((award) => award.name === GENERIC_AWARD_NAME));
+	const gradeSpecificAwards = $derived(awards.filter((award) => award.name !== GENERIC_AWARD_NAME));
+	const isMultiGrades = $derived(gradeSpecificAwards.length > 0);
+	const selectedGradeSpecificCount = $derived(gradeSpecificAwards.filter((award) => award.isSelected).length);
+	const isOneAward = $derived(!isMultiGrades || (selectedGradeSpecificCount === 0 && (genericAward?.isSelected ?? true)));
+	const winnerCount = $derived(isOneAward ? 1 : 2);
+
+	$effect(() => {
+		if (!isMultiGrades || !genericAward) return;
+
+		if (selectedGradeSpecificCount > 0 && genericAward.isSelected) {
+			genericAward.isSelected = false;
+		}
+	});
 
 	function onChange(e: Event) {
 		const value = (e.target as HTMLInputElement).value;
 		if (value === '1') {
-			for (let i = 0; i < awards.length; i++) {
-				awards[i].isSelected = awards[i].name === 'Design Award';
+			for (const award of awards) {
+				award.isSelected = award.name === GENERIC_AWARD_NAME;
 			}
 		} else {
-			for (let i = 0; i < awards.length; i++) {
-				awards[i].isSelected = awards[i].name !== 'Design Award';
+			for (const award of awards) {
+				award.isSelected = award.name !== GENERIC_AWARD_NAME;
 			}
 		}
 	}
@@ -43,7 +57,7 @@
 				<span class="text-xs text-gray-500">x</span>
 				<input
 					type="number"
-					value={isOneAward ? 1 : 2}
+					value={winnerCount}
 					min="1"
 					max={isMultiGrades ? 2 : 1}
 					onchange={onChange}
