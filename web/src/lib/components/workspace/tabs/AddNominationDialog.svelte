@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import type { Award } from '@judgesroom.com/protocol/src/award';
+	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { subscriptions } from '$lib/index.svelte';
 	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
 	interface Props {
@@ -14,7 +15,57 @@
 		onConfirm: (teamId: string, showAbsent: boolean, bypassRequirements: boolean) => void;
 	}
 
+	type AwardRequirementChecks = {
+		meetNotebook: boolean;
+		meetTeamInterview: boolean;
+		meetGrade: boolean;
+	};
+
 	let { open, award, allTeams, absentTeamIds, onClose, onConfirm }: Props = $props();
+
+	const teamsWithTeamInterview = $derived.by(() => {
+		const teamIds = new Set<string>();
+		for (const cache of Object.values(subscriptions.allSubmissionCaches)) {
+			if (cache.tiId) {
+				teamIds.add(cache.teamId);
+			}
+		}
+		return teamIds;
+	});
+
+	function getAwardRequirementChecks(teamId: string, team: TeamInfoAndData): AwardRequirementChecks {
+		return {
+			meetNotebook: meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus),
+			meetTeamInterview: !award.requireTeamInterview || teamsWithTeamInterview.has(teamId),
+			meetGrade: award.acceptedGrades.includes(team.grade)
+		};
+	}
+
+	function meetsAllAwardRequirements(teamId: string, team: TeamInfoAndData): boolean {
+		const checks = getAwardRequirementChecks(teamId, team);
+		return checks.meetNotebook && checks.meetTeamInterview && checks.meetGrade;
+	}
+
+	function getRequirementWarnings(teamId: string, team: TeamInfoAndData): string[] {
+		const checks = getAwardRequirementChecks(teamId, team);
+		const warnings: string[] = [];
+
+		if (!checks.meetNotebook) {
+			if (requiresFullyDevelopedNotebook(award.name)) {
+				warnings.push(m.fully_developed_required_btn());
+			} else {
+				warnings.push(m.notebook_required());
+			}
+		}
+		if (!checks.meetTeamInterview) {
+			warnings.push(m.team_interview_required_btn());
+		}
+		if (!checks.meetGrade) {
+			warnings.push(m.grade_must_be({ grades: formatGradesShort(award.acceptedGrades) }));
+		}
+
+		return warnings;
+	}
 
 	// Dialog state
 	let selectedTeamId = $state('');
@@ -30,71 +81,33 @@
 		}
 	});
 
-	// Get available teams based on filters
-	let availableTeams = $derived(() => {
-		const teams = Object.entries(allTeams);
-
-		return teams.filter(([teamId, team]) => {
-			// Always hide already nominated teams
+	const availableTeamsList = $derived.by(() => {
+		return Object.entries(allTeams).filter(([teamId, team]) => {
 			if (absentTeamIds.has(teamId)) {
 				return false;
 			}
 
-			// Hide absent teams unless "Show absent teams" is checked
 			if (team.absent && !showAbsentTeams) {
 				return false;
 			}
 
-			// Hide teams that don't meet award requirements unless bypassing
-			if (!bypassRequirements) {
-				const meetNotebookReq = meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus);
-				const meetGradeReq = award.acceptedGrades.includes(team.grade);
-
-				if (!meetNotebookReq || !meetGradeReq) {
-					return false;
-				}
+			if (!bypassRequirements && !meetsAllAwardRequirements(teamId, team)) {
+				return false;
 			}
 
 			return true;
 		});
 	});
 
-	// Get the actual list for template iteration
-	let availableTeamsList = $derived(availableTeams());
+	const selectedTeam = $derived(selectedTeamId ? allTeams[selectedTeamId] : null);
 
-	// Check if selected team meets award requirements
-	let selectedTeam = $derived(selectedTeamId ? allTeams[selectedTeamId] : null);
-	let meetRequirements = $derived(() => {
-		if (!selectedTeam || bypassRequirements) return true;
-
-		const meetNotebookReq = meetsAwardNotebookRequirement(award, selectedTeam.notebookDevelopmentStatus);
-		const meetGradeReq = award.acceptedGrades.includes(selectedTeam.grade);
-
-		return meetNotebookReq && meetGradeReq;
-	});
-
-	// Get the actual meet requirements value for template use
-	let meetRequirementsValue = $derived(meetRequirements());
-
-	let requirementWarnings = $derived(() => {
-		if (!selectedTeam || bypassRequirements || meetRequirementsValue) return [];
-
-		const warnings = [];
-		if (!meetsAwardNotebookRequirement(award, selectedTeam.notebookDevelopmentStatus)) {
-			if (requiresFullyDevelopedNotebook(award.name)) {
-				warnings.push(m.fully_developed_required_btn());
-			} else {
-				warnings.push(m.notebook_required());
-			}
+	const requirementWarningsList = $derived.by(() => {
+		if (!selectedTeam || bypassRequirements || meetsAllAwardRequirements(selectedTeamId, selectedTeam)) {
+			return [];
 		}
-		if (!award.acceptedGrades.includes(selectedTeam.grade)) {
-			warnings.push(m.grade_must_be({ grades: award.acceptedGrades.join(', ') }));
-		}
-		return warnings;
-	});
 
-	// Get the actual list for template iteration
-	let requirementWarningsList = $derived(requirementWarnings());
+		return getRequirementWarnings(selectedTeamId, selectedTeam);
+	});
 
 	function handleClose() {
 		onClose();
@@ -106,7 +119,6 @@
 		}
 	}
 
-	// Format team display with number and name
 	function formatTeamDisplay(team: TeamInfoAndData): string {
 		return `${team.number} - ${team.name}`;
 	}
