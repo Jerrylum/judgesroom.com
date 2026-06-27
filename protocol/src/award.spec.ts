@@ -10,7 +10,9 @@ import {
 	isExcellenceAward,
 	getPairedExcellenceAwardName,
 	getDesignExcellenceSwapZone,
-	isDesignExcellenceSwapZone
+	isDesignExcellenceSwapZone,
+	formatGradeShort,
+	formatGradesShort
 } from './award';
 
 describe('Awards Schema Validation', () => {
@@ -59,6 +61,19 @@ describe('Awards Schema Validation', () => {
 			invalidGrades.forEach((grade) => {
 				expect(() => GradeSchema.parse(grade)).toThrow();
 			});
+		});
+	});
+
+	describe('formatGradeShort', () => {
+		it('should return short grade labels', () => {
+			expect(formatGradeShort('Elementary School')).toBe('ES');
+			expect(formatGradeShort('Middle School')).toBe('MS');
+			expect(formatGradeShort('High School')).toBe('HS');
+			expect(formatGradeShort('College')).toBe('College');
+		});
+
+		it('should join multiple grades', () => {
+			expect(formatGradesShort(['Elementary School', 'Middle School'])).toBe('ES, MS');
 		});
 	});
 

@@ -2,7 +2,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import type { Award } from '@judgesroom.com/protocol/src/award';
+	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
@@ -119,7 +119,7 @@
 				{/if}
 			{/if}
 			{#if !isMeetGradeRequirement}
-				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>
+				<p>{m.grade_must_be_btn({ grades: formatGradesShort(award.acceptedGrades) })}</p>
 			{/if}
 		</div>
 	{:else if isEditMode}

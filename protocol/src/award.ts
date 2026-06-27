@@ -9,6 +9,24 @@ export type AwardType = z.infer<typeof AwardTypeSchema>;
 export const GradeSchema = z.enum(['Elementary School', 'Middle School', 'High School', 'College']);
 export type Grade = z.infer<typeof GradeSchema>;
 
+/** Short grade label for compact UI (e.g. award requirement hints). */
+export function formatGradeShort(grade: Grade): string {
+	switch (grade) {
+		case 'Elementary School':
+			return 'ES';
+		case 'Middle School':
+			return 'MS';
+		case 'High School':
+			return 'HS';
+		case 'College':
+			return 'College';
+	}
+}
+
+export function formatGradesShort(grades: readonly Grade[]): string {
+	return grades.map(formatGradeShort).join(', ');
+}
+
 export const AwardNameSchema = z
 	.string()
 	.nonempty()

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
-	import type { Award } from '@judgesroom.com/protocol/src/award';
+	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
@@ -74,7 +74,7 @@
 				<p>{m.team_interview_required_btn()}</p>
 			{/if}
 			{#if !isMeetGradeRequirement}
-				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>
+				<p>{m.grade_must_be_btn({ grades: formatGradesShort(award.acceptedGrades) })}</p>
 			{/if}
 		</div>
 	{/if}
