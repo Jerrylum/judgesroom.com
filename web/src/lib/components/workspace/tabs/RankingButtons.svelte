@@ -4,7 +4,7 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
-	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
+	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
 	interface Props {
 		awardIndex: number;
@@ -22,7 +22,8 @@
 	let touchTimeout: ReturnType<typeof setTimeout> | null = null;
 	let ranking = $derived(awardRankings.rankings?.[team.id]?.[awardIndex] ?? 0);
 
-	const isMeetNotebookRequirement = $derived(award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true);
+	const isMeetNotebookRequirement = $derived(meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus));
+	const needsFullyDevelopedNotebook = $derived(requiresFullyDevelopedNotebook(award.name));
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isDisabled = $derived(
 		bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement
@@ -111,7 +112,11 @@
 	{#if isDisabled}
 		<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
 			{#if !isMeetNotebookRequirement}
-				<p>{m.notebook_required_btn()}</p>
+				{#if needsFullyDevelopedNotebook}
+					<p>{m.fully_developed_required_btn()}</p>
+				{:else}
+					<p>{m.notebook_required_btn()}</p>
+				{/if}
 			{/if}
 			{#if !isMeetGradeRequirement}
 				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>

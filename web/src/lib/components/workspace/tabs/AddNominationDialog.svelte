@@ -3,7 +3,7 @@
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
+	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
 	interface Props {
 		open: boolean;
@@ -47,7 +47,7 @@
 
 			// Hide teams that don't meet award requirements unless bypassing
 			if (!bypassRequirements) {
-				const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true;
+				const meetNotebookReq = meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus);
 				const meetGradeReq = award.acceptedGrades.includes(team.grade);
 
 				if (!meetNotebookReq || !meetGradeReq) {
@@ -67,7 +67,7 @@
 	let meetRequirements = $derived(() => {
 		if (!selectedTeam || bypassRequirements) return true;
 
-		const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(selectedTeam.notebookDevelopmentStatus) : true;
+		const meetNotebookReq = meetsAwardNotebookRequirement(award, selectedTeam.notebookDevelopmentStatus);
 		const meetGradeReq = award.acceptedGrades.includes(selectedTeam.grade);
 
 		return meetNotebookReq && meetGradeReq;
@@ -80,8 +80,12 @@
 		if (!selectedTeam || bypassRequirements || meetRequirementsValue) return [];
 
 		const warnings = [];
-		if (award.requireNotebook && !isSubmittedNotebook(selectedTeam.notebookDevelopmentStatus)) {
-			warnings.push(m.notebook_required());
+		if (!meetsAwardNotebookRequirement(award, selectedTeam.notebookDevelopmentStatus)) {
+			if (requiresFullyDevelopedNotebook(award.name)) {
+				warnings.push(m.fully_developed_required_btn());
+			} else {
+				warnings.push(m.notebook_required());
+			}
 		}
 		if (!award.acceptedGrades.includes(selectedTeam.grade)) {
 			warnings.push(m.grade_must_be({ grades: award.acceptedGrades.join(', ') }));
