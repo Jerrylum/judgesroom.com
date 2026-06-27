@@ -35,7 +35,7 @@
         "crypto-js": "^4.2.0",
         "dompurify": "^3.3.1",
         "events": "^3.3.0",
-        "events.vex": "^7.0.0",
+        "events.vex": "^7.0.1",
         "papaparse": "^5.5.3",
         "qrcode": "^1.5.4",
         "svelte-dnd-action": "^0.9.65",
@@ -633,7 +633,7 @@
 
     "events": ["events@3.3.0", "", {}, "sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q=="],
 
-    "events.vex": ["events.vex@7.0.0", "", { "dependencies": { "openapi-fetch": "^0.11.1" } }, "sha512-6T72R8tdtXW0+8/f4CXfjvposmdTT6/b6CPrdqHWQbPUFj/fCSsUQGSBvf53DzAU0ocuF8rjDczDwl/0cbTLmg=="],
+    "events.vex": ["events.vex@7.0.1", "", { "dependencies": { "openapi-fetch": "^0.11.1" } }, "sha512-3I1Hh0YCGe2XWYrEZbVOzGtUTmEZXRWxA1J1rfzK6rm9Jiw7VZpO/4wNCCPsUmkV35+qEzbEecQfambkUzkzqA=="],
 
     "exit-hook": ["exit-hook@2.2.1", "", {}, "sha512-eNTPlAD67BmP31LDINZ3U7HSF8l57TxOY2PmBJ1shpCvpnxBF93mWCE8YHBnXs8qiUZJc9WDcWIeC3a2HIAMfw=="],
 

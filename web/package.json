@@ -52,7 +52,7 @@
 		"crypto-js": "^4.2.0",
 		"dompurify": "^3.3.1",
 		"events": "^3.3.0",
-		"events.vex": "^7.0.0",
+		"events.vex": "^7.0.1",
 		"papaparse": "^5.5.3",
 		"qrcode": "^1.5.4",
 		"svelte-dnd-action": "^0.9.65",
