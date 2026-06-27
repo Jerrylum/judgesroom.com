@@ -3,12 +3,7 @@
 	import { app } from '$lib/index.svelte';
 	import type { Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import {
-		meetsAwardNotebookRequirement,
-		meetsInnovateAwardSubmissionFormRequirement,
-		REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM,
-		requiresFullyDevelopedNotebook
-	} from '$lib/award.svelte';
+	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
 
 	interface Props {
 		award: Award;
@@ -28,16 +23,10 @@
 	const needsFullyDevelopedNotebook = $derived(requiresFullyDevelopedNotebook(award.name));
 	const isMeetTeamInterviewRequirement = $derived(award.requireTeamInterview ? hasTeamInterview : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
-	const isMeetInnovateAwardSubmissionFormRequirement = $derived(
-		meetsInnovateAwardSubmissionFormRequirement(award.name, team.hasInnovateAwardSubmissionForm)
-	);
 	const isDisabled = $derived(
 		bypassAwardRequirements
 			? false
-			: !isMeetNotebookRequirement ||
-					!isMeetTeamInterviewRequirement ||
-					!isMeetGradeRequirement ||
-					(REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM && !isMeetInnovateAwardSubmissionFormRequirement)
+			: !isMeetNotebookRequirement || !isMeetTeamInterviewRequirement || !isMeetGradeRequirement
 	);
 
 	async function removeNomination() {
@@ -86,9 +75,6 @@
 			{/if}
 			{#if !isMeetGradeRequirement}
 				<p>{m.grade_must_be_btn({ grades: award.acceptedGrades.join(', ') })}</p>
-			{/if}
-			{#if REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM && isMeetNotebookRequirement && !isMeetInnovateAwardSubmissionFormRequirement}
-				<p>{m.submission_form_required_btn()}</p>
 			{/if}
 		</div>
 	{/if}

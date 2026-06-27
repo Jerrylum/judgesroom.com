@@ -10,17 +10,10 @@ import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 import { type TeamInfo, type NotebookDevelopmentStatus, isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
 
-/** GRSF: Innovate Award Submission Form is no longer required. */
-export const REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM = false;
-
-export function meetsInnovateAwardSubmissionFormRequirement(
-	awardName: string,
-	hasInnovateAwardSubmissionForm: boolean
-): boolean {
-	if (!REQUIRE_INNOVATE_AWARD_SUBMISSION_FORM) return true;
-	return awardName !== 'Innovate Award' || hasInnovateAwardSubmissionForm;
-}
-
+/**
+ * GRSF award eligibility helpers.
+ * Under GRSF judging guidelines, the Innovate Award Submission Form is no longer required for Innovate Award eligibility.
+ */
 export function requiresFullyDevelopedNotebook(awardName: string): boolean {
 	return isExcellenceAward(awardName) || isDesignAward(awardName) || awardName === 'Innovate Award';
 }

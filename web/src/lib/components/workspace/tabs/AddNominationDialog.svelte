@@ -4,7 +4,6 @@
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import { isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
-	import { meetsInnovateAwardSubmissionFormRequirement } from '$lib/award.svelte';
 
 	interface Props {
 		open: boolean;
@@ -50,12 +49,8 @@
 			if (!bypassRequirements) {
 				const meetNotebookReq = award.requireNotebook ? isSubmittedNotebook(team.notebookDevelopmentStatus) : true;
 				const meetGradeReq = award.acceptedGrades.includes(team.grade);
-				const meetInnovateAwardSubmissionFormReq = meetsInnovateAwardSubmissionFormRequirement(
-					award.name,
-					team.hasInnovateAwardSubmissionForm
-				);
 
-				if (!meetNotebookReq || !meetGradeReq || !meetInnovateAwardSubmissionFormReq) {
+				if (!meetNotebookReq || !meetGradeReq) {
 					return false;
 				}
 			}
