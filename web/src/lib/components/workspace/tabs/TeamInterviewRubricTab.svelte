@@ -8,10 +8,7 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
-	import {
-		createEmptyTeamInterviewRubricScores,
-		TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT
-	} from '@judgesroom.com/protocol/src/rubric';
+	import { createEmptyTeamInterviewRubricScores, TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT } from '@judgesroom.com/protocol/src/rubric';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';

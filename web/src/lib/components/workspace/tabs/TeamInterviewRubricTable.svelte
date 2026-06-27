@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import {
-		formatRubricScore,
-		sumRubricScores,
-		teamInterviewRubricConfig
-	} from '@judgesroom.com/protocol/src/rubric';
+	import { formatRubricScore, sumRubricScores, teamInterviewRubricConfig } from '@judgesroom.com/protocol/src/rubric';
 	import { getRubricCriterionTitle, getRubricProficiencyText, type ProficiencyLevel } from '$lib/rubric-messages';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import ScoringSlider from './ScoringSlider.svelte';

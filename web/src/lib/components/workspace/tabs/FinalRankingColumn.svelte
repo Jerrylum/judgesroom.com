@@ -153,7 +153,7 @@
 
 <div class="flex max-w-40 min-w-40 flex-col gap-1">
 	<div class="flex min-h-14 flex-col items-center justify-center p-2 text-center">
-		<div class="max-w-full wrap-break-word min-h-12">
+		<div class="min-h-12 max-w-full wrap-break-word">
 			{award.name}
 		</div>
 		<div class="text-xs text-gray-500">

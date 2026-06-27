@@ -28,10 +28,7 @@ export function getRubricSectionHeading(categoryKey: string, sectionMaxPoints: n
 	return `${title} (${sectionMaxPoints} pts)`;
 }
 
-export function getRubricProficiencyHeader(
-	scale: NotebookProficiencyHeaderScale,
-	level: ProficiencyLevel
-): string {
+export function getRubricProficiencyHeader(scale: NotebookProficiencyHeaderScale, level: ProficiencyLevel): string {
 	return getMessage(`rubric_nb_hdr_${scale}_${level}`)?.() ?? '';
 }
 

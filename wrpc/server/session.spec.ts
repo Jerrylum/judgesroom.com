@@ -313,9 +313,7 @@ describe('Server-side Session', () => {
 		});
 
 		it('should handle query as an intermediate path segment in broadcast', async () => {
-			const mockResponses: WRPCResponse[] = [
-				{ kind: 'response', id: 'id-1', result: { type: 'data', data: { items: [] } } }
-			];
+			const mockResponses: WRPCResponse[] = [{ kind: 'response', id: 'id-1', result: { type: 'data', data: { items: [] } } }];
 
 			vi.mocked(mockNetwork.broadcast).mockResolvedValue(mockResponses);
 
@@ -335,9 +333,7 @@ describe('Server-side Session', () => {
 		});
 
 		it('should handle mutation as an intermediate path segment in broadcast', async () => {
-			const mockResponses: WRPCResponse[] = [
-				{ kind: 'response', id: 'id-1', result: { type: 'data', data: { success: true } } }
-			];
+			const mockResponses: WRPCResponse[] = [{ kind: 'response', id: 'id-1', result: { type: 'data', data: { success: true } } }];
 
 			vi.mocked(mockNetwork.broadcast).mockResolvedValue(mockResponses);
 

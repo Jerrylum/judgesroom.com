@@ -172,7 +172,7 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 		}
 
 		const assignedTeams = values.flatMap((v) => v.assignedTeams.map((t) => ({ judgeGroupId: v.id, teamId: t })));
-		
+
 		await tx.delete(judgeGroupsAssignedTeams);
 
 		// for (const v of assignedTeams) {

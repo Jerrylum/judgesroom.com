@@ -25,9 +25,7 @@
 	const isMeetNotebookRequirement = $derived(meetsAwardNotebookRequirement(award, team.notebookDevelopmentStatus));
 	const needsFullyDevelopedNotebook = $derived(requiresFullyDevelopedNotebook(award.name));
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
-	const isDisabled = $derived(
-		bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement
-	);
+	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
 
 	// Handle ranking update
 	async function updateRanking(newRanking: number) {

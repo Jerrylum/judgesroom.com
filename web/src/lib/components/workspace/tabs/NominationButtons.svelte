@@ -24,9 +24,7 @@
 	const isMeetTeamInterviewRequirement = $derived(award.requireTeamInterview ? hasTeamInterview : true);
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isDisabled = $derived(
-		bypassAwardRequirements
-			? false
-			: !isMeetNotebookRequirement || !isMeetTeamInterviewRequirement || !isMeetGradeRequirement
+		bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetTeamInterviewRequirement || !isMeetGradeRequirement
 	);
 
 	async function removeNomination() {

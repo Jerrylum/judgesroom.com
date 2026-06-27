@@ -1189,7 +1189,7 @@ describe('WebsocketClient', () => {
 			await vi.advanceTimersByTimeAsync(10);
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			
+
 			// Advance time by 4 minutes (before ping would be sent)
 			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
 
@@ -1239,7 +1239,7 @@ describe('WebsocketClient', () => {
 			await vi.advanceTimersByTimeAsync(10);
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			
+
 			// Advance time by 4 minutes
 			await vi.advanceTimersByTimeAsync(4 * 60 * 1000);
 
@@ -1284,7 +1284,7 @@ describe('WebsocketClient', () => {
 			await vi.advanceTimersByTimeAsync(10);
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			
+
 			// Server sends ping
 			mockWs.simulateMessage(JSON.stringify({ kind: 'ping' }));
 			await vi.advanceTimersByTimeAsync(10);
@@ -1319,7 +1319,7 @@ describe('WebsocketClient', () => {
 			await vi.advanceTimersByTimeAsync(10);
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			
+
 			// Disconnect
 			wsClient.disconnect();
 			await vi.advanceTimersByTimeAsync(10);
@@ -1339,7 +1339,7 @@ describe('WebsocketClient', () => {
 			await vi.advanceTimersByTimeAsync(10);
 
 			const mockWs = vi.mocked(MockWebSocket).mock.results[0]?.value as any;
-			
+
 			// Simulate connection close
 			mockWs.simulateClose(1000, 'Normal closure');
 			await vi.advanceTimersByTimeAsync(10);
@@ -1362,13 +1362,13 @@ describe('WebsocketClient', () => {
 
 			// Simulate abnormal close (triggers reconnect)
 			mockWs1.simulateClose(1006, 'Abnormal closure');
-			
+
 			// Wait for exponential backoff delay (1000ms * 2^0 = 1000ms) and connection setup
 			await vi.advanceTimersByTimeAsync(1100);
 
 			// Get the new WebSocket instance after reconnect
 			const mockWs2 = vi.mocked(MockWebSocket).mock.results[1]?.value as any;
-			
+
 			// Verify connection was re-established
 			expect(mockWs2).toBeDefined();
 

@@ -24,9 +24,7 @@ export function createWRPCClient<TServerRouter extends AnyRouter, TClientRouter 
 							if (key === 'query' || key === 'mutation') {
 								// Create a function that can be called
 								const fn = (input: unknown) => {
-									return key === 'query'
-										? client.query(currentParts.join('.'), input)
-										: client.mutation(currentParts.join('.'), input);
+									return key === 'query' ? client.query(currentParts.join('.'), input) : client.mutation(currentParts.join('.'), input);
 								};
 
 								// Wrap it in a proxy to allow property access for traversal

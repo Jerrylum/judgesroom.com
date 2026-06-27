@@ -3,7 +3,12 @@
 	import { app } from '$lib/index.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-	import { isExcellenceAward, getDesignExcellenceSwapZone, isDesignExcellenceSwapZone, type Award } from '@judgesroom.com/protocol/src/award';
+	import {
+		isExcellenceAward,
+		getDesignExcellenceSwapZone,
+		isDesignExcellenceSwapZone,
+		type Award
+	} from '@judgesroom.com/protocol/src/award';
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
 	import { tick } from 'svelte';
 	import { getJudgedAwardWinners } from '$lib/award.svelte';
