@@ -7,6 +7,7 @@ import ts from 'typescript-eslint';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 const prettierIgnorePath = fileURLToPath(new URL('./.prettierignore', import.meta.url));
+const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
 export default ts.config(
 	includeIgnoreFile(gitignorePath, 'gitignore'),
@@ -30,7 +31,7 @@ export default ts.config(
 		languageOptions: {
 			parserOptions: {
 				projectService: true,
-				tsconfigRootDir: __dirname
+				tsconfigRootDir
 			}
 			// },
 			// rules: {
