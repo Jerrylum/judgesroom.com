@@ -12,6 +12,13 @@ const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 export default ts.config(
 	includeIgnoreFile(gitignorePath, 'gitignore'),
 	includeIgnoreFile(prettierIgnorePath, 'prettierignore'),
+	{
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir
+			}
+		}
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	prettier,
@@ -30,27 +37,27 @@ export default ts.config(
 		files: ['**/*.ts'],
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				project: './tsconfig.json',
 				tsconfigRootDir
 			}
-			// },
-			// rules: {
-			// 	// Enforce consistent type imports to catch verbatimModuleSyntax issues
-			// 	'@typescript-eslint/consistent-type-imports': [
-			// 		'error',
-			// 		{
-			// 			prefer: 'type-imports',
-			// 			disallowTypeAnnotations: false,
-			// 			fixStyle: 'separate-type-imports'
-			// 		}
-			// 	],
-			// 	// Ensure consistent type exports as well
-			// 	'@typescript-eslint/consistent-type-exports': [
-			// 		'error',
-			// 		{
-			// 			fixMixedExportsWithInlineTypeSpecifier: false
-			// 		}
-			// 	]
 		}
+		// rules: {
+		// 	// Enforce consistent type imports to catch verbatimModuleSyntax issues
+		// 	'@typescript-eslint/consistent-type-imports': [
+		// 		'error',
+		// 		{
+		// 			prefer: 'type-imports',
+		// 			disallowTypeAnnotations: false,
+		// 			fixStyle: 'separate-type-imports'
+		// 		}
+		// 	],
+		// 	// Ensure consistent type exports as well
+		// 	'@typescript-eslint/consistent-type-exports': [
+		// 		'error',
+		// 		{
+		// 			fixMixedExportsWithInlineTypeSpecifier: false
+		// 		}
+		// 	]
+		// }
 	}
 );
