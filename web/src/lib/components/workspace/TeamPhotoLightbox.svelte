@@ -122,7 +122,7 @@
 							type="button"
 							class={{
 								'h-20 w-20 overflow-hidden rounded border-2 border-transparent bg-gray-100': true,
-								'border-blue-500': photo.id === photoId
+								'border-blue-500!': photo.id === photoId
 							}}
 							onclick={() => onPhotoIdChange(photo.id)}
 							title={new Date(photo.createdAt).toLocaleString()}
