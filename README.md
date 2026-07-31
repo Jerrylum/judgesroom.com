@@ -103,7 +103,7 @@ bunx wrangler r2 bucket lifecycle add judgesroom-team-photos \
   --expire-days 7
 ```
 
-When a Judges' Room is destroyed, the Worker also deletes every object under `rooms/{roomId}/` immediately. Photos are compressed in the browser (max long edge 1600px) and rejected above 3 MB; each team is limited to 20 photos.
+When a Judges' Room is destroyed, the Worker deletes that room's photo objects (keyed by photo id) and purges their cache tags. Photos are compressed in the browser (max long edge 1600px) and rejected above 3 MB; each team is limited to 20 photos.
 
 Optional: Deploy to Cloudflare (production)
 

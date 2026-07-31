@@ -231,7 +231,6 @@ export const teamPhotos = sqliteTable(
 		teamId: text('teamId')
 			.references(() => teams.id, { onDelete: 'cascade' })
 			.notNull(),
-		objectKey: text('objectKey').notNull(),
 		contentType: text('contentType').notNull(),
 		byteSize: integer('byteSize').notNull(),
 		createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
@@ -250,7 +249,6 @@ export const pendingPhotoUploads = sqliteTable('PendingPhotoUploads', {
 		.notNull(),
 	contentType: text('contentType').notNull(),
 	byteSize: integer('byteSize').notNull(),
-	objectKey: text('objectKey').notNull(),
 	createdByDeviceId: text('createdByDeviceId').notNull(),
 	createdByJudgeId: text('createdByJudgeId'),
 	expiresAt: integer('expiresAt', { mode: 'timestamp' }).notNull()

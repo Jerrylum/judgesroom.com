@@ -12,13 +12,7 @@ import { count, eq, lt } from 'drizzle-orm';
 import { z } from 'zod';
 import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
 import { pendingPhotoUploads, teamPhotos, teams } from '../db/schema';
-import {
-	PHOTO_CACHE_MAX_AGE_SECONDS,
-	photoCacheTags,
-	photoObjectKey,
-	timingSafeEqualString,
-	UPLOAD_TOKEN_TTL_MS
-} from '../media/constants';
+import { PHOTO_CACHE_MAX_AGE_SECONDS, timingSafeEqualString, UPLOAD_TOKEN_TTL_MS } from '../media/constants';
 import type { PhotosObjectBody } from '../media/types';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { uuidv4 } from '@judgesroom.com/protocol/src/utils';
@@ -43,6 +37,14 @@ function toTeamPhoto(row: {
 		createdByJudgeId: row.createdByJudgeId,
 		viewSecret: row.viewSecret
 	};
+}
+
+export async function listUploads(db: DatabaseOrTransaction): Promise<Set<string>> {
+	const [stored, pending] = await Promise.all([
+		db.select({ id: teamPhotos.id }).from(teamPhotos),
+		db.select({ photoId: pendingPhotoUploads.photoId }).from(pendingPhotoUploads)
+	]);
+	return new Set([...stored.map((row) => row.id), ...pending.map((row) => row.photoId)]);
 }
 
 export async function listAllTeamPhotos(db: DatabaseOrTransaction): Promise<TeamPhoto[]> {
@@ -88,10 +90,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 					throw new Error('Team not found');
 				}
 
-				const [teamCountRow] = await ctx.db
-					.select({ value: count() })
-					.from(teamPhotos)
-					.where(eq(teamPhotos.teamId, input.teamId));
+				const [teamCountRow] = await ctx.db.select({ value: count() }).from(teamPhotos).where(eq(teamPhotos.teamId, input.teamId));
 				if ((teamCountRow?.value ?? 0) >= MAX_PHOTOS_PER_TEAM) {
 					throw new Error(`Maximum of ${MAX_PHOTOS_PER_TEAM} photos per team reached`);
 				}
@@ -103,7 +102,6 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 
 				const photoId = uuidv4();
 				const uploadToken = uuidv4();
-				const objectKey = photoObjectKey(session.roomId, input.teamId, photoId, input.contentType);
 				const expiresAt = new Date(Date.now() + UPLOAD_TOKEN_TTL_MS);
 
 				await ctx.db.insert(pendingPhotoUploads).values({
@@ -112,7 +110,6 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 					teamId: input.teamId,
 					contentType: input.contentType,
 					byteSize: input.byteSize,
-					objectKey,
 					createdByDeviceId: session.currentClient.deviceId,
 					createdByJudgeId: input.judgeId ?? null,
 					expiresAt
@@ -125,27 +122,24 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 				};
 			}),
 
-		deletePhoto: w.procedure
-			.input(z.object({ photoId: z.uuidv4() }))
-			.mutation(async ({ ctx, input, session }) => {
-				const rows = await ctx.db.select().from(teamPhotos).where(eq(teamPhotos.id, input.photoId)).limit(1);
-				const photo = rows[0];
-				if (!photo) {
-					throw new Error('Photo not found');
-				}
+		deletePhoto: w.procedure.input(z.object({ photoId: z.uuidv4() })).mutation(async ({ ctx, input, session }) => {
+			const rows = await ctx.db.select().from(teamPhotos).where(eq(teamPhotos.id, input.photoId)).limit(1);
+			const photo = rows[0];
+			if (!photo) {
+				throw new Error('Photo not found');
+			}
 
-				await ctx.photos.delete(photo.objectKey);
-				await ctx.db.delete(teamPhotos).where(eq(teamPhotos.id, input.photoId));
-				await ctx.purgePhotoCacheTags?.(photoCacheTags(session.roomId, photo.id));
+			await ctx.photos.delete(photo.id);
+			await ctx.db.delete(teamPhotos).where(eq(teamPhotos.id, input.photoId));
 
-				session.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
-					action: 'deleted',
-					photoId: photo.id,
-					teamId: photo.teamId
-				});
+			session.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
+				action: 'deleted',
+				photoId: photo.id,
+				teamId: photo.teamId
+			});
 
-				return { success: true };
-			})
+			return { success: true };
+		})
 	};
 }
 
@@ -187,7 +181,7 @@ export async function completePhotoUpload(
 		throw new Error(`Maximum of ${MAX_PHOTOS_PER_TEAM} photos per team reached`);
 	}
 
-	await ctx.photos.put(pending.objectKey, body, {
+	await ctx.photos.put(pending.photoId, body, {
 		httpMetadata: { contentType: pending.contentType }
 	});
 
@@ -196,7 +190,6 @@ export async function completePhotoUpload(
 	await ctx.db.insert(teamPhotos).values({
 		id: pending.photoId,
 		teamId: pending.teamId,
-		objectKey: pending.objectKey,
 		contentType: pending.contentType,
 		byteSize: pending.byteSize,
 		createdAt,
@@ -233,7 +226,7 @@ export async function getPhotoObject(
 		throw new Error('Photo not found');
 	}
 
-	const object = await ctx.photos.get(photo.objectKey);
+	const object = await ctx.photos.get(photo.id);
 	if (!object) {
 		throw new Error('Photo object missing from storage');
 	}

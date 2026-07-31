@@ -8,9 +8,10 @@ import migrations from '../drizzle/migrations';
 import { broadcastDeviceListUpdate } from './routes/device';
 import { unsubscribeTopics } from './routes/subscriptions';
 import { metadata } from './db/schema';
-import { completePhotoUpload, getPhotoObject } from './routes/media';
-import { deleteRoomPhotoObjects } from './media/r2';
-import { roomPhotoCacheTag } from './media/constants';
+import { completePhotoUpload, getPhotoObject, listUploads } from './routes/media';
+import { createPhotosBucket } from './media/r2';
+import type { PhotosBucket } from './media/types';
+import { photoCacheTag, roomPhotoCacheTag } from './media/constants';
 import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
 
@@ -53,7 +54,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			const data = (await this.ctx.storage.get('wrpc-data')) as { roomId: string | null } | undefined;
 			const roomId = data?.roomId ?? null;
 			if (roomId) {
-				await deleteRoomPhotoObjects(this.env.TEAM_PHOTOS, roomId);
+				const photoIds = await listUploads(this.db);
+				await this.env.TEAM_PHOTOS.delete(Array.from(photoIds));
 				await this.env.CACHED_MEDIA.purgeTags([roomPhotoCacheTag(roomId)]);
 			}
 			await this.ctx.storage.deleteAll();
@@ -65,6 +67,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		}
 	});
 	private db: DrizzleSqliteDODatabase;
+	private photos: PhotosBucket;
 
 	/**
 	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
@@ -78,6 +81,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Initialize the WebSocket handler with hibernation support
 		this.wsHandler.initialize().catch(console.error);
 		this.db = drizzle(this.ctx.storage);
+		this.photos = createPhotosBucket(this.env.TEAM_PHOTOS, (photoIds) => this.env.CACHED_MEDIA.purgeTags(photoIds.map(photoCacheTag)));
 
 		// Make sure all migrations complete before accepting queries.
 		// Otherwise you will need to run `this.migrate()` in any function
@@ -91,8 +95,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		return {
 			db: this.db,
 			network: this.wsHandler.connectionManager,
-			photos: this.env.TEAM_PHOTOS,
-			purgePhotoCacheTags: (tags: string[]) => this.env.CACHED_MEDIA.purgeTags(tags)
+			photos: this.photos
 		};
 	}
 

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "819e281f-e23c-4d2b-b749-0ecf55f8c480",
+  "id": "e2c58034-a997-4c13-910f-798dd1bb024f",
   "prevId": "c09bde36-b1dc-4e1a-9d6f-52e148786eeb",
   "tables": {
     "AwardRankings": {
@@ -861,13 +861,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "objectKey": {
-          "name": "objectKey",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "createdByDeviceId": {
           "name": "createdByDeviceId",
           "type": "text",
@@ -1157,13 +1150,6 @@
         },
         "teamId": {
           "name": "teamId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "objectKey": {
-          "name": "objectKey",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

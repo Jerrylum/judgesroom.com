@@ -1,16 +1,24 @@
-import { roomPhotosPrefix } from './constants';
 import type { PhotosBucket } from './types';
 
 /**
- * Delete every R2 object under rooms/{roomId}/.
+ * Wrap an R2 bucket so photo deletes also purge Workers Cache tags via CachedMedia.
+ * Object keys are photo ids.
  */
-export async function deleteRoomPhotoObjects(bucket: PhotosBucket, roomId: string): Promise<void> {
-	const prefix = roomPhotosPrefix(roomId);
-	let cursor: string | undefined;
-
-	do {
-		const listed = await bucket.list({ prefix, cursor, limit: 1000 });
-		await Promise.all(listed.objects.map((object) => bucket.delete(object.key)));
-		cursor = listed.truncated ? listed.cursor : undefined;
-	} while (cursor);
+export function createPhotosBucket(r2: R2Bucket, onDelete: (photoIds: string[]) => Promise<void>): PhotosBucket {
+	return {
+		async put(photoId, value, options) {
+			return r2.put(photoId, value, options);
+		},
+		async get(photoId) {
+			return r2.get(photoId);
+		},
+		async delete(photoId) {
+			const photoIds = Array.isArray(photoId) ? photoId : [photoId];
+			if (photoIds.length === 0) {
+				return;
+			}
+			await r2.delete(photoIds);
+			await onDelete(photoIds);
+		}
+	};
 }

@@ -1,5 +1,6 @@
 /**
- * Minimal R2-like surface used by media routes so web typecheck does not need Workers runtime types.
+ * Minimal photo storage surface used by media routes so web typecheck does not need Workers runtime types.
+ * Implementations may also invalidate Workers Cache tags on delete.
  */
 export interface PhotosObjectBody {
 	body: ReadableStream;
@@ -7,15 +8,11 @@ export interface PhotosObjectBody {
 
 export interface PhotosBucket {
 	put(
-		key: string,
+		photoId: string,
 		value: ArrayBuffer | ArrayBufferView | string | null | Blob | ReadableStream,
 		options?: { httpMetadata?: { contentType?: string } }
 	): Promise<unknown>;
-	get(key: string): Promise<PhotosObjectBody | null>;
-	delete(key: string | string[]): Promise<void>;
-	list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<{
-		objects: { key: string }[];
-		truncated: boolean;
-		cursor?: string;
-	}>;
+	get(photoId: string): Promise<PhotosObjectBody | null>;
+	/** Delete photo object(s) and purge photo-{id} cache tags. */
+	delete(photoId: string | string[]): Promise<void>;
 }

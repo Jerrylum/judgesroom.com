@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { awards, teams, metadata, judgeGroups } from './db/schema';
 import type { ServerContext } from './server-router';
+import type { PhotosBucket } from './media/types';
 import type { Network, ClientData } from '@judgesroom.com/wrpc/server/types';
 import type { Award } from '@judgesroom.com/protocol/src/award';
 import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
@@ -50,30 +51,23 @@ export function createTestDatabase() {
 /**
  * Creates a test server context with a test database
  */
-function createMockR2Bucket(): R2Bucket {
+function createMockPhotosBucket(): PhotosBucket {
 	const objects = new Map<string, { body: ArrayBuffer; contentType?: string }>();
 
 	return {
-		async head() {
-			return null;
-		},
-		async get(key: string) {
-			const object = objects.get(key);
+		async get(photoId: string) {
+			const object = objects.get(photoId);
 			if (!object) return null;
 			return {
-				key,
-				size: object.body.byteLength,
 				body: new ReadableStream({
 					start(controller) {
 						controller.enqueue(new Uint8Array(object.body));
 						controller.close();
 					}
-				}),
-				arrayBuffer: async () => object.body,
-				httpMetadata: { contentType: object.contentType }
-			} as unknown as R2ObjectBody;
+				})
+			};
 		},
-		async put(key: string, value: ArrayBuffer | ArrayBufferView | string | null | Blob | ReadableStream, options?: R2PutOptions) {
+		async put(photoId: string, value: ArrayBuffer | ArrayBufferView | string | null | Blob | ReadableStream, options?) {
 			let body: ArrayBuffer;
 			if (value instanceof ArrayBuffer) {
 				body = value;
@@ -103,35 +97,16 @@ function createMockR2Bucket(): R2Bucket {
 				body = merged.buffer;
 			}
 
-			const contentType = options?.httpMetadata && 'contentType' in options.httpMetadata ? options.httpMetadata.contentType : undefined;
-			objects.set(key, { body, contentType });
-			return { key, size: body.byteLength } as unknown as R2Object;
+			const contentType = options?.httpMetadata?.contentType;
+			objects.set(photoId, { body, contentType });
+			return { key: photoId, size: body.byteLength };
 		},
-		async delete(keys: string | string[]) {
-			for (const key of Array.isArray(keys) ? keys : [keys]) {
-				objects.delete(key);
+		async delete(photoId: string | string[]) {
+			for (const id of Array.isArray(photoId) ? photoId : [photoId]) {
+				objects.delete(id);
 			}
-		},
-		async list(options?: R2ListOptions) {
-			const prefix = options?.prefix ?? '';
-			const matched = [...objects.keys()]
-				.filter((key) => key.startsWith(prefix))
-				.sort()
-				.slice(0, options?.limit ?? 1000)
-				.map((key) => ({ key, size: objects.get(key)!.body.byteLength }) as unknown as R2Object);
-			return {
-				objects: matched,
-				truncated: false,
-				delimitedPrefixes: []
-			};
-		},
-		createMultipartUpload() {
-			throw new Error('Not implemented in mock R2');
-		},
-		resumeMultipartUpload() {
-			throw new Error('Not implemented in mock R2');
 		}
-	} as unknown as R2Bucket;
+	};
 }
 
 export function createTestServerContext(): ServerContext & { cleanup: () => void } {
@@ -176,7 +151,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 	return {
 		db,
 		network,
-		photos: createMockR2Bucket(),
+		photos: createMockPhotosBucket(),
 		cleanup
 	};
 }

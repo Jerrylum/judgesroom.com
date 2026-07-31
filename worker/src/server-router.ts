@@ -14,8 +14,6 @@ export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
 	network: Network;
 	photos: PhotosBucket;
-	/** Purge Workers Cache tags via the CachedMedia entrypoint (optional in tests). */
-	purgePhotoCacheTags?: (tags: string[]) => Promise<void>;
 }
 
 export type Transaction = Parameters<Parameters<DrizzleSqliteDODatabase['transaction']>[0]>[0];
