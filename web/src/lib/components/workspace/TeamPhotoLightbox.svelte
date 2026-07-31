@@ -4,7 +4,7 @@
 	import ChevronLeftIcon from '$lib/icon/ChevronLeftIcon.svelte';
 	import ChevronRightIcon from '$lib/icon/ChevronRightIcon.svelte';
 	import { deleteTeamPhoto, getPhotoObjectUrl } from '$lib/media';
-	import { app, subscriptions } from '$lib/index.svelte';
+	import { app, dialogs, subscriptions } from '$lib/index.svelte';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
 
 	interface Props {
@@ -37,6 +37,12 @@
 		}
 	}
 
+	function handleShellClose() {
+		// Keep the lightbox open while a stacked confirm dialog is showing
+		if (dialogs.hasDialogs) return;
+		onClose();
+	}
+
 	function goToIndex(index: number) {
 		if (photos.length === 0) return;
 		const next = ((index % photos.length) + photos.length) % photos.length;
@@ -55,7 +61,7 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (!open || photos.length === 0) return;
+		if (!open || photos.length === 0 || dialogs.hasDialogs) return;
 		if (event.key === 'ArrowLeft') {
 			event.preventDefault();
 			goPrevious();
@@ -67,17 +73,35 @@
 
 	async function handleDelete() {
 		if (!photoId || !allowDelete) return;
+
+		const confirmed = await dialogs.showConfirmation({
+			title: m.delete_photo(),
+			message: m.delete_photo_message(),
+			confirmText: m.delete_photo(),
+			cancelText: m.cancel(),
+			confirmButtonClass: 'danger'
+		});
+		if (!confirmed) return;
+
+		const deletedId = photoId;
+		const indexAtDelete = photos.findIndex((photo) => photo.id === deletedId);
+		const remaining = photos.filter((photo) => photo.id !== deletedId);
+
 		try {
-			await deleteTeamPhoto(photoId);
-			delete subscriptions.allTeamPhotos[photoId];
-			const remaining = photos.filter((photo) => photo.id !== photoId);
+			await deleteTeamPhoto(deletedId);
+
+			// Select the next photo before removing from the store so the UI
+			// never briefly resolves to an empty/missing current photo.
 			if (remaining.length === 0) {
+				delete subscriptions.allTeamPhotos[deletedId];
 				onClose();
 				return;
 			}
-			const nextIndex = Math.min(currentIndex, remaining.length - 1);
+
+			const nextIndex = Math.min(Math.max(indexAtDelete, 0), remaining.length - 1);
 			const nextPhoto = remaining[nextIndex];
 			if (nextPhoto) onPhotoIdChange(nextPhoto.id);
+			delete subscriptions.allTeamPhotos[deletedId];
 		} catch (error) {
 			const message = error instanceof Error ? error.message : m.photo_delete_failed();
 			app.addErrorNotice(message);
@@ -87,7 +111,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<Dialog {open} {onClose} innerContainerClass="max-w-5xl">
+<Dialog {open} onClose={handleShellClose} innerContainerClass="max-w-5xl">
 	{#if currentPhoto && currentUrl}
 		<div class="flex flex-col gap-3">
 			<div class="relative flex min-h-[40vh] items-center justify-center bg-gray-950">
@@ -137,14 +161,14 @@
 				</div>
 			{/if}
 
-			<div class="flex items-center justify-between gap-2">
+			<div class="flex items-center justify-between gap-3">
+				<button type="button" class="cancel tiny" onclick={handleShellClose}>{m.close_dialog_text()}</button>
 				<p class="text-xs text-gray-500">
 					{#if photos.length > 0 && currentIndex >= 0}
 						{currentIndex + 1} / {photos.length}
 					{/if}
 				</p>
-				<div class="flex justify-end gap-2">
-					<button type="button" class="secondary tiny" onclick={onClose}>{m.cancel()}</button>
+				<div class="flex min-w-24 justify-end">
 					{#if allowDelete}
 						<button type="button" class="danger tiny" onclick={handleDelete}>{m.delete_photo()}</button>
 					{/if}
@@ -155,7 +179,7 @@
 		<div class="flex flex-col gap-3">
 			<p class="text-sm text-gray-600">{m.no_team_photos_yet()}</p>
 			<div class="flex justify-end">
-				<button type="button" class="secondary tiny" onclick={onClose}>{m.cancel()}</button>
+				<button type="button" class="cancel tiny" onclick={handleShellClose}>{m.close_dialog_text()}</button>
 			</div>
 		</div>
 	{/if}

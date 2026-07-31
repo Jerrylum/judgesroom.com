@@ -723,6 +723,7 @@
 	"uploading_photos": "上載中...",
 	"no_team_photos_yet": "尚未有照片",
 	"delete_photo": "刪除照片",
+	"delete_photo_message": "你確定要刪除這張照片嗎？此操作無法撤銷。",
 	"photo_upload_failed": "照片上載失敗",
 	"photo_delete_failed": "刪除照片失敗",
 	"photo_limit_reached": "每隊最多 {count} 張照片",
