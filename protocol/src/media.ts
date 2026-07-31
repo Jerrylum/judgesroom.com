@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const MAX_PHOTO_BYTES = 3 * 1024 * 1024; // 3 MB
-export const MAX_PHOTOS_PER_TEAM = 20;
-export const MAX_PHOTOS_PER_ROOM = 100;
+export const MAX_PHOTOS_PER_TEAM = 10;
+export const MAX_PHOTOS_PER_ROOM = 500;
 export const PHOTO_MAX_LONG_EDGE = 1600;
 export const PHOTO_JPEG_QUALITY = 0.8;
 

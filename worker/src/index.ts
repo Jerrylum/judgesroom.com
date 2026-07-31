@@ -54,8 +54,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			const data = (await this.ctx.storage.get('wrpc-data')) as { roomId: string | null } | undefined;
 			const roomId = data?.roomId ?? null;
 			if (roomId) {
-				const photoIds = await listUploads(this.db);
-				await this.env.TEAM_PHOTOS.delete(Array.from(photoIds));
+				const photoIds = Array.from(await listUploads(this.db));
+				if (photoIds.length > 0) {
+					await this.env.TEAM_PHOTOS.delete(photoIds);
+				}
 				await this.env.CACHED_MEDIA.purgeTags([roomPhotoCacheTag(roomId)]);
 			}
 			await this.ctx.storage.deleteAll();
@@ -119,12 +121,22 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 					return new Response('Missing upload token', { status: 401 });
 				}
 
-				const contentLength = request.headers.get('Content-Length');
-				if (contentLength && Number(contentLength) > MAX_PHOTO_BYTES) {
+				const contentLengthHeader = request.headers.get('Content-Length');
+				if (contentLengthHeader === null) {
+					return new Response('Content-Length required', { status: 411 });
+				}
+				const contentLength = Number(contentLengthHeader);
+				if (!Number.isFinite(contentLength) || contentLength < 0) {
+					return new Response('Invalid Content-Length', { status: 400 });
+				}
+				if (contentLength > MAX_PHOTO_BYTES) {
 					return new Response('Photo too large', { status: 413 });
 				}
 
 				const body = await request.arrayBuffer();
+				if (body.byteLength !== contentLength) {
+					return new Response('Content-Length does not match body size', { status: 400 });
+				}
 				const photo = await completePhotoUpload(ctx, token, body, request.headers.get('Content-Type'));
 
 				void this.wsHandler.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({

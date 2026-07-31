@@ -129,8 +129,9 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 				throw new Error('Photo not found');
 			}
 
-			await ctx.photos.delete(photo.id);
+			// Drop the DB row first so clients stop listing the photo even if R2/purge fails.
 			await ctx.db.delete(teamPhotos).where(eq(teamPhotos.id, input.photoId));
+			await ctx.photos.delete(photo.id);
 
 			session.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
 				action: 'deleted',
@@ -186,18 +187,23 @@ export async function completePhotoUpload(
 
 	const createdAt = new Date();
 	const viewSecret = uuidv4();
-	await ctx.db.insert(teamPhotos).values({
-		id: pending.photoId,
-		teamId: pending.teamId,
-		contentType: pending.contentType,
-		byteSize: pending.byteSize,
-		createdAt,
-		createdByDeviceId: pending.createdByDeviceId,
-		createdByJudgeId: pending.createdByJudgeId,
-		viewSecret
-	});
-
-	await ctx.db.delete(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, token));
+	try {
+		await ctx.db.insert(teamPhotos).values({
+			id: pending.photoId,
+			teamId: pending.teamId,
+			contentType: pending.contentType,
+			byteSize: pending.byteSize,
+			createdAt,
+			createdByDeviceId: pending.createdByDeviceId,
+			createdByJudgeId: pending.createdByJudgeId,
+			viewSecret
+		});
+		await ctx.db.delete(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, token));
+	} catch (error) {
+		// Avoid orphaning the R2 object if DB writes fail after put.
+		await ctx.photos.delete(pending.photoId).catch(() => {});
+		throw error;
+	}
 
 	return toTeamPhoto({
 		id: pending.photoId,

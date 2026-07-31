@@ -161,6 +161,23 @@ describe('media routes', () => {
 				'Content-Type does not match authorized upload'
 			);
 		});
+
+		it('removes the R2 object if DB insert fails after put', async () => {
+			const auth = await createAuthorizedUpload(4);
+			await context.db.insert(teamPhotos).values({
+				id: auth.photoId,
+				teamId,
+				contentType: 'image/jpeg',
+				byteSize: 4,
+				createdAt: new Date(),
+				createdByDeviceId: deviceId,
+				createdByJudgeId: null,
+				viewSecret: 'preexisting-secret'
+			});
+
+			await expect(completePhotoUpload(context, auth.uploadToken, new ArrayBuffer(4), 'image/jpeg')).rejects.toThrow();
+			expect(await context.photos.get(auth.photoId)).toBeNull();
+		});
 	});
 
 	describe('getPhotoObject', () => {
