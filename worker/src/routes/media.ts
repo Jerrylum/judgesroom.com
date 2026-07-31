@@ -147,8 +147,7 @@ export async function completePhotoUpload(
 	ctx: ServerContext,
 	token: string,
 	body: ArrayBuffer,
-	contentTypeHeader: string | null,
-	broadcast: (photo: TeamPhoto) => void
+	contentTypeHeader: string | null
 ): Promise<TeamPhoto> {
 	await cleanupExpiredUploadTokens(ctx.db);
 
@@ -200,7 +199,7 @@ export async function completePhotoUpload(
 
 	await ctx.db.delete(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, token));
 
-	const photo = toTeamPhoto({
+	return toTeamPhoto({
 		id: pending.photoId,
 		teamId: pending.teamId,
 		contentType: pending.contentType,
@@ -210,9 +209,6 @@ export async function completePhotoUpload(
 		createdByJudgeId: pending.createdByJudgeId,
 		viewSecret
 	});
-
-	broadcast(photo);
-	return photo;
 }
 
 export async function getPhotoObject(
