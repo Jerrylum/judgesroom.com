@@ -7,10 +7,15 @@ import { buildJudgeRoute } from './routes/judge';
 import { buildJudgingRoute } from './routes/judging';
 import { buildEssentialRoute } from './routes/essential';
 import { buildDeviceRoute } from './routes/device';
+import { buildMediaRoute } from './routes/media';
+import type { PhotosBucket } from './media/types';
 
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
 	network: Network;
+	photos: PhotosBucket;
+	/** Purge Workers Cache tags via the CachedMedia entrypoint (optional in tests). */
+	purgePhotoCacheTags?: (tags: string[]) => Promise<void>;
 }
 
 export type Transaction = Parameters<Parameters<DrizzleSqliteDODatabase['transaction']>[0]>[0];
@@ -29,7 +34,8 @@ const serverRouter = w.router({
 	team: buildTeamRoute(w),
 	judge: buildJudgeRoute(w),
 	judging: buildJudgingRoute(w),
-	device: buildDeviceRoute(w)
+	device: buildDeviceRoute(w),
+	media: buildMediaRoute(w)
 });
 
 export { serverRouter };

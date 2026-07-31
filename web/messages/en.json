@@ -408,7 +408,7 @@
 	"destroy_judging_data": "Destroy Judging Data",
 	"destroy_judging_data_description": "Prior to the award ceremony, the Judge Advisor should secure the Judges' Room and destroy all judging materials. These items are not to be given to the Event Partner for destruction.",
 	"warning": "Warning",
-	"destroy_judging_data_description_warning": "This action will permanently destroy all judging data including team evaluations, rankings, and notes. Make sure all connected devices have completed judging and all data has been properly collected before proceeding.",
+	"destroy_judging_data_description_warning": "This action will permanently destroy all judging data including team evaluations, rankings, notes, and interview photos. Make sure all connected devices have completed judging and all data has been properly collected before proceeding.",
 	"destroy_judging_data_confirmation": "Type 'destroy' below to confirm the permanent destruction of all judging data.",
 	"confirmation": "Confirmation",
 	"destroy_judging_data_confirmation_placeholder": "Type 'destroy' to confirm",
@@ -710,5 +710,17 @@
 	"rubric_nb_complete_growth_proficient": "Clear progression",
 	"rubric_nb_complete_growth_developing": "Some evidence",
 	"rubric_nb_complete_growth_beginning": "Minimal",
-	"rubric_nb_innovate_award_notes": "Innovate Award notes (optional):"
+	"rubric_nb_innovate_award_notes": "Innovate Award notes (optional):",
+	"team_photos": "Team Photos",
+	"take_or_add_photos": "Take / Add Photos",
+	"uploading_photos": "Uploading...",
+	"no_team_photos_yet": "No photos yet",
+	"delete_photo": "Delete Photo",
+	"photo_upload_failed": "Photo upload failed",
+	"photo_delete_failed": "Failed to delete photo",
+	"photo_limit_reached": "Maximum of {count} photos per team reached",
+	"photos_album": "Photos",
+	"view_team_photos": "View photos ({count})",
+	"previous_photo": "Previous photo",
+	"next_photo": "Next photo"
 }

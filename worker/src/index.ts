@@ -8,6 +8,13 @@ import migrations from '../drizzle/migrations';
 import { broadcastDeviceListUpdate } from './routes/device';
 import { unsubscribeTopics } from './routes/subscriptions';
 import { metadata } from './db/schema';
+import { completePhotoUpload, getPhotoObject } from './routes/media';
+import { deleteRoomPhotoObjects } from './media/r2';
+import { roomPhotoCacheTag } from './media/constants';
+import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
+
+export { CachedMedia } from './media/cached-media';
 
 const IntentionSchema = z.object({
 	roomId: z.uuidv4(),
@@ -42,7 +49,15 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		router: serverRouter,
 		loadData: () => this.ctx.storage.get('wrpc-data'),
 		saveData: (data) => this.ctx.storage.put('wrpc-data', data),
-		destroy: () => this.ctx.storage.deleteAll(),
+		destroy: async () => {
+			const data = (await this.ctx.storage.get('wrpc-data')) as { roomId: string | null } | undefined;
+			const roomId = data?.roomId ?? null;
+			if (roomId) {
+				await deleteRoomPhotoObjects(this.env.TEAM_PHOTOS, roomId);
+				await this.env.CACHED_MEDIA.purgeTags([roomPhotoCacheTag(roomId)]);
+			}
+			await this.ctx.storage.deleteAll();
+		},
 		getWebSocket: (clientId) => this.ctx.getWebSockets(clientId)[0] || null,
 		getClientIdByWebSocket: (ws) => this.ctx.getTags(ws)[0] || null,
 		onError: (opts) => {
@@ -72,6 +87,15 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		});
 	}
 
+	private getServerContext() {
+		return {
+			db: this.db,
+			network: this.wsHandler.connectionManager,
+			photos: this.env.TEAM_PHOTOS,
+			purgePhotoCacheTags: (tags: string[]) => this.env.CACHED_MEDIA.purgeTags(tags)
+		};
+	}
+
 	async getMetadata() {
 		const metadataRows = await this.db.select().from(metadata).limit(1);
 		if (metadataRows.length === 0) {
@@ -81,7 +105,70 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		return metadataRows[0];
 	}
 
+	async handleMediaRequest(request: Request): Promise<Response> {
+		const url = new URL(request.url);
+		const ctx = this.getServerContext();
+
+		try {
+			if (url.pathname === '/media/upload' && request.method === 'PUT') {
+				const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? url.searchParams.get('token');
+				if (!token) {
+					return new Response('Missing upload token', { status: 401 });
+				}
+
+				const contentLength = request.headers.get('Content-Length');
+				if (contentLength && Number(contentLength) > MAX_PHOTO_BYTES) {
+					return new Response('Photo too large', { status: 413 });
+				}
+
+				const body = await request.arrayBuffer();
+				const photo = await completePhotoUpload(ctx, token, body, request.headers.get('Content-Type'), (uploaded) => {
+					void this.wsHandler.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
+						action: 'added',
+						photo: uploaded
+					});
+				});
+
+				return Response.json(photo, { status: 201 });
+			}
+
+			if (url.pathname === '/media/photo' && request.method === 'GET') {
+				const photoId = url.searchParams.get('photoId');
+				const secret = url.searchParams.get('secret');
+				if (!photoId || !secret) {
+					return new Response('Missing photoId or secret', { status: 400 });
+				}
+
+				const { body, contentType, cacheControl } = await getPhotoObject(ctx, photoId, secret);
+				return new Response(body.body, {
+					headers: {
+						'Content-Type': contentType,
+						'Cache-Control': cacheControl
+					}
+				});
+			}
+
+			return new Response('Not found', { status: 404 });
+		} catch (error) {
+			const message = error instanceof Error ? error.message : 'Media request failed';
+			const status =
+				message.includes('Invalid') || message.includes('expired') || message.includes('Unauthorized')
+					? 401
+					: message.includes('not found') || message.includes('missing')
+						? 404
+						: message.includes('size') || message.includes('Content-Type') || message.includes('Maximum')
+							? 400
+							: 500;
+			return new Response(message, { status });
+		}
+	}
+
 	async fetch(request: Request): Promise<Response> {
+		const url = new URL(request.url);
+		if (url.pathname.startsWith('/media/')) {
+			return this.handleMediaRequest(request);
+		}
+
 		const intention = parseIntention(request);
 		if (!intention) {
 			return new Response('Invalid request', { status: 400 });
@@ -120,7 +207,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 
 		// The connection manager will handle finding the right client based on the WebSocket
-		const messageCtx = { db: this.db, network: this.wsHandler.connectionManager };
+		const messageCtx = this.getServerContext();
 		await this.wsHandler.handleMessage(ws, messageStr, messageCtx);
 	}
 
@@ -142,6 +229,20 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Delegate to the WebSocket handler
 		this.wsHandler.handleError(ws, error);
 	}
+}
+
+function withMediaCors(request: Request, response: Response): Response {
+	const origin = request.headers.get('Origin');
+	if (!origin) {
+		return response;
+	}
+
+	const headers = new Headers(response.headers);
+	headers.set('Access-Control-Allow-Origin', origin);
+	headers.set('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
+	headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+	headers.set('Vary', 'Origin');
+	return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
 export default {
@@ -172,6 +273,30 @@ export default {
 
 			// Forward the request to the Durable Object
 			return stub.fetch(request);
+		}
+
+		if (url.pathname.startsWith('/media/')) {
+			if (request.method === 'OPTIONS') {
+				return withMediaCors(request, new Response(null, { status: 204 }));
+			}
+
+			const roomId = url.searchParams.get('roomId');
+			if (!roomId) {
+				return withMediaCors(request, new Response('Missing roomId', { status: 400 }));
+			}
+
+			// Photo GETs go through CachedMedia so Workers Cache can serve HITs without
+			// re-entering the Durable Object. CORS is applied here on the gateway so
+			// cached responses still get a correct Access-Control-Allow-Origin.
+			if (request.method === 'GET' && url.pathname === '/media/photo') {
+				const response = await ctx.exports.CachedMedia.fetch(request);
+				return withMediaCors(request, response);
+			}
+
+			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
+			const stub = env.WEBSOCKET_HIBERNATION_SERVER.get(id);
+			const response = await stub.handleMediaRequest(request);
+			return withMediaCors(request, response);
 		}
 
 		if (url.pathname === '/join') {

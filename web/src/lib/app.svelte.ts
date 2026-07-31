@@ -605,6 +605,14 @@ export class App {
 		return this.clientManager.getClient()[1];
 	}
 
+	get developmentMode(): boolean {
+		return this.isDevelopment;
+	}
+
+	getMediaOrigin(): string {
+		return this.isDevelopment ? `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:8787` : typeof window !== 'undefined' ? window.location.origin : '';
+	}
+
 	// ============================================================================
 	// Private Methods
 	// ============================================================================

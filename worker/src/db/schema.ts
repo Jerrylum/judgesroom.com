@@ -223,3 +223,35 @@ export const finalAwardNominations = sqliteTable(
 		unique('final_award_nominations_awardName_teamId').on(table.awardName, table.teamId)
 	]
 );
+
+export const teamPhotos = sqliteTable(
+	'TeamPhotos',
+	{
+		id: text('id').primaryKey(),
+		teamId: text('teamId')
+			.references(() => teams.id, { onDelete: 'cascade' })
+			.notNull(),
+		objectKey: text('objectKey').notNull(),
+		contentType: text('contentType').notNull(),
+		byteSize: integer('byteSize').notNull(),
+		createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
+		createdByDeviceId: text('createdByDeviceId').notNull(),
+		createdByJudgeId: text('createdByJudgeId'),
+		viewSecret: text('viewSecret').notNull()
+	},
+	(table) => [index('team_photos_teamId').on(table.teamId)]
+);
+
+export const pendingPhotoUploads = sqliteTable('PendingPhotoUploads', {
+	token: text('token').primaryKey(),
+	photoId: text('photoId').notNull(),
+	teamId: text('teamId')
+		.references(() => teams.id, { onDelete: 'cascade' })
+		.notNull(),
+	contentType: text('contentType').notNull(),
+	byteSize: integer('byteSize').notNull(),
+	objectKey: text('objectKey').notNull(),
+	createdByDeviceId: text('createdByDeviceId').notNull(),
+	createdByJudgeId: text('createdByJudgeId'),
+	expiresAt: integer('expiresAt', { mode: 'timestamp' }).notNull()
+});

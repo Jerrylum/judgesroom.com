@@ -75,6 +75,10 @@
 								<strong>Judge Notes:</strong> Observations, comments, and evaluations that may contain team member names or other personal information
 							</li>
 							<li><strong>Award Deliberations:</strong> Nominations, rankings, and final award decisions</li>
+							<li>
+								<strong>Team Interview Photos:</strong> Pictures of robots or interview context captured by judges during team interviews.
+								Photos may incidentally include people or team identifiers visible in the frame.
+							</li>
 						</ul>
 					</div>
 
@@ -86,9 +90,10 @@
 						</p>
 						<p class="mb-4 leading-relaxed text-gray-700">
 							judgesroom.com operates using Cloudflare Workers as our server infrastructure. All data processing occurs within Cloudflare's
-							secure infrastructure, which maintains industry-standard security protocols and compliance certifications. All data is stored
-							securely using Cloudflare's infrastructure, where all objects stored in D1 databases, including metadata, live databases, and
-							inactive databases, are encrypted at rest.
+							secure infrastructure, which maintains industry-standard security protocols and compliance certifications. Judging state for
+							each Judges' Room is stored in Cloudflare Durable Objects (SQLite), encrypted at rest. Team interview photos are stored in
+							private Cloudflare R2 object storage, encrypted at rest, and are served only through authenticated Worker routes — not via
+							public bucket URLs.
 						</p>
 						<p class="mb-4 leading-relaxed text-gray-700">
 							All communications between your browser and our servers are encrypted over TLS/SSL (HTTPS) to protect your data from being
@@ -132,10 +137,14 @@
 
 						<div>
 							<h3 class="mb-3 text-xl font-semibold">Deleting Your Information</h3>
-							<p class="leading-relaxed text-gray-700">
+							<p class="mb-4 leading-relaxed text-gray-700">
 								To delete your information, you can ask your judge advisor to remove your name from the Event Setup page, or request that
-								the entire judges' room be destroyed. When a judges' room is destroyed, all associated data is permanently deleted and
-								cannot be restored.
+								the entire judges' room be destroyed. When a judges' room is destroyed, all associated data is permanently deleted —
+								including Durable Object judging state and all interview photos stored for that room in R2 — and cannot be restored.
+							</p>
+							<p class="leading-relaxed text-gray-700">
+								As an additional safeguard on the hosted service, interview photos are subject to a maximum retention of 7 days via R2
+								object lifecycle rules, even if a Judges' Room is abandoned without an explicit destroy action.
 							</p>
 						</div>
 					</div>
@@ -157,6 +166,7 @@
 								<li>Award rankings and deliberations</li>
 								<li>Award nominations and finalist selections</li>
 								<li>Final award winners</li>
+								<li>Team interview / robot photos</li>
 								<li>Any other judging-related documentation</li>
 							</ul>
 						</div>
@@ -197,7 +207,7 @@
 					</div>
 
 					<div class="border-t pt-4 text-center text-sm text-gray-500">
-						<p>Last updated: June 2026</p>
+						<p>Last updated: July 2026</p>
 					</div>
 				</div>
 			</div>

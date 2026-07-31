@@ -50,6 +50,90 @@ export function createTestDatabase() {
 /**
  * Creates a test server context with a test database
  */
+function createMockR2Bucket(): R2Bucket {
+	const objects = new Map<string, { body: ArrayBuffer; contentType?: string }>();
+
+	return {
+		async head() {
+			return null;
+		},
+		async get(key: string) {
+			const object = objects.get(key);
+			if (!object) return null;
+			return {
+				key,
+				size: object.body.byteLength,
+				body: new ReadableStream({
+					start(controller) {
+						controller.enqueue(new Uint8Array(object.body));
+						controller.close();
+					}
+				}),
+				arrayBuffer: async () => object.body,
+				httpMetadata: { contentType: object.contentType }
+			} as unknown as R2ObjectBody;
+		},
+		async put(key: string, value: ArrayBuffer | ArrayBufferView | string | null | Blob | ReadableStream, options?: R2PutOptions) {
+			let body: ArrayBuffer;
+			if (value instanceof ArrayBuffer) {
+				body = value;
+			} else if (ArrayBuffer.isView(value)) {
+				body = value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength) as ArrayBuffer;
+			} else if (typeof value === 'string') {
+				body = new TextEncoder().encode(value).buffer as ArrayBuffer;
+			} else if (value instanceof Blob) {
+				body = await value.arrayBuffer();
+			} else if (value === null) {
+				body = new ArrayBuffer(0);
+			} else {
+				const reader = value.getReader();
+				const chunks: Uint8Array[] = [];
+				while (true) {
+					const { done, value: chunk } = await reader.read();
+					if (done) break;
+					chunks.push(chunk);
+				}
+				const total = chunks.reduce((sum, chunk) => sum + chunk.byteLength, 0);
+				const merged = new Uint8Array(total);
+				let offset = 0;
+				for (const chunk of chunks) {
+					merged.set(chunk, offset);
+					offset += chunk.byteLength;
+				}
+				body = merged.buffer;
+			}
+
+			const contentType = options?.httpMetadata && 'contentType' in options.httpMetadata ? options.httpMetadata.contentType : undefined;
+			objects.set(key, { body, contentType });
+			return { key, size: body.byteLength } as unknown as R2Object;
+		},
+		async delete(keys: string | string[]) {
+			for (const key of Array.isArray(keys) ? keys : [keys]) {
+				objects.delete(key);
+			}
+		},
+		async list(options?: R2ListOptions) {
+			const prefix = options?.prefix ?? '';
+			const matched = [...objects.keys()]
+				.filter((key) => key.startsWith(prefix))
+				.sort()
+				.slice(0, options?.limit ?? 1000)
+				.map((key) => ({ key, size: objects.get(key)!.body.byteLength }) as unknown as R2Object);
+			return {
+				objects: matched,
+				truncated: false,
+				delimitedPrefixes: []
+			};
+		},
+		createMultipartUpload() {
+			throw new Error('Not implemented in mock R2');
+		},
+		resumeMultipartUpload() {
+			throw new Error('Not implemented in mock R2');
+		}
+	} as unknown as R2Bucket;
+}
+
 export function createTestServerContext(): ServerContext & { cleanup: () => void } {
 	const { db, cleanup } = createTestDatabase();
 
@@ -92,6 +176,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 	return {
 		db,
 		network,
+		photos: createMockR2Bucket(),
 		cleanup
 	};
 }

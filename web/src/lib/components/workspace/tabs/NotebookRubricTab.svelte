@@ -12,6 +12,7 @@
 	import NotebookRubricTable from './NotebookRubricTable.svelte';
 	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
 	import WarningSign from './WarningSign.svelte';
+	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
 
@@ -336,6 +337,10 @@
 					{#if qrCodeDataUrl}
 						<img src={qrCodeDataUrl} alt="QR Code for engineering notebook" class="h-48 w-48 rounded max-sm:hidden" />
 					{/if}
+				</div>
+
+				<div class="mb-4 rounded-lg bg-gray-50 p-4">
+					<TeamPhotoAlbum teamId={tab.teamId} allowCapture={false} />
 				</div>
 
 				{#if showNoNotebookSubmittedWarning(selectedTeam)}

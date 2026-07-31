@@ -82,6 +82,28 @@ Notes:
 - The Worker will serve static assets from `../web/build` per `wrangler.jsonc` when using `--env production` (or `--env beta`).
 - Default local port is http://localhost:8787
 - Keep the terminal open while running. Press Ctrl+C to stop.
+- Interview photos require a Cloudflare R2 bucket bound as `TEAM_PHOTOS` (see below).
+
+### R2 bucket for interview photos
+
+Team interview photos are stored in a private R2 bucket (not public). Configure the bucket before deploying:
+
+```bash
+cd worker
+
+# Create the production bucket (once)
+bunx wrangler r2 bucket create judgesroom-team-photos
+
+# Optional local/preview bucket
+bunx wrangler r2 bucket create judgesroom-team-photos-preview
+
+# Expire all objects after 7 days (hosted confidentiality safety net)
+bunx wrangler r2 bucket lifecycle add judgesroom-team-photos \
+  --name expire-after-7-days \
+  --expire-days 7
+```
+
+When a Judges' Room is destroyed, the Worker also deletes every object under `rooms/{roomId}/` immediately. Photos are compressed in the browser (max long edge 1600px) and rejected above 3 MB; each team is limited to 20 photos.
 
 Optional: Deploy to Cloudflare (production)
 
@@ -100,6 +122,7 @@ Self‑hosting responsibilities:
 
 - You are responsible for privacy, security, and compliance when self‑hosting.
 - The hosted privacy policy applies only to `judgesroom.com`. Follow the confidentiality practices in the GRSF judging guidelines (e.g., secure access, destroy materials post‑event).
+- If you enable interview photos, provision the R2 bucket, keep it private, set a short lifecycle (e.g. 7 days), and ensure destroy-room deletes room prefixes.
 
 ## How judgesroom.com aligns with GRSF judging guidelines
 

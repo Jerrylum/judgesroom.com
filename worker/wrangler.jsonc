@@ -6,8 +6,18 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "judgesroom-com",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-07-26",
+	"compatibility_date": "2026-07-29",
 	"compatibility_flags": ["nodejs_compat"],
+	// Workers Cache: only CachedMedia is cached. Default gateway stays uncached
+	// so /ws, /join, uploads, and static assets are not served from cache / billed
+	// as if the whole Worker were cache-enabled for assets.
+	"cache": {
+		"enabled": true
+	},
+	"exports": {
+		"default": { "type": "worker", "cache": { "enabled": false } },
+		"CachedMedia": { "type": "worker", "cache": { "enabled": true } }
+	},
 	"env": {
 		"development": {
 			"durable_objects": {
@@ -17,14 +27,28 @@
 						"name": "WEBSOCKET_HIBERNATION_SERVER"
 					}
 				]
-			}
+			},
+			"r2_buckets": [
+				{
+					"binding": "TEAM_PHOTOS",
+					"bucket_name": "judgesroom-team-photos",
+					"preview_bucket_name": "judgesroom-team-photos-preview"
+				}
+			],
+			"services": [
+				{
+					"binding": "CACHED_MEDIA",
+					"service": "judgesroom-com-development",
+					"entrypoint": "CachedMedia"
+				}
+			]
 		},
 		"beta": {
 			"assets": {
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
 				"html_handling": "auto-trailing-slash",
-				"run_worker_first": ["/ws", "/join"],
+				"run_worker_first": ["/ws", "/join", "/media/*"],
 				"binding": "ASSETS"
 			},
 			"durable_objects": {
@@ -34,14 +58,28 @@
 						"name": "WEBSOCKET_HIBERNATION_SERVER"
 					}
 				]
-			}
+			},
+			"r2_buckets": [
+				{
+					"binding": "TEAM_PHOTOS",
+					"bucket_name": "judgesroom-team-photos",
+					"preview_bucket_name": "judgesroom-team-photos-preview"
+				}
+			],
+			"services": [
+				{
+					"binding": "CACHED_MEDIA",
+					"service": "judgesroom-com-beta",
+					"entrypoint": "CachedMedia"
+				}
+			]
 		},
 		"production": {
 			"assets": {
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
 				"html_handling": "auto-trailing-slash",
-				"run_worker_first": ["/ws", "/join"],
+				"run_worker_first": ["/ws", "/join", "/media/*"],
 				"binding": "ASSETS"
 			},
 			"durable_objects": {
@@ -51,7 +89,20 @@
 						"name": "WEBSOCKET_HIBERNATION_SERVER"
 					}
 				]
-			}
+			},
+			"r2_buckets": [
+				{
+					"binding": "TEAM_PHOTOS",
+					"bucket_name": "judgesroom-team-photos"
+				}
+			],
+			"services": [
+				{
+					"binding": "CACHED_MEDIA",
+					"service": "judgesroom-com-production",
+					"entrypoint": "CachedMedia"
+				}
+			]
 		}
 	},
 	"migrations": [
@@ -70,38 +121,4 @@
 	"observability": {
 		"enabled": true
 	}
-	/**
-	 * Smart Placement
-	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": { "mode": "smart" },
-
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-
-	/**
-	 * Environment Variables
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-	 */
-	// "vars": { "MY_VARIABLE": "production_value" },
-	/**
-	 * Note: Use secrets to store sensitive data.
-	 * https://developers.cloudflare.com/workers/configuration/secrets/
-	 */
-
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": { "directory": "./public/", "binding": "ASSETS" },
-
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
 }

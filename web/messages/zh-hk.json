@@ -408,7 +408,7 @@
 	"destroy_judging_data": "銷毀評審數據",
 	"destroy_judging_data_description": "在頒獎典禮之前，評判顧問應該鎖定評審室並銷毀所有評審材料。這些物品不應提供給賽事合作夥伴進行銷毀。",
 	"warning": "警告",
-	"destroy_judging_data_description_warning": "這個操作將永久銷毀所有評審數據，包括隊伍評估、排名和筆記評分表。請確保所有連接的設備已完成評審後再繼續。",
+	"destroy_judging_data_description_warning": "這個操作將永久銷毀所有評審數據，包括隊伍評估、排名、筆記評分表及訪談照片。請確保所有連接的設備已完成評審後再繼續。",
 	"destroy_judging_data_confirmation": "在下方輸入 destroy 以確認永久銷毀所有評審數據。",
 	"confirmation": "確認",
 	"destroy_judging_data_confirmation_placeholder": "輸入 destroy 以確認",
@@ -717,5 +717,17 @@
 	"home_youtube_channel": "YouTube 頻道",
 	"rubric_print_license": "根據 GPLv3 授權。judgesroom.com 是一個自由開源軟件。",
 	"rubric_print_version": "版本 {version}",
-	"page_size": "頁面尺寸"
+	"page_size": "頁面尺寸",
+	"team_photos": "隊伍照片",
+	"take_or_add_photos": "拍攝 / 新增照片",
+	"uploading_photos": "上載中...",
+	"no_team_photos_yet": "尚未有照片",
+	"delete_photo": "刪除照片",
+	"photo_upload_failed": "照片上載失敗",
+	"photo_delete_failed": "刪除照片失敗",
+	"photo_limit_reached": "每隊最多 {count} 張照片",
+	"photos_album": "照片",
+	"view_team_photos": "查看照片（{count}）",
+	"previous_photo": "上一張照片",
+	"next_photo": "下一張照片"
 }

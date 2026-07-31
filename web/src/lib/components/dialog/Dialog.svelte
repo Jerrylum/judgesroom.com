@@ -16,14 +16,14 @@
 	// Get all focusable elements within the dialog
 	function getFocusableElements(container: HTMLElement): HTMLElement[] {
 		const focusableSelectors = [
-			'button:not([disabled])',
-			'input:not([disabled])',
-			'textarea:not([disabled])',
-			'select:not([disabled])',
-			'a[href]',
-			'area[href]',
+			'button:not([disabled]):not([tabindex="-1"])',
+			'input:not([disabled]):not([tabindex="-1"])',
+			'textarea:not([disabled]):not([tabindex="-1"])',
+			'select:not([disabled]):not([tabindex="-1"])',
+			'a[href]:not([tabindex="-1"])',
+			'area[href]:not([tabindex="-1"])',
 			'[tabindex]:not([tabindex="-1"])',
-			'[contenteditable="true"]'
+			'[contenteditable="true"]:not([tabindex="-1"])'
 		].join(', ');
 
 		return Array.from(container.querySelectorAll(focusableSelectors)).filter((element) => {

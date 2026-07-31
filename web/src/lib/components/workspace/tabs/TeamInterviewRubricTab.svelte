@@ -13,6 +13,7 @@
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
 	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
+	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
 
@@ -354,6 +355,10 @@
 					{#if qrCodeDataUrl}
 						<img src={qrCodeDataUrl} alt="QR Code for engineering notebook" class="h-48 w-48 rounded max-sm:hidden" />
 					{/if}
+				</div>
+
+				<div class="mb-4 rounded-lg bg-gray-50 p-4">
+					<TeamPhotoAlbum teamId={tab.teamId} allowCapture={true} />
 				</div>
 
 				{#if selectedTeam.absent}

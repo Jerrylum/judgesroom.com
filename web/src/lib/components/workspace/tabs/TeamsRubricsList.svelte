@@ -9,6 +9,7 @@
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import QRCodeButton from './QRCodeButton.svelte';
+	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 
 	interface Props {
 		subscriptionScope: 'all_judge_groups' | 'current_judge_group';
@@ -266,8 +267,9 @@
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				<div class="flex max-w-40 min-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
-				<div class="flex max-w-85 min-w-85 items-center justify-center">{m.notebook_rubrics_table()}</div>
-				<div class="flex max-w-85 min-w-85 items-center justify-center">{m.team_interview_rubrics_table()}</div>
+				<div class="flex max-w-74 min-w-74 items-center justify-center">{m.notebook_rubrics_table()}</div>
+				<div class="flex max-w-74 min-w-74 items-center justify-center">{m.team_interview_rubrics_table()}</div>
+				<div class="flex max-w-20 min-w-20 items-center justify-center">{m.photos_album()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -306,7 +308,7 @@
 						</div>
 
 						<!-- Notebook Rubrics Column -->
-						<div class="flex max-w-85 min-w-85 items-center justify-center overflow-hidden">
+						<div class="flex max-w-74 min-w-74 items-center justify-center overflow-hidden">
 							<div class="flex flex-row justify-center gap-1 p-1">
 								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
@@ -327,7 +329,7 @@
 						</div>
 
 						<!-- Team Interview Rubrics Column -->
-						<div class="flex max-w-85 min-w-85 items-center justify-center overflow-hidden">
+						<div class="flex max-w-74 min-w-74 items-center justify-center overflow-hidden">
 							<div class="flex flex-row justify-center gap-1 p-1">
 								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
 									<button
@@ -339,6 +341,11 @@
 									</button>
 								{/each}
 							</div>
+						</div>
+
+						<!-- Team Photos Column -->
+						<div class="flex max-w-20 min-w-20 items-center justify-center overflow-hidden p-1">
+							<TeamPhotoAlbum teamId={team.id} compact={true} allowCapture={false} />
 						</div>
 					</content>
 				</scroll-container>

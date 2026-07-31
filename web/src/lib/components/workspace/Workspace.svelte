@@ -4,6 +4,7 @@
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
+	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
 	import type { Tab } from '$lib/tab.svelte';
 
 	// Get tab state
@@ -151,6 +152,21 @@
 
 			await app.wrpcClient.judging.unsubscribeSubmissionCaches.mutation();
 		};
+	});
+
+	$effect(() => {
+		if (!isJudgingReady) return;
+
+		console.log('Loading team photos');
+		app.wrpcClient.media.listAllTeamPhotos.query().then((photos) => {
+			subscriptions.allTeamPhotos = photos.reduce(
+				(acc, photo) => {
+					acc[photo.id] = photo;
+					return acc;
+				},
+				{} as Record<string, TeamPhoto>
+			);
+		});
 	});
 </script>
 

@@ -7,6 +7,7 @@ import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
 import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
 import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judgesroom.com/protocol/src/rubric';
 import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
+import { TeamPhotoUpdateSchema } from '@judgesroom.com/protocol/src/media';
 import { JoiningKitSchema } from '@judgesroom.com/worker/src/routes/handshake';
 
 // Initialize WRPC client with server router type
@@ -116,6 +117,18 @@ const clientRouter = w.router({
 		}
 
 		app.handleEssentialDataUpdate({ ...essData, judgingStep: 'award_deliberations' });
+	}),
+
+	/**
+	 * Server pushes team photo album updates to client
+	 */
+	onTeamPhotoUpdate: w.procedure.input(TeamPhotoUpdateSchema).mutation(async ({ input }) => {
+		console.log(`📷 Team photo updated:`, input);
+		if (input.action === 'added') {
+			subscriptions.allTeamPhotos[input.photo.id] = input.photo;
+		} else {
+			delete subscriptions.allTeamPhotos[input.photoId];
+		}
 	})
 });
 

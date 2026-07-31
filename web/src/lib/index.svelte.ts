@@ -32,7 +32,8 @@ export const tabs = new TabController();
 export const subscriptions: SubscriptionsStorage = $state({
 	allJudgeGroupsAwardRankings: {},
 	allJudgeGroupsReviewedTeams: {},
-	allSubmissionCaches: {}
+	allSubmissionCaches: {},
+	allTeamPhotos: {}
 });
 export const googleAnalytics = new GoogleAnalytics();
 
