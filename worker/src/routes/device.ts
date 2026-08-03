@@ -4,16 +4,21 @@ import z from 'zod';
 import { offlineDevices } from '../db/schema';
 import type { Network } from '@judgesroom.com/wrpc/server';
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
-import { eq } from 'drizzle-orm';
+import { eq, ne } from 'drizzle-orm';
+import { assertAuthenticatedJudgeAdvisor } from '../access/tokens';
 import { broadcastTopic, type ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
 
-export async function getDevices(tx: DatabaseOrTransaction, network: Network) {
-	const listOfOfflineDevices = await tx.select().from(offlineDevices);
+type DeviceListContext = Pick<ServerContext, 'db' | 'network'>;
+
+export async function getDevices(ctx: DeviceListContext) {
+	const listOfOfflineDevices = await ctx.db.select().from(offlineDevices);
+	const authenticatedByDevice = ctx.network.getAllAuthenticatedDevices();
 	return listOfOfflineDevices.map((device) => ({
 		deviceId: device.deviceId,
 		deviceName: device.deviceName,
 		connectedAt: device.connectedAt.getTime(),
-		isOnline: network.isDeviceConnected(device.deviceId)
+		isOnline: ctx.network.isDeviceConnected(device.deviceId),
+		authenticated: authenticatedByDevice.get(device.deviceId) ?? null
 	}));
 }
 
@@ -29,9 +34,9 @@ export async function kickDevice(tx: DatabaseOrTransaction, network: Network, de
 	}
 }
 
-export function broadcastDeviceListUpdate(tx: DatabaseOrTransaction, network: Network, source: ClientSource) {
-	getDevices(tx, network).then((devices) => {
-		broadcastTopic(tx, 'deviceList', source, (client) => {
+export function broadcastDeviceListUpdate(ctx: DeviceListContext, source: ClientSource) {
+	getDevices(ctx).then((devices) => {
+		broadcastTopic(ctx.db, 'deviceList', source, (client) => {
 			return client.onDeviceListUpdate.mutation(devices);
 		});
 	});
@@ -40,12 +45,12 @@ export function broadcastDeviceListUpdate(tx: DatabaseOrTransaction, network: Ne
 export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getDevices: w.procedure.output(z.array(DeviceInfoSchema)).query(async ({ ctx }) => {
-			return getDevices(ctx.db, ctx.network);
+			return getDevices(ctx);
 		}),
 
 		subscribeDeviceList: w.procedure.output(z.array(DeviceInfoSchema)).mutation(async ({ ctx, session }) => {
 			await subscribeTopic(ctx.db, session.currentClient.clientId, 'deviceList');
-			return getDevices(ctx.db, ctx.network);
+			return getDevices(ctx);
 		}),
 
 		unsubscribeDeviceList: w.procedure.mutation(async ({ ctx, session }) => {
@@ -53,8 +58,11 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 		}),
 
 		kickDevice: w.procedure.input(z.object({ deviceId: z.string() })).mutation(async ({ ctx, input, session }) => {
+			if (ctx.auth.isAuthenticated()) {
+				assertAuthenticatedJudgeAdvisor(ctx.auth);
+			}
 			const result = await kickDevice(ctx.db, ctx.network, input.deviceId);
-			broadcastDeviceListUpdate(ctx.db, ctx.network, session);
+			// No need to broadcast device list update here, see webSocketClose
 			return result;
 		})
 	};

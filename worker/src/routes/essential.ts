@@ -7,12 +7,15 @@ import { eq, getTableColumns, sql, SQL } from 'drizzle-orm';
 import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
-import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import type { ClientRouter } from '../client-router';
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { transaction } from '../utils';
 import { getFinalAwardNominations } from './judging';
 import { getTeamData } from './team';
 import { getJudges } from './judge';
+import { generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
+import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
+import { RoomState } from './handshake';
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -85,6 +88,7 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 			eventGradeLevel: metadataRows[0].eventGradeLevel,
 			judgingMethod: metadataRows[0].judgingMethod,
 			judgingStep: metadataRows[0].judgingStep,
+			accessControlEnabled: metadataRows[0].accessControlEnabled,
 			awards: await getAwards(tx),
 			teamInfos: await getTeamInfos(tx),
 			judgeGroups: await getJudgeGroups(tx)
@@ -197,6 +201,41 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		updateEssentialData: w.procedure.input(EssentialDataSchema).mutation(async ({ ctx, input, session }) => {
+			const wasAccessControlEnabled = await ctx.network.isAccessControlEnabled();
+			if (wasAccessControlEnabled) {
+				assertAuthenticatedJudgeAdvisor(ctx.auth);
+			}
+
+			if (wasAccessControlEnabled !== input.accessControlEnabled) {
+				if (input.accessControlEnabled) {
+					const authentication = {
+						isAccessControlled: true as const,
+						authToken: generateAuthToken(),
+						role: 'judge_advisor' as const
+					};
+
+					// Client ACK first — if this fails, leave AC flag and attachment unchanged.
+					await session.getClient<ClientRouter>(session.currentClient.clientId).onClientAuthenticationChange.mutation(authentication);
+
+					await upsertJudgeAdvisorAuthToken(ctx.db, authentication.authToken);
+					ctx.auth.setAuthentication(authentication);
+				} else {
+					const authentication = uncontrolledAuthentication;
+
+					// Client ACK first — if this fails, leave AC flag and attachment unchanged.
+					await session.getClient<ClientRouter>(session.currentClient.clientId).onClientAuthenticationChange.mutation(authentication);
+
+					ctx.auth.setAuthentication(authentication);
+				}
+
+				// SAFETY: Must kick every other client when AC toggles.
+				// With AC on, authorizeConnect only accepts controlled attachments, and DO
+				// single-concurrency means no reconnect can slip in before the flag is written
+				// below. Mutations then trust that uncontrolled sockets cannot exist while AC
+				// is on (no per-mutation requireAuthenticated). Do not remove or narrow this kick.
+				await ctx.network.kickClientsWhere((entry) => entry.clientId !== session.currentClient.clientId);
+			}
+
 			await updateEssentialData(ctx.db, input);
 
 			// Do not wait for the broadcast to complete
@@ -206,7 +245,7 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 					teamData: await getTeamData(tx),
 					judges: await getJudges(tx),
 					finalAwardNominations: await getFinalAwardNominations(tx)
-				};
+				} satisfies RoomState;
 			}).then((message) => {
 				session.broadcast<ClientRouter>().onEventSetupUpdate.mutation(message);
 			});

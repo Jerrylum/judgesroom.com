@@ -30,7 +30,7 @@ export const CreatePhotoUploadInputSchema = z.object({
 	teamId: z.uuidv4(),
 	contentType: PhotoContentTypeSchema,
 	byteSize: z.number().int().positive().max(MAX_PHOTO_BYTES),
-	judgeId: z.uuidv4().nullable().optional()
+	judgeId: z.uuidv4().nullable()
 });
 
 export type CreatePhotoUploadInput = z.infer<typeof CreatePhotoUploadInputSchema>;

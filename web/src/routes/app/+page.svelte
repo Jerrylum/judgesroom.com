@@ -12,7 +12,7 @@
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
-	import { parseJudgesRoomUrl } from '$lib/utils.svelte';
+	import { parseAuthTokenFromUrl, parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
 	import Leaving from '$lib/components/leaving/Leaving.svelte';
 	import I18n from '$lib/components/i18n/I18n.svelte';
@@ -28,35 +28,41 @@
 	$effect(() => {
 		// Handle role deletion
 		if (app.isJudgingReady() && currentUser && currentUser.role === 'judge' && !currentUserJudge) {
-			// Show confirmation dialog and redirect to role selection
 			app.unselectUser();
-			AppUI.appPhase = 'role_selection';
-			dialogs.showAlert({
-				title: 'Role Removed',
-				message: 'Your judge role has been removed from the event setup. Please select a new role.',
-				confirmText: 'OK',
-				confirmButtonClass: 'primary'
-			});
+			if (app.isAccessControlEnabled()) {
+				AppUI.appPhase = 'leaving';
+				dialogs.showAlert({
+					title: m.role_removed(),
+					message: m.your_judge_access_was_revoked_ask_ja_for_a_new_link(),
+					confirmText: 'OK',
+					confirmButtonClass: 'primary'
+				});
+			} else {
+				AppUI.appPhase = 'role_selection';
+				dialogs.showAlert({
+					title: m.role_removed(),
+					message: m.your_judge_role_has_been_removed_please_select_a_new_role(),
+					confirmText: 'OK',
+					confirmButtonClass: 'primary'
+				});
+			}
 		}
 	});
 
 	// $inspect(AppUI.appPhase);
 
 	onMount(async () => {
-		const hash = window.location.hash;
-		// If there is a hash, it means we are trying to join a Judges' Room from a URL
-		if (hash) {
-			// Parse the Judges' Room URL from the hash
-			const result = parseJudgesRoomUrl(window.location.href);
+		const roomIdFromUrl = parseJudgesRoomUrl(window.location.href);
+		const authFromUrl = parseAuthTokenFromUrl(window.location.href);
+		// Join link: /app?roomId=…&auth=… (or via /join redirect)
+		if (roomIdFromUrl) {
 			const existingPermit = app.getPermit();
-			// If the Judges' Room URL is different from the existing Judges' Room,
-			// leave the current Judges' Room and join the new one
-			if (existingPermit?.roomId !== result) {
+			if (existingPermit?.roomId !== roomIdFromUrl || existingPermit?.authToken !== authFromUrl) {
 				await handleJudgesRoomUrl();
 				return;
 			}
 
-			// Clear URL hash for security using SvelteKit navigation
+			// Clear join params from the address bar (roomId / auth)
 			// Use tick() to avoid "cannot call replaceState(...) before router is initialized"
 			tick().then(() => {
 				replaceState('/app', {});
@@ -80,7 +86,7 @@
 			await app.leaveJudgesRoom();
 			await app.joinJudgesRoomFromUrl(window.location.href);
 
-			// Clear URL hash for security using SvelteKit navigation
+			// Clear join params from the address bar (roomId / auth)
 			replaceState('/app', {});
 
 			// Wait for sync to complete

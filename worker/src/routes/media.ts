@@ -10,7 +10,8 @@ import {
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { count, eq, lt } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import type { ClientRouter } from '../client-router';
+import { assertAuthorship } from '../access/tokens';
 import { pendingPhotoUploads, teamPhotos, teams } from '../db/schema';
 import { PHOTO_CACHE_MAX_AGE_SECONDS, timingSafeEqualString, UPLOAD_TOKEN_TTL_MS } from '../media/constants';
 import type { PhotosObjectBody } from '../media/types';
@@ -80,6 +81,8 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 			.output(CreatePhotoUploadResultSchema)
 			.mutation(async ({ ctx, input, session }) => {
 				await cleanupExpiredUploadTokens(ctx.db);
+				// AC-on auth is guaranteed by authorizeConnect + kick-on-AC-toggle (see essential.ts).
+				assertAuthorship(ctx.auth, input.judgeId);
 
 				if (input.byteSize > MAX_PHOTO_BYTES) {
 					throw new Error(`Photo exceeds maximum size of ${MAX_PHOTO_BYTES} bytes`);
@@ -111,7 +114,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 					contentType: input.contentType,
 					byteSize: input.byteSize,
 					createdByDeviceId: session.currentClient.deviceId,
-					createdByJudgeId: input.judgeId ?? null,
+					createdByJudgeId: input.judgeId,
 					expiresAt
 				});
 

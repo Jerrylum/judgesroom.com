@@ -179,6 +179,7 @@ describe('Integration Tests', () => {
 			eventGradeLevel: selectedGradeLevel!.value,
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',
+			accessControlEnabled: false,
 			awards: [
 				{
 					name: 'Tournament Champions',
@@ -247,6 +248,7 @@ describe('Integration Tests', () => {
 			eventGradeLevel: blendedOption!.value,
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',
+			accessControlEnabled: false,
 			teamInfos: [],
 			awards: [],
 			judgeGroups: [
@@ -259,5 +261,29 @@ describe('Integration Tests', () => {
 		};
 
 		expect(() => EssentialDataSchema.parse(eventSetup)).not.toThrow();
+	});
+
+	it('requires accessControlEnabled (no Zod default)', () => {
+		const eventSetup = {
+			robotEventsSku: null,
+			robotEventsEventId: null,
+			divisionId: null,
+			eventName: 'Test Event',
+			program: 'V5RC' as const,
+			eventGradeLevel: 'HS Only' as const,
+			judgingMethod: 'assigned' as const,
+			judgingStep: 'beginning' as const,
+			teamInfos: [],
+			awards: [],
+			judgeGroups: [
+				{
+					id: uuidv4(),
+					name: 'Default Group',
+					assignedTeams: []
+				}
+			]
+		};
+
+		expect(() => EssentialDataSchema.parse(eventSetup)).toThrow();
 	});
 });

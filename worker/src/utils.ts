@@ -27,14 +27,18 @@ import type { DatabaseOrTransaction, Transaction } from './server-router';
 export function transaction<T>(tx: DatabaseOrTransaction, fn: (tx: Transaction) => Promise<T>) {
 	const { promise, resolve, reject } = Promise.withResolvers<T>();
 
-	tx.transaction(async (tx) => {
-		try {
-			resolve(await fn(tx));
-		} catch (error) {
-			reject(error);
-			throw error;
-		}
-	});
+	// Re-throw inside the driver callback so real DO SQLite rolls back; swallow the
+	// driver's rejected promise afterward — error is already on `promise` via reject().
+	void Promise.resolve(
+		tx.transaction(async (inner) => {
+			try {
+				resolve(await fn(inner));
+			} catch (error) {
+				reject(error);
+				throw error;
+			}
+		})
+	).catch(() => {});
 
 	return promise;
 }

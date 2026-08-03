@@ -1,4 +1,5 @@
 import type { TeamData } from '@judgesroom.com/protocol/src/team';
+import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import z from 'zod';
 import { v4 } from 'uuid';
@@ -70,12 +71,33 @@ export function debounce<T extends (...args: Parameters<T>) => void>(func: T, wa
 
 export function parseJudgesRoomUrl(url: string): string | null {
 	try {
-		const hash = new SvelteURL(url).hash.substring(1);
-		return z.uuidv4().parse(hash);
+		const roomId = new SvelteURL(url).searchParams.get('roomId');
+		if (!roomId) return null;
+		return z.uuidv4().parse(roomId);
 	} catch (error) {
 		console.error("Failed to parse Judges' Room URL:", error);
 		return null;
 	}
+}
+
+export function parseAuthTokenFromUrl(url: string): string | null {
+	try {
+		const auth = new SvelteURL(url).searchParams.get('auth');
+		if (!auth) return null;
+		const parsed = AuthTokenSchema.safeParse(auth);
+		return parsed.success ? parsed.data : null;
+	} catch {
+		return null;
+	}
+}
+
+export function buildJudgesRoomJoinUrl(origin: string, roomId: string, authToken?: string | null): string {
+	const url = new URL('/join', origin);
+	url.searchParams.set('roomId', roomId);
+	if (authToken) {
+		url.searchParams.set('auth', authToken);
+	}
+	return url.toString();
 }
 
 export function errorToString(error: unknown): string {

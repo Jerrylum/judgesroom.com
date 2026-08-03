@@ -1,12 +1,15 @@
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import { awards, teams, metadata, judgeGroups } from './db/schema';
+import { awards, teams, metadata, judgeGroups, judgeAdvisors } from './db/schema';
 import type { ServerContext } from './server-router';
+import { Authentication } from './access/authentication';
+import { generateAuthToken, JUDGE_ADVISOR_SINGLETON_ID } from './access/tokens';
 import type { PhotosBucket } from './media/types';
 import type { Network, ClientData } from '@judgesroom.com/wrpc/server/types';
 import type { Award } from '@judgesroom.com/protocol/src/award';
 import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
+import { JudgesRoomNetwork } from './network/judges-room-network';
 import path from 'path';
 
 /**
@@ -117,7 +120,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 	const connectedDeviceIds = new Set<string>();
 	const clientData = new Map<string, ClientData>();
 
-	const network: Network = {
+	const inner: Network = {
 		async sendToClient() {
 			return { kind: 'response', id: 'test', result: { type: 'data', data: null } };
 		},
@@ -148,10 +151,17 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 		}
 	};
 
+	const network = new JudgesRoomNetwork({
+		inner,
+		db,
+		getWebSockets: () => []
+	});
+
 	return {
 		db,
 		network,
 		photos: createMockPhotosBucket(),
+		auth: Authentication.unauthenticated(),
 		cleanup
 	};
 }
@@ -279,7 +289,13 @@ export async function seedTestDatabase(context: ServerContext) {
 		program: 'VIQRC',
 		eventGradeLevel: 'MS Only',
 		judgingMethod: 'assigned',
-		judgingStep: 'beginning'
+		judgingStep: 'beginning',
+		accessControlEnabled: false
+	});
+
+	await context.db.insert(judgeAdvisors).values({
+		id: JUDGE_ADVISOR_SINGLETON_ID,
+		authToken: generateAuthToken()
 	});
 
 	// Insert a judge group so EssentialDataSchema (min 1) is satisfied

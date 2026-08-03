@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { createWebSocketHandler } from '@judgesroom.com/wrpc/server';
-import { ServerRouter, serverRouter } from './server-router';
+import { ServerRouter, serverRouter, type ServerContext } from './server-router';
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
@@ -12,8 +12,11 @@ import { completePhotoUpload, getPhotoObject, listUploads } from './routes/media
 import { createPhotosBucket } from './media/r2';
 import type { PhotosBucket } from './media/types';
 import { photoCacheTag, roomPhotoCacheTag } from './media/constants';
-import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import type { ClientRouter } from './client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
+import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { Authentication } from './access/authentication';
+import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -22,7 +25,8 @@ const IntentionSchema = z.object({
 	clientId: z.uuidv4(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),
-	action: z.enum(['create', 'join', 'rejoin'])
+	action: z.enum(['create', 'join', 'rejoin']),
+	auth: AuthTokenSchema.nullable()
 });
 
 type Intention = z.infer<typeof IntentionSchema>;
@@ -34,7 +38,8 @@ function parseIntention(request: Request): Intention | null {
 		clientId: url.searchParams.get('clientId'),
 		deviceId: url.searchParams.get('deviceId'),
 		deviceName: url.searchParams.get('deviceName'),
-		action: url.searchParams.get('action')
+		action: url.searchParams.get('action'),
+		auth: url.searchParams.get('auth') // null when absent; invalid token still fails schema
 	});
 
 	if (!result.success) {
@@ -70,6 +75,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	});
 	private db: DrizzleSqliteDODatabase;
 	private photos: PhotosBucket;
+	private network: JudgesRoomNetwork;
 
 	/**
 	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
@@ -84,6 +90,11 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		this.wsHandler.initialize().catch(console.error);
 		this.db = drizzle(this.ctx.storage);
 		this.photos = createPhotosBucket(this.env.TEAM_PHOTOS, (photoIds) => this.env.CACHED_MEDIA.purgeTags(photoIds.map(photoCacheTag)));
+		this.network = new JudgesRoomNetwork({
+			inner: this.wsHandler.connectionManager,
+			db: this.db,
+			getWebSockets: () => this.ctx.getWebSockets()
+		});
 
 		// Make sure all migrations complete before accepting queries.
 		// Otherwise you will need to run `this.migrate()` in any function
@@ -93,11 +104,35 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		});
 	}
 
-	private getServerContext() {
+	private httpServerContext(): ServerContext {
 		return {
 			db: this.db,
-			network: this.wsHandler.connectionManager,
-			photos: this.photos
+			network: this.network,
+			photos: this.photos,
+			auth: Authentication.unauthenticated()
+		};
+	}
+
+	private async serverContextForWebSocket(ws: WebSocket): Promise<ServerContext> {
+		const attachment = ws.deserializeAttachment() as WsAttachment | null;
+		if (!attachment) {
+			throw new Error('CRITICAL: Missing WebSocket attachment');
+		}
+
+		return {
+			db: this.db,
+			network: this.network,
+			photos: this.photos,
+			auth: new Authentication({
+				authentication: attachment.authentication,
+				persist: (nextAuthentication) => {
+					const current = ws.deserializeAttachment() as WsAttachment | null;
+					if (!current) {
+						throw new Error('CRITICAL: Missing WebSocket attachment');
+					}
+					ws.serializeAttachment({ ...current, authentication: nextAuthentication } satisfies WsAttachment);
+				}
+			})
 		};
 	}
 
@@ -112,7 +147,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 	async handleMediaRequest(request: Request): Promise<Response> {
 		const url = new URL(request.url);
-		const ctx = this.getServerContext();
+		const ctx = this.httpServerContext();
 
 		try {
 			if (url.pathname === '/media/upload' && request.method === 'PUT') {
@@ -188,7 +223,13 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		if (!intention) {
 			return new Response('Invalid request', { status: 400 });
 		}
-		const { roomId, clientId, deviceId, deviceName } = intention;
+
+		const { roomId, clientId, deviceId, deviceName, auth } = intention;
+
+		const connectAuth = await this.network.authorizeConnect(auth);
+		if (!connectAuth.allowed) {
+			return connectAuth.response;
+		}
 
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
@@ -208,6 +249,13 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// WebSocket receives a message, the runtime will recreate the Durable Object
 		// (run the `constructor`) and deliver the message to the appropriate handler.
 		this.ctx.acceptWebSocket(server, [clientId]);
+		server.serializeAttachment({
+			roomId,
+			clientId,
+			deviceId,
+			deviceName,
+			authentication: connectAuth.authentication
+		} satisfies WsAttachment);
 
 		// Set up connection with the WebSocket handler (now async for storage)
 		await this.wsHandler.handleConnection(server, { roomId, clientId, deviceId, deviceName });
@@ -222,7 +270,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 
 		// The connection manager will handle finding the right client based on the WebSocket
-		const messageCtx = this.getServerContext();
+		const messageCtx = await this.serverContextForWebSocket(ws);
 		await this.wsHandler.handleMessage(ws, messageStr, messageCtx);
 	}
 
@@ -237,7 +285,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 		// Broadcast device list update to all devices
 		// Do not wait for the broadcast to complete
-		broadcastDeviceListUpdate(this.db, this.wsHandler.connectionManager, this.wsHandler);
+		broadcastDeviceListUpdate(this.httpServerContext(), this.wsHandler);
 	}
 
 	async webSocketError(ws: WebSocket, error: Error): Promise<void> {

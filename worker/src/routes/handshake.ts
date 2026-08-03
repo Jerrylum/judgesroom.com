@@ -1,41 +1,29 @@
-import z from 'zod';
 import { getEssentialData, hasEssentialData, updateEssentialData } from './essential';
-import { EssentialDataSchema } from '@judgesroom.com/protocol/src/event';
-import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
-import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
-import { broadcastDeviceListUpdate, getDevices } from './device';
+import { broadcastDeviceListUpdate } from './device';
 import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { WRPCError } from '@judgesroom.com/wrpc/server/types';
-import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
-import { AwardNominationSchema } from '@judgesroom.com/protocol/src/rubric';
 import { getFinalAwardNominations } from './judging';
+import {
+	ClientAuthenticationSchema,
+	generateAuthToken,
+	uncontrolledAuthentication
+} from '@judgesroom.com/protocol/src/access';
+import { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit } from '@judgesroom.com/protocol/src/room';
+import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 
-export const StarterKitSchema = z.object({
-	essentialData: EssentialDataSchema,
-	teamData: z.array(TeamDataSchema),
-	judges: z.array(JudgeSchema)
-});
-
-export type StarterKit = z.infer<typeof StarterKitSchema>;
-
-export const JoiningKitSchema = z.object({
-	essentialData: EssentialDataSchema,
-	teamData: z.array(TeamDataSchema),
-	judges: z.array(JudgeSchema),
-	finalAwardNominations: z.record(AwardNameSchema, z.array(AwardNominationSchema))
-});
-
-export type JoiningKit = z.infer<typeof JoiningKitSchema>;
+export { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit };
+export { RoomStateSchema } from '@judgesroom.com/protocol/src/room';
 
 export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		joinJudgesRoom: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
-			const hasExistingEssentialData = await hasEssentialData(ctx.db);
+			const essentialData = await getEssentialData(ctx.db);
+			const hasExistingEssentialData = !!essentialData;
 			if (!hasExistingEssentialData) {
 				throw new WRPCError("Judges' Room not found");
 			}
@@ -57,27 +45,29 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 
 			// Broadcast client list update to all clients
 			// Do not wait for the broadcast to complete
-			broadcastDeviceListUpdate(ctx.db, ctx.network, session);
+			broadcastDeviceListUpdate(ctx, session);
 
 			return transaction(ctx.db, async (tx) => {
 				return {
 					essentialData: await getEssentialData(tx),
 					teamData: await getTeamData(tx),
 					judges: await getJudges(tx),
-					finalAwardNominations: await getFinalAwardNominations(tx)
+					finalAwardNominations: await getFinalAwardNominations(tx),
+					authentication: ctx.auth.authentication
 				};
 			});
 		}),
 
 		createJudgesRoom: w.procedure
 			.input(StarterKitSchema)
-			.output(z.object({ success: z.boolean(), message: z.string() }))
+			.output(ClientAuthenticationSchema)
 			.mutation(async ({ ctx, input, session }) => {
-				// return false if has essential data
 				const hasExistingEssentialData = await hasEssentialData(ctx.db);
 				if (hasExistingEssentialData) {
-					return { success: false, message: "Judges' Room already exists" };
+					throw new WRPCError("Judges' Room already exists");
 				}
+
+				const judgeAdvisorAuthToken = generateAuthToken();
 
 				const offlineDevice = {
 					deviceId: session.currentClient.deviceId,
@@ -103,11 +93,26 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 
 					await Promise.all(input.judges.map((judge) => upsertJudge(tx, judge)));
 
-					return { success: true, message: "Judges' Room created" };
+					await upsertJudgeAdvisorAuthToken(tx, judgeAdvisorAuthToken);
+					const authentication = input.essentialData.accessControlEnabled
+						? ({
+								isAccessControlled: true,
+								authToken: judgeAdvisorAuthToken,
+								role: 'judge_advisor'
+							} as const)
+						: uncontrolledAuthentication;
+
+					ctx.auth.setAuthentication(authentication);
+
+					return authentication;
 				});
 			}),
 
 		destroyJudgesRoom: w.procedure.mutation(async ({ ctx }) => {
+			if (await ctx.network.isAccessControlEnabled()) {
+				assertAuthenticatedJudgeAdvisor(ctx.auth);
+			}
+
 			await ctx.network.destroy();
 
 			return { success: true, message: "Judges' Room destroyed" };

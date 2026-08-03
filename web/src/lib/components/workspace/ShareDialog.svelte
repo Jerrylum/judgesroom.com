@@ -95,7 +95,7 @@
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">
 	<div class="flex flex-col overflow-auto p-2">
 		<div class="mb-4 flex items-center justify-between">
-			<h3 id="dialog-title" class="text-lg font-medium text-gray-900">{m.judges_room_management()}</h3>
+			<h3 id="dialog-title" class="text-lg font-medium text-gray-900">{m.share_judges_room()}</h3>
 			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close dialog">
 				<CloseIcon size={24} />
 			</button>
@@ -104,8 +104,6 @@
 		<div class="flex shrink-0 flex-col gap-6 overflow-hidden md:flex-row">
 			<!-- Left Column: Share Judges' Room -->
 			<div class="max-h-140 flex-1 space-y-6">
-				<h4 class="text-lg font-medium text-gray-900">{m.share_judges_room()}</h4>
-
 				<!-- QR Code Section -->
 				<div class="text-center">
 					<div class="mb-3">

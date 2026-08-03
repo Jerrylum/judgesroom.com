@@ -4,6 +4,7 @@ import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from
 import { getAwards, getTeamInfos, getEssentialData } from './routes/essential';
 import { getTeamData } from './routes/team';
 import { getJudges } from './routes/judge';
+import { Authentication } from './access/authentication';
 import type { ServerContext } from './server-router';
 import type { Session } from '@judgesroom.com/wrpc/server/session';
 import type { AnyRouter } from '@judgesroom.com/wrpc/server/router';
@@ -81,11 +82,20 @@ describe('ServerRouter', () => {
 			expect(Array.isArray(result.judges)).toBe(true);
 		});
 
-		it('createJudgesRoom returns already exists when metadata present', async () => {
+		it('createJudgesRoom rejects when metadata present', async () => {
 			const resolver = serverRouter.handshake.createJudgesRoom._def._resolver!;
-			const starter = await serverRouter.handshake.joinJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
-			const result = await resolver({ input: starter, session, ctx: context });
-			expect(result.success).toBe(false);
+			context.auth = Authentication.withFixture();
+			await expect(
+				resolver({
+					input: {
+						essentialData: await getEssentialData(context.db),
+						teamData: [],
+						judges: []
+					},
+					session,
+					ctx: context
+				})
+			).rejects.toThrow(/already exists/);
 		});
 
 		it('destroyJudgesRoom returns success', async () => {
@@ -145,18 +155,19 @@ describe('ServerRouter', () => {
 	});
 
 	describe('judge router', () => {
-		it('get, upsert, remove judge', async () => {
+		it('get, upsert, remove judge via updateAllJudges', async () => {
 			const getResolver = serverRouter.judge.getJudges._def._resolver!;
 			const updateResolver = serverRouter.judge.updateJudge._def._resolver!;
-			const removeResolver = serverRouter.judge.removeJudge._def._resolver!;
+			const updateAllResolver = serverRouter.judge.updateAllJudges._def._resolver!;
 			const initial = await getResolver({ input: undefined, session, ctx: context });
 			const newJudge = { id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', name: 'New Judge', groupId: 'group-1' };
 			await updateResolver({ input: newJudge, session, ctx: context });
 			const withNew = await getJudges(context.db);
 			expect(withNew.some((j) => j.id === newJudge.id)).toBe(true);
-			await removeResolver({ input: newJudge, session, ctx: context });
+			await updateAllResolver({ input: initial, session, ctx: context });
 			const afterRemove = await getJudges(context.db);
 			expect(afterRemove.length).toBe(initial.length);
+			expect(afterRemove.some((j) => j.id === newJudge.id)).toBe(false);
 		});
 	});
 

@@ -14,11 +14,20 @@ import type { Award } from '@judgesroom.com/protocol/src/award';
 import type { ServerRouter } from '@judgesroom.com/worker/src/server-router';
 import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
-import { generateUUID, getDeviceNameFromUserAgent, parseJudgesRoomUrl, processTeamDataArray } from './utils.svelte';
+import {
+	buildJudgesRoomJoinUrl,
+	generateUUID,
+	getDeviceNameFromUserAgent,
+	parseAuthTokenFromUrl,
+	parseJudgesRoomUrl,
+	processTeamDataArray
+} from './utils.svelte';
 import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-import type { JoiningKit } from '@judgesroom.com/worker/src/routes/handshake';
+import type { JoiningKit, RoomState } from '@judgesroom.com/protocol/src/room';
+import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 
@@ -89,7 +98,8 @@ export const PermitSchema = z.object({
 	roomId: z.uuidv4(),
 	createdAt: z.number().int().positive(),
 	deviceId: z.uuidv4(),
-	deviceName: z.string().min(1).max(100)
+	deviceName: z.string().min(1).max(100),
+	authToken: AuthTokenSchema.optional()
 });
 
 export type Permit = z.infer<typeof PermitSchema>;
@@ -128,7 +138,7 @@ export class App {
 	// Session, Judges' Room, Permit
 	// ============================================================================
 
-	private async joinJudgesRoom(): Promise<void> {
+	private async joinJudgesRoom(): Promise<JoiningKit> {
 		if (!this.hasPermit()) {
 			throw new Error('CRITICAL: No permit');
 		}
@@ -140,9 +150,10 @@ export class App {
 		// Just to be safe, reset the client manager
 		this.clientManager.resetClient();
 
-		// Join the Judges' Room, this will call createWRPCClient
-		const starterKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
-		this.handleEventSetupUpdate(starterKit);
+		const joiningKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
+		this.handleEventSetupUpdate(joiningKit);
+		this.handleClientAuthenticationChange(joiningKit.authentication);
+		return joiningKit;
 	}
 
 	/**
@@ -159,11 +170,15 @@ export class App {
 				throw new Error("Invalid Judges' Room URL");
 			}
 
-			this.permit = this.createNewPermit(roomId);
+			const authToken = parseAuthTokenFromUrl(url) ?? undefined;
+			this.permit = this.createNewPermit(roomId, authToken);
 			this.savePermitToStorage();
 
 			await this.joinJudgesRoom();
 		} catch (error) {
+			this.permit = null;
+			this.clearPermitFromStorage();
+			this.clearUserFromStorage();
 			this.addErrorNotice(m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
 			throw error;
 		}
@@ -179,11 +194,39 @@ export class App {
 	/**
 	 * Get Judges' Room URL for sharing
 	 */
-	getJudgesRoomUrl(): string {
+	getJudgesRoomUrl(authToken?: string | null): string {
 		if (!this.permit?.roomId) {
 			throw new Error("CRITICAL: No active Judges' Room");
 		}
-		return `${window.location.origin}/join?roomId=${this.permit.roomId}`;
+		// When AC is off, omit auth from share links even if the permit stores a JA token.
+		// Pass an explicit token (including null) to override.
+		const token = authToken !== undefined ? authToken : this.isAccessControlEnabled() ? (this.permit.authToken ?? null) : null;
+		return buildJudgesRoomJoinUrl(window.location.origin, this.permit.roomId, token);
+	}
+
+	isAccessControlEnabled(): boolean {
+		return this.essentialData?.accessControlEnabled ?? false;
+	}
+
+	handleClientAuthenticationChange(authentication: ClientAuthentication): void {
+		if (!this.permit) {
+			throw new Error('CRITICAL: No permit');
+		}
+
+		this.permit.authToken = authentication.isAccessControlled ? authentication.authToken : undefined;
+		this.savePermitToStorage();
+
+		if (!authentication.isAccessControlled) {
+			return;
+		}
+		if (authentication.role === 'judge_advisor') {
+			this.setCurrentUserLocally({ role: 'judge_advisor' });
+			return;
+		}
+		const judge = this.allJudges.find((j) => j.id === authentication.judgeId);
+		if (judge) {
+			this.setCurrentUserLocally({ role: 'judge', judge });
+		}
 	}
 
 	/**
@@ -198,25 +241,21 @@ export class App {
 			this.clearPermitFromStorage();
 			this.clearUserFromStorage();
 
-			const roomId = generateUUID();
-			this.permit = this.createNewPermit(roomId);
-
 			if (!this.essentialData) {
 				throw new Error('CRITICAL: No essential data');
 			}
 
-			const response = await this.wrpcClient.handshake.createJudgesRoom.mutation({
+			const roomId = generateUUID();
+			// Connect without auth; server mints the JA token and returns it in authentication.
+			this.permit = this.createNewPermit(roomId);
+			this.savePermitToStorage();
+
+			const authentication = await this.wrpcClient.handshake.createJudgesRoom.mutation({
 				essentialData: this.essentialData,
 				teamData: [...Object.values(this.allTeamData)],
 				judges: [...this.allJudges]
 			});
-			if (response.success) {
-				this.savePermitToStorage();
-			} else {
-				this.permit = null;
-				this.clearPermitFromStorage();
-				throw new Error(response.message);
-			}
+			this.handleClientAuthenticationChange(authentication);
 		} catch (error) {
 			this.permit = null;
 			this.clearPermitFromStorage();
@@ -277,9 +316,13 @@ export class App {
 		try {
 			await this.joinJudgesRoom();
 		} catch (error) {
-			// Do not clear permit from storage, the user might be able to connect to the Judges' Room again
-			// this.clearPermitFromStorage();
-			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
+			const message = error instanceof Error ? error.message : 'Unknown error';
+			if (message.includes('Access link') || message.includes('Invalid or expired') || message.includes('already bound')) {
+				this.permit = null;
+				this.clearPermitFromStorage();
+				this.clearUserFromStorage();
+			}
+			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
 			throw error;
 		}
 	}
@@ -288,7 +331,7 @@ export class App {
 		return this.connectionState;
 	}
 
-	handleEventSetupUpdate(data: Readonly<JoiningKit>): void {
+	handleEventSetupUpdate(data: Readonly<RoomState | JoiningKit>): void {
 		this.handleEssentialDataUpdate(data.essentialData);
 		this.handleAllTeamDataUpdate(data.teamData);
 		this.handleAllJudgesUpdate(data.judges);
@@ -502,10 +545,19 @@ export class App {
 	// ============================================================================
 
 	async selectUser(user: User): Promise<void> {
+		if (this.isAccessControlEnabled()) {
+			throw new Error('CRITICAL: Switching roles is disabled when access control is enabled');
+		}
+
 		if (user.role === 'judge') {
 			await this.wrpcClient.judge.updateJudge.mutation(user.judge);
 		}
 
+		this.setCurrentUserLocally(user);
+	}
+
+	/** Set local role without server roster mutations (used after access-control bind). */
+	setCurrentUserLocally(user: User): void {
 		this.currentUser = user;
 		this.saveUserToStorage();
 	}
@@ -610,7 +662,11 @@ export class App {
 	}
 
 	getMediaOrigin(): string {
-		return this.isDevelopment ? `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:8787` : typeof window !== 'undefined' ? window.location.origin : '';
+		return this.isDevelopment
+			? `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:8787`
+			: typeof window !== 'undefined'
+				? window.location.origin
+				: '';
 	}
 
 	// ============================================================================
@@ -618,13 +674,15 @@ export class App {
 	// ============================================================================
 
 	private createClientOptions(): ClientOptions<ClientRouter> {
-		const wsUrl = this.isDevelopment
-			? `ws://${window.location.hostname}:8787/ws` // Local development server
-			: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`; // Production Cloudflare Worker
-
 		if (this.permit === null) {
 			throw new Error('CRITICAL: No permit');
 		}
+
+		const baseWsUrl = this.isDevelopment
+			? `ws://${window.location.hostname}:8787/ws` // Local development server
+			: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`; // Production Cloudflare Worker
+
+		const wsUrl = this.permit.authToken ? `${baseWsUrl}?auth=${encodeURIComponent(this.permit.authToken)}` : baseWsUrl;
 
 		return {
 			wsUrl,
@@ -636,6 +694,10 @@ export class App {
 			onOpen: () => {},
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
+					this.permit = null;
+					this.currentUser = null;
+					this.clearPermitFromStorage();
+					this.clearUserFromStorage();
 					this.addErrorNotice(m.you_have_been_kicked_from_the_judges_room());
 					AppUI.appPhase = 'leaving';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
@@ -657,10 +719,16 @@ export class App {
 		this.clearUserFromStorage();
 	}
 
-	private createNewPermit(roomId: string): Permit {
+	private createNewPermit(roomId: string, authToken?: string): Permit {
 		const deviceId = generateUUID();
 		const deviceName = getDeviceNameFromUserAgent();
-		return { roomId, deviceId, deviceName, createdAt: Date.now() };
+		return {
+			roomId,
+			deviceId,
+			deviceName,
+			createdAt: Date.now(),
+			authToken
+		};
 	}
 
 	private loadPermitFromStorage(): Permit | null {

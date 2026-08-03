@@ -28,13 +28,23 @@ import {
 	teamInterviewRubrics,
 	metadata
 } from '../db/schema';
+import { assertAuthorship } from '../access/tokens';
+import { WRPCError } from '@judgesroom.com/wrpc/server/types';
 import { AwardNameSchema, isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 import { RankSchema } from '@judgesroom.com/protocol/src/rubric';
 import type { RouterBroadcastProxy, WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeTopic } from './subscriptions';
 import { transaction } from '../utils';
 import { getAwards } from './essential';
-import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import type { ClientRouter } from '../client-router';
+
+/** Conflict update skipped (setWhere false) → not the same author. */
+function requireAuthoredUpsert<T>(row: T | undefined): T {
+	if (!row) {
+		throw new WRPCError('You can only edit rubrics you authored');
+	}
+	return row;
+}
 
 export async function getAwardRankings(db: DatabaseOrTransaction, judgeGroupId: string): Promise<AwardRankingsFullUpdate> {
 	const { judgedAwards, rankingsData } = await transaction(db, async (tx) => {
@@ -121,15 +131,23 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				})
 			)
 			.mutation(async ({ ctx, input, session }) => {
-				// insert or update
+				assertAuthorship(ctx.auth, input.submission.judgeId);
+
+				// insert or update (setWhere keeps judgeId sticky / blocks foreign overwrite)
 				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
-					await tx
-						.insert(engineeringNotebookRubrics)
-						.values(input.submission)
-						.onConflictDoUpdate({
-							target: [engineeringNotebookRubrics.id],
-							set: input.submission
-						});
+					requireAuthoredUpsert(
+						(
+							await tx
+								.insert(engineeringNotebookRubrics)
+								.values(input.submission)
+								.onConflictDoUpdate({
+									target: [engineeringNotebookRubrics.id],
+									setWhere: eq(engineeringNotebookRubrics.judgeId, input.submission.judgeId),
+									set: input.submission
+								})
+								.returning()
+						)[0]
+					);
 
 					const submissionCache = (
 						await tx
@@ -188,14 +206,22 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				})
 			)
 			.mutation(async ({ ctx, input, session }) => {
+				assertAuthorship(ctx.auth, input.submission.judgeId);
+
 				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
-					await tx
-						.insert(teamInterviewRubrics)
-						.values(input.submission)
-						.onConflictDoUpdate({
-							target: [teamInterviewRubrics.id],
-							set: input.submission
-						});
+					requireAuthoredUpsert(
+						(
+							await tx
+								.insert(teamInterviewRubrics)
+								.values(input.submission)
+								.onConflictDoUpdate({
+									target: [teamInterviewRubrics.id],
+									setWhere: eq(teamInterviewRubrics.judgeId, input.submission.judgeId),
+									set: input.submission
+								})
+								.returning()
+						)[0]
+					);
 					const submissionCache = (
 						await tx
 							.insert(judgeGroupsSubmissionsCache)
@@ -252,14 +278,22 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				})
 			)
 			.mutation(async ({ ctx, input, session }) => {
+				assertAuthorship(ctx.auth, input.submission.judgeId);
+
 				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
-					await tx
-						.insert(teamInterviewNotes)
-						.values(input.submission)
-						.onConflictDoUpdate({
-							target: [teamInterviewNotes.id],
-							set: input.submission
-						});
+					requireAuthoredUpsert(
+						(
+							await tx
+								.insert(teamInterviewNotes)
+								.values(input.submission)
+								.onConflictDoUpdate({
+									target: [teamInterviewNotes.id],
+									setWhere: eq(teamInterviewNotes.judgeId, input.submission.judgeId),
+									set: input.submission
+								})
+								.returning()
+						)[0]
+					);
 					const submissionCache = (
 						await tx
 							.insert(judgeGroupsSubmissionsCache)

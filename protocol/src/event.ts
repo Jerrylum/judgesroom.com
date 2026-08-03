@@ -34,6 +34,7 @@ export const EssentialDataSchema = z.object({
 	eventGradeLevel: EventGradeLevelSchema,
 	judgingMethod: JudgingMethodSchema,
 	judgingStep: JudgingStepSchema,
+	accessControlEnabled: z.boolean(),
 	teamInfos: z.array(TeamInfoSchema),
 	judgeGroups: z.array(JudgeGroupSchema).min(1),
 	awards: z.array(AwardSchema)

@@ -5,7 +5,7 @@ import { teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
-import type { ClientRouter } from '@judgesroom.com/web/src/lib/client-router';
+import type { ClientRouter } from '../client-router';
 import { transaction } from '../utils';
 
 export async function getTeamData(db: DatabaseOrTransaction): Promise<TeamData[]> {

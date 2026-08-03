@@ -1,12 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { app, AppUI, dialogs } from '$lib/index.svelte';
 
 	onMount(() => {
-		const roomId = new URLSearchParams(window.location.search).get('roomId');
+		const params = new URLSearchParams(window.location.search);
+		const roomId = params.get('roomId');
+		const auth = params.get('auth');
 		if (roomId) {
-			goto(`/app#${roomId}`, { replaceState: true });
+			const next = new URLSearchParams({ roomId });
+			if (auth) next.set('auth', auth);
+			goto(`/app?${next.toString()}`, { replaceState: true });
 		} else {
 			goto('/app', { replaceState: true });
 		}

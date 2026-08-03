@@ -1,6 +1,7 @@
 import { initWRPC } from '@judgesroom.com/wrpc/server';
-import type { Network } from '@judgesroom.com/wrpc/server';
 import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
+import type { Authentication } from './access/authentication';
+import type { JudgesRoomNetwork } from './network/judges-room-network';
 import { buildHandshakeRoute } from './routes/handshake';
 import { buildTeamRoute } from './routes/team';
 import { buildJudgeRoute } from './routes/judge';
@@ -8,12 +9,14 @@ import { buildJudgingRoute } from './routes/judging';
 import { buildEssentialRoute } from './routes/essential';
 import { buildDeviceRoute } from './routes/device';
 import { buildMediaRoute } from './routes/media';
+import { buildAccessRoute } from './routes/access';
 import type { PhotosBucket } from './media/types';
 
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
-	network: Network;
+	network: JudgesRoomNetwork;
 	photos: PhotosBucket;
+	auth: Authentication;
 }
 
 export type Transaction = Parameters<Parameters<DrizzleSqliteDODatabase['transaction']>[0]>[0];
@@ -33,7 +36,8 @@ const serverRouter = w.router({
 	judge: buildJudgeRoute(w),
 	judging: buildJudgingRoute(w),
 	device: buildDeviceRoute(w),
-	media: buildMediaRoute(w)
+	media: buildMediaRoute(w),
+	access: buildAccessRoute(w)
 });
 
 export { serverRouter };

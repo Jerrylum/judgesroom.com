@@ -26,8 +26,18 @@ export const metadata = sqliteTable('Metadata', {
 	program: text('program', { enum: ['V5RC', 'VIQRC', 'VURC'] }).notNull(),
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),
 	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
-	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull()
+	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull(),
+	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false)
 });
+
+export const judgeAdvisors = sqliteTable(
+	'JudgeAdvisors',
+	{
+		id: text('id').primaryKey(),
+		authToken: text('authToken').notNull()
+	},
+	(table) => [uniqueIndex('judge_advisors_authToken').on(table.authToken)]
+);
 
 export const awards = sqliteTable(
 	'Awards',
@@ -87,13 +97,19 @@ export const judgeGroupsAssignedTeams = sqliteTable(
 	(table) => [index('assignment').on(table.judgeGroupId, table.teamId)]
 );
 
-export const judges = sqliteTable('Judges', {
-	id: text('id').primaryKey(),
-	name: text('name').notNull(),
-	groupId: text('groupId')
-		.references(() => judgeGroups.id, { onDelete: 'cascade' })
-		.notNull()
-});
+export const judges = sqliteTable(
+	'Judges',
+	{
+		id: text('id').primaryKey(),
+		name: text('name').notNull(),
+		groupId: text('groupId')
+			.references(() => judgeGroups.id, { onDelete: 'cascade' })
+			.notNull(),
+		/** Always minted; enforced only when access control is enabled. */
+		authToken: text('authToken').notNull()
+	},
+	(table) => [uniqueIndex('judges_authToken').on(table.authToken)]
+);
 
 export const engineeringNotebookRubrics = sqliteTable(
 	'EngineeringNotebookRubrics',

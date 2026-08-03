@@ -27,6 +27,8 @@
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const accessControlEnabled = $derived(app.isAccessControlEnabled());
+	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const currentJudge = $derived(app.getCurrentUserJudge());
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 
@@ -40,6 +42,8 @@
 	let rubricScores = $state<number[]>(createEmptyTeamInterviewRubricScores());
 	let notes = $state('');
 	let timestamp = $state(0);
+
+	const canEditCurrentRubric = $derived(!accessControlEnabled || (currentJudge && judgeId === currentJudge.id));
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
@@ -232,6 +236,10 @@
 	}
 
 	function editRubric() {
+		if (!canEditCurrentRubric) {
+			app.addErrorNotice(m.you_can_only_edit_your_own_rubrics());
+			return;
+		}
 		// Enable editing mode
 		isSubmitted = false;
 		showValidationErrors = false;
@@ -274,7 +282,7 @@
 		<div class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-xl font-semibold text-gray-900">{m.team_interview()}</h2>
-				{#if isSubmitted}
+				{#if isSubmitted && canEditCurrentRubric}
 					<button onclick={editRubric} class="secondary tiny">{m.edit()}</button>
 				{/if}
 			</div>
@@ -372,7 +380,7 @@
 			<div class="mt-2 text-sm text-gray-700">
 				{#if judgeId}
 					<p><strong>{m.judge_name_colon()}</strong>{app.findJudgeById(judgeId)?.name}</p>
-				{:else}
+				{:else if isJudgeAdvisor}
 					<p>
 						{m.please_switch_to_a_judge()}{' '}<button onclick={switchToJudge} class="text-blue-500 hover:text-blue-600"
 							>{m.switch_to_judge()}</button
@@ -400,11 +408,15 @@
 
 			<div class="mt-6 flex justify-center gap-4">
 				{#if isSubmitted}
-					<button onclick={editRubric} class="secondary">{m.edit_rubric()}</button>
+					{#if canEditCurrentRubric}
+						<button onclick={editRubric} class="secondary">{m.edit_rubric()}</button>
+					{/if}
 					<button onclick={closeRubric} class="secondary">{m.close_rubric()}</button>
-					<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
+					{#if !accessControlEnabled || currentJudge}
+						<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
+					{/if}
 				{:else}
-					<button onclick={saveRubric} class="primary" disabled={!judgeId}>{m.submit_rubric()}</button>
+					<button onclick={saveRubric} class="primary" disabled={!judgeId || !canEditCurrentRubric}>{m.submit_rubric()}</button>
 				{/if}
 			</div>
 		</div>

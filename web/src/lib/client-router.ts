@@ -1,64 +1,44 @@
-import { z } from 'zod';
-import { initWRPC } from '@judgesroom.com/wrpc/client';
-import type { ServerRouter } from '@judgesroom.com/worker/src/server-router';
-import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
+import { buildClientRouter } from './client-router-def';
 import { app, subscriptions } from './index.svelte';
-import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
-import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
-import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judgesroom.com/protocol/src/rubric';
-import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
-import { TeamPhotoUpdateSchema } from '@judgesroom.com/protocol/src/media';
-import { JoiningKitSchema } from '@judgesroom.com/worker/src/routes/handshake';
 
-// Initialize WRPC client with server router type
-const w = initWRPC.createClient<ServerRouter>();
+export type { ClientRouter } from './client-router-def';
 
 /**
- * Client router defines procedures that can be called by the server
- * These are the endpoints the server can invoke on this client
+ * Client router handlers — server can invoke these on this client.
+ * Procedure shape lives in client-router-def.ts (shared with worker types).
  */
-const clientRouter = w.router({
-	/**
-	 * Server pushes event setup updates to client (this is just like joining the judges' room again)
-	 */
-	onEventSetupUpdate: w.procedure.input(JoiningKitSchema).mutation(async ({ input }) => {
+export const clientRouter = buildClientRouter({
+	onEventSetupUpdate: (input) => {
 		console.log(`📊 Event setup updated:`, input);
 		app.handleEventSetupUpdate(input);
-	}),
+	},
 
-	/**
-	 * Server pushes device list updates to client
-	 */
-	onDeviceListUpdate: w.procedure.input(z.array(DeviceInfoSchema)).mutation(async ({ input }) => {
+	onDeviceListUpdate: (input) => {
 		console.log(`📊 Device list updated:`, input);
 		app.handleDeviceListUpdate(input);
-	}),
+	},
 
-	/**
-	 * Server pushes team data updates to client
-	 */
-	onAllTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
+	onClientAuthenticationChange: (input) => {
+		console.log(`🔐 Client authentication changed:`, input);
+		app.handleClientAuthenticationChange(input);
+	},
+
+	onAllTeamDataUpdate: (input) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleAllTeamDataUpdate(input);
-	}),
+	},
 
-	/**
-	 * Server pushes team data update to client
-	 */
-	onTeamDataUpdate: w.procedure.input(TeamDataSchema).mutation(async ({ input }) => {
+	onTeamDataUpdate: (input) => {
 		console.log(`📊 Team data updated:`, input);
 		app.handleTeamDataUpdate(input);
-	}),
+	},
 
-	/**
-	 * Server pushes judges updates to client
-	 */
-	onAllJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
+	onAllJudgesUpdate: (input) => {
 		console.log(`📊 Judges updated:`, input);
 		app.handleAllJudgesUpdate(input);
-	}),
+	},
 
-	onAwardRankingsUpdate: w.procedure.input(AwardRankingsPartialUpdateSchema).mutation(async ({ input }) => {
+	onAwardRankingsUpdate: (input) => {
 		console.log(`📊 Award rankings partial updated:`, input);
 
 		const awardRankings = subscriptions.allJudgeGroupsAwardRankings[input.judgeGroupId];
@@ -77,9 +57,9 @@ const clientRouter = w.router({
 		}
 
 		awardRankings.rankings[input.teamId][index] = input.ranking;
-	}),
+	},
 
-	onReviewedTeamsUpdate: w.procedure.input(z.object({ judgeGroupId: z.string(), teamId: z.string() })).mutation(async ({ input }) => {
+	onReviewedTeamsUpdate: (input) => {
 		console.log(`📊 Reviewed teams updated:`, input);
 
 		const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[input.judgeGroupId];
@@ -89,26 +69,20 @@ const clientRouter = w.router({
 		}
 
 		reviewedTeams.push(input.teamId);
-	}),
+	},
 
-	onSubmissionCacheUpdate: w.procedure.input(SubmissionCacheSchema).mutation(async ({ input }) => {
+	onSubmissionCacheUpdate: (input) => {
 		console.log(`📊 Submission cache updated:`, input);
 		const uuid = input.tiId || input.enrId || input.tnId || 'null';
 		subscriptions.allSubmissionCaches[uuid] = input;
-	}),
+	},
 
-	onFinalAwardNominationsUpdate: w.procedure
-		.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
-		.mutation(async ({ input }) => {
-			console.log(`📊 Final award nominations updated:`, input);
+	onFinalAwardNominationsUpdate: (input) => {
+		console.log(`📊 Final award nominations updated:`, input);
+		app.handleFinalAwardNominationsUpdate(input.awardName, input.nominations);
+	},
 
-			app.handleFinalAwardNominationsUpdate(input.awardName, input.nominations);
-		}),
-
-	/**
-	 * Server triggers when award deliberation starts
-	 */
-	onAwardDeliberationStarted: w.procedure.mutation(async () => {
+	onAwardDeliberationStarted: () => {
 		console.log(`🏆 Award deliberation started - opening award nomination tab`);
 
 		const essData = app.getEssentialData();
@@ -117,25 +91,14 @@ const clientRouter = w.router({
 		}
 
 		app.handleEssentialDataUpdate({ ...essData, judgingStep: 'award_deliberations' });
-	}),
+	},
 
-	/**
-	 * Server pushes team photo album updates to client
-	 */
-	onTeamPhotoUpdate: w.procedure.input(TeamPhotoUpdateSchema).mutation(async ({ input }) => {
+	onTeamPhotoUpdate: (input) => {
 		console.log(`📷 Team photo updated:`, input);
 		if (input.action === 'added') {
 			subscriptions.allTeamPhotos[input.photo.id] = input.photo;
 		} else {
 			delete subscriptions.allTeamPhotos[input.photoId];
 		}
-	})
+	}
 });
-
-export { clientRouter };
-
-/**
- * Type definition for the client router
- * Used by server-side code to get type-safe client procedure calls
- */
-export type ClientRouter = typeof clientRouter;

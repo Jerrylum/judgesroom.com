@@ -5,10 +5,12 @@ import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from
 import type { ServerContext } from '../server-router';
 import type { Session } from '@judgesroom.com/wrpc/server/session';
 import type { AnyRouter } from '@judgesroom.com/wrpc/server/router';
-import { pendingPhotoUploads, teamPhotos } from '../db/schema';
+import { judges, metadata, pendingPhotoUploads, teamPhotos } from '../db/schema';
 import { completePhotoUpload, getPhotoObject, listUploads } from './media';
 import { PHOTO_CACHE_MAX_AGE_SECONDS } from '../media/constants';
 import { uuidv4 } from '@judgesroom.com/protocol/src/utils';
+import { Authentication } from '../access/authentication';
+import { generateAuthToken } from '../access/tokens';
 
 describe('media routes', () => {
 	let context: ServerContext & { cleanup: () => void };
@@ -99,6 +101,97 @@ describe('media routes', () => {
 					ctx: context
 				})
 			).rejects.toThrow('Team not found');
+		});
+
+		it('rejects judgeId spoofing when bound as a different judge', async () => {
+			await context.db.update(metadata).set({ accessControlEnabled: true });
+			const boundJudgeId = uuidv4();
+			const otherJudgeId = uuidv4();
+			const resolver = serverRouter.media.createUpload._def._resolver!;
+
+			await expect(
+				resolver({
+					input: {
+						teamId,
+						contentType: 'image/jpeg',
+						byteSize: 16,
+						judgeId: otherJudgeId
+					},
+					session,
+					ctx: {
+						...context,
+						auth: Authentication.withFixture({
+							isAccessControlled: true,
+							authToken: generateAuthToken(),
+							role: 'judge',
+							judgeId: boundJudgeId
+						})
+					}
+				})
+			).rejects.toThrow('You can only create or edit as your bound judge');
+		});
+
+		it('allows upload as the bound judge when access control is on', async () => {
+			await context.db.update(metadata).set({ accessControlEnabled: true });
+			const boundJudgeId = uuidv4();
+			await context.db.insert(judges).values({
+				id: boundJudgeId,
+				name: 'Bound',
+				groupId: 'group-1',
+				authToken: generateAuthToken()
+			});
+			const resolver = serverRouter.media.createUpload._def._resolver!;
+
+			const result = await resolver({
+				input: {
+					teamId,
+					contentType: 'image/jpeg',
+					byteSize: 16,
+					judgeId: boundJudgeId
+				},
+				session,
+				ctx: {
+					...context,
+					auth: Authentication.withFixture({
+						isAccessControlled: true,
+						authToken: generateAuthToken(),
+						role: 'judge',
+						judgeId: boundJudgeId
+					})
+				}
+			});
+
+			expect(result.photoId).toBeTruthy();
+			const pending = await context.db
+				.select()
+				.from(pendingPhotoUploads)
+				.where(eq(pendingPhotoUploads.token, result.uploadToken));
+			expect(pending[0]?.createdByJudgeId).toBe(boundJudgeId);
+		});
+
+		it('allows judge advisor uploads when access control is on', async () => {
+			await context.db.update(metadata).set({ accessControlEnabled: true });
+			const resolver = serverRouter.media.createUpload._def._resolver!;
+
+			const result = await resolver({
+				input: {
+					teamId,
+					contentType: 'image/jpeg',
+					byteSize: 16,
+					judgeId: null
+				},
+				session,
+				ctx: {
+					...context,
+					auth: Authentication.withFixture({
+						isAccessControlled: true,
+						authToken: generateAuthToken(),
+						role: 'judge_advisor'
+					})
+				}
+			});
+
+			expect(result.photoId).toBeTruthy();
 		});
 	});
 
@@ -227,6 +320,7 @@ describe('media routes', () => {
 				}
 			]);
 		});
+
 	});
 
 	describe('listUploads', () => {
