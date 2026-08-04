@@ -3,6 +3,7 @@
 	import { dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import { canUseClipboard } from '$lib/utils.svelte';
 
 	interface Props {
 		generateReportText: (config: TeamPresentationConfig) => string;
@@ -18,6 +19,7 @@
 	let { generateReportText }: Props = $props();
 	let copyButtonText = $state(m.copy());
 	let textareaElement: HTMLTextAreaElement;
+	const clipboardAvailable = canUseClipboard();
 
 	// Presentation configuration state
 	let showTeamNumber = $state(true);
@@ -116,9 +118,11 @@
 
 		<div class="flex justify-end space-x-3">
 			<button onclick={handleClose} class="secondary">{m.close_dialog_text()}</button>
-			<button onclick={copyText} class="primary">
-				{copyButtonText}
-			</button>
+			{#if clipboardAvailable}
+				<button onclick={copyText} class="primary">
+					{copyButtonText}
+				</button>
+			{/if}
 		</div>
 	</div>
 </Dialog>
