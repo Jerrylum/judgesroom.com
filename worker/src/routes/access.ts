@@ -12,6 +12,7 @@ import { judges } from '../db/schema';
 import type { ClientRouter } from '../client-router';
 import type { ServerContext } from '../server-router';
 import { WRPCError } from '@judgesroom.com/wrpc/server/types';
+import { broadcastDeviceListUpdate } from './device';
 
 export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
@@ -38,7 +39,7 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 		rotateJudgeAuth: w.procedure
 			.input(z.object({ judgeId: z.uuidv4() }))
 			.output(z.object({ authToken: AuthTokenSchema }))
-			.mutation(async ({ ctx, input }) => {
+			.mutation(async ({ ctx, input, session }) => {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 
 				const authToken = generateAuthToken();
@@ -47,12 +48,10 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 					throw new WRPCError('CRITICAL: Judge not found');
 				}
 
-				await ctx.network.kickClientsWhere(
-					(entry) =>
-						entry.authentication.isAccessControlled &&
-						entry.authentication.role === 'judge' &&
-						entry.authentication.judgeId === input.judgeId
-				);
+				await ctx.network.kickJudge(input.judgeId);
+
+				// Always broadcast: already-offline kicks do not get a webSocketClose update.
+				broadcastDeviceListUpdate(ctx, session);
 
 				return { authToken };
 			}),
@@ -70,15 +69,25 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 			// Client ACK first — if this fails, leave DB token and attachment unchanged.
 			await session.getClient<ClientRouter>(session.currentClient.clientId).onClientAuthenticationChange.mutation(authentication);
 
+			// Update the judge advisor auth token
 			await upsertJudgeAdvisorAuthToken(ctx.db, authToken);
+
+			// Set the authentication of the current client
 			ctx.auth.setAuthentication(authentication);
 
-			await ctx.network.kickClientsWhere(
-				(entry) =>
-					entry.clientId !== session.currentClient.clientId &&
-					entry.authentication.isAccessControlled &&
-					entry.authentication.role === 'judge_advisor'
-			);
+			// Kick all other judge advisors
+			for (const c of ctx.network.getAllClientAuthentications()) {
+				if (
+					c.clientId !== session.currentClient.clientId &&
+					c.authentication.isAccessControlled &&
+					c.authentication.role === 'judge_advisor'
+				) {
+					await ctx.network.kickClient(c.clientId);
+				}
+			}
+
+			// Always broadcast: already-offline kicks do not get a webSocketClose update.
+			broadcastDeviceListUpdate(ctx, session);
 
 			return { authToken };
 		})

@@ -9,8 +9,12 @@
 	import UserIcon from '$lib/icon/UserIcon.svelte';
 	import DestroyDialog from './DestroyDialog.svelte';
 	import ShareDialog from './ShareDialog.svelte';
+	import DevicesDialog from './DevicesDialog.svelte';
+	import UsersDialog from './UsersDialog.svelte';
 	import RoleSelectionDialog from './RoleSelectionDialog.svelte';
 	import PreferencesDialog from './PreferencesDialog.svelte';
+	import DevicesIcon from '$lib/icon/DevicesIcon.svelte';
+	import UsersIcon from '$lib/icon/UsersIcon.svelte';
 	import { onMount } from 'svelte';
 
 	let isOpen = $state(false);
@@ -19,6 +23,10 @@
 
 	const currentUser = $derived(app.getCurrentUser());
 	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
+	const accessControlEnabled = $derived(app.isAccessControlEnabled());
+	const roomDialogLabel = $derived(
+		!accessControlEnabled ? m.share_judges_room() : isJudgeAdvisor ? m.users() : m.devices()
+	);
 
 	function toggleMenu() {
 		isOpen = !isOpen;
@@ -28,9 +36,10 @@
 		isOpen = false;
 	}
 
-	function handleShareJudgesRoom() {
+	function handleRoomDialog() {
 		closeMenu();
-		dialogs.showCustom(ShareDialog, {
+		const dialog = !accessControlEnabled ? ShareDialog : isJudgeAdvisor ? UsersDialog : DevicesDialog;
+		dialogs.showCustom(dialog, {
 			props: {},
 			maxWidth: 'max-w-4xl'
 		});
@@ -38,6 +47,16 @@
 
 	function handleSwitchRole() {
 		closeMenu();
+		// Bound judges stay locked to their access link; JA may switch working-as role.
+		if (accessControlEnabled && !isJudgeAdvisor) {
+			void dialogs.showAlert({
+				title: m.permission_denied(),
+				message: m.switching_roles_disabled_with_access_control(),
+				confirmText: 'OK',
+				confirmButtonClass: 'primary'
+			});
+			return;
+		}
 		dialogs.showCustom(RoleSelectionDialog, { props: {} });
 	}
 
@@ -158,21 +177,28 @@
 			aria-orientation="vertical"
 			aria-labelledby="menu-button"
 		>
-			<!-- Share Judges' Room -->
-			<button onclick={handleShareJudgesRoom} class="menu-item" role="menuitem">
+			<button onclick={handleRoomDialog} class="menu-item" role="menuitem">
 				<span class="mr-3">
-					<ShareIcon />
+					{#if !accessControlEnabled}
+						<ShareIcon />
+					{:else if isJudgeAdvisor}
+						<UsersIcon size={16} />
+					{:else}
+						<DevicesIcon size={16} />
+					{/if}
 				</span>
-				<span>{m.share_judges_room()}</span>
+				<span>{roomDialogLabel}</span>
 			</button>
 
-			<!-- Switch Role -->
-			<button onclick={handleSwitchRole} class="menu-item" role="menuitem">
-				<span class="mr-3">
-					<UserIcon />
-				</span>
-				<span>{m.switch_role()}</span>
-			</button>
+			<!-- Switch Role: open mode always; with AC only Judge Advisor may change working-as role -->
+			{#if !accessControlEnabled || isJudgeAdvisor}
+				<button onclick={handleSwitchRole} class="menu-item" role="menuitem">
+					<span class="mr-3">
+						<UserIcon />
+					</span>
+					<span>{m.switch_role()}</span>
+				</button>
+			{/if}
 
 			<!-- Preferences -->
 			<button onclick={handlePreferences} class="menu-item" role="menuitem">

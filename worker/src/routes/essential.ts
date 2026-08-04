@@ -16,6 +16,7 @@ import { getJudges } from './judge';
 import { generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 import { RoomState } from './handshake';
+import { broadcastDeviceListUpdate } from './device';
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -233,7 +234,9 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 				// single-concurrency means no reconnect can slip in before the flag is written
 				// below. Mutations then trust that uncontrolled sockets cannot exist while AC
 				// is on (no per-mutation requireAuthenticated). Do not remove or narrow this kick.
-				await ctx.network.kickClientsWhere((entry) => entry.clientId !== session.currentClient.clientId);
+				await ctx.network.kickOtherClients(session.currentClient.clientId);
+				// Always broadcast: already-offline kicks do not get a webSocketClose update.
+				broadcastDeviceListUpdate(ctx, session);
 			}
 
 			await updateEssentialData(ctx.db, input);

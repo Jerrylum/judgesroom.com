@@ -8,35 +8,38 @@
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import { canUseClipboard } from '$lib/utils.svelte';
 	import { onDestroy, onMount } from 'svelte';
+	import type { DeviceAuthenticated } from '@judgesroom.com/protocol/src/access';
+	import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
 
 	let qrCodeDataUrl = $state('');
+	let secretsVisible = $state(false);
 	let copyButtonText = $state(m.copy());
 	const clipboardAvailable = canUseClipboard();
+	const showAccessLinkAction = $derived(!secretsVisible || clipboardAvailable);
+	const accessLinkActionLabel = $derived(secretsVisible ? copyButtonText : m.show());
 
 	const devices = $derived(app.getDevices());
 	const connectionState = $derived(app.getConnectionState());
-	const currentUser = $derived(app.getCurrentUser());
 	const permit = $derived(app.getPermit());
-	const shareableUrl = $derived(app.getJudgesRoomUrl());
-	const isJudgeAdvisor = $derived(currentUser?.role === 'judge_advisor');
+	const personalAccessUrl = $derived(app.getJudgesRoomUrl());
 	const currentDevice = $derived(permit ? devices.find((device) => device.deviceId === permit.deviceId) : null);
-	const otherDevices = $derived(permit ? devices.filter((device) => device.deviceId !== permit.deviceId) : []);
 	const isDisconnectedFromServer = $derived(connectionState !== 'connected');
 
-	// Handle kick device
-	async function handleKickDevice(targetDeviceId: string) {
-		try {
-			await app.kickDevice(targetDeviceId);
-		} catch (error) {
-			console.error('Failed to kick device:', error);
-		}
+	function sameAuthentication(a: DeviceAuthenticated | null, b: DeviceAuthenticated | null): boolean {
+		if (!a || !b) return false;
+		if (a.role === 'judge_advisor' && b.role === 'judge_advisor') return true;
+		return a.role === 'judge' && b.role === 'judge' && a.judgeId === b.judgeId;
 	}
 
-	// Generate QR code when URL changes
+	const matchingDevices = $derived(
+		devices.filter((device) => sameAuthentication(device.authenticated, currentDevice?.authenticated ?? null))
+	);
+	const otherMatchingDevices = $derived(matchingDevices.filter((device) => device.deviceId !== permit?.deviceId));
+
 	$effect(() => {
-		if (shareableUrl) {
+		if (personalAccessUrl) {
 			(async () => {
-				qrCodeDataUrl = await generateQrCodeDataUrl(shareableUrl, {
+				qrCodeDataUrl = await generateQrCodeDataUrl(personalAccessUrl, {
 					width: (41 + 2 + 2) * 4,
 					margin: 2,
 					color: {
@@ -49,21 +52,28 @@
 		}
 	});
 
-	async function copyShareUrl() {
-		if (shareableUrl) {
-			try {
-				await navigator.clipboard.writeText(shareableUrl);
-				copyButtonText = m.copied();
-				setTimeout(() => {
-					copyButtonText = m.copy();
-				}, 2000);
-			} catch (error) {
-				console.error('Failed to copy URL:', error);
-				copyButtonText = m.failed();
-				setTimeout(() => {
-					copyButtonText = m.copy();
-				}, 2000);
-			}
+	function revealSecrets() {
+		secretsVisible = true;
+		copyButtonText = m.copy();
+	}
+
+	async function handleAccessLinkAction() {
+		if (!secretsVisible) {
+			revealSecrets();
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(personalAccessUrl);
+			copyButtonText = m.copied();
+			setTimeout(() => {
+				copyButtonText = m.copy();
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy URL:', error);
+			copyButtonText = m.failed();
+			setTimeout(() => {
+				copyButtonText = m.copy();
+			}, 2000);
 		}
 	}
 
@@ -83,9 +93,17 @@
 		dialogs.closeDialog();
 	}
 
+	function deviceRow(device: DeviceInfo) {
+		return {
+			name: device.deviceName,
+			duration: getConnectionDuration(device.connectedAt),
+			isOnline: device.isOnline
+		};
+	}
+
 	onMount(() => {
-		app.wrpcClient.device.subscribeDeviceList.mutation().then((devices) => {
-			app.handleDeviceListUpdate(devices);
+		app.wrpcClient.device.subscribeDeviceList.mutation().then((list) => {
+			app.handleDeviceListUpdate(list);
 		});
 	});
 
@@ -97,59 +115,69 @@
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">
 	<div class="flex flex-col overflow-auto p-2">
 		<div class="mb-4 flex items-center justify-between">
-			<h3 id="dialog-title" class="text-lg font-medium text-gray-900">{m.share_judges_room()}</h3>
+			<h3 id="dialog-title" class="flex items-center gap-2 text-lg font-medium text-gray-900">
+				{m.devices()}
+			</h3>
 			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close dialog">
 				<CloseIcon size={24} />
 			</button>
 		</div>
 
 		<div class="flex shrink-0 flex-col gap-6 overflow-hidden md:flex-row">
-			<!-- Left Column: Share Judges' Room -->
 			<div class="max-h-140 flex-1 space-y-6">
-				<!-- QR Code Section -->
 				<div class="text-center">
 					<div class="mb-3">
 						<h5 class="text-sm font-medium text-gray-700">{m.scan_qr_code()}</h5>
 					</div>
-					<div class="inline-block rounded-lg bg-gray-50 p-4">
-						{#if qrCodeDataUrl}
-							<img src={qrCodeDataUrl} alt="QR Code for Judges' Room link" class="h-48 w-48 rounded" />
-						{:else}
-							<div class="flex h-48 w-48 items-center justify-center text-sm text-gray-500"></div>
+					<button
+						type="button"
+						class="group relative inline-block rounded-lg bg-gray-50 p-4"
+						onclick={revealSecrets}
+						disabled={secretsVisible}
+					>
+						<div class={secretsVisible ? '' : 'blur-xs select-none'}>
+							{#if qrCodeDataUrl}
+								<img src={qrCodeDataUrl} alt="" class="h-48 w-48 rounded" draggable="false" />
+							{:else}
+								<div class="flex h-48 w-48 items-center justify-center text-sm text-gray-500"></div>
+							{/if}
+						</div>
+						{#if !secretsVisible}
+							<div
+								class="absolute inset-0 flex items-center justify-center rounded-lg bg-gray-50/40 opacity-0 transition-opacity group-hover:opacity-100"
+							>
+								<span class="rounded-md bg-white/90 px-3 py-1.5 text-sm font-medium text-gray-800 shadow-sm">{m.click_to_show()}</span>
+							</div>
 						{/if}
-					</div>
+					</button>
 				</div>
 
-				<!-- URL Section -->
 				<div>
-					<label for="judges-room-url" class="mb-2 block text-sm font-medium text-gray-700">{m.judges_room_link()}</label>
+					<label for="personal-access-url" class="mb-2 block text-sm font-medium text-gray-700">{m.your_access_link()}</label>
 					<div class="flex items-center space-x-2">
-						<input id="judges-room-url" type="text" value={shareableUrl} readonly class="classic flex-1" />
-						{#if clipboardAvailable}
-							<button onclick={copyShareUrl} class="primary tiny">
-								{copyButtonText}
+						<input
+							id="personal-access-url"
+							type="text"
+							value={secretsVisible ? personalAccessUrl : '••••••••••••••••••••••••••••••••'}
+							readonly
+							class="classic min-w-0 flex-1 {secretsVisible ? '' : 'select-none'}"
+						/>
+						{#if showAccessLinkAction}
+							<button onclick={handleAccessLinkAction} class="primary tiny">
+								{accessLinkActionLabel}
 							</button>
 						{/if}
 					</div>
 				</div>
 
-				<!-- Instructions -->
 				<div class="rounded-lg bg-slate-50 p-4">
 					<div class="text-sm text-slate-800">
-						<h5 class="mb-2 font-medium">{m.how_to_share()}</h5>
-						<ul class="space-y-1 text-xs">
-							<li>• {m.send_the_link_to_other_judges_to_invite_them_to_join()}</li>
-							<li>• {m.or_have_them_scan_the_qr_code_with_their_phone_camera()}</li>
-							<li>• {m.all_participants_will_see_real_time_updates()}</li>
-						</ul>
+						<p class="text-xs">{m.devices_access_link_instructions()}</p>
 					</div>
 				</div>
 			</div>
 
-			<!-- Right Column: Connected Devices -->
 			<div class="flex flex-1 flex-col space-y-4 overflow-hidden lg:max-h-140">
-				<h4 class="text-lg font-medium text-gray-900">{m.connected_devices()}</h4>
-
 				{#if isDisconnectedFromServer}
 					<div class="rounded-lg bg-red-50 p-4">
 						<div class="flex items-center space-x-2 text-red-800">
@@ -160,24 +188,23 @@
 							</div>
 						</div>
 					</div>
-				{:else if devices.length === 0}
+				{:else if matchingDevices.length === 0}
 					<div class="py-8 text-center text-gray-500">
 						<ClientsIcon />
 						<p class="mt-2 text-sm">{m.no_devices_currently_connected()}</p>
 					</div>
 				{:else}
-					<!-- Current Device Section -->
 					<div class="space-y-3">
 						<h5 class="text-sm font-medium text-gray-700">{m.current_device()}</h5>
-						{#if currentDevice}
+						{#if currentDevice && matchingDevices.some((device) => device.deviceId === currentDevice.deviceId)}
+							{@const row = deviceRow(currentDevice)}
 							<div class="flex items-center justify-between rounded-lg bg-blue-50 p-3">
 								<div class="flex items-center space-x-3">
 									<div class="h-2 w-2 rounded-full bg-blue-500"></div>
 									<div>
-										<div class="font-medium text-gray-900">{currentDevice.deviceName}</div>
+										<div class="font-medium text-gray-900">{row.name}</div>
 										<div class="text-xs text-gray-500">
-											<!-- Connected {getConnectionDuration(currentDevice.connectedAt)} ago -->
-											{m.connected_ago({ duration: getConnectionDuration(currentDevice.connectedAt) })}
+											{m.connected_ago({ duration: row.duration })}
 										</div>
 									</div>
 								</div>
@@ -185,38 +212,27 @@
 						{/if}
 					</div>
 
-					<!-- Other Devices Section -->
-					{#if otherDevices.length > 0}
+					{#if otherMatchingDevices.length > 0}
 						<div class="flex min-h-0 flex-col space-y-3">
 							<h5 class="text-sm font-medium text-gray-700">{m.other_devices()}</h5>
 
 							<div class="min-h-0 space-y-3 overflow-hidden pr-1 lg:overflow-auto">
-								{#each otherDevices as device (device.deviceId)}
+								{#each otherMatchingDevices as device (device.deviceId)}
+									{@const row = deviceRow(device)}
 									<div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
 										<div class="flex items-center space-x-3">
-											{#if device.isOnline}
+											{#if row.isOnline}
 												<div class="h-2 w-2 rounded-full bg-green-500"></div>
 											{:else}
 												<div class="h-2 w-2 rounded-full bg-red-500"></div>
 											{/if}
 											<div>
-												<div class="font-medium text-gray-900">{device.deviceName}</div>
+												<div class="font-medium text-gray-900">{row.name}</div>
 												<div class="text-xs text-gray-500">
-													<!-- Joined {getConnectionDuration(device.connectedAt)} ago -->
-													{m.joined_ago({ duration: getConnectionDuration(device.connectedAt) })}
+													{m.joined_ago({ duration: row.duration })}
 												</div>
 											</div>
 										</div>
-										{#if isJudgeAdvisor}
-											<button
-												onclick={() => handleKickDevice(device.deviceId)}
-												class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
-												title="Kick device"
-												aria-label="Kick device"
-											>
-												<CloseIcon size={16} />
-											</button>
-										{/if}
 									</div>
 								{/each}
 							</div>

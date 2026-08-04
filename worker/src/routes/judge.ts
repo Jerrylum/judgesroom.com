@@ -8,6 +8,7 @@ import z from 'zod';
 import type { ClientRouter } from '../client-router';
 import { transaction } from '../utils';
 import { assertAuthenticatedJudgeAdvisor, generateAuthToken } from '../access/tokens';
+import { broadcastDeviceListUpdate } from './device';
 
 export async function getJudges(db: DatabaseOrTransaction): Promise<Judge[]> {
 	return db.select({ id: judges.id, name: judges.name, groupId: judges.groupId }).from(judges);
@@ -53,14 +54,13 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
-			await transaction(ctx.db, async (tx) => {
+			const removedJudges = await transaction(ctx.db, async (tx) => {
 				const allJudges = await tx.select().from(judges);
+				const rtn = new Set<string>();
+
 				for (const v of allJudges) {
 					if (!input.some((v2) => v2.id === v.id)) {
-						await ctx.network.kickClientsWhere(
-							(entry) =>
-								entry.authentication.isAccessControlled && entry.authentication.role === 'judge' && entry.authentication.judgeId === v.id
-						);
+						rtn.add(v.id);
 						await tx.delete(judges).where(eq(judges.id, v.id));
 					}
 				}
@@ -68,12 +68,19 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				for (const judge of input) {
 					await upsertJudge(tx, judge);
 				}
+
+				return Array.from(rtn);
 			});
 
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judgesList) => {
 				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
 			});
+
+			await Promise.all(removedJudges.map((judgeId) => ctx.network.kickJudge(judgeId)));
+
+			// Always broadcast: already-offline kicks do not get a webSocketClose update.
+			broadcastDeviceListUpdate(ctx, session);
 		})
 	};
 }

@@ -226,7 +226,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 		const { roomId, clientId, deviceId, deviceName, auth } = intention;
 
-		const connectAuth = await this.network.authorizeConnect(auth);
+		const connectAuth = await this.network.authorizeConnect(deviceId, auth);
 		if (!connectAuth.allowed) {
 			return connectAuth.response;
 		}

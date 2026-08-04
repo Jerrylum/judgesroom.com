@@ -1,37 +1,32 @@
 import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
-import type { DatabaseOrTransaction, ServerContext } from '../server-router';
+import type { ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineDevices } from '../db/schema';
-import type { Network } from '@judgesroom.com/wrpc/server';
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
-import { eq, ne } from 'drizzle-orm';
 import { assertAuthenticatedJudgeAdvisor } from '../access/tokens';
 import { broadcastTopic, type ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
+import { type DeviceAuthenticated, toDeviceAuthenticated } from '@judgesroom.com/protocol/src/access';
 
 type DeviceListContext = Pick<ServerContext, 'db' | 'network'>;
 
 export async function getDevices(ctx: DeviceListContext) {
 	const listOfOfflineDevices = await ctx.db.select().from(offlineDevices);
-	const authenticatedByDevice = ctx.network.getAllAuthenticatedDevices();
+
+	const roles = new Map<string, DeviceAuthenticated>();
+	for (const entry of ctx.network.getAllClientAuthentications()) {
+		const authenticated = toDeviceAuthenticated(entry.authentication);
+		if (authenticated) {
+			roles.set(entry.deviceId, authenticated);
+		}
+	}
+
 	return listOfOfflineDevices.map((device) => ({
 		deviceId: device.deviceId,
 		deviceName: device.deviceName,
 		connectedAt: device.connectedAt.getTime(),
 		isOnline: ctx.network.isDeviceConnected(device.deviceId),
-		authenticated: authenticatedByDevice.get(device.deviceId) ?? null
+		authenticated: roles.get(device.deviceId) ?? null
 	}));
-}
-
-export async function kickDevice(tx: DatabaseOrTransaction, network: Network, deviceId: string) {
-	await tx.delete(offlineDevices).where(eq(offlineDevices.deviceId, deviceId));
-	if (network.isDeviceConnected(deviceId)) {
-		for (const client of network.getAllClientData()) {
-			if (client.deviceId === deviceId) {
-				await network.kickClient(client.clientId);
-			}
-		}
-		return { success: true };
-	}
 }
 
 export function broadcastDeviceListUpdate(ctx: DeviceListContext, source: ClientSource) {
@@ -58,12 +53,12 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 		}),
 
 		kickDevice: w.procedure.input(z.object({ deviceId: z.string() })).mutation(async ({ ctx, input, session }) => {
-			if (ctx.auth.isAuthenticated()) {
+			if (await ctx.network.isAccessControlEnabled()) {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
-			const result = await kickDevice(ctx.db, ctx.network, input.deviceId);
-			// No need to broadcast device list update here, see webSocketClose
-			return result;
+			await ctx.network.kickDevice(input.deviceId);
+			// Always broadcast: already-offline kicks do not get a webSocketClose update.
+			broadcastDeviceListUpdate(ctx, session);
 		})
 	};
 }

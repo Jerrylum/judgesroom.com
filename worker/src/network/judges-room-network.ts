@@ -1,13 +1,13 @@
 import {
-	toDeviceAuthenticated,
 	type ClientAuthentication,
-	type DeviceAuthenticated,
-	uncontrolledAuthentication
+	uncontrolledAuthentication,
+	clientAuthenticationsEqual
 } from '@judgesroom.com/protocol/src/access';
 import type { Network } from '@judgesroom.com/wrpc/server/types';
 import type { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
-import { metadata } from '../db/schema';
+import { metadata, offlineDevices } from '../db/schema';
 import { resolveClientAuthentication } from '../access/tokens';
+import { eq, inArray, ne } from 'drizzle-orm';
 
 export type WsAttachment = {
 	roomId: string;
@@ -63,8 +63,51 @@ export class JudgesRoomNetwork implements Network {
 		return this.opts.inner.getClientData(clientId);
 	}
 
-	kickClient(clientId: string): Promise<void> {
-		return this.opts.inner.kickClient(clientId);
+	async kickClient(clientId: string): Promise<void> {
+		const client = this.getClientData(clientId);
+		await this.opts.inner.kickClient(clientId);
+		if (client && !this.isDeviceConnected(client.deviceId)) {
+			await this.opts.db.delete(offlineDevices).where(eq(offlineDevices.deviceId, client.deviceId));
+		}
+	}
+
+	async kickOtherClients(exceptClientId: string): Promise<void> {
+		const except = this.getClientData(exceptClientId);
+		for (const client of this.getAllClientData()) {
+			if (client.clientId !== exceptClientId) {
+				await this.opts.inner.kickClient(client.clientId);
+			}
+		}
+		if (except) {
+			await this.opts.db.delete(offlineDevices).where(ne(offlineDevices.deviceId, except.deviceId));
+		} else {
+			await this.opts.db.delete(offlineDevices);
+		}
+	}
+
+	async kickDevice(deviceId: string): Promise<void> {
+		if (this.isDeviceConnected(deviceId)) {
+			for (const client of this.getAllClientData()) {
+				if (client.deviceId === deviceId) {
+					await this.opts.inner.kickClient(client.clientId);
+				}
+			}
+		}
+		await this.opts.db.delete(offlineDevices).where(eq(offlineDevices.deviceId, deviceId));
+	}
+
+	async kickJudge(judgeId: string): Promise<void> {
+		const kickingDevices = new Set<string>();
+		for (const ca of this.getAllClientAuthentications()) {
+			if (ca.authentication.isAccessControlled && ca.authentication.role === 'judge' && ca.authentication.judgeId === judgeId) {
+				kickingDevices.add(ca.deviceId);
+				await this.opts.inner.kickClient(ca.clientId);
+			}
+		}
+		if (kickingDevices.size === 0) {
+			return;
+		}
+		await this.opts.db.delete(offlineDevices).where(inArray(offlineDevices.deviceId, Array.from(kickingDevices)));
 	}
 
 	destroy(): Promise<void> {
@@ -86,6 +129,7 @@ export class JudgesRoomNetwork implements Network {
 	 * rely on that and do not re-check requireAuthenticated.
 	 */
 	async authorizeConnect(
+		deviceId: string,
 		auth: string | null
 	): Promise<{ allowed: true; authentication: ClientAuthentication } | { allowed: false; response: Response }> {
 		// Empty room (create path): no Metadata yet — allow connect; createJudgesRoom mints JA auth.
@@ -99,7 +143,20 @@ export class JudgesRoomNetwork implements Network {
 		if (!authentication) {
 			return { allowed: false, response: new Response('Invalid or expired access link', { status: 401 }) };
 		}
+		const existingAuthentication = this.getClientAuthenticationByDeviceId(deviceId);
+		if (existingAuthentication && !clientAuthenticationsEqual(existingAuthentication, authentication)) {
+			return { allowed: false, response: new Response('Device already authenticated with different credentials', { status: 401 }) };
+		}
 		return { allowed: true, authentication };
+	}
+
+	getClientAuthenticationByDeviceId(deviceId: string): ClientAuthentication | null {
+		for (const entry of this.getAllClientAuthentications()) {
+			if (entry.deviceId === deviceId) {
+				return entry.authentication;
+			}
+		}
+		return null;
 	}
 
 	getAllClientAuthentications(): readonly ClientAuthenticationEntry[] {
@@ -114,25 +171,5 @@ export class JudgesRoomNetwork implements Network {
 			});
 		}
 		return entries;
-	}
-
-	/** Live deviceId → public authenticated role from WS attachments (online sockets only). */
-	getAllAuthenticatedDevices(): Map<string, DeviceAuthenticated> {
-		const roles = new Map<string, DeviceAuthenticated>();
-		for (const entry of this.getAllClientAuthentications()) {
-			const authenticated = toDeviceAuthenticated(entry.authentication);
-			if (authenticated) {
-				roles.set(entry.deviceId, authenticated);
-			}
-		}
-		return roles;
-	}
-
-	async kickClientsWhere(predicate: (entry: ClientAuthenticationEntry) => boolean): Promise<void> {
-		for (const entry of this.getAllClientAuthentications()) {
-			if (predicate(entry)) {
-				await this.kickClient(entry.clientId);
-			}
-		}
 	}
 }

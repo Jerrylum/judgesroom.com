@@ -105,7 +105,7 @@ describe('access control', () => {
 
 	it('rejects connect without auth when access control is on', async () => {
 		await enableAccessControl();
-		const denied = await context.network.authorizeConnect(null);
+		const denied = await context.network.authorizeConnect(otherDeviceId, null);
 		expect(denied.allowed).toBe(false);
 		if (!denied.allowed) {
 			expect(denied.response.status).toBe(401);
@@ -214,9 +214,9 @@ describe('access control', () => {
 	it('rotates judge token and invalidates old link', async () => {
 		const links = await enableAccessControl();
 		const oldToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
-		let kicked = false;
-		context.network.kickClientsWhere = async () => {
-			kicked = true;
+		const kickedJudgeIds: string[] = [];
+		context.network.kickJudge = async (id) => {
+			kickedJudgeIds.push(id);
 		};
 
 		await serverRouter.handshake.joinJudgesRoom._def._resolver!({
@@ -231,9 +231,9 @@ describe('access control', () => {
 			ctx: context
 		});
 		expect(rotated.authToken).not.toBe(oldToken);
-		expect(kicked).toBe(true);
+		expect(kickedJudgeIds).toEqual([judgeId]);
 
-		const denied = await context.network.authorizeConnect(oldToken);
+		const denied = await context.network.authorizeConnect(judgeDeviceId, oldToken);
 		expect(denied.allowed).toBe(false);
 
 		const ok = await serverRouter.handshake.joinJudgesRoom._def._resolver!({
@@ -247,9 +247,22 @@ describe('access control', () => {
 	it('rotates JA token and keeps current JA device', async () => {
 		const links = await enableAccessControl();
 		const oldJaToken = links.judgeAdvisorAuthToken;
-		let kicked = false;
-		context.network.kickClientsWhere = async () => {
-			kicked = true;
+		const kickedClientIds: string[] = [];
+		const otherJaClientId = `${otherDeviceId}-client`;
+		context.network.getAllClientAuthentications = () => [
+			{
+				clientId: jaSession.currentClient.clientId,
+				deviceId: jaDeviceId,
+				authentication: { isAccessControlled: true, authToken: oldJaToken, role: 'judge_advisor' }
+			},
+			{
+				clientId: otherJaClientId,
+				deviceId: otherDeviceId,
+				authentication: { isAccessControlled: true, authToken: oldJaToken, role: 'judge_advisor' }
+			}
+		];
+		context.network.kickClient = async (clientId) => {
+			kickedClientIds.push(clientId);
 		};
 
 		const rotated = await serverRouter.access.rotateJudgeAdvisorAuth._def._resolver!({
@@ -258,20 +271,20 @@ describe('access control', () => {
 			ctx: context
 		});
 		expect(rotated.authToken).not.toBe(oldJaToken);
-		expect(kicked).toBe(true);
+		expect(kickedClientIds).toEqual([otherJaClientId]);
 		expect(context.auth.authToken).toBe(rotated.authToken);
 		expect(await getJudgeAdvisorAuthToken(context.db)).toBe(rotated.authToken);
 
-		const denied = await context.network.authorizeConnect(oldJaToken);
+		const denied = await context.network.authorizeConnect(otherDeviceId, oldJaToken);
 		expect(denied.allowed).toBe(false);
 	});
 
 	it('closes sockets for deleted judge auth token', async () => {
 		const links = await enableAccessControl();
 		const oldToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
-		let kicked = false;
-		context.network.kickClientsWhere = async () => {
-			kicked = true;
+		const kickedJudgeIds: string[] = [];
+		context.network.kickJudge = async (id) => {
+			kickedJudgeIds.push(id);
 		};
 
 		await serverRouter.handshake.joinJudgesRoom._def._resolver!({
@@ -286,7 +299,7 @@ describe('access control', () => {
 			ctx: context
 		});
 
-		expect(kicked).toBe(true);
+		expect(kickedJudgeIds).toEqual([judgeId]);
 		const remaining = await context.db.select().from(judges).where(eq(judges.id, judgeId));
 		expect(remaining).toHaveLength(0);
 	});
@@ -321,7 +334,7 @@ describe('access control', () => {
 				session: judgeSession,
 				ctx: judgeCtx
 			})
-		).rejects.toThrow(/bound judge/);
+		).rejects.toThrow(/authenticated identity/);
 	});
 
 	it('rejects updating another judge authored rubric under access control', async () => {
@@ -385,21 +398,26 @@ describe('access control', () => {
 		).rejects.toThrow(/authored/);
 	});
 
-	it('allows the same device to rejoin with a different access link', async () => {
+	it('rejects the same device connecting with a different access link', async () => {
 		const links = await enableAccessControl();
 		const judgeToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
-		await serverRouter.handshake.joinJudgesRoom._def._resolver!({
-			input: undefined,
-			session: judgeSession,
-			ctx: await ctxWithAuth(judgeToken)
-		});
+		context.network.getAllClientAuthentications = () => [
+			{
+				clientId: judgeSession.currentClient.clientId,
+				deviceId: judgeDeviceId,
+				authentication: { isAccessControlled: true, authToken: judgeToken, role: 'judge', judgeId }
+			}
+		];
 
-		const result = await serverRouter.handshake.joinJudgesRoom._def._resolver!({
-			input: undefined,
-			session: judgeSession,
-			ctx: await ctxWithAuth(links.judgeAdvisorAuthToken)
-		});
-		expect(result.authentication).toMatchObject({ isAccessControlled: true, role: 'judge_advisor' });
+		const denied = await context.network.authorizeConnect(judgeDeviceId, links.judgeAdvisorAuthToken);
+		expect(denied.allowed).toBe(false);
+		if (!denied.allowed) {
+			expect(denied.response.status).toBe(401);
+			expect(await denied.response.text()).toMatch(/different credentials/i);
+		}
+
+		const same = await context.network.authorizeConnect(judgeDeviceId, judgeToken);
+		expect(same.allowed).toBe(true);
 	});
 
 	it('includes authenticated from connected device attachments in getDevices', async () => {
@@ -411,8 +429,13 @@ describe('access control', () => {
 			ctx: await ctxWithAuth(judgeToken)
 		});
 
-		context.network.getAllAuthenticatedDevices = () =>
-			new Map([[judgeDeviceId, { role: 'judge' as const, judgeId }]]);
+		context.network.getAllClientAuthentications = () => [
+			{
+				clientId: judgeSession.currentClient.clientId,
+				deviceId: judgeDeviceId,
+				authentication: { isAccessControlled: true, authToken: judgeToken, role: 'judge', judgeId }
+			}
+		];
 
 		const devices = await serverRouter.device.getDevices._def._resolver!({
 			input: undefined,

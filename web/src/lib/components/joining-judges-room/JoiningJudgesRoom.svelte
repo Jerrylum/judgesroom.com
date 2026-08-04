@@ -5,11 +5,15 @@
 	// Watch for app data to become available and transition UI automatically
 	$effect(() => {
 		if (app.hasEssentialData()) {
-			// Data is now available, transition to appropriate state
 			const currentUser = app.getCurrentUser();
 			if (currentUser) {
-				app.selectUser(currentUser);
+				if (!app.isAccessControlEnabled()) {
+					void app.selectUser(currentUser);
+				}
 				AppUI.appPhase = 'workspace';
+			} else if (app.isAccessControlEnabled()) {
+				// Access control requires a personal link; role picker is unavailable.
+				AppUI.appPhase = 'begin';
 			} else {
 				AppUI.appPhase = 'role_selection';
 			}

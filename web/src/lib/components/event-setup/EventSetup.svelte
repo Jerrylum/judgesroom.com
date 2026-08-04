@@ -6,7 +6,7 @@
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
 	import { onMount } from 'svelte';
-	import { app, AppUI, gtag } from '$lib/index.svelte';
+	import { app, AppUI, dialogs, gtag } from '$lib/index.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
 	import { EditingJudgeGroup } from '$lib/judging.svelte';
 	import { type TeamInfoAndData } from '$lib/team.svelte';
@@ -15,12 +15,15 @@
 	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import EventCodeSetup from './EventCodeSetup.svelte';
+	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
 
 	// Step management
 	let currentStep = $state(0);
 	const totalSteps = 6;
 
 	let isEditingEventSetup = $state(false);
+	let accessControlEnabled = $state(false);
+	let wasAccessControlEnabled = $state(false);
 
 	// RobotEvents import state
 	let robotEventsSku: string | null = $state(null);
@@ -91,6 +94,8 @@
 
 			judgingMethod = eventSetup.judgingMethod;
 			judgingStep = eventSetup.judgingStep;
+			accessControlEnabled = eventSetup.accessControlEnabled;
+			wasAccessControlEnabled = eventSetup.accessControlEnabled;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
@@ -140,6 +145,7 @@
 				eventGradeLevel: selectedEventGradeLevel,
 				judgingMethod,
 				judgingStep,
+				accessControlEnabled,
 				teamInfos: teams.map((team) => ({
 					id: team.id,
 					number: team.number,
@@ -180,8 +186,16 @@
 					.filter((judge) => judgeGroups.some((group) => group.id === judge.groupId));
 
 				await app.wrpcClient.judge.updateAllJudges.mutation([...newJudges, ...judges]);
-				// User is already ready, go back to workspace
+
 				AppUI.appPhase = 'workspace';
+
+				if (accessControlEnabled && !wasAccessControlEnabled) {
+					const accessLink = app.getJudgesRoomUrl();
+					await dialogs.showCustom(AccessLinkVerifyDialog, {
+						props: { accessLink },
+						maxWidth: 'max-w-xl'
+					});
+				}
 			} else {
 				app.handleEssentialDataUpdate(essentialData);
 				app.handleAllTeamDataUpdate(
@@ -196,10 +210,21 @@
 				app.handleAllJudgesUpdate(judges);
 
 				await app.createJudgesRoom();
-				// For Judge Advisor who created the Judges' Room, auto-select role and show share dialog
-				await app.selectUser({ role: 'judge_advisor' });
+				if (accessControlEnabled) {
+					app.setCurrentUserLocally({ role: 'judge_advisor' });
+				} else {
+					await app.selectUser({ role: 'judge_advisor' });
+				}
 
 				AppUI.appPhase = 'workspace';
+
+				if (accessControlEnabled) {
+					const accessLink = app.getJudgesRoomUrl();
+					await dialogs.showCustom(AccessLinkVerifyDialog, {
+						props: { accessLink },
+						maxWidth: 'max-w-xl'
+					});
+				}
 			}
 
 			gtag('event', 'event_setup_completed', {
@@ -320,7 +345,13 @@
 					onPrev={prevStep}
 				/>
 			{:else if currentStep === 6}
-				<ReviewStep onPrev={prevStep} onComplete={completeSetup} onCancel={cancelSetup} isJudgesRoomJoined={app.isJudgesRoomJoined()} />
+				<ReviewStep
+					onPrev={prevStep}
+					onComplete={completeSetup}
+					onCancel={cancelSetup}
+					isJudgesRoomJoined={app.isJudgesRoomJoined()}
+					bind:accessControlEnabled
+				/>
 			{/if}
 		</div>
 	</div>

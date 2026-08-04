@@ -46,6 +46,23 @@ export type ClientAuthentication = z.infer<typeof ClientAuthenticationSchema>;
 
 export const uncontrolledAuthentication = { isAccessControlled: false } as const satisfies ClientAuthentication;
 
+/** Structural equality for connection/session ClientAuthentication values. */
+export function clientAuthenticationsEqual(a: ClientAuthentication, b: ClientAuthentication): boolean {
+	if (a.isAccessControlled !== b.isAccessControlled) {
+		return false;
+	}
+	if (!a.isAccessControlled || !b.isAccessControlled) {
+		return true;
+	}
+	if (a.role !== b.role || a.authToken !== b.authToken) {
+		return false;
+	}
+	if (a.role === 'judge' && b.role === 'judge') {
+		return a.judgeId === b.judgeId;
+	}
+	return true;
+}
+
 /** Public device-list auth (never includes authToken). */
 export const DeviceAuthenticatedSchema = z.discriminatedUnion('role', [
 	z.object({

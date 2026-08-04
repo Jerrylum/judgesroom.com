@@ -5,6 +5,14 @@ import z from 'zod';
 import { v4 } from 'uuid';
 
 /**
+ * Clipboard write (navigator.clipboard) requires a secure context.
+ * False on plain HTTP LAN hosts (e.g. http://192.168.x.x); true on https and localhost.
+ */
+export function canUseClipboard(): boolean {
+	return typeof window !== 'undefined' && window.isSecureContext && typeof navigator.clipboard?.writeText === 'function';
+}
+
+/**
  * Get device name from user agent
  */
 export function getDeviceNameFromUserAgent(): string {

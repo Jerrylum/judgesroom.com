@@ -1,18 +1,48 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 
 	interface Props {
 		onPrev: () => void;
 		onComplete: () => Promise<void>;
 		onCancel: () => void;
 		isJudgesRoomJoined: boolean;
+		accessControlEnabled?: boolean;
+		onAccessControlEnabledChange?: (value: boolean) => void;
 	}
 
-	let { onPrev, onComplete, onCancel, isJudgesRoomJoined }: Props = $props();
+	let {
+		onPrev,
+		onComplete,
+		onCancel,
+		isJudgesRoomJoined,
+		accessControlEnabled = $bindable(false),
+		onAccessControlEnabledChange
+	}: Props = $props();
 
 	let enableGoogleAnalytics = $state(true);
 	let isLoading = $state(false);
+
+	async function handleAccessControlChange(input: HTMLInputElement) {
+		const checked = input.checked;
+		if (isJudgesRoomJoined) {
+			const confirmed = await dialogs.showConfirmation({
+				title: checked ? m.enable_access_control_confirm_title() : m.disable_access_control_confirm_title(),
+				message: checked ? m.enable_access_control_confirm_message() : m.disable_access_control_confirm_message(),
+				confirmText: checked ? m.enable_access_control_confirm_title() : m.disable_access_control_confirm_title(),
+				cancelText: m.cancel(),
+				confirmButtonClass: 'danger'
+			});
+			if (!confirmed) {
+				// Browser already toggled the input; restore controlled state.
+				input.checked = accessControlEnabled;
+				return;
+			}
+		}
+
+		accessControlEnabled = checked;
+		onAccessControlEnabledChange?.(checked);
+	}
 
 	async function handleComplete() {
 		isLoading = true;
@@ -26,7 +56,37 @@
 </script>
 
 <div class="space-y-6">
-	<h2 class="text-xl font-semibold text-gray-900">{m.review_and_confirm()}</h2>
+	<h2 class="text-xl font-semibold text-gray-900">{m.other_settings()}</h2>
+
+	<label class="flex cursor-pointer items-start space-x-3">
+		<input
+			type="checkbox"
+			checked={accessControlEnabled}
+			onchange={(event) => {
+				void handleAccessControlChange(event.currentTarget as HTMLInputElement);
+			}}
+			class="mt-1"
+			disabled={isLoading}
+		/>
+		<div class="flex-1">
+			<div class="font-medium text-gray-900">{m.enable_access_control()}</div>
+			<p class="mt-1 text-sm text-gray-600">{m.enable_access_control_description()}</p>
+		</div>
+	</label>
+
+	<label class="flex cursor-pointer items-start space-x-3">
+		<input type="checkbox" bind:checked={enableGoogleAnalytics} class="mt-1" disabled={isLoading} />
+		<div class="flex-1">
+			<div class="font-medium text-gray-900">{m.enable_google_analytics()}</div>
+			<p class="mt-1 text-sm text-gray-600">
+				{m.help_us_improve_judgesroom_com()}
+				<a href="./privacy" target="_blank" class="text-slate-600 underline hover:text-slate-800"
+					>{m.data_protection_and_privacy_policy()}</a
+				>
+				{m.help_us_improve_judgesroom_com_description()}
+			</p>
+		</div>
+	</label>
 
 	<div class="space-y-4 text-sm text-gray-700">
 		<div class="space-y-2">
@@ -43,20 +103,6 @@
 			</p>
 		</div>
 	</div>
-
-	<label class="flex cursor-pointer items-start space-x-3">
-		<input type="checkbox" bind:checked={enableGoogleAnalytics} class="mt-1" disabled={isLoading} />
-		<div class="flex-1">
-			<div class="font-medium text-gray-900">{m.enable_google_analytics()}</div>
-			<p class="mt-1 text-sm text-gray-600">
-				{m.help_us_improve_judgesroom_com()}
-				<a href="./privacy" target="_blank" class="text-slate-600 underline hover:text-slate-800"
-					>{m.data_protection_and_privacy_policy()}</a
-				>
-				{m.help_us_improve_judgesroom_com_description()}
-			</p>
-		</div>
-	</label>
 
 	<div class="flex justify-between pt-4">
 		{#if !isLoading}
