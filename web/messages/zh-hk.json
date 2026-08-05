@@ -31,7 +31,7 @@
 	"judged_awards": "評判獎項",
 	"volunteer_nominated_awards": "提名獎項",
 	"back": "返回",
-	"next_review": "下一步：確認",
+	"next_other_settings": "下一步：其他設定",
 	"upload_csv_again": "請上傳 VEX Events 或 Tournament Manager 的 CSV 文件",
 	"error_reading_file": "讀取文件錯誤",
 	"upload_csv_first": "請先上傳 CSV 文件",

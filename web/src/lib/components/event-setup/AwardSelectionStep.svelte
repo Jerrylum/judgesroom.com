@@ -225,7 +225,7 @@
 				submit();
 				onNext();
 			}}
-			class="primary">{m.next_review()}</button
+			class="primary">{m.next_other_settings()}</button
 		>
 	</div>
 </div>
