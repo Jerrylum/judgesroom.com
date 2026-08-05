@@ -41,7 +41,7 @@
 	// Validation
 	const isEventNameValid = $derived(eventName.trim().length > 0);
 	const hasLeadingTrailingWhitespace = $derived(eventName.length > 0 && eventName !== eventName.trim());
-	const isEventNameTooLong = $derived(eventName.length > 100);
+	const isEventNameTooLong = $derived(eventName.length > 200);
 
 	const canProceed = $derived(
 		isEventNameValid && !hasLeadingTrailingWhitespace && !isEventNameTooLong && (robotEventsEventId !== null || teams.length > 0) // For unofficial events, teams must be imported
@@ -181,7 +181,7 @@
 				type="text"
 				id="event-name"
 				bind:value={eventName}
-				maxlength="100"
+				maxlength="200"
 				class="classic block w-full"
 				class:border-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}
 				class:focus:ring-red-500={!isEventNameValid || hasLeadingTrailingWhitespace || isEventNameTooLong}

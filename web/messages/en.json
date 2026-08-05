@@ -42,7 +42,7 @@
 	"event_name": "Event Name",
 	"event_name_is_required": "Event name is required",
 	"event_name_whitespace_error_message": "Event name must not have leading or trailing whitespace",
-	"event_name_too_long_error_message": "Event name must be 100 characters or less",
+	"event_name_too_long_error_message": "Event name must be 200 characters or less",
 	"program": "Program",
 	"grade_level": "Grade Level",
 	"team_import": "Team Import",

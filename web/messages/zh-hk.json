@@ -42,7 +42,7 @@
 	"event_name": "賽事名稱",
 	"event_name_is_required": "賽事名稱是必填的",
 	"event_name_whitespace_error_message": "賽事名稱不能有前後空格",
-	"event_name_too_long_error_message": "賽事名稱不能超過 100 個字符",
+	"event_name_too_long_error_message": "賽事名稱不能超過 200 個字符",
 	"program": "賽事類型",
 	"grade_level": "年級",
 	"team_import": "隊伍導入",
