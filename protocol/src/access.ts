@@ -46,6 +46,19 @@ export type ClientAuthentication = z.infer<typeof ClientAuthenticationSchema>;
 
 export const uncontrolledAuthentication = { isAccessControlled: false } as const satisfies ClientAuthentication;
 
+/** Close-reason strings for connect-time access-control denials (accept-then-close). */
+export const ConnectAuthCloseReason = {
+	ACCESS_LINK_REQUIRED: 'Access link required',
+	INVALID_ACCESS_LINK: 'Invalid or expired access link',
+	DEVICE_AUTH_CONFLICT: 'Device already authenticated with different credentials'
+} as const;
+
+export type ConnectAuthCloseReason = (typeof ConnectAuthCloseReason)[keyof typeof ConnectAuthCloseReason];
+
+export function isConnectAuthCloseReason(reason: string): boolean {
+	return (Object.values(ConnectAuthCloseReason) as string[]).includes(reason.trim());
+}
+
 /** Structural equality for connection/session ClientAuthentication values. */
 export function clientAuthenticationsEqual(a: ClientAuthentication, b: ClientAuthentication): boolean {
 	if (a.isAccessControlled !== b.isAccessControlled) {

@@ -1,13 +1,20 @@
 import {
 	type ClientAuthentication,
 	uncontrolledAuthentication,
-	clientAuthenticationsEqual
+	clientAuthenticationsEqual,
+	ConnectAuthCloseReason,
+	type ConnectAuthCloseReason as ConnectAuthCloseReasonValue
 } from '@judgesroom.com/protocol/src/access';
 import type { Network } from '@judgesroom.com/wrpc/server/types';
 import type { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { metadata, offlineDevices } from '../db/schema';
 import { resolveClientAuthentication } from '../access/tokens';
 import { eq, inArray, ne } from 'drizzle-orm';
+
+export type ConnectAuthDenial = {
+	allowed: false;
+	reason: ConnectAuthCloseReasonValue;
+};
 
 export type WsAttachment = {
 	roomId: string;
@@ -131,21 +138,21 @@ export class JudgesRoomNetwork implements Network {
 	async authorizeConnect(
 		deviceId: string,
 		auth: string | null
-	): Promise<{ allowed: true; authentication: ClientAuthentication } | { allowed: false; response: Response }> {
+	): Promise<{ allowed: true; authentication: ClientAuthentication } | ConnectAuthDenial> {
 		// Empty room (create path): no Metadata yet — allow connect; createJudgesRoom mints JA auth.
 		if (!(await this.isAccessControlEnabled())) {
 			return { allowed: true, authentication: uncontrolledAuthentication };
 		}
 		if (!auth) {
-			return { allowed: false, response: new Response('Access link required', { status: 401 }) };
+			return { allowed: false, reason: ConnectAuthCloseReason.ACCESS_LINK_REQUIRED };
 		}
 		const authentication = await resolveClientAuthentication(this.opts.db, auth);
 		if (!authentication) {
-			return { allowed: false, response: new Response('Invalid or expired access link', { status: 401 }) };
+			return { allowed: false, reason: ConnectAuthCloseReason.INVALID_ACCESS_LINK };
 		}
 		const existingAuthentication = this.getClientAuthenticationByDeviceId(deviceId);
 		if (existingAuthentication && !clientAuthenticationsEqual(existingAuthentication, authentication)) {
-			return { allowed: false, response: new Response('Device already authenticated with different credentials', { status: 401 }) };
+			return { allowed: false, reason: ConnectAuthCloseReason.DEVICE_AUTH_CONFLICT };
 		}
 		return { allowed: true, authentication };
 	}

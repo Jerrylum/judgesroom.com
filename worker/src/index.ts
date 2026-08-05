@@ -1,6 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { createWebSocketHandler } from '@judgesroom.com/wrpc/server';
+import { ConnectionCloseCode } from '@judgesroom.com/wrpc/client';
 import { ServerRouter, serverRouter, type ServerContext } from './server-router';
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
@@ -226,17 +227,21 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 		const { roomId, clientId, deviceId, deviceName, auth } = intention;
 
-		const connectAuth = await this.network.authorizeConnect(deviceId, auth);
-		if (!connectAuth.allowed) {
-			return connectAuth.response;
-		}
-
 		// Creates two ends of a WebSocket connection.
 		const webSocketPair = new WebSocketPair();
 		const [client, server] = Object.values(webSocketPair);
 
 		if (!client || !server) {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
+		}
+
+		const connectAuth = await this.network.authorizeConnect(deviceId, auth);
+		if (!connectAuth.allowed) {
+			// Browser JS cannot read HTTP 401 on a failed upgrade. Accept then close with a
+			// reason the client can read via onClosed. Use KICKED so stock wrpc does not reconnect.
+			this.ctx.acceptWebSocket(server);
+			server.close(ConnectionCloseCode.KICKED, connectAuth.reason);
+			return new Response(null, { status: 101, webSocket: client });
 		}
 
 		// Calling `acceptWebSocket()` informs the runtime that this WebSocket is to begin terminating

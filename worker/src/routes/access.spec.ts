@@ -108,7 +108,7 @@ describe('access control', () => {
 		const denied = await context.network.authorizeConnect(otherDeviceId, null);
 		expect(denied.allowed).toBe(false);
 		if (!denied.allowed) {
-			expect(denied.response.status).toBe(401);
+			expect(denied.reason).toMatch(/access link required/i);
 		}
 
 		// Join itself trusts fetch gating; unauthenticated context yields uncontrolled auth.
@@ -412,8 +412,7 @@ describe('access control', () => {
 		const denied = await context.network.authorizeConnect(judgeDeviceId, links.judgeAdvisorAuthToken);
 		expect(denied.allowed).toBe(false);
 		if (!denied.allowed) {
-			expect(denied.response.status).toBe(401);
-			expect(await denied.response.text()).toMatch(/different credentials/i);
+			expect(denied.reason).toMatch(/different credentials/i);
 		}
 
 		const same = await context.network.authorizeConnect(judgeDeviceId, judgeToken);

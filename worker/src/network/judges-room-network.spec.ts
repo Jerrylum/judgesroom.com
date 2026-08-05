@@ -77,11 +77,14 @@ describe('JudgesRoomNetwork.authorizeConnect', () => {
 		const missing = await context.network.authorizeConnect(jaDeviceId, null);
 		expect(missing.allowed).toBe(false);
 		if (!missing.allowed) {
-			expect(missing.response.status).toBe(401);
+			expect(missing.reason).toMatch(/access link required/i);
 		}
 
 		const invalid = await context.network.authorizeConnect(jaDeviceId, 'notAValidTok');
 		expect(invalid.allowed).toBe(false);
+		if (!invalid.allowed) {
+			expect(invalid.reason).toMatch(/invalid or expired/i);
+		}
 
 		const jaToken = await getJudgeAdvisorAuthToken(context.db);
 		expect(jaToken).toBeTruthy();
@@ -139,8 +142,7 @@ describe('JudgesRoomNetwork.authorizeConnect', () => {
 		const denied = await context.network.authorizeConnect(judgeDeviceId, jaToken);
 		expect(denied.allowed).toBe(false);
 		if (!denied.allowed) {
-			expect(denied.response.status).toBe(401);
-			expect(await denied.response.text()).toMatch(/different credentials/i);
+			expect(denied.reason).toMatch(/different credentials/i);
 		}
 	});
 });
