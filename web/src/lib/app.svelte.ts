@@ -27,7 +27,7 @@ import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 import type { JoiningKit, RoomState } from '@judgesroom.com/protocol/src/room';
 import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
-import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { AuthTokenSchema, isConnectAuthCloseReason } from '@judgesroom.com/protocol/src/access';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 
@@ -110,6 +110,10 @@ export class App {
 	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
 	private readonly preferences: Preferences;
 	private connectionState: ConnectionState = $state('offline');
+	/** Suppress kick toast when the server closes us as part of leaveJudgesRoom. */
+	private intentionalLeave = false;
+	/** Set from onClosed when the server rejects connect with an auth close code/reason. */
+	private lastConnectAuthError: string | null = null;
 	private permit: Permit | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
@@ -160,6 +164,7 @@ export class App {
 	 * Join a Judges' Room from URL
 	 */
 	async joinJudgesRoomFromUrl(url: string): Promise<void> {
+		this.lastConnectAuthError = null;
 		try {
 			if (this.hasPermit()) {
 				throw new Error("CRITICAL: already in a Judges' Room");
@@ -176,11 +181,13 @@ export class App {
 
 			await this.joinJudgesRoom();
 		} catch (error) {
+			const message = this.lastConnectAuthError ?? (error instanceof Error ? error.message : 'Unknown error');
+			this.lastConnectAuthError = null;
 			this.permit = null;
 			this.clearPermitFromStorage();
 			this.clearUserFromStorage();
-			this.addErrorNotice(m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
-			throw error;
+			this.addErrorNotice(m.failed_to_join_judges_room({ error: message }));
+			throw new Error(message);
 		}
 	}
 
@@ -286,6 +293,20 @@ export class App {
 	 * Leave current Judges' Room
 	 */
 	async leaveJudgesRoom(): Promise<void> {
+
+		
+		// Ask the server to kick siblings, forget this device, and force-close this socket.
+		// The mutation often rejects when kickClient closes us; that is expected.
+		this.intentionalLeave = true;
+		try {
+			if (this.getConnectionState() === 'connected') {
+				await this.wrpcClient.handshake.leaveJudgesRoom.mutation();
+			}
+		} catch (error) {
+			// Socket may already be closed by kickClient — ignore.
+			console.debug('leaveJudgesRoom server notify finished:', error);
+		}
+
 		// Clear local Judges' Room data
 		this.permit = null;
 		this.currentUser = null;
@@ -300,6 +321,7 @@ export class App {
 		// Clear storage
 		this.clearPermitFromStorage();
 		this.clearUserFromStorage();
+		this.intentionalLeave = false;
 	}
 
 	/**
@@ -313,17 +335,19 @@ export class App {
 	 * Reconnect to stored Judges' Room
 	 */
 	async joinJudgesRoomWithStoredPermit(): Promise<void> {
+		this.lastConnectAuthError = null;
 		try {
 			await this.joinJudgesRoom();
 		} catch (error) {
-			const message = error instanceof Error ? error.message : 'Unknown error';
+			const message = this.lastConnectAuthError ?? (error instanceof Error ? error.message : 'Unknown error');
+			this.lastConnectAuthError = null;
 			if (message.includes('Access link') || message.includes('Invalid or expired') || message.includes('already bound')) {
 				this.permit = null;
 				this.clearPermitFromStorage();
 				this.clearUserFromStorage();
 			}
 			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
-			throw error;
+			throw new Error(message);
 		}
 	}
 
@@ -694,6 +718,15 @@ export class App {
 			onOpen: () => {},
 			onClosed: (code, reason) => {
 				if (code === ConnectionCloseCode.KICKED) {
+					if (this.intentionalLeave) {
+						// Server closed us as part of leaveJudgesRoom — cleanup continues there.
+						return;
+					}
+					if (isConnectAuthCloseReason(reason)) {
+						// Accept-then-close auth denial — join/reconnect catch uses this over the generic WS error.
+						this.lastConnectAuthError = reason.trim();
+						return;
+					}
 					this.permit = null;
 					this.currentUser = null;
 					this.clearPermitFromStorage();

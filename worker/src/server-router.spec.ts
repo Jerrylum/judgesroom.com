@@ -191,6 +191,17 @@ describe('ServerRouter', () => {
 			const devices = await getResolver({ input: undefined, session, ctx: context });
 			expect(devices.length).toBeGreaterThan(0);
 		});
+
+		it('leaveJudgesRoom removes the current device from the device list', async () => {
+			await serverRouter.handshake.joinJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
+			const before = await serverRouter.device.getDevices._def._resolver!({ input: undefined, session, ctx: context });
+			expect(before.some((d) => d.deviceId === session.currentClient.deviceId)).toBe(true);
+
+			await serverRouter.handshake.leaveJudgesRoom._def._resolver!({ input: undefined, session, ctx: context });
+
+			const after = await serverRouter.device.getDevices._def._resolver!({ input: undefined, session, ctx: context });
+			expect(after.some((d) => d.deviceId === session.currentClient.deviceId)).toBe(false);
+		});
 	});
 
 	// describe('judging router', () => {

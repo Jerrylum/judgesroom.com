@@ -108,6 +108,13 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				});
 			}),
 
+		leaveJudgesRoom: w.procedure.mutation(async ({ ctx, session }) => {
+			// Same as kickDevice for this device: close every socket (including the leaver) and
+			// forget OfflineDevices. leaveJudgesRoom is the self-service path (no JA check).
+			await ctx.network.kickDevice(session.currentClient.deviceId);
+			broadcastDeviceListUpdate(ctx, session);
+		}),
+
 		destroyJudgesRoom: w.procedure.mutation(async ({ ctx }) => {
 			if (await ctx.network.isAccessControlEnabled()) {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
