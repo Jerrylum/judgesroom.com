@@ -25,16 +25,31 @@
 
 	async function handleAccessControlChange(input: HTMLInputElement) {
 		const checked = input.checked;
-		if (isJudgesRoomJoined) {
+
+		if (checked) {
 			const confirmed = await dialogs.showConfirmation({
-				title: checked ? m.enable_access_control_confirm_title() : m.disable_access_control_confirm_title(),
-				message: checked ? m.enable_access_control_confirm_message() : m.disable_access_control_confirm_message(),
-				confirmText: checked ? m.enable_access_control_confirm_title() : m.disable_access_control_confirm_title(),
+				title: m.enable_access_control_confirm_title(),
+				message: isJudgesRoomJoined
+					? m.enable_access_control_confirm_message()
+					: m.enable_access_control_confirm_message_new_room(),
+				confirmText: m.enable_access_control_confirm_title(),
 				cancelText: m.cancel(),
 				confirmButtonClass: 'danger'
 			});
 			if (!confirmed) {
 				// Browser already toggled the input; restore controlled state.
+				input.checked = accessControlEnabled;
+				return;
+			}
+		} else if (isJudgesRoomJoined) {
+			const confirmed = await dialogs.showConfirmation({
+				title: m.disable_access_control_confirm_title(),
+				message: m.disable_access_control_confirm_message(),
+				confirmText: m.disable_access_control_confirm_title(),
+				cancelText: m.cancel(),
+				confirmButtonClass: 'danger'
+			});
+			if (!confirmed) {
 				input.checked = accessControlEnabled;
 				return;
 			}
