@@ -32,7 +32,7 @@
 				<button class="text-blue-500 hover:text-blue-600" onclick={() => tabs.addOrReuseTab(new FinalAwardRankingTab())}
 					>{m.final_ranking()}</button
 				>
-				{m.tab_to_determine_the_winners()}.
+				{m.tab_to_determine_the_winners()}
 			</p>
 
 			<!-- Filter Options -->
