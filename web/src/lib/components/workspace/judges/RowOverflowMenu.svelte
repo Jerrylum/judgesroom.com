@@ -53,7 +53,7 @@
 	{#if open}
 		<div
 			role="menu"
-			class="absolute z-20 mt-1 min-w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg [&_[role=menuitem]]:w-full [&_[role=menuitem]]:px-3 [&_[role=menuitem]]:py-2 [&_[role=menuitem]]:text-left [&_[role=menuitem]]:text-sm [&_[role=menuitem]]:hover:bg-gray-50"
+			class="absolute z-20 mt-1 min-w-40 rounded-md border border-gray-200 bg-white py-1 shadow-lg **:[[role=menuitem]]:w-full **:[[role=menuitem]]:px-3 **:[[role=menuitem]]:py-2 **:[[role=menuitem]]:text-left **:[[role=menuitem]]:text-sm **:[[role=menuitem]]:hover:bg-gray-50"
 			class:left-0={align === 'left'}
 			class:right-0={align === 'right'}
 		>
