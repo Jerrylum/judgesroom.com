@@ -169,6 +169,55 @@ describe('ServerRouter', () => {
 			expect(afterRemove.length).toBe(initial.length);
 			expect(afterRemove.some((j) => j.id === newJudge.id)).toBe(false);
 		});
+
+		it('removeJudge', async () => {
+			const judgeId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+
+			await serverRouter.judge.updateJudge._def._resolver!({
+				input: { id: judgeId, name: 'Removable Judge', groupId: 'group-1' },
+				session,
+				ctx: context
+			});
+
+			await serverRouter.judge.removeJudge._def._resolver!({
+				input: { judgeId },
+				session,
+				ctx: context
+			});
+			const after = await getJudges(context.db);
+			expect(after.some((j) => j.id === judgeId)).toBe(false);
+		});
+	});
+
+	describe('essential.reassignTeam', () => {
+		it('moves a team to another judge group', async () => {
+			const { judgeGroups, judgeGroupsAssignedTeams } = await import('./db/schema');
+			const groupA = '11111111-1111-4111-8111-111111111111';
+			const groupB = '22222222-2222-4222-8222-222222222222';
+			const teamId = sampleTeamInfoAndData[0].id;
+
+			await context.db.insert(judgeGroups).values([
+				{ id: groupA, name: 'Alpha' },
+				{ id: groupB, name: 'Beta' }
+			]);
+			await context.db.insert(judgeGroupsAssignedTeams).values({
+				order: 0,
+				judgeGroupId: groupA,
+				teamId
+			});
+
+			await serverRouter.essential.reassignTeam._def._resolver!({
+				input: { teamId, toJudgeGroupId: groupB },
+				session,
+				ctx: context
+			});
+
+			const essential = await getEssentialData(context.db);
+			const alpha = essential.judgeGroups.find((g) => g.id === groupA);
+			const beta = essential.judgeGroups.find((g) => g.id === groupB);
+			expect(alpha?.assignedTeams).not.toContain(teamId);
+			expect(beta?.assignedTeams).toContain(teamId);
+		});
 	});
 
 	// describe('client router', () => {

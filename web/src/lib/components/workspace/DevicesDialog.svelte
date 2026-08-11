@@ -6,6 +6,7 @@
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
 	import { canUseClipboard } from '$lib/utils.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import type { DeviceAuthenticated } from '@judgesroom.com/protocol/src/access';
@@ -21,6 +22,7 @@
 	const devices = $derived(app.getDevices());
 	const connectionState = $derived(app.getConnectionState());
 	const permit = $derived(app.getPermit());
+	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const personalAccessUrl = $derived(app.getJudgesRoomUrl());
 	const currentDevice = $derived(permit ? devices.find((device) => device.deviceId === permit.deviceId) : null);
 	const isDisconnectedFromServer = $derived(connectionState !== 'connected');
@@ -93,6 +95,38 @@
 		dialogs.closeDialog();
 	}
 
+	async function handleRotateLink() {
+		if (!isJudgeAdvisor) return;
+
+		const confirmed = await dialogs.showConfirmation({
+			title: m.rotate_access_link(),
+			message: m.rotate_judge_advisor_access_link_confirm(),
+			confirmText: m.rotate_access_link(),
+			confirmButtonClass: 'danger'
+		});
+		if (!confirmed) return;
+
+		try {
+			const { authToken } = await app.wrpcClient.access.rotateJudgeAdvisorAuth.mutation();
+			const accessLink = app.getJudgesRoomUrl(authToken);
+			await dialogs.showCustom(AccessLinkVerifyDialog, {
+				props: { accessLink },
+				maxWidth: 'max-w-xl'
+			});
+		} catch (error) {
+			console.error('Failed to rotate access link:', error);
+			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+		}
+	}
+
+	async function handleKickDevice(targetDeviceId: string) {
+		try {
+			await app.kickDevice(targetDeviceId);
+		} catch (error) {
+			console.error('Failed to kick device:', error);
+		}
+	}
+
 	function deviceRow(device: DeviceInfo) {
 		return {
 			name: device.deviceName,
@@ -114,13 +148,25 @@
 
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">
 	<div class="flex flex-col overflow-auto p-2">
-		<div class="mb-4 flex items-center justify-between">
-			<h3 id="dialog-title" class="flex items-center gap-2 text-lg font-medium text-gray-900">
+		<div class="mb-4 flex items-center justify-between gap-3">
+			<h3 id="dialog-title" class="min-w-0 flex-1 truncate text-lg font-medium text-gray-900">
 				{m.devices()}
 			</h3>
-			<button onclick={handleClose} class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600" aria-label="Close dialog">
-				<CloseIcon size={24} />
-			</button>
+			<div class="flex shrink-0 items-center gap-2">
+				{#if isJudgeAdvisor}
+					<button type="button" onclick={() => void handleRotateLink()} class="lightweight tiny">
+						{m.rotate_access_link()}
+					</button>
+				{/if}
+				<button
+					type="button"
+					onclick={handleClose}
+					class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+					aria-label="Close dialog"
+				>
+					<CloseIcon size={24} />
+				</button>
+			</div>
 		</div>
 
 		<div class="flex shrink-0 flex-col gap-6 overflow-hidden md:flex-row">
@@ -233,6 +279,17 @@
 												</div>
 											</div>
 										</div>
+										{#if isJudgeAdvisor}
+											<button
+												type="button"
+												onclick={() => handleKickDevice(device.deviceId)}
+												class="rounded-full p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
+												title={m.kick_device()}
+												aria-label={m.kick_device()}
+											>
+												<CloseIcon size={16} />
+											</button>
+										{/if}
 									</div>
 								{/each}
 							</div>

@@ -5,7 +5,7 @@
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
-	import type { Tab } from '$lib/tab.svelte';
+	import { JudgesTab, type Tab } from '$lib/tab.svelte';
 
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);
@@ -13,16 +13,26 @@
 	const activeTab = $derived(activeTabId ? tabs.getTab(activeTabId) : null);
 	const isJudgingReady = $derived(app.isJudgingReady());
 	const currentJudgeGroupId = $derived(app.getCurrentUserJudgeGroup()?.id ?? null);
+	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const isViewingAwardNominationTab = $derived(activeTab?.type === 'award_nomination');
 	const isViewingOverviewTab = $derived(activeTab?.type === 'overview');
+	const isViewingJudgesTab = $derived(activeTab?.type === 'judges');
 	const overviewTabSubscriptionScope = $derived(tabs.overviewTab.subscriptionScope);
 	let subscriptionScope = $state<'all_judge_groups' | 'current_judge_group'>('current_judge_group');
 	let targetJudgeGroupIds = $state<string[]>([]);
 
 	$effect(() => {
+		if (isJudgeAdvisor) {
+			tabs.ensureTab(new JudgesTab(), 'overview');
+		} else {
+			tabs.removeTabOfType('judges');
+		}
+	});
+
+	$effect(() => {
 		if (isViewingOverviewTab) {
 			subscriptionScope = overviewTabSubscriptionScope;
-		} else if (isViewingAwardNominationTab) {
+		} else if (isViewingAwardNominationTab || isViewingJudgesTab) {
 			subscriptionScope = 'all_judge_groups';
 		} else {
 			subscriptionScope = 'current_judge_group';

@@ -34,3 +34,9 @@ export const JudgeGroupSchema = z.object({
 	assignedTeams: z.array(z.uuidv4()) // Team IDs
 });
 export type JudgeGroup = z.infer<typeof JudgeGroupSchema>;
+
+export const ReassignTeamInputSchema = z.object({
+	teamId: z.uuidv4(),
+	toJudgeGroupId: z.uuidv4()
+});
+export type ReassignTeamInput = z.infer<typeof ReassignTeamInputSchema>;

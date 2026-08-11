@@ -15,6 +15,8 @@
 	} from '$lib/tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 	import { gtag } from '$lib/index.svelte';
+	import NotebookIcon from '$lib/icon/NotebookIcon.svelte';
+	import ChatIcon from '$lib/icon/ChatIcon.svelte';
 
 	interface Props {
 		tab: OverviewTab;
@@ -173,16 +175,7 @@
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
-						<svg
-							class="h-5 w-5 text-slate-600"
-							fill="currentColor"
-							stroke="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 640 640"
-							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-								d="M480 576L192 576C139 576 96 533 96 480L96 160C96 107 139 64 192 64L496 64C522.5 64 544 85.5 544 112L544 400C544 420.9 530.6 438.7 512 445.3L512 512C529.7 512 544 526.3 544 544C544 561.7 529.7 576 512 576L480 576zM192 448C174.3 448 160 462.3 160 480C160 497.7 174.3 512 192 512L448 512L448 448L192 448zM224 216C224 229.3 234.7 240 248 240L424 240C437.3 240 448 229.3 448 216C448 202.7 437.3 192 424 192L248 192C234.7 192 224 202.7 224 216zM248 288C234.7 288 224 298.7 224 312C224 325.3 234.7 336 248 336L424 336C437.3 336 448 325.3 448 312C448 298.7 437.3 288 424 288L248 288z"
-							/></svg
-						>
+						<NotebookIcon class="h-5 w-5 text-slate-600" />
 					</div>
 					<div>
 						<div class="font-medium">{m.notebook_review()}</div>
@@ -195,16 +188,7 @@
 					class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
 				>
 					<div class="rounded-full bg-slate-300 p-2">
-						<svg
-							class="h-5 w-5 text-slate-600"
-							fill="currentColor"
-							stroke="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 640 640"
-							><!--!Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-								d="M416 208C416 305.2 330 384 224 384C197.3 384 171.9 379 148.8 370L67.2 413.2C57.9 418.1 46.5 416.4 39 409C31.5 401.6 29.8 390.1 34.8 380.8L70.4 313.6C46.3 284.2 32 247.6 32 208C32 110.8 118 32 224 32C330 32 416 110.8 416 208zM416 576C321.9 576 243.6 513.9 227.2 432C347.2 430.5 451.5 345.1 463 229.3C546.3 248.5 608 317.6 608 400C608 439.6 593.7 476.2 569.6 505.6L605.2 572.8C610.1 582.1 608.4 593.5 601 601C593.6 608.5 582.1 610.2 572.8 605.2L491.2 562C468.1 571 442.7 576 416 576z"
-							/></svg
-						>
+						<ChatIcon class="h-5 w-5 text-slate-600" />
 					</div>
 					<div>
 						<div class="font-medium">{m.team_interview()}</div>

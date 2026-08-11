@@ -32,6 +32,10 @@ export async function upsertJudge(db: DatabaseOrTransaction, judge: Judge): Prom
 		});
 }
 
+export async function removeJudge(db: DatabaseOrTransaction, judgeId: string): Promise<void> {
+	await db.delete(judges).where(eq(judges.id, judgeId));
+}
+
 export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getJudges: w.procedure.output(z.array(JudgeSchema)).query(async ({ ctx }) => {
@@ -48,6 +52,21 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 			getJudges(ctx.db).then((judgesList) => {
 				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
 			});
+		}),
+		removeJudge: w.procedure.input(z.object({ judgeId: z.uuidv4() })).mutation(async ({ ctx, input, session }) => {
+			if (ctx.auth.isAuthenticated()) {
+				assertAuthenticatedJudgeAdvisor(ctx.auth);
+			}
+
+			await removeJudge(ctx.db, input.judgeId);
+			await ctx.network.kickJudge(input.judgeId);
+
+			getJudges(ctx.db).then((judgesList) => {
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
+			});
+
+			// Always broadcast: already-offline kicks do not get a webSocketClose update.
+			broadcastDeviceListUpdate(ctx, session);
 		}),
 		updateAllJudges: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ ctx, input, session }) => {
 			if (ctx.auth.isAuthenticated()) {

@@ -13,6 +13,7 @@ import FinalRankingTabComponent from './components/workspace/tabs/FinalRankingTa
 import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.svelte';
 import TeamAttendanceTabComponent from './components/workspace/tabs/TeamAttendanceTab.svelte';
 import ExcellenceAwardEligibilityTabComponent from './components/workspace/tabs/ExcellenceAwardCandidatesTab.svelte';
+import JudgesTabComponent from './components/workspace/judges/JudgesTab.svelte';
 
 // ============================================================================
 // Tab System
@@ -353,8 +354,37 @@ export class AwardWinnerTab implements BaseTab<typeof AwardWinnerTabComponent> {
 	}
 }
 
+export class JudgesTab implements BaseTab<typeof JudgesTabComponent> {
+	readonly id: string;
+	readonly isPinned = true;
+	readonly type = 'judges';
+	readonly component = JudgesTabComponent;
+	readonly props = {};
+
+	get title() {
+		return m.judges_tab_title();
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
 export type Tab =
 	| OverviewTab
+	| JudgesTab
 	| TeamAttendanceTab
 	| NotebookSortingTab
 	| NotebookRubricTab
@@ -407,6 +437,31 @@ export class TabController {
 			this.switchToTab(existingTab.id);
 		} else {
 			this.addTab(tab);
+		}
+	}
+
+	/**
+	 * Ensure a tab exists without switching to it (used for JA-only pinned Judges tab).
+	 */
+	ensureTab(tab: Tab, insertAfterType?: string): Tab {
+		const existingTab = this.findTab(tab);
+		if (existingTab) return existingTab;
+
+		if (insertAfterType) {
+			const index = this.tabs.findIndex((t) => t.type === insertAfterType);
+			if (index >= 0) {
+				this.tabs.splice(index + 1, 0, tab);
+				return tab;
+			}
+		}
+		this.tabs.push(tab);
+		return tab;
+	}
+
+	removeTabOfType(type: Tab['type']): void {
+		const existing = this.tabs.find((tab) => tab.type === type);
+		if (existing) {
+			this.closeTab(existing.id);
 		}
 	}
 
