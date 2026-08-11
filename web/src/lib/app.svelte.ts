@@ -373,6 +373,25 @@ export class App {
 		this.essentialData = $state.snapshot(data);
 	}
 
+	/**
+	 * Patch assignedTeams on existing judge groups from a full assignment snapshot.
+	 */
+	handleReassignTeamsUpdate(assignments: Readonly<Record<string, readonly string[]>>): void {
+		if (!this.essentialData) return;
+
+		// this.essentialData = {
+		// 	...this.essentialData,
+		// 	judgeGroups: this.essentialData.judgeGroups.map((group) => ({
+		// 		...group,
+		// 		assignedTeams: [...(assignments[group.id] ?? [])]
+		// 	}))
+		// };
+
+		for (const group of this.essentialData.judgeGroups) {
+			group.assignedTeams = [...(assignments[group.id] ?? [])];
+		}
+	}
+
 	getEssentialData(): Readonly<EssentialData> | null {
 		return this.essentialData ? $state.snapshot(this.essentialData) : null;
 	}

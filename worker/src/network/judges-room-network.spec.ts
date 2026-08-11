@@ -26,6 +26,7 @@ describe('JudgesRoomNetwork.authorizeConnect', () => {
 				onDeviceListUpdate: { mutation: async () => [] },
 				onEventSetupUpdate: { mutation: async () => [] },
 				onAllJudgesUpdate: { mutation: async () => [] },
+				onReassignTeams: { mutation: async () => [] },
 				onSubmissionCacheUpdate: { mutation: async () => [] },
 				onReviewedTeamsUpdate: { mutation: async () => [] }
 			}) as never,

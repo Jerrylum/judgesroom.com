@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { eq } from 'drizzle-orm';
 import { serverRouter } from './server-router';
 import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from './test-utils';
 import { getAwards, getTeamInfos, getEssentialData } from './routes/essential';
@@ -27,7 +28,8 @@ describe('ServerRouter', () => {
 					onEventSetupUpdate: { mutation: async () => [] },
 					onAllTeamDataUpdate: { mutation: async () => [] },
 					onTeamDataUpdate: { mutation: async () => [] },
-					onAllJudgesUpdate: { mutation: async () => [] }
+					onAllJudgesUpdate: { mutation: async () => [] },
+					onReassignTeams: { mutation: async () => [] }
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				}) as any,
 			getServer: () => {
@@ -190,20 +192,53 @@ describe('ServerRouter', () => {
 	});
 
 	describe('essential.reassignTeam', () => {
-		it('moves a team to another judge group', async () => {
-			const { judgeGroups, judgeGroupsAssignedTeams } = await import('./db/schema');
+		it('moves a team and its submission caches to another judge group', async () => {
+			const {
+				judgeGroups,
+				judgeGroupsAssignedTeams,
+				judgeGroupsSubmissionsCache,
+				judges,
+				engineeringNotebookRubrics
+			} = await import('./db/schema');
 			const groupA = '11111111-1111-4111-8111-111111111111';
 			const groupB = '22222222-2222-4222-8222-222222222222';
+			const judgeId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 			const teamId = sampleTeamInfoAndData[0].id;
+			const enrId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 
 			await context.db.insert(judgeGroups).values([
 				{ id: groupA, name: 'Alpha' },
 				{ id: groupB, name: 'Beta' }
 			]);
+			await context.db.insert(judges).values({
+				id: judgeId,
+				name: 'Judge',
+				groupId: groupA,
+				authToken: 'test-token-reassign-cache'
+			});
 			await context.db.insert(judgeGroupsAssignedTeams).values({
 				order: 0,
 				judgeGroupId: groupA,
 				teamId
+			});
+			await context.db.insert(engineeringNotebookRubrics).values({
+				id: enrId,
+				teamId,
+				judgeId,
+				rubric: {},
+				notes: '',
+				innovateAwardNotes: '',
+				timestamp: Date.now()
+			});
+			await context.db.insert(judgeGroupsSubmissionsCache).values({
+				judgeGroupId: groupA,
+				teamId,
+				judgeId,
+				timestamp: Date.now(),
+				enrId,
+				tiId: null,
+				tnId: null,
+				score: 10
 			});
 
 			await serverRouter.essential.reassignTeam._def._resolver!({
@@ -217,7 +252,12 @@ describe('ServerRouter', () => {
 			const beta = essential.judgeGroups.find((g) => g.id === groupB);
 			expect(alpha?.assignedTeams).not.toContain(teamId);
 			expect(beta?.assignedTeams).toContain(teamId);
+
+			const caches = await context.db.select().from(judgeGroupsSubmissionsCache).where(eq(judgeGroupsSubmissionsCache.teamId, teamId));
+			expect(caches).toHaveLength(1);
+			expect(caches[0]?.judgeGroupId).toBe(groupB);
 		});
+
 	});
 
 	// describe('client router', () => {

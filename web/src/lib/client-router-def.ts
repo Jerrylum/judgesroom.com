@@ -3,7 +3,7 @@ import { initWRPC } from '@judgesroom.com/wrpc/client';
 import { ClientAuthenticationSchema } from '@judgesroom.com/protocol/src/access';
 import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
 import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
-import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
+import { JudgeSchema, ReassignTeamsUpdateSchema } from '@judgesroom.com/protocol/src/judging';
 import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCacheSchema } from '@judgesroom.com/protocol/src/rubric';
 import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
 import { TeamPhotoUpdateSchema } from '@judgesroom.com/protocol/src/media';
@@ -23,7 +23,8 @@ export type ClientRouterHandlers = {
 	onAllJudgesUpdate: (input: z.infer<typeof JudgeSchema>[]) => void | Promise<void>;
 	onAwardRankingsUpdate: (input: z.infer<typeof AwardRankingsPartialUpdateSchema>) => void | Promise<void>;
 	onReviewedTeamsUpdate: (input: { judgeGroupId: string; teamId: string }) => void | Promise<void>;
-	onSubmissionCacheUpdate: (input: z.infer<typeof SubmissionCacheSchema>) => void | Promise<void>;
+	onReassignTeams: (input: z.infer<typeof ReassignTeamsUpdateSchema>) => void | Promise<void>;
+	onSubmissionCacheUpdate: (input: z.infer<typeof SubmissionCacheSchema>[]) => void | Promise<void>;
 	onFinalAwardNominationsUpdate: (input: {
 		awardName: z.infer<typeof AwardNameSchema>;
 		nominations: z.infer<typeof AwardNominationSchema>[];
@@ -59,7 +60,10 @@ export function buildClientRouter(handlers: ClientRouterHandlers) {
 		onReviewedTeamsUpdate: w.procedure.input(z.object({ judgeGroupId: z.string(), teamId: z.string() })).mutation(async ({ input }) => {
 			await handlers.onReviewedTeamsUpdate(input);
 		}),
-		onSubmissionCacheUpdate: w.procedure.input(SubmissionCacheSchema).mutation(async ({ input }) => {
+		onReassignTeams: w.procedure.input(ReassignTeamsUpdateSchema).mutation(async ({ input }) => {
+			await handlers.onReassignTeams(input);
+		}),
+		onSubmissionCacheUpdate: w.procedure.input(z.array(SubmissionCacheSchema)).mutation(async ({ input }) => {
 			await handlers.onSubmissionCacheUpdate(input);
 		}),
 		onFinalAwardNominationsUpdate: w.procedure

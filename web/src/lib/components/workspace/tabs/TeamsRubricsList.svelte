@@ -5,7 +5,6 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
-	import { mergeArrays } from '$lib/utils.svelte';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import QRCodeButton from './QRCodeButton.svelte';
@@ -46,9 +45,7 @@
 	const teamList = $derived.by(() => {
 		let teamIdsInOrder: string[] = [];
 		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup) {
-			const assignedTeams = currentJudgeGroup.assignedTeams;
-			const reviewedTeams = subscriptions.allJudgeGroupsReviewedTeams[currentJudgeGroup.id] ?? [];
-			teamIdsInOrder = mergeArrays(assignedTeams, reviewedTeams);
+			teamIdsInOrder = currentJudgeGroup.assignedTeams;
 		} else {
 			teamIdsInOrder = sortByTeamNumber(Object.values(includedTeams)).map((team) => team.id);
 		}

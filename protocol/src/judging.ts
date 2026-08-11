@@ -40,3 +40,7 @@ export const ReassignTeamInputSchema = z.object({
 	toJudgeGroupId: z.uuidv4()
 });
 export type ReassignTeamInput = z.infer<typeof ReassignTeamInputSchema>;
+
+/** Full snapshot of judge-group → ordered assigned team ids (after reassign). */
+export const ReassignTeamsUpdateSchema = z.record(z.uuidv4(), z.array(z.uuidv4()));
+export type ReassignTeamsUpdate = z.infer<typeof ReassignTeamsUpdateSchema>;

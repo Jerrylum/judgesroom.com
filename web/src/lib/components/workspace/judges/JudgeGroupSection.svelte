@@ -20,12 +20,13 @@
 	let newJudgeName = $state('');
 	let adding = $state(false);
 
+	const isAssignedJudging = $derived(app.getEssentialData()?.judgingMethod === 'assigned');
 	const group = $derived(app.getAllJudgeGroups().find((g) => g.id === groupId));
 	const groupName = $derived(group?.name ?? '');
 	const judges = $derived(app.getExistingJudgesGroupedByGroup()[groupId] ?? []);
 	const teamsById = $derived(app.getAllTeamInfoAndData());
 	const submissionCaches = $derived(Object.values(subscriptions.allSubmissionCaches));
-	const canReassign = $derived(app.getAllJudgeGroups().length > 1);
+	const canReassign = $derived(isAssignedJudging && app.getAllJudgeGroups().length > 1);
 
 	const teams = $derived.by(() => {
 		if (!group) return [];
@@ -47,16 +48,12 @@
 
 	const normalizedQuery = $derived(searchQuery.trim().toLowerCase());
 
-	const visibleJudges = $derived(
-		judges.filter((judge) => !normalizedQuery || judge.name.toLowerCase().includes(normalizedQuery))
-	);
+	const visibleJudges = $derived(judges.filter((judge) => !normalizedQuery || judge.name.toLowerCase().includes(normalizedQuery)));
 
 	const visibleTeams = $derived(
 		teams.filter(
 			(team) =>
-				!normalizedQuery ||
-				team.teamNumber.toLowerCase().includes(normalizedQuery) ||
-				team.teamName.toLowerCase().includes(normalizedQuery)
+				!normalizedQuery || team.teamNumber.toLowerCase().includes(normalizedQuery) || team.teamName.toLowerCase().includes(normalizedQuery)
 		)
 	);
 
@@ -66,7 +63,10 @@
 
 	const sectionVisible = $derived(
 		Boolean(group) &&
-			(!normalizedQuery || visibleJudges.length > 0 || visibleTeams.length > 0 || groupName.toLowerCase().includes(normalizedQuery))
+			(!normalizedQuery ||
+				visibleJudges.length > 0 ||
+				(isAssignedJudging && visibleTeams.length > 0) ||
+				groupName.toLowerCase().includes(normalizedQuery))
 	);
 
 	async function addJudge() {
@@ -97,14 +97,16 @@
 	<section class="space-y-6 rounded-lg bg-white p-6 shadow-sm">
 		<div class="flex flex-wrap items-baseline justify-between gap-2">
 			<h3 class="text-lg font-medium text-gray-900">{groupName}</h3>
-			<p class="text-sm text-gray-600">
-				{m.judge_group_progress({
-					notebookDone: String(notebookDone),
-					notebookTotal: String(teamTotal),
-					interviewDone: String(interviewDone),
-					interviewTotal: String(teamTotal)
-				})}
-			</p>
+			{#if isAssignedJudging}
+				<p class="text-sm text-gray-600">
+					{m.judge_group_progress({
+						notebookDone: String(notebookDone),
+						notebookTotal: String(teamTotal),
+						interviewDone: String(interviewDone),
+						interviewTotal: String(teamTotal)
+					})}
+				</p>
+			{/if}
 		</div>
 
 		<div class="space-y-3">
@@ -144,25 +146,27 @@
 			</form>
 		</div>
 
-		<div class="space-y-3">
-			<h4 class="text-sm font-medium text-gray-900">{m.teams_section()}</h4>
-			{#if visibleTeams.length === 0}
-				<p class="text-sm text-gray-500">—</p>
-			{:else}
-				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-					{#each visibleTeams as team (team.teamId)}
-						<TeamRow
-							teamId={team.teamId}
-							teamNumber={team.teamNumber}
-							teamName={team.teamName}
-							{groupId}
-							notebookDone={team.notebookDone}
-							interviewDone={team.interviewDone}
-							{canReassign}
-						/>
-					{/each}
-				</div>
-			{/if}
-		</div>
+		{#if isAssignedJudging}
+			<div class="space-y-3">
+				<h4 class="text-sm font-medium text-gray-900">{m.teams_section()}</h4>
+				{#if visibleTeams.length === 0}
+					<p class="text-sm text-gray-500">—</p>
+				{:else}
+					<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+						{#each visibleTeams as team (team.teamId)}
+							<TeamRow
+								teamId={team.teamId}
+								teamNumber={team.teamNumber}
+								teamName={team.teamName}
+								{groupId}
+								notebookDone={team.notebookDone}
+								interviewDone={team.interviewDone}
+								{canReassign}
+							/>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</section>
 {/if}

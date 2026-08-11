@@ -171,6 +171,15 @@
 		return !isSubmitted && (team.notebookDevelopmentStatus === 'not_submitted' || team.notebookDevelopmentStatus === 'undetermined');
 	}
 
+	function getAssignedGroupIdForTeam(teamId: string): string | null {
+		for (const group of app.getAllJudgeGroups()) {
+			if (group.assignedTeams.includes(teamId)) {
+				return group.id;
+			}
+		}
+		return null;
+	}
+
 	async function saveRubric() {
 		if (!tab.teamId) {
 			app.addErrorNotice(m.please_select_a_team());
@@ -205,7 +214,7 @@
 
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
-				judgeGroupId: currentJudgeGroup.id,
+				judgeGroupId: (isAssignedJudging ? getAssignedGroupIdForTeam(tab.teamId) : null) ?? currentJudgeGroup.id,
 				submission: {
 					id: tab.rubricId,
 					teamId: tab.teamId,

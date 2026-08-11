@@ -180,7 +180,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation(submissionCache)
+					client.onSubmissionCacheUpdate.mutation([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
@@ -252,7 +252,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation(submissionCache)
+					client.onSubmissionCacheUpdate.mutation([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
@@ -323,7 +323,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation(submissionCache)
+					client.onSubmissionCacheUpdate.mutation([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete

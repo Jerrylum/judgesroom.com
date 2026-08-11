@@ -29,8 +29,12 @@
 		}
 	});
 
+	const judgingMethod = $derived(app.getEssentialData()?.judgingMethod);
+
 	$effect(() => {
-		if (isViewingOverviewTab) {
+		if (judgingMethod === 'walk_in') {
+			subscriptionScope = 'all_judge_groups';
+		} else if (isViewingOverviewTab) {
 			subscriptionScope = overviewTabSubscriptionScope;
 		} else if (isViewingAwardNominationTab || isViewingJudgesTab) {
 			subscriptionScope = 'all_judge_groups';

@@ -162,13 +162,15 @@
 		<div class="min-w-0 flex-1">
 			<div class="flex flex-wrap items-center gap-2">
 				<div class="truncate text-sm font-medium text-gray-900">{name}</div>
-				{#if online > 0}
-					<span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
-						<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-						{m.online_device_count({ count: online })}
-					</span>
-				{:else}
-					<span class="text-xs text-gray-400">{m.no_devices_online()}</span>
+				{#if accessControlEnabled}
+					{#if online > 0}
+						<span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+							<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+							{m.online_device_count({ count: online })}
+						</span>
+					{:else}
+						<span class="text-xs text-gray-400">{m.no_devices_online()}</span>
+					{/if}
 				{/if}
 			</div>
 		</div>

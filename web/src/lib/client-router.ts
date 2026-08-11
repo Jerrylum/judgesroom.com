@@ -71,10 +71,17 @@ export const clientRouter = buildClientRouter({
 		reviewedTeams.push(input.teamId);
 	},
 
+	onReassignTeams: (input) => {
+		console.log(`📊 Team assignments updated:`, input);
+		app.handleReassignTeamsUpdate(input);
+	},
+
 	onSubmissionCacheUpdate: (input) => {
 		console.log(`📊 Submission cache updated:`, input);
-		const uuid = input.tiId || input.enrId || input.tnId || 'null';
-		subscriptions.allSubmissionCaches[uuid] = input;
+		for (const cache of input) {
+			const uuid = cache.tiId || cache.enrId || cache.tnId || 'null';
+			subscriptions.allSubmissionCaches[uuid] = cache;
+		}
 	},
 
 	onFinalAwardNominationsUpdate: (input) => {

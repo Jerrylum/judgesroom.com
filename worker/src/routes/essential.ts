@@ -1,12 +1,13 @@
 import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 import { EssentialDataSchema } from '@judgesroom.com/protocol/src/event';
-import { awards, judgeGroups, judgeGroupsAssignedTeams, metadata, teams } from '../db/schema';
-import type { DatabaseOrTransaction, ServerContext } from '../server-router';
+import { awards, judgeGroups, judgeGroupsAssignedTeams, judgeGroupsSubmissionsCache, metadata, teams } from '../db/schema';
+import type { DatabaseOrTransaction, ServerContext, Transaction } from '../server-router';
 import type { Award, AwardType } from '@judgesroom.com/protocol/src/award';
-import { desc, eq, getTableColumns, sql, SQL } from 'drizzle-orm';
+import { desc, eq, getTableColumns, ne, sql, SQL } from 'drizzle-orm';
 import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
 import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 import { ReassignTeamInputSchema } from '@judgesroom.com/protocol/src/judging';
+import type { SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ClientRouter } from '../client-router';
 import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
@@ -18,6 +19,26 @@ import { generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/p
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 import type { RoomState } from './handshake';
 import { broadcastDeviceListUpdate } from './device';
+import { broadcastTopic, type ClientSource } from './subscriptions';
+
+/**
+ * Result of moving a team between judge groups.
+ * Reviewed teams, award rankings, and final nomination judgeGroupId are intentionally
+ * left on the old group — the team may still appear on that group's reviewed∪ranking boards.
+ */
+export type ReassignTeamResult = {
+	movedCaches: SubmissionCache[];
+	didReassign: boolean;
+};
+
+/** Procedure session: room broadcast + ClientSource for topic fanout. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ReassignBroadcastSession = ClientSource & { broadcast: any };
+
+const emptyReassignResult: ReassignTeamResult = {
+	movedCaches: [],
+	didReassign: false
+};
 
 export async function getAwards(db: DatabaseOrTransaction, type?: AwardType): Promise<Award[]> {
 	// JERRY: explicit type definition is needed to cast acceptedGrades from unknown to AwardType[]
@@ -98,51 +119,70 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 	});
 }
 
-export async function reassignTeam(
-	db: DatabaseOrTransaction,
-	teamId: string,
-	toJudgeGroupId: string
-): Promise<void> {
-	await transaction(db, async (tx) => {
-		const groupRows = await tx.select({ id: judgeGroups.id }).from(judgeGroups).where(eq(judgeGroups.id, toJudgeGroupId)).limit(1);
-		if (groupRows.length === 0) {
-			throw new Error('Judge group not found');
-		}
+export async function reassignTeamInTx(tx: Transaction, teamId: string, toJudgeGroupId: string): Promise<ReassignTeamResult> {
+	const [maxOrderRow] = await tx
+		.select({ order: judgeGroupsAssignedTeams.order })
+		.from(judgeGroupsAssignedTeams)
+		.orderBy(desc(judgeGroupsAssignedTeams.order))
+		.limit(1);
+	const nextOrder = (maxOrderRow?.order ?? -1) + 1;
 
-		const teamRows = await tx.select({ id: teams.id }).from(teams).where(eq(teams.id, teamId)).limit(1);
-		if (teamRows.length === 0) {
-			throw new Error('Team not found');
-		}
-
-		const [maxOrderRow] = await tx
-			.select({ order: judgeGroupsAssignedTeams.order })
-			.from(judgeGroupsAssignedTeams)
-			.orderBy(desc(judgeGroupsAssignedTeams.order))
-			.limit(1);
-		const nextOrder = (maxOrderRow?.order ?? -1) + 1;
-
-		const existing = await tx
-			.select({ teamId: judgeGroupsAssignedTeams.teamId, judgeGroupId: judgeGroupsAssignedTeams.judgeGroupId })
-			.from(judgeGroupsAssignedTeams)
-			.where(eq(judgeGroupsAssignedTeams.teamId, teamId))
-			.limit(1);
-
-		if (existing.length > 0) {
-			if (existing[0].judgeGroupId === toJudgeGroupId) {
-				return;
-			}
-			await tx
-				.update(judgeGroupsAssignedTeams)
-				.set({ judgeGroupId: toJudgeGroupId, order: nextOrder })
-				.where(eq(judgeGroupsAssignedTeams.teamId, teamId));
-		} else {
-			await tx.insert(judgeGroupsAssignedTeams).values({
-				teamId,
+	// Upsert assignment. setWhere skips the update when already in the target group
+	// (RETURNING empty ⇒ no-op). Invalid team/group ids fail via FK.
+	const upserted = await tx
+		.insert(judgeGroupsAssignedTeams)
+		.values({
+			teamId,
+			judgeGroupId: toJudgeGroupId,
+			order: nextOrder
+		})
+		.onConflictDoUpdate({
+			target: [judgeGroupsAssignedTeams.teamId],
+			set: {
 				judgeGroupId: toJudgeGroupId,
 				order: nextOrder
-			});
-		}
+			},
+			setWhere: ne(judgeGroupsAssignedTeams.judgeGroupId, toJudgeGroupId)
+		})
+		.returning({ teamId: judgeGroupsAssignedTeams.teamId });
+
+	if (upserted.length === 0) {
+		return emptyReassignResult;
+	}
+
+	const movedCaches = (await tx
+		.update(judgeGroupsSubmissionsCache)
+		.set({ judgeGroupId: toJudgeGroupId })
+		.where(eq(judgeGroupsSubmissionsCache.teamId, teamId))
+		.returning()) satisfies SubmissionCache[];
+
+	return {
+		movedCaches,
+		didReassign: true
+	};
+}
+
+export async function reassignTeam(db: DatabaseOrTransaction, teamId: string, toJudgeGroupId: string): Promise<ReassignTeamResult> {
+	return transaction(db, async (tx) => reassignTeamInTx(tx, teamId, toJudgeGroupId));
+}
+
+export function broadcastReassignUpdate(
+	db: DatabaseOrTransaction,
+	session: ReassignBroadcastSession,
+	result: ReassignTeamResult
+): void {
+	if (!result.didReassign) return;
+
+	void getJudgeGroups(db).then((groups) => {
+		const assignments = Object.fromEntries(groups.map((group) => [group.id, group.assignedTeams]));
+		session.broadcast().onReassignTeams.mutation(assignments);
 	});
+
+	if (result.movedCaches.length > 0) {
+		void broadcastTopic(db, 'submissions', session, async (client) =>
+			client.onSubmissionCacheUpdate.mutation(result.movedCaches)
+		);
+	}
 }
 
 export async function updateEssentialData(db: DatabaseOrTransaction, essentialData: EssentialData): Promise<void> {
@@ -254,19 +294,8 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
-			await reassignTeam(ctx.db, input.teamId, input.toJudgeGroupId);
-
-			// Do not wait for the broadcast to complete
-			transaction(ctx.db, async (tx) => {
-				return {
-					essentialData: await getEssentialData(tx),
-					teamData: await getTeamData(tx),
-					judges: await getJudges(tx),
-					finalAwardNominations: await getFinalAwardNominations(tx)
-				} satisfies RoomState;
-			}).then((message) => {
-				session.broadcast<ClientRouter>().onEventSetupUpdate.mutation(message);
-			});
+			const result = await reassignTeam(ctx.db, input.teamId, input.toJudgeGroupId);
+			broadcastReassignUpdate(ctx.db, session, result);
 		}),
 		updateEssentialData: w.procedure.input(EssentialDataSchema).mutation(async ({ ctx, input, session }) => {
 			const wasAccessControlEnabled = await ctx.network.isAccessControlEnabled();
