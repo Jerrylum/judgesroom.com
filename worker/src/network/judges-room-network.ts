@@ -5,7 +5,7 @@ import {
 	ConnectAuthCloseReason,
 	type ConnectAuthCloseReason as ConnectAuthCloseReasonValue
 } from '@judgesroom.com/protocol/src/access';
-import type { Network } from '@judgesroom.com/wrpc/server/types';
+import type { Network } from '@jerrylum/wrpc/server';
 import type { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { metadata, offlineDevices } from '../db/schema';
 import { resolveClientAuthentication } from '../access/tokens';
@@ -48,6 +48,14 @@ export class JudgesRoomNetwork implements Network {
 
 	broadcast(...args: Parameters<Network['broadcast']>): ReturnType<Network['broadcast']> {
 		return this.opts.inner.broadcast(...args);
+	}
+
+	sendNotification(...args: Parameters<Network['sendNotification']>): ReturnType<Network['sendNotification']> {
+		return this.opts.inner.sendNotification(...args);
+	}
+
+	broadcastNotification(...args: Parameters<Network['broadcastNotification']>): ReturnType<Network['broadcastNotification']> {
+		return this.opts.inner.broadcastNotification(...args);
 	}
 
 	getConnectedClients(): Readonly<string[]> {

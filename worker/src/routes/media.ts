@@ -7,7 +7,7 @@ import {
 	TeamPhotoSchema,
 	type TeamPhoto
 } from '@judgesroom.com/protocol/src/media';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { count, eq, lt } from 'drizzle-orm';
 import { z } from 'zod';
 import type { ClientRouter } from '../client-router';

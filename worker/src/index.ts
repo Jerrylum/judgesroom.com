@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
-import { createWebSocketHandler } from '@judgesroom.com/wrpc/server';
-import { ConnectionCloseCode } from '@judgesroom.com/wrpc/client';
+import { createWebSocketHandler } from '@jerrylum/wrpc/server';
+import { ConnectionCloseCode } from '@jerrylum/wrpc/client';
 import { ServerRouter, serverRouter, type ServerContext } from './server-router';
 import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';

@@ -7,8 +7,7 @@ import { getTeamData } from './routes/team';
 import { getJudges } from './routes/judge';
 import { Authentication } from './access/authentication';
 import type { ServerContext } from './server-router';
-import type { Session } from '@judgesroom.com/wrpc/server/session';
-import type { AnyRouter } from '@judgesroom.com/wrpc/server/router';
+import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 
 describe('ServerRouter', () => {
 	let context: ServerContext & { cleanup: () => void };

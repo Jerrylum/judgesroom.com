@@ -1,7 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { subscriptions } from '../db/schema';
 import type { DatabaseOrTransaction } from '../server-router';
-import type { RouterProxy } from '@judgesroom.com/wrpc/server';
+import type { RouterProxy } from '@jerrylum/wrpc/server';
 import type { ClientRouter } from '../client-router';
 import { transaction } from '../utils';
 

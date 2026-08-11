@@ -29,10 +29,9 @@ import {
 	metadata
 } from '../db/schema';
 import { assertAuthorship } from '../access/tokens';
-import { WRPCError } from '@judgesroom.com/wrpc/server/types';
+import { WRPCError, type RouterBroadcastProxy, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import { AwardNameSchema, isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 import { RankSchema } from '@judgesroom.com/protocol/src/rubric';
-import type { RouterBroadcastProxy, WRPCRootObject } from '@judgesroom.com/wrpc/server';
 import { broadcastJudgeGroupTopic, subscribeJudgeGroupTopic, unsubscribeTopic } from './subscriptions';
 import { transaction } from '../utils';
 import { getAwards } from './essential';

@@ -1,4 +1,4 @@
-import { initWRPC } from '@judgesroom.com/wrpc/server';
+import { initWRPC } from '@jerrylum/wrpc/server';
 import { DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import type { Authentication } from './access/authentication';
 import type { JudgesRoomNetwork } from './network/judges-room-network';

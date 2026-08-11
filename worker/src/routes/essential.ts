@@ -10,7 +10,7 @@ import { ReassignTeamInputSchema } from '@judgesroom.com/protocol/src/judging';
 import type { SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ClientRouter } from '../client-router';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { transaction } from '../utils';
 import { getFinalAwardNominations } from './judging';
 import { getTeamData } from './team';

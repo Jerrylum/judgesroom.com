@@ -35,7 +35,7 @@
 	"dependencies": {
 		"@judgesroom.com/protocol": "workspace:*",
 		"@judgesroom.com/web": "workspace:*",
-		"@judgesroom.com/wrpc": "workspace:*",
+		"@jerrylum/wrpc": "^1.1.0",
 		"drizzle-orm": "^0.44.4",
 		"zod": "^4.0.15"
 	}

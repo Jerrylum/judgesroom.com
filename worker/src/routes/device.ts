@@ -2,7 +2,7 @@ import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
 import type { ServerContext } from '../server-router';
 import z from 'zod';
 import { offlineDevices } from '../db/schema';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { assertAuthenticatedJudgeAdvisor } from '../access/tokens';
 import { broadcastTopic, type ClientSource, subscribeTopic, unsubscribeTopic } from './subscriptions';
 import { type DeviceAuthenticated, toDeviceAuthenticated } from '@judgesroom.com/protocol/src/access';

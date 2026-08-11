@@ -6,7 +6,7 @@ import type { ServerContext } from './server-router';
 import { Authentication } from './access/authentication';
 import { generateAuthToken, JUDGE_ADVISOR_SINGLETON_ID } from './access/tokens';
 import type { PhotosBucket } from './media/types';
-import type { Network, ClientData } from '@judgesroom.com/wrpc/server/types';
+import type { Network, ClientData } from '@jerrylum/wrpc/server';
 import type { Award } from '@judgesroom.com/protocol/src/award';
 import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
 import { JudgesRoomNetwork } from './network/judges-room-network';
@@ -127,6 +127,8 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 		async broadcast() {
 			return [];
 		},
+		sendNotification() {},
+		broadcastNotification() {},
 		getConnectedClients() {
 			return Array.from(connectedClientIds);
 		},

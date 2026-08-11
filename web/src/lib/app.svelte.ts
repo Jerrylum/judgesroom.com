@@ -5,7 +5,7 @@ import {
 	type ClientOptions,
 	type ConnectionState,
 	type WRPCClientManager
-} from '@judgesroom.com/wrpc/client';
+} from '@jerrylum/wrpc/client';
 import type { Judge, JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
 import type { EssentialData } from '@judgesroom.com/protocol/src/event';

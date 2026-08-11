@@ -30,8 +30,8 @@
       "name": "@judgesroom.com/web",
       "version": "0.0.0",
       "dependencies": {
+        "@jerrylum/wrpc": "^1.1.0",
         "@judgesroom.com/protocol": "workspace:*",
-        "@judgesroom.com/wrpc": "workspace:*",
         "crypto-js": "^4.2.0",
         "dompurify": "^3.3.1",
         "events": "^3.3.0",
@@ -79,9 +79,9 @@
       "name": "@judgesroom.com/worker",
       "version": "0.0.0",
       "dependencies": {
+        "@jerrylum/wrpc": "^1.1.0",
         "@judgesroom.com/protocol": "workspace:*",
         "@judgesroom.com/web": "workspace:*",
-        "@judgesroom.com/wrpc": "workspace:*",
         "drizzle-orm": "^0.44.4",
         "zod": "^4.0.15",
       },
@@ -100,23 +100,6 @@
         "typescript-eslint": "^8.20.0",
         "vitest": "^3.2.3",
         "wrangler": "4.118.0",
-      },
-    },
-    "wrpc": {
-      "name": "@judgesroom.com/wrpc",
-      "version": "0.0.0",
-      "dependencies": {
-        "zod": "^4.0.15",
-      },
-      "devDependencies": {
-        "@eslint/compat": "^1.2.5",
-        "@eslint/js": "^9.18.0",
-        "eslint": "^9.32.0",
-        "eslint-config-prettier": "^10.1.8",
-        "prettier": "^3.6.2",
-        "typescript": "^5.5.2",
-        "typescript-eslint": "^8.20.0",
-        "vitest": "^3.2.3",
       },
     },
   },
@@ -291,6 +274,8 @@
 
     "@inlang/sdk": ["@inlang/sdk@2.4.10", "", { "dependencies": { "@lix-js/sdk": "0.4.7", "@sinclair/typebox": "^0.31.17", "kysely": "^0.27.4", "sqlite-wasm-kysely": "0.3.0", "uuid": "^10.0.0" } }, "sha512-MLcYSb9ERwvyfxMsMXGjmAYfh6Bn/rkT58ffkibWxbFLiL3ejSdmLGP8Wl7118dMo6nj2PXTcEPzUw+2YPQ62Q=="],
 
+    "@jerrylum/wrpc": ["@jerrylum/wrpc@1.1.0", "", { "peerDependencies": { "zod": "^4.0.0" } }, "sha512-a99K5z6aHm81N3019nkjjBXnHOUFTLnFhBw4Q4NsRbTGQxqnQAe2hU0mR/qmGNdBQiejSYGIQjyTWok781AEfw=="],
+
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 
     "@jridgewell/remapping": ["@jridgewell/remapping@2.3.5", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-LI9u/+laYG4Ds1TDKSJW2YPrIlcVYOwi2fUC6xB43lueCjgxV4lffOCZCtYFiH6TNOX+tQKXx97T4IKHbhyHEQ=="],
@@ -306,8 +291,6 @@
     "@judgesroom.com/web": ["@judgesroom.com/web@workspace:web"],
 
     "@judgesroom.com/worker": ["@judgesroom.com/worker@workspace:worker"],
-
-    "@judgesroom.com/wrpc": ["@judgesroom.com/wrpc@workspace:wrpc"],
 
     "@lix-js/sdk": ["@lix-js/sdk@0.4.7", "", { "dependencies": { "@lix-js/server-protocol-schema": "0.1.1", "dedent": "1.5.1", "human-id": "^4.1.1", "js-sha256": "^0.11.0", "kysely": "^0.27.4", "sqlite-wasm-kysely": "0.3.0", "uuid": "^10.0.0" } }, "sha512-pRbW+joG12L0ULfMiWYosIW0plmW4AsUdiPCp+Z8rAsElJ+wJ6in58zhD3UwUcd4BNcpldEGjg6PdA7e0RgsDQ=="],
 

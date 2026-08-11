@@ -1,5 +1,5 @@
 import { AccessLinksSchema, AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import { WRPCError, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import { eq } from 'drizzle-orm';
 import z from 'zod';
 import {
@@ -11,7 +11,6 @@ import {
 import { judges } from '../db/schema';
 import type { ClientRouter } from '../client-router';
 import type { ServerContext } from '../server-router';
-import { WRPCError } from '@judgesroom.com/wrpc/server/types';
 import { broadcastDeviceListUpdate } from './device';
 
 export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {

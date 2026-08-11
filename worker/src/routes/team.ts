@@ -1,6 +1,6 @@
 import type { TeamData } from '@judgesroom.com/protocol/src/team';
 import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { teams } from '../db/schema';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { eq } from 'drizzle-orm';

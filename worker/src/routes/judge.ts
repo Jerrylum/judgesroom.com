@@ -1,6 +1,6 @@
 import type { Judge } from '@judgesroom.com/protocol/src/judging';
 import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { judges } from '../db/schema';
 import { eq } from 'drizzle-orm';

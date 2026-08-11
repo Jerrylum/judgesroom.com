@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
-	import type { ConnectionState } from '@judgesroom.com/wrpc/client';
+	import type { ConnectionState } from '@jerrylum/wrpc/client';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let isJudgesRoomJoined = $derived(app.isJudgesRoomJoined());

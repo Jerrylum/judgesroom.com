@@ -148,7 +148,7 @@ cd worker && bun run dev
 
 ## Architecture
 
-- `wrpc`: Bidirectional, type‑safe WebSocket RPC
+- `@jerrylum/wrpc`: Bidirectional, type‑safe WebSocket RPC (npm)
 - `worker`: Cloudflare Worker with Durable Object for connection/state; serves static assets in production
 - `web`: SvelteKit UI built to static site; connects to Worker via HTTP/WebSocket
 - `protocol`: Zod schemas and shared types

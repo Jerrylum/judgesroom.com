@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { initWRPC } from '@judgesroom.com/wrpc/client';
+import { initWRPC } from '@jerrylum/wrpc/client';
 import { ClientAuthenticationSchema } from '@judgesroom.com/protocol/src/access';
 import { DeviceInfoSchema } from '@judgesroom.com/protocol/src/client';
 import { TeamDataSchema } from '@judgesroom.com/protocol/src/team';

@@ -1,12 +1,11 @@
 import { getEssentialData, hasEssentialData, updateEssentialData } from './essential';
-import type { WRPCRootObject } from '@judgesroom.com/wrpc/server';
+import { WRPCError, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
 import { broadcastDeviceListUpdate } from './device';
 import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
-import { WRPCError } from '@judgesroom.com/wrpc/server/types';
 import { getFinalAwardNominations } from './judging';
 import {
 	ClientAuthenticationSchema,

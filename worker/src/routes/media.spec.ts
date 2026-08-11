@@ -3,8 +3,7 @@ import { eq } from 'drizzle-orm';
 import { serverRouter } from '../server-router';
 import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from '../test-utils';
 import type { ServerContext } from '../server-router';
-import type { Session } from '@judgesroom.com/wrpc/server/session';
-import type { AnyRouter } from '@judgesroom.com/wrpc/server/router';
+import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 import { judges, metadata, pendingPhotoUploads, teamPhotos } from '../db/schema';
 import { completePhotoUpload, getPhotoObject, listUploads } from './media';
 import { PHOTO_CACHE_MAX_AGE_SECONDS } from '../media/constants';
@@ -128,7 +127,7 @@ describe('media routes', () => {
 						})
 					}
 				})
-			).rejects.toThrow('You can only create or edit as your bound judge');
+			).rejects.toThrow('CRITICAL: The authenticated identity does not match the submission judge');
 		});
 
 		it('allows upload as the bound judge when access control is on', async () => {

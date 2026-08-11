@@ -6,7 +6,7 @@ import {
 	type ClientAuthentication
 } from '@judgesroom.com/protocol/src/access';
 import { eq } from 'drizzle-orm';
-import { WRPCError } from '@judgesroom.com/wrpc/server/types';
+import { WRPCError } from '@jerrylum/wrpc/server';
 import { judgeAdvisors, judges } from '../db/schema';
 import type { DatabaseOrTransaction } from '../server-router';
 import type { Authentication } from './authentication';
