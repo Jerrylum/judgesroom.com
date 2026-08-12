@@ -2,7 +2,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { generateQrCodeDataUrl } from '$lib/qrcode';
 	import './rubric.css';
-	import { app, tabs, subscriptions, dialogs } from '$lib/index.svelte';
+	import { app, tabs, subscriptions } from '$lib/index.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
 	import { generateUUID } from '$lib/utils.svelte';
@@ -12,7 +12,7 @@
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
-	import RoleSelectionDialog from '../RoleSelectionDialog.svelte';
+	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
@@ -43,7 +43,12 @@
 	let notes = $state('');
 	let timestamp = $state(0);
 
-	const canEditCurrentRubric = $derived(!accessControlEnabled || (currentJudge && judgeId === currentJudge.id));
+	const canEditCurrentRubric = $derived(
+		!accessControlEnabled || isJudgeAdvisor || Boolean(currentJudge && judgeId === currentJudge.id)
+	);
+	const effectiveJudgeGroup = $derived(
+		currentJudgeGroup ?? (judgeId ? app.findJudgeGroupByJudgeId(judgeId) : null)
+	);
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
@@ -97,8 +102,8 @@
 	});
 
 	$effect(() => {
-		if (!isSubmitted) {
-			judgeId = currentJudge?.id ?? null;
+		if (!isSubmitted && currentJudge) {
+			judgeId = currentJudge.id;
 		}
 	});
 
@@ -129,7 +134,7 @@
 	});
 
 	$effect(() => {
-		if (tab.teamId && !currentJudgeGroup?.assignedTeams.includes(tab.teamId)) {
+		if (tab.teamId && !effectiveJudgeGroup?.assignedTeams.includes(tab.teamId)) {
 			// If the user is editing a team that is not assigned to them, uncheck the "Only show assigned teams" checkbox
 			// Such that the user can see all the teams in the event
 			showOnlyAssignedTeams = false;
@@ -144,7 +149,7 @@
 	function handleShowOnlyAssignedTeamsChange(event: { currentTarget: EventTarget & HTMLInputElement }) {
 		const newState = event.currentTarget.checked;
 
-		if (newState && !currentJudgeGroup?.assignedTeams.includes(tab.teamId)) {
+		if (newState && !effectiveJudgeGroup?.assignedTeams.includes(tab.teamId)) {
 			// Clear the team selection if the user is checking the box and the team is not assigned to them
 			tab.teamId = '';
 		}
@@ -155,8 +160,8 @@
 
 	// Get teams to display based on filter
 	const teamsToShow = $derived.by(() => {
-		if (isAssignedJudging && showOnlyAssignedTeams && currentJudgeGroup && !isSubmitted) {
-			const rtn = sortByAssignedTeams(includedTeams, currentJudgeGroup.assignedTeams);
+		if (isAssignedJudging && showOnlyAssignedTeams && effectiveJudgeGroup && !isSubmitted) {
+			const rtn = sortByAssignedTeams(includedTeams, effectiveJudgeGroup.assignedTeams);
 			console.log('rtn', rtn);
 			return rtn;
 		} else {
@@ -201,8 +206,13 @@
 			return;
 		}
 
-		if (!judgeId || !currentJudgeGroup) {
-			app.addErrorNotice('CRITICAL: Please switch to a judge');
+		if (!judgeId) {
+			app.addErrorNotice(m.select_a_judge());
+			return;
+		}
+
+		if (!effectiveJudgeGroup) {
+			app.addErrorNotice(m.select_a_judge());
 			return;
 		}
 
@@ -219,7 +229,7 @@
 
 			// Save the rubric via WRPC
 			await app.wrpcClient.judging.completeTeamInterviewRubric.mutation({
-				judgeGroupId: (isAssignedJudging ? getAssignedGroupIdForTeam(tab.teamId) : null) ?? currentJudgeGroup.id,
+				judgeGroupId: (isAssignedJudging ? getAssignedGroupIdForTeam(tab.teamId) : null) ?? effectiveJudgeGroup.id,
 				submission: {
 					id: tab.rubricId,
 					teamId: tab.teamId,
@@ -265,7 +275,9 @@
 		// Reset all form data
 		tab.teamId = '';
 		tab.rubricId = null;
-		judgeId = currentJudge?.id ?? null;
+		if (!isJudgeAdvisor) {
+			judgeId = currentJudge?.id ?? null;
+		}
 		rubricScores = createEmptyTeamInterviewRubricScores();
 		notes = '';
 		showValidationErrors = false;
@@ -278,10 +290,6 @@
 
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-	}
-
-	function switchToJudge() {
-		dialogs.showCustom(RoleSelectionDialog, { props: {} });
 	}
 </script>
 
@@ -312,7 +320,7 @@
 				{/if}
 
 				<!-- Filter Controls -->
-				{#if isAssignedJudging && !isSubmitted && currentJudgeGroup}
+				{#if isAssignedJudging && !isSubmitted && effectiveJudgeGroup}
 					<div class="mb-4">
 						<label class="flex items-center">
 							<input
@@ -322,7 +330,7 @@
 								onchange={handleShowOnlyAssignedTeamsChange}
 							/>
 							<span class="text-sm text-gray-700">
-								{m.only_show_assigned_teams_for_your_current_judge_group({ name: currentJudgeGroup.name })}
+								{m.only_show_assigned_teams_for_your_current_judge_group({ name: effectiveJudgeGroup.name })}
 							</span>
 						</label>
 					</div>
@@ -385,16 +393,12 @@
 				{/if}
 			{/if}
 
-			<!-- Current Judge Information (Read-only) -->
+			<!-- Current Judge Information -->
 			<div class="mt-2 text-sm text-gray-700">
-				{#if judgeId}
+				{#if isJudgeAdvisor && !isSubmitted}
+					<JudgeAuthorSelect bind:judgeId />
+				{:else if judgeId}
 					<p><strong>{m.judge_name_colon()}</strong>{app.findJudgeById(judgeId)?.name}</p>
-				{:else if isJudgeAdvisor}
-					<p>
-						{m.please_switch_to_a_judge()}{' '}<button onclick={switchToJudge} class="text-blue-500 hover:text-blue-600"
-							>{m.switch_to_judge()}</button
-						>
-					</p>
 				{/if}
 				<!-- Submission Timestamp -->
 				{#if tab.rubricId}
@@ -421,7 +425,7 @@
 						<button onclick={editRubric} class="secondary">{m.edit_rubric()}</button>
 					{/if}
 					<button onclick={closeRubric} class="secondary">{m.close_rubric()}</button>
-					{#if !accessControlEnabled || currentJudge}
+					{#if !accessControlEnabled || currentJudge || isJudgeAdvisor}
 						<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
 					{/if}
 				{:else}
@@ -431,7 +435,7 @@
 		</div>
 
 		<!-- Award Rankings Section -->
-		{#if tab.teamId && currentJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[currentJudgeGroup.id]}
+		{#if tab.teamId && effectiveJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[effectiveJudgeGroup.id]}
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h3 class="mb-4 text-lg font-semibold text-gray-900">{m.award_candidate_ranking()}</h3>
 				<p class="mb-4 text-sm text-gray-600">
@@ -439,7 +443,7 @@
 				</p>
 				<AwardRankingTable
 					title=""
-					judgeGroup={currentJudgeGroup}
+					judgeGroup={effectiveJudgeGroup}
 					showingTeams={{ targetTeams: [tab.teamId] }}
 					bypassAwardRequirements={false}
 				/>

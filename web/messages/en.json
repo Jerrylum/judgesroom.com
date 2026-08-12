@@ -473,6 +473,7 @@
 	"judge_name_colon": "Judge Name: ",
 	"please_switch_to_a_judge": "(Please switch to a judge in order to submit the rubric)",
 	"switch_to_judge": "Switch to Judge",
+	"select_a_judge": "Select a judge",
 	"submitted_at_colon": "Submitted at: ",
 	"team_interview_rubric_directions": "<b>Directions:</b> Determine a point value that best characterizes the content of the Team Interview for that criterion. Please refer to the Team Interview Rubrics article in the GRSF judging guidelines for more information.",
 	"judging_materials_strictly_confidential_description": "All judging materials are strictly confidential. They are not shared beyond the Judges and Judge Advisor and shall be destroyed at the end of the event.",
