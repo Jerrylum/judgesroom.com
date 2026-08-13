@@ -743,7 +743,7 @@
 	"judges_tab_title": "評判",
 	"judges_tab_description": "按評判組管理評判、存取連結、裝置與隊伍分配。",
 	"search_judges_and_teams": "搜尋評判或隊伍…",
-	"download_access_links_csv": "下載 CSV",
+	"download_access_links_csv": "下載存取連結 CSV",
 	"download_access_links_csv_hint": "下載個人存取連結試算表。請把這些連結當作密碼。每位評判只應收到自己的連結。",
 	"access_link_select_to_copy": "若無法使用複製按鈕，請選取連結後以 Ctrl/Cmd+C 複製。",
 	"add_judge": "新增評判",
