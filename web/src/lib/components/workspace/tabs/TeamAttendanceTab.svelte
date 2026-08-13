@@ -154,7 +154,7 @@
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<div class="flex flex-col items-start justify-between gap-3 sm:flex-row">
 				<div>
-					<h2 class="text-lg font-medium text-gray-900">Team Attendance</h2>
+					<h2 class="text-lg font-medium text-gray-900">{m.team_attendance()}</h2>
 					<p class="mt-2 text-sm text-gray-600">
 						{#if hasRobotEventsId}
 							{m.team_attendance_description_robotevents_integrated()}
