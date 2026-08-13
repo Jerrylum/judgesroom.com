@@ -35,6 +35,7 @@ button.tiny {
 input.classic[type='text'],
 input.classic[type='number'],
 input.classic[type='url'],
+input.classic[type='search'],
 textarea.classic,
 select.classic {
 	@apply min-h-10 rounded-md border-gray-300 px-3 py-2 shadow-sm focus:border-slate-900 focus:ring-slate-900;
