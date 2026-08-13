@@ -305,8 +305,8 @@
 						</div>
 
 						<!-- Notebook Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center justify-center overflow-hidden">
-							<div class="flex flex-row justify-center gap-1 p-1">
+						<div class="flex max-w-74 min-w-74 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
+							<div class="mx-auto flex w-max flex-row gap-1 p-1">
 								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
 										<button
@@ -326,8 +326,8 @@
 						</div>
 
 						<!-- Team Interview Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center justify-center overflow-hidden">
-							<div class="flex flex-row justify-center gap-1 p-1">
+						<div class="flex max-w-74 min-w-74 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
+							<div class="mx-auto flex w-max flex-row gap-1 p-1">
 								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
 									<button
 										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
