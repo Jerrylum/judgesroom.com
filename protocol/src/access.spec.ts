@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
+	AUTH_TOKEN_ALPHABET,
+	AUTH_TOKEN_LENGTH,
+	AuthTokenSchema,
 	clientAuthenticationsEqual,
 	generateAuthToken,
 	uncontrolledAuthentication,
@@ -8,6 +11,29 @@ import {
 
 const judgeIdA = '550e8400-e29b-41d4-a716-4466554400aa';
 const judgeIdB = '550e8400-e29b-41d4-a716-4466554400bb';
+
+describe('generateAuthToken', () => {
+	it(`returns ${AUTH_TOKEN_LENGTH} alphanumeric characters from the published alphabet`, () => {
+		const token = generateAuthToken();
+		expect(token).toHaveLength(AUTH_TOKEN_LENGTH);
+		expect(AuthTokenSchema.parse(token)).toBe(token);
+		for (const ch of token) {
+			expect(AUTH_TOKEN_ALPHABET).toContain(ch);
+		}
+	});
+
+	it('does not emit duplicate tokens across a sample (unguessable for a short-lived room)', () => {
+		const tokens = new Set(Array.from({ length: 200 }, () => generateAuthToken()));
+		expect(tokens.size).toBe(200);
+	});
+
+	it('rejects short, long, or non-alphanumeric strings', () => {
+		expect(AuthTokenSchema.safeParse('short').success).toBe(false);
+		expect(AuthTokenSchema.safeParse('abcdefghijklm').success).toBe(false);
+		expect(AuthTokenSchema.safeParse('abcdefghi jk').success).toBe(false);
+		expect(AuthTokenSchema.safeParse('abcdefghijk!').success).toBe(false);
+	});
+});
 
 describe('clientAuthenticationsEqual', () => {
 	it('treats uncontrolled authentications as equal', () => {

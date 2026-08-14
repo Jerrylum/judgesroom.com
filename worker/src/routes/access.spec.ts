@@ -445,6 +445,44 @@ describe('access control', () => {
 		expect(judgeDevice?.authenticated).toEqual({ role: 'judge', judgeId });
 	});
 
+	it('kicks every other client when access control is toggled on or off', async () => {
+		const kicked: string[] = [];
+		context.network.kickOtherClients = async (exceptClientId) => {
+			kicked.push(exceptClientId);
+		};
+
+		await enableAccessControl();
+		expect(kicked).toEqual([jaSession.currentClient.clientId]);
+
+		const essential = await getEssentialData(context.db);
+		await serverRouter.essential.updateEssentialData._def._resolver!({
+			input: { ...essential, accessControlEnabled: false },
+			session: jaSession,
+			ctx: context
+		});
+		expect(kicked).toEqual([jaSession.currentClient.clientId, jaSession.currentClient.clientId]);
+	});
+
+	it('resolveClientAuthentication maps JA and judge tokens and rejects unknown ones', async () => {
+		const links = await enableAccessControl();
+		expect(await resolveClientAuthentication(context.db, links.judgeAdvisorAuthToken)).toMatchObject({
+			isAccessControlled: true,
+			role: 'judge_advisor',
+			authToken: links.judgeAdvisorAuthToken
+		});
+
+		const judgeToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
+		expect(await resolveClientAuthentication(context.db, judgeToken)).toMatchObject({
+			isAccessControlled: true,
+			role: 'judge',
+			judgeId,
+			authToken: judgeToken
+		});
+
+		expect(await resolveClientAuthentication(context.db, 'abcdefghijkl')).toBeNull();
+		expect(await resolveClientAuthentication(context.db, 'short')).toBeNull();
+	});
+
 	it('enforces unique judge authToken index', async () => {
 		await enableAccessControl();
 		const token = generateAuthToken();
