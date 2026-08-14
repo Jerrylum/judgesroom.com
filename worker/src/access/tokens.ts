@@ -5,6 +5,7 @@ import {
 	type AuthToken,
 	type ClientAuthentication
 } from '@judgesroom.com/protocol/src/access';
+import { timingSafeEqualString } from '@judgesroom.com/protocol/src/utils';
 import { eq } from 'drizzle-orm';
 import { WRPCError } from '@jerrylum/wrpc/server';
 import { judgeAdvisors, judges } from '../db/schema';
@@ -42,7 +43,7 @@ export async function resolveClientAuthentication(
 	}
 
 	const jaToken = await getJudgeAdvisorAuthToken(db);
-	if (jaToken === parsed.data) {
+	if (jaToken !== null && timingSafeEqualString(jaToken, parsed.data)) {
 		return { isAccessControlled: true, authToken: parsed.data, role: 'judge_advisor' };
 	}
 

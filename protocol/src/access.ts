@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 export const AUTH_TOKEN_LENGTH = 12;
-export const AUTH_TOKEN_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+/** 64 URL-safe characters so each random byte maps uniformly via `% 64`. */
+export const AUTH_TOKEN_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
 
 /** Singleton primary key for the one Judge Advisors row per room. */
 export const JUDGE_ADVISOR_SINGLETON_ID = 'judge_advisor';
@@ -9,18 +10,14 @@ export const JUDGE_ADVISOR_SINGLETON_ID = 'judge_advisor';
 export const AuthTokenSchema = z
 	.string()
 	.length(AUTH_TOKEN_LENGTH)
-	.regex(/^[a-zA-Z0-9]+$/, { message: 'Auth token must be alphanumeric' });
+	.regex(/^[a-zA-Z0-9_-]+$/, { message: 'Auth token must be alphanumeric, hyphen, or underscore' });
 
 export type AuthToken = z.infer<typeof AuthTokenSchema>;
 
 export function generateAuthToken(): AuthToken {
 	const bytes = new Uint8Array(AUTH_TOKEN_LENGTH);
 	crypto.getRandomValues(bytes);
-	let token = '';
-	for (let i = 0; i < AUTH_TOKEN_LENGTH; i++) {
-		token += AUTH_TOKEN_ALPHABET[bytes[i]! % AUTH_TOKEN_ALPHABET.length];
-	}
-	return token as AuthToken;
+	return Array.from(bytes, (byte) => AUTH_TOKEN_ALPHABET[byte % AUTH_TOKEN_ALPHABET.length]!).join('') as AuthToken;
 }
 
 /** Connection/session auth stored on the WebSocket attachment and returned to the owning client. */

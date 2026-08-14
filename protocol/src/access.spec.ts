@@ -13,7 +13,7 @@ const judgeIdA = '550e8400-e29b-41d4-a716-4466554400aa';
 const judgeIdB = '550e8400-e29b-41d4-a716-4466554400bb';
 
 describe('generateAuthToken', () => {
-	it(`returns ${AUTH_TOKEN_LENGTH} alphanumeric characters from the published alphabet`, () => {
+	it(`returns ${AUTH_TOKEN_LENGTH} characters from the published alphabet`, () => {
 		const token = generateAuthToken();
 		expect(token).toHaveLength(AUTH_TOKEN_LENGTH);
 		expect(AuthTokenSchema.parse(token)).toBe(token);
@@ -27,11 +27,23 @@ describe('generateAuthToken', () => {
 		expect(tokens.size).toBe(200);
 	});
 
-	it('rejects short, long, or non-alphanumeric strings', () => {
+	it('rejects short, long, or characters outside the alphabet', () => {
 		expect(AuthTokenSchema.safeParse('short').success).toBe(false);
 		expect(AuthTokenSchema.safeParse('abcdefghijklm').success).toBe(false);
 		expect(AuthTokenSchema.safeParse('abcdefghi jk').success).toBe(false);
 		expect(AuthTokenSchema.safeParse('abcdefghijk!').success).toBe(false);
+	});
+
+	it('accepts hyphen and underscore so existing alphanumeric tokens remain valid', () => {
+		expect(AuthTokenSchema.safeParse('abcdEFGH-12_').success).toBe(true);
+		expect(AuthTokenSchema.safeParse('abcdefghijkl').success).toBe(true);
+	});
+
+	it('uses a 64-character alphabet so every byte maps uniformly via % 64', () => {
+		expect(AUTH_TOKEN_ALPHABET).toHaveLength(64);
+		expect(256 % AUTH_TOKEN_ALPHABET.length).toBe(0);
+		expect(AUTH_TOKEN_ALPHABET).toContain('-');
+		expect(AUTH_TOKEN_ALPHABET).toContain('_');
 	});
 });
 
