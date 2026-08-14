@@ -10,6 +10,7 @@ import { PHOTO_CACHE_MAX_AGE_SECONDS } from '../media/constants';
 import { uuidv4 } from '@judgesroom.com/protocol/src/utils';
 import { Authentication } from '../access/authentication';
 import { generateAuthToken } from '../access/tokens';
+import { MAX_PHOTOS_PER_TEAM } from '@judgesroom.com/protocol/src/media';
 
 describe('media routes', () => {
 	let context: ServerContext & { cleanup: () => void };
@@ -74,8 +75,12 @@ describe('media routes', () => {
 			expect(result.photoId).toMatch(
 				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 			);
-			expect(result.uploadToken.length).toBeGreaterThan(0);
+			expect(result.uploadToken).toMatch(
+				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+			);
 			expect(result.uploadUrl).toBe(`/media/upload?roomId=${encodeURIComponent(roomId)}`);
+			expect(result.uploadUrl).not.toContain('token=');
+			expect(result.uploadUrl).not.toContain(result.uploadToken);
 
 			const pending = await context.db
 				.select()
@@ -205,7 +210,9 @@ describe('media routes', () => {
 			expect(photo.teamId).toBe(teamId);
 			expect(photo.contentType).toBe('image/jpeg');
 			expect(photo.byteSize).toBe(8);
-			expect(photo.viewSecret.length).toBeGreaterThan(0);
+			expect(photo.viewSecret).toMatch(
+				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+			);
 			expect(photo.createdByDeviceId).toBe(deviceId);
 
 			const stored = await context.photos.get(photo.id);
@@ -289,6 +296,11 @@ describe('media routes', () => {
 
 			await expect(getPhotoObject(context, photo.id, 'wrong-secret')).rejects.toThrow('Photo not found');
 		});
+
+		it('rejects unknown photo ids without throwing a storage error', async () => {
+			await expect(getPhotoObject(context, uuidv4(), uuidv4())).rejects.toThrow('Photo not found');
+			await expect(getPhotoObject(context, 'not-a-uuid', 'also-not')).rejects.toThrow('Photo not found');
+		});
 	});
 
 	describe('deletePhoto', () => {
@@ -340,6 +352,52 @@ describe('media routes', () => {
 					}
 				})
 			).resolves.toEqual({ success: true });
+		});
+
+		it('makes the Durable Object copy unreadable after delete (Workers/browser cache is separate)', async () => {
+			const auth = await createAuthorizedUpload(4);
+			const photo = await completePhotoUpload(context, auth.uploadToken, new ArrayBuffer(4), 'image/jpeg');
+			await serverRouter.media.deletePhoto._def._resolver!({
+				input: { photoId: photo.id },
+				session,
+				ctx: context
+			});
+			await expect(getPhotoObject(context, photo.id, photo.viewSecret)).rejects.toThrow('Photo not found');
+		});
+	});
+
+	describe('listAllTeamPhotos', () => {
+		it('returns viewSecret to any connected client (capability for the stable URL)', async () => {
+			const auth = await createAuthorizedUpload(4);
+			const photo = await completePhotoUpload(context, auth.uploadToken, new ArrayBuffer(4), 'image/jpeg');
+			const listed = await serverRouter.media.listAllTeamPhotos._def._resolver!({
+				input: undefined,
+				session,
+				ctx: context
+			});
+			expect(listed).toEqual(expect.arrayContaining([expect.objectContaining({ id: photo.id, viewSecret: photo.viewSecret })]));
+		});
+	});
+
+	describe('pending upload caps', () => {
+		it('does not count pending rows toward the per-team stored-photo cap', async () => {
+			const resolver = serverRouter.media.createUpload._def._resolver!;
+			const pending = [];
+			for (let i = 0; i < MAX_PHOTOS_PER_TEAM + 1; i++) {
+				pending.push(
+					await resolver({
+						input: {
+							teamId,
+							contentType: 'image/jpeg',
+							byteSize: 4,
+							judgeId: null
+						},
+						session,
+						ctx: context
+					})
+				);
+			}
+			expect(pending).toHaveLength(MAX_PHOTOS_PER_TEAM + 1);
 		});
 	});
 

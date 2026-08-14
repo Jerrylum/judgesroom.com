@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
-import { PHOTO_CACHE_MAX_AGE_SECONDS, photoCacheTags } from './constants';
+import { PHOTO_CACHE_MAX_AGE_SECONDS, PHOTO_X_CONTENT_TYPE_OPTIONS, photoCacheTags } from './constants';
 import { parseRoomId } from '../room-id';
 
 /**
@@ -32,6 +32,7 @@ export class CachedMedia extends WorkerEntrypoint<Env> {
 		const headers = new Headers(response.headers);
 		headers.set('Cache-Control', `public, max-age=${PHOTO_CACHE_MAX_AGE_SECONDS}`);
 		headers.set('Cache-Tag', photoCacheTags(roomId, photoId).join(','));
+		headers.set('X-Content-Type-Options', PHOTO_X_CONTENT_TYPE_OPTIONS);
 
 		return new Response(response.body, {
 			status: response.status,

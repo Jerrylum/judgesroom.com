@@ -12,7 +12,7 @@ import { metadata } from './db/schema';
 import { completePhotoUpload, getPhotoObject, listUploads } from './routes/media';
 import { createPhotosBucket } from './media/r2';
 import type { PhotosBucket } from './media/types';
-import { photoCacheTag, roomPhotoCacheTag } from './media/constants';
+import { photoCacheTag, photoContentHeaders, roomPhotoCacheTag } from './media/constants';
 import type { ClientRouter } from './client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
@@ -193,10 +193,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 
 				const { body, contentType, cacheControl } = await getPhotoObject(ctx, photoId, secret);
 				return new Response(body.body, {
-					headers: {
-						'Content-Type': contentType,
-						'Cache-Control': cacheControl
-					}
+					headers: photoContentHeaders(contentType, cacheControl)
 				});
 			}
 
