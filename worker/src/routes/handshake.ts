@@ -21,9 +21,7 @@ export { RoomStateSchema } from '@judgesroom.com/protocol/src/room';
 export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		joinJudgesRoom: w.procedure.output(JoiningKitSchema).mutation(async ({ ctx, session }) => {
-			const essentialData = await getEssentialData(ctx.db);
-			const hasExistingEssentialData = !!essentialData;
-			if (!hasExistingEssentialData) {
+			if (!(await hasEssentialData(ctx.db))) {
 				throw new WRPCError("Judges' Room not found");
 			}
 

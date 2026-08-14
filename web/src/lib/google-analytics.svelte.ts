@@ -1,3 +1,5 @@
+import { sanitizeAnalyticsUrl } from './analytics-url';
+
 export class GoogleAnalytics {
 	readonly GTAG = 'G-39NVMKLCK8'; // cspell:disable-line
 
@@ -19,7 +21,13 @@ export class GoogleAnalytics {
 		document.body.appendChild(script);
 
 		this.gtag('js', new Date());
-		this.gtag('config', this.GTAG);
+		const config: { page_location: string; page_referrer?: string } = {
+			page_location: sanitizeAnalyticsUrl(window.location.href)
+		};
+		if (document.referrer) {
+			config.page_referrer = sanitizeAnalyticsUrl(document.referrer);
+		}
+		this.gtag('config', this.GTAG, config);
 	}
 
 	public setEnabled(enabled: boolean) {

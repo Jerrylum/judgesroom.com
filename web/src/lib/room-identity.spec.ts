@@ -56,7 +56,7 @@ describe('room identity — client mint and join URLs', () => {
 		expect(buildJudgesRoomJoinUrl('https://judgesroom.com', id, null)).toBe(`https://judgesroom.com/join?roomId=${id}`);
 	});
 
-	it('Google Analytics is enabled by default (join URL may be sent as page_location)', () => {
+	it('Google Analytics remains enabled by default', () => {
 		const preferences = new Preferences(memoryStorage() as never);
 		expect(preferences.get('isGoogleAnalyticsEnabled')).toBe(true);
 	});

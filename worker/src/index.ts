@@ -18,6 +18,7 @@ import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
+import { parseRoomId } from './room-id';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -348,9 +349,9 @@ export default {
 				return withMediaCors(request, new Response(null, { status: 204 }));
 			}
 
-			const roomId = url.searchParams.get('roomId');
+			const roomId = parseRoomId(url.searchParams.get('roomId'));
 			if (!roomId) {
-				return withMediaCors(request, new Response('Missing roomId', { status: 400 }));
+				return withMediaCors(request, new Response('Invalid roomId', { status: 400 }));
 			}
 
 			// Photo GETs go through CachedMedia so Workers Cache can serve HITs without
@@ -368,7 +369,7 @@ export default {
 		}
 
 		if (url.pathname === '/join') {
-			const roomId = url.searchParams.get('roomId');
+			const roomId = parseRoomId(url.searchParams.get('roomId'));
 			const assetResponse = await env.ASSETS.fetch(request);
 
 			if (!roomId) {

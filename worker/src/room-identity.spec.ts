@@ -8,15 +8,10 @@ import { metadata } from './db/schema';
 import type { ServerContext } from './server-router';
 import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 
-/**
- * Same shape as parseIntention() in index.ts. Kept here because the Worker
- * entrypoint cannot be imported from Node tests (cloudflare:workers).
- * /ws uses this. GET /join and /media/* currently do not — see S1-1.
- */
-const ConnectIntentionRoomIdSchema = z.uuidv4();
+import { parseRoomId } from './room-id';
 
 const ConnectIntentionSchema = z.object({
-	roomId: ConnectIntentionRoomIdSchema,
+	roomId: z.uuidv4(),
 	clientId: z.uuidv4(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),
@@ -102,7 +97,7 @@ describe('room identity — handshake with only a roomId', () => {
 				session,
 				ctx: context
 			})
-		).rejects.toThrow(/not found|no metadata found/i);
+		).rejects.toThrow("Judges' Room not found");
 	});
 
 	it('intended: AC-off, knowing roomId is enough to read the whole room', async () => {
@@ -173,12 +168,14 @@ describe('room identity — handshake with only a roomId', () => {
 	});
 });
 
-describe('room identity — GET /join and /media roomId (desired gateway check)', () => {
-	it('non-uuid names must not be used as Durable Object names', () => {
-		// Today index.ts /join and /media call idFromName(roomId) after only a
-		// non-empty check. This is the check /ws already applies.
-		expect(ConnectIntentionRoomIdSchema.safeParse('probe').success).toBe(false);
-		expect(ConnectIntentionRoomIdSchema.safeParse('../../../etc').success).toBe(false);
-		expect(ConnectIntentionRoomIdSchema.safeParse('550e8400-e29b-41d4-a716-446655440000').success).toBe(true);
+describe('room identity — GET /join and /media roomId', () => {
+	it('parseRoomId rejects names that must not reach idFromName', () => {
+		expect(parseRoomId(null)).toBeNull();
+		expect(parseRoomId('')).toBeNull();
+		expect(parseRoomId('probe')).toBeNull();
+		expect(parseRoomId('../../../etc')).toBeNull();
+		expect(parseRoomId('550e8400-e29b-41d4-a716-446655440000')).toBe(
+			'550e8400-e29b-41d4-a716-446655440000'
+		);
 	});
 });

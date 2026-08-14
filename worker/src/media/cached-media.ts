@@ -1,5 +1,6 @@
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { PHOTO_CACHE_MAX_AGE_SECONDS, photoCacheTags } from './constants';
+import { parseRoomId } from '../room-id';
 
 /**
  * Cached entrypoint for team interview photo GETs.
@@ -13,11 +14,11 @@ export class CachedMedia extends WorkerEntrypoint<Env> {
 			return new Response('Not found', { status: 404 });
 		}
 
-		const roomId = url.searchParams.get('roomId');
+		const roomId = parseRoomId(url.searchParams.get('roomId'));
 		const photoId = url.searchParams.get('photoId');
 		const secret = url.searchParams.get('secret');
 		if (!roomId || !photoId || !secret) {
-			return new Response('Missing roomId, photoId, or secret', { status: 400 });
+			return new Response('Invalid roomId, photoId, or secret', { status: 400 });
 		}
 
 		const id = this.env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
