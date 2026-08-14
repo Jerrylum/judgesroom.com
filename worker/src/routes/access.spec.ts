@@ -37,7 +37,11 @@ describe('access control', () => {
 					onAllJudgesUpdate: { mutation: async () => [] },
 					onReassignTeams: { mutation: async () => [] },
 					onSubmissionCacheUpdate: { mutation: async () => [] },
-					onReviewedTeamsUpdate: { mutation: async () => [] }
+					onReviewedTeamsUpdate: { mutation: async () => [] },
+					onTeamDataUpdate: { mutation: async () => [] },
+					onAwardDeliberationStarted: { mutation: async () => [] },
+					onFinalAwardNominationsUpdate: { mutation: async () => [] },
+					onAwardRankingsUpdate: { mutation: async () => [] }
 				}) as never,
 			getServer: () => {
 				throw new Error('getServer() cannot be called from server-side session');
@@ -158,6 +162,172 @@ describe('access control', () => {
 				ctx: judgeCtx
 			})
 		).rejects.toThrow(/Judge Advisor/);
+	});
+
+	it('forbids JA-only mutations for a bound judge', async () => {
+		const links = await enableAccessControl();
+		const judgeToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
+		const judgeCtx = await ctxWithAuth(judgeToken);
+		const jaOnly = /Judge Advisor/;
+
+		await expect(
+			serverRouter.access.listAccessLinks._def._resolver!({
+				input: undefined,
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.access.rotateJudgeAuth._def._resolver!({
+				input: { judgeId },
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.access.rotateJudgeAdvisorAuth._def._resolver!({
+				input: undefined,
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.judge.updateJudge._def._resolver!({
+				input: { id: judgeId, name: 'Hijack', groupId },
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.judge.removeJudge._def._resolver!({
+				input: { judgeId },
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.judge.updateAllJudges._def._resolver!({
+				input: [],
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		await expect(
+			serverRouter.essential.reassignTeam._def._resolver!({
+				input: { teamId: sampleTeamInfoAndData[0]!.id, toJudgeGroupId: groupId },
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+
+		const essential = await getEssentialData(context.db);
+		await expect(
+			serverRouter.essential.updateEssentialData._def._resolver!({
+				input: { ...essential, accessControlEnabled: false },
+				session: judgeSession,
+				ctx: judgeCtx
+			})
+		).rejects.toThrow(jaOnly);
+	});
+
+	it('allows a bound judge to write shared room data', async () => {
+		const links = await enableAccessControl();
+		const judgeToken = links.judges.find((j) => j.judgeId === judgeId)!.authToken;
+		const judgeCtx = await ctxWithAuth(judgeToken);
+		const teamId = sampleTeamInfoAndData[0]!.id;
+
+		await serverRouter.team.updateTeamData._def._resolver!({
+			input: {
+				id: teamId,
+				notebookLink: 'https://example.com/hijack',
+				hasInnovateAwardSubmissionForm: true,
+				notebookDevelopmentStatus: 'fully_developed',
+				absent: true
+			},
+			session: judgeSession,
+			ctx: judgeCtx
+		});
+
+		await serverRouter.judging.updateAwardRanking._def._resolver!({
+			input: { judgeGroupId: groupId, teamId, awardName: 'Design Award', ranking: 1 },
+			session: judgeSession,
+			ctx: judgeCtx
+		});
+
+		await serverRouter.judging.nominateFinalAward._def._resolver!({
+			input: { awardName: 'Design Award', teamId, judgeGroupId: groupId },
+			session: judgeSession,
+			ctx: judgeCtx
+		});
+
+		await serverRouter.judging.startAwardDeliberation._def._resolver!({
+			input: undefined,
+			session: judgeSession,
+			ctx: judgeCtx
+		});
+
+		const [meta] = await context.db.select().from(metadata).limit(1);
+		expect(meta?.judgingStep).toBe('award_deliberations');
+		expect(meta?.accessControlEnabled).toBe(true);
+	});
+
+	it('allows the Judge Advisor to complete a rubric as any judge', async () => {
+		await enableAccessControl();
+		const otherJudgeId = uuidv4();
+		await upsertJudge(context.db, { id: otherJudgeId, name: 'Other', groupId });
+
+		await expect(
+			serverRouter.judging.completeEngineeringNotebookRubric._def._resolver!({
+				input: {
+					judgeGroupId: groupId,
+					submission: {
+						id: uuidv4(),
+						teamId: sampleTeamInfoAndData[0]!.id,
+						judgeId: otherJudgeId,
+						rubric: createEmptyNotebookRubricScores(),
+						notes: 'JA on behalf',
+						innovateAwardNotes: '',
+						timestamp: Date.now()
+					}
+				},
+				session: jaSession,
+				ctx: context
+			})
+		).resolves.toBeUndefined();
+	});
+
+	it('does not list access links when access control is off', async () => {
+		await expect(
+			serverRouter.access.listAccessLinks._def._resolver!({
+				input: undefined,
+				session: jaSession,
+				ctx: context
+			})
+		).rejects.toThrow(/Judge Advisor/);
+	});
+
+	it('allows kick and roster edits when access control is off', async () => {
+		await expect(
+			serverRouter.device.kickDevice._def._resolver!({
+				input: { deviceId: otherDeviceId },
+				session: otherSession,
+				ctx: context
+			})
+		).resolves.toBeUndefined();
+
+		await expect(
+			serverRouter.judge.updateJudge._def._resolver!({
+				input: { id: judgeId, name: 'Anyone', groupId },
+				session: otherSession,
+				ctx: context
+			})
+		).resolves.toBeUndefined();
 	});
 
 	it('rejects spoofed JA deviceId without connection auth', async () => {

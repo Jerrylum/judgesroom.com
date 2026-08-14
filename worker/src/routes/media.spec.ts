@@ -320,6 +320,27 @@ describe('media routes', () => {
 			]);
 		});
 
+		it('allows a bound judge to delete any photo (no authorship check)', async () => {
+			const auth = await createAuthorizedUpload(4);
+			const photo = await completePhotoUpload(context, auth.uploadToken, new ArrayBuffer(4), 'image/jpeg');
+			const resolver = serverRouter.media.deletePhoto._def._resolver!;
+
+			await expect(
+				resolver({
+					input: { photoId: photo.id },
+					session,
+					ctx: {
+						...context,
+						auth: Authentication.withFixture({
+							isAccessControlled: true,
+							authToken: generateAuthToken(),
+							role: 'judge',
+							judgeId: uuidv4()
+						})
+					}
+				})
+			).resolves.toEqual({ success: true });
+		});
 	});
 
 	describe('listUploads', () => {
