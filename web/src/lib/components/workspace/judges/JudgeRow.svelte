@@ -46,7 +46,7 @@
 	}
 
 	async function openAccessLinkDialog(accessUrl: string) {
-		await dialogs.showCustom(JudgeAccessLinkDialog, {
+		const result = await dialogs.showCustom(JudgeAccessLinkDialog, {
 			props: {
 				name,
 				accessUrl,
@@ -55,6 +55,11 @@
 			},
 			maxWidth: 'max-w-4xl'
 		});
+		// Rotate closes with the new URL. Confirmation unmounts this dialog, so reopen
+		// instead of trying to patch the destroyed instance.
+		if (typeof result === 'string') {
+			await openAccessLinkDialog(result);
+		}
 	}
 
 	async function rotateLink() {

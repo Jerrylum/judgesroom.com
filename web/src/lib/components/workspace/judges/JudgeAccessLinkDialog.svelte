@@ -17,7 +17,6 @@
 
 	let { name, accessUrl, judgeId, onAccessLinksChanged }: Props = $props();
 
-	let currentAccessUrl = $state(accessUrl);
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state(m.copy());
 	const clipboardAvailable = canUseClipboard();
@@ -33,13 +32,9 @@
 	);
 
 	$effect(() => {
-		currentAccessUrl = accessUrl;
-	});
-
-	$effect(() => {
-		if (!currentAccessUrl) return;
+		if (!accessUrl) return;
 		(async () => {
-			qrCodeDataUrl = await generateQrCodeDataUrl(currentAccessUrl, {
+			qrCodeDataUrl = await generateQrCodeDataUrl(accessUrl, {
 				width: (41 + 2 + 2) * 4,
 				margin: 2,
 				color: {
@@ -53,7 +48,7 @@
 
 	async function handleCopy() {
 		try {
-			await navigator.clipboard.writeText(currentAccessUrl);
+			await navigator.clipboard.writeText(accessUrl);
 			copyButtonText = m.copied();
 			setTimeout(() => {
 				copyButtonText = m.copy();
@@ -78,8 +73,9 @@
 
 		try {
 			const { authToken } = await app.wrpcClient.access.rotateJudgeAuth.mutation({ judgeId });
-			currentAccessUrl = app.getJudgesRoomUrl(authToken);
 			onAccessLinksChanged?.();
+			// JudgeRow reopens this dialog with the returned URL.
+			dialogs.closeDialog(app.getJudgesRoomUrl(authToken));
 		} catch (error) {
 			console.error('Failed to rotate access link:', error);
 			app.addErrorNotice(error instanceof Error ? error.message : String(error));
@@ -162,7 +158,7 @@
 						<input
 							id="judge-access-url"
 							type="text"
-							value={currentAccessUrl}
+							value={accessUrl}
 							readonly
 							class="classic min-w-0 flex-1"
 							onclick={handleFocus}
