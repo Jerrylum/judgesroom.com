@@ -30,7 +30,7 @@ import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
 import { AuthTokenSchema, isConnectAuthCloseReason } from '@judgesroom.com/protocol/src/access';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
-import { shouldResumeJudgesRoom } from './session-resume';
+import { connectionResumeStep } from './session-resume';
 
 export interface Notice {
 	id: string;
@@ -126,6 +126,8 @@ export class App {
 	/** Bumped after a successful reconnect resume so Workspace effects re-subscribe. */
 	private sessionEpoch = $state(0);
 	private resumeGeneration = 0;
+	/** wrpc goes reconnecting → connecting → connected; remember the first hop. */
+	private reconnectPending = false;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
 	public readonly version: string = '2.1.0';
 
@@ -347,6 +349,7 @@ export class App {
 		this.deviceListRetainCount = 0;
 		this.sessionEpoch = 0;
 		this.resumeGeneration += 1;
+		this.reconnectPending = false;
 		this.allFinalAwardNominations = {};
 		// no client-held room id field to clear
 		this.clientManager.resetClient();
@@ -836,9 +839,10 @@ export class App {
 				}
 			},
 			onConnectionStateChange: (state) => {
-				const previous = this.connectionState;
 				this.connectionState = state;
-				if (shouldResumeJudgesRoom(previous, state, this.isJudgesRoomJoined())) {
+				const step = connectionResumeStep(state, this.isJudgesRoomJoined(), this.reconnectPending);
+				this.reconnectPending = step.reconnectPending;
+				if (step.resume) {
 					void this.resumeJudgesRoom();
 				}
 			}
