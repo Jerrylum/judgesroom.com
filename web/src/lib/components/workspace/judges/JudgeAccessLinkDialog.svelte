@@ -111,6 +111,13 @@
 	function handleFocus(event: FocusEvent & { currentTarget: HTMLInputElement }) {
 		event.currentTarget.select();
 	}
+
+	$effect(() => {
+		app.retainDeviceList();
+		return () => {
+			app.releaseDeviceList();
+		};
+	});
 </script>
 
 <Dialog open={true} onClose={handleClose} innerContainerClass="max-w-4xl p-4!">

@@ -5,13 +5,13 @@
 	import JudgeGroupSection from './JudgeGroupSection.svelte';
 	import { buildAccessLinksCsv, downloadTextFile } from '$lib/judges-csv';
 	import type { AccessLinks } from '@judgesroom.com/protocol/src/access';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		isActive?: boolean;
 	}
 
-	let { isActive: _isActive = false }: Props = $props();
+	let { isActive = false }: Props = $props();
 
 	let searchQuery = $state('');
 	let accessLinks = $state<AccessLinks | null>(null);
@@ -75,14 +75,15 @@
 	}
 
 	onMount(() => {
-		app.wrpcClient.device.subscribeDeviceList.mutation().then((list) => {
-			app.handleDeviceListUpdate(list);
-		});
 		void loadAccessLinks();
 	});
 
-	onDestroy(() => {
-		app.wrpcClient.device.unsubscribeDeviceList.mutation();
+	$effect(() => {
+		if (!isActive) return;
+		app.retainDeviceList();
+		return () => {
+			app.releaseDeviceList();
+		};
 	});
 </script>
 

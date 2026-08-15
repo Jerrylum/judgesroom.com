@@ -48,7 +48,7 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 			return getDevices(ctx);
 		}),
 
-		unsubscribeDeviceList: w.procedure.mutation(async ({ ctx, session }) => {
+		unsubscribeDeviceList: w.procedure.notify(async ({ ctx, session }) => {
 			await unsubscribeTopic(ctx.db, session.currentClient.clientId, 'deviceList');
 		}),
 

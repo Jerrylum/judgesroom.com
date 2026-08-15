@@ -12,6 +12,7 @@
 	const activeTabId = $derived(tabs.activeTab);
 	const activeTab = $derived(activeTabId ? tabs.getTab(activeTabId) : null);
 	const isJudgingReady = $derived(app.isJudgingReady());
+	const sessionEpoch = $derived(app.getSessionEpoch());
 	const currentJudgeGroupId = $derived(app.getCurrentUserJudgeGroup()?.id ?? null);
 	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const isViewingAwardNominationTab = $derived(activeTab?.type === 'award_nomination');
@@ -105,6 +106,7 @@
 
 	$effect(() => {
 		if (!isJudgingReady) return;
+		sessionEpoch;
 
 		console.log('Subscribing to award rankings', $state.snapshot(targetJudgeGroupIds));
 		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
@@ -117,15 +119,15 @@
 			);
 		});
 
-		return async () => {
+		return () => {
 			console.log('Unsubscribing from award rankings');
-
-			await app.wrpcClient.judging.unsubscribeAwardRankings.mutation();
+			app.wrpcClient.judging.unsubscribeAwardRankings.notify();
 		};
 	});
 
 	$effect(() => {
 		if (!isJudgingReady) return;
+		sessionEpoch;
 
 		console.log('Subscribing to reviewed teams', $state.snapshot(targetJudgeGroupIds));
 
@@ -139,15 +141,15 @@
 			);
 		});
 
-		return async () => {
+		return () => {
 			console.log('Unsubscribing from reviewed teams');
-
-			await app.wrpcClient.judging.unsubscribeReviewedTeams.mutation();
+			app.wrpcClient.judging.unsubscribeReviewedTeams.notify();
 		};
 	});
 
 	$effect(() => {
 		if (!isJudgingReady) return;
+		sessionEpoch;
 
 		console.log('Subscribing to submission caches', $state.snapshot(targetJudgeGroupIds));
 
@@ -161,15 +163,15 @@
 			);
 		});
 
-		return async () => {
+		return () => {
 			console.log('Unsubscribing from submission caches');
-
-			await app.wrpcClient.judging.unsubscribeSubmissionCaches.mutation();
+			app.wrpcClient.judging.unsubscribeSubmissionCaches.notify();
 		};
 	});
 
 	$effect(() => {
 		if (!isJudgingReady) return;
+		sessionEpoch;
 
 		console.log('Loading team photos');
 		app.wrpcClient.media.listAllTeamPhotos.query().then((photos) => {

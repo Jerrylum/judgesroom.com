@@ -36,6 +36,15 @@ export async function unsubscribeTopics(db: DatabaseOrTransaction, clientId: str
 	await db.delete(subscriptions).where(eq(subscriptions.id, clientId));
 }
 
+/**
+ * Topic rows are keyed by clientId, which wrpc reuses across reconnect.
+ * Skip delete when another socket still holds that tag, or a late close of the
+ * old socket would wipe subscriptions the new socket just recreated.
+ */
+export function shouldClearTopicsOnSocketClose(socketsTaggedWithClientId: readonly WebSocket[], closing: WebSocket): boolean {
+	return !socketsTaggedWithClientId.some((socket) => socket !== closing);
+}
+
 export async function broadcastJudgeGroupTopic<T>(
 	db: DatabaseOrTransaction,
 	judgeGroupId: string,

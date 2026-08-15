@@ -7,7 +7,6 @@
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import { canUseClipboard } from '$lib/utils.svelte';
-	import { onDestroy, onMount } from 'svelte';
 
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state(m.copy());
@@ -83,14 +82,11 @@
 		dialogs.closeDialog();
 	}
 
-	onMount(() => {
-		app.wrpcClient.device.subscribeDeviceList.mutation().then((devices) => {
-			app.handleDeviceListUpdate(devices);
-		});
-	});
-
-	onDestroy(() => {
-		app.wrpcClient.device.unsubscribeDeviceList.mutation();
+	$effect(() => {
+		app.retainDeviceList();
+		return () => {
+			app.releaseDeviceList();
+		};
 	});
 </script>
 

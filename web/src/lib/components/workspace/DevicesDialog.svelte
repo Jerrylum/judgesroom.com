@@ -8,7 +8,6 @@
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
 	import { canUseClipboard } from '$lib/utils.svelte';
-	import { onDestroy, onMount } from 'svelte';
 	import type { DeviceAuthenticated } from '@judgesroom.com/protocol/src/access';
 	import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
 
@@ -135,14 +134,11 @@
 		};
 	}
 
-	onMount(() => {
-		app.wrpcClient.device.subscribeDeviceList.mutation().then((list) => {
-			app.handleDeviceListUpdate(list);
-		});
-	});
-
-	onDestroy(() => {
-		app.wrpcClient.device.unsubscribeDeviceList.mutation();
+	$effect(() => {
+		app.retainDeviceList();
+		return () => {
+			app.releaseDeviceList();
+		};
 	});
 </script>
 

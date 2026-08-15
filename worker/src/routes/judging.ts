@@ -355,8 +355,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 			}),
 
-		unsubscribeReviewedTeams: w.procedure.mutation(async ({ ctx, session }) => {
-			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'reviewedTeams');
+		unsubscribeReviewedTeams: w.procedure.notify(async ({ ctx, session }) => {
+			await unsubscribeTopic(ctx.db, session.currentClient.clientId, 'reviewedTeams');
 		}),
 
 		updateAwardRanking: w.procedure
@@ -386,8 +386,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 			}),
 
-		unsubscribeAwardRankings: w.procedure.mutation(async ({ ctx, session }) => {
-			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
+		unsubscribeAwardRankings: w.procedure.notify(async ({ ctx, session }) => {
+			await unsubscribeTopic(ctx.db, session.currentClient.clientId, 'awardRankings');
 		}),
 
 		subscribeSubmissionCaches: w.procedure
@@ -402,8 +402,8 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 			}),
 
-		unsubscribeSubmissionCaches: w.procedure.mutation(async ({ ctx, session }) => {
-			return unsubscribeTopic(ctx.db, session.currentClient.clientId, 'submissions');
+		unsubscribeSubmissionCaches: w.procedure.notify(async ({ ctx, session }) => {
+			await unsubscribeTopic(ctx.db, session.currentClient.clientId, 'submissions');
 		}),
 
 		nominateFinalAward: w.procedure

@@ -30,6 +30,7 @@ import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
 import { AuthTokenSchema, isConnectAuthCloseReason } from '@judgesroom.com/protocol/src/access';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
+import { shouldResumeJudgesRoom } from './session-resume';
 
 export interface Notice {
 	id: string;
@@ -120,6 +121,11 @@ export class App {
 	private allTeamData: Record<string, TeamData> = $state({});
 	private allJudges: readonly Judge[] = $state([]);
 	private allDevices: readonly DeviceInfo[] = $state([]);
+	/** UI retain count for the deviceList topic (not refcounted on the server). */
+	private deviceListRetainCount = 0;
+	/** Bumped after a successful reconnect resume so Workspace effects re-subscribe. */
+	private sessionEpoch = $state(0);
+	private resumeGeneration = 0;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
 	public readonly version: string = '2.1.0';
 
@@ -188,6 +194,32 @@ export class App {
 			this.clearUserFromStorage();
 			this.addErrorNotice(m.failed_to_join_judges_room({ error: message }));
 			throw new Error(message);
+		}
+	}
+
+	/**
+	 * wrpc auto-reconnect brings the socket back but not the room session.
+	 * Re-join for a fresh snapshot, then re-subscribe topics.
+	 */
+	private async resumeJudgesRoom(): Promise<void> {
+		const generation = ++this.resumeGeneration;
+		const client = this.wrpcClient;
+		try {
+			const joiningKit = await client.handshake.joinJudgesRoom.mutation();
+			if (generation !== this.resumeGeneration || this.wrpcClient !== client || !this.isJudgesRoomJoined()) {
+				return;
+			}
+			this.handleEventSetupUpdate(joiningKit);
+			this.handleClientAuthenticationChange(joiningKit.authentication);
+			this.sessionEpoch += 1;
+			this.subscribeDeviceListIfRetained();
+		} catch (error) {
+			if (generation !== this.resumeGeneration || !this.isJudgesRoomJoined()) {
+				return;
+			}
+			const message = error instanceof Error ? error.message : 'Unknown error';
+			console.error('Failed to resume Judges Room after reconnect:', error);
+			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
 		}
 	}
 
@@ -293,8 +325,6 @@ export class App {
 	 * Leave current Judges' Room
 	 */
 	async leaveJudgesRoom(): Promise<void> {
-
-		
 		// Ask the server to kick siblings, forget this device, and force-close this socket.
 		// The mutation often rejects when kickClient closes us; that is expected.
 		this.intentionalLeave = true;
@@ -314,6 +344,9 @@ export class App {
 		this.allTeamData = {};
 		this.allJudges = [];
 		this.allDevices = [];
+		this.deviceListRetainCount = 0;
+		this.sessionEpoch = 0;
+		this.resumeGeneration += 1;
 		this.allFinalAwardNominations = {};
 		// no client-held room id field to clear
 		this.clientManager.resetClient();
@@ -353,6 +386,10 @@ export class App {
 
 	getConnectionState(): ConnectionState {
 		return this.connectionState;
+	}
+
+	getSessionEpoch(): number {
+		return this.sessionEpoch;
 	}
 
 	handleEventSetupUpdate(data: Readonly<RoomState | JoiningKit>): void {
@@ -468,6 +505,47 @@ export class App {
 	 */
 	handleDeviceListUpdate(clients: Readonly<Readonly<DeviceInfo>[]>): void {
 		this.allDevices = $state.snapshot(clients);
+	}
+
+	/**
+	 * Subscribe to deviceList on 0→1. Callers must pair with releaseDeviceList().
+	 */
+	retainDeviceList(): void {
+		this.deviceListRetainCount++;
+		if (this.deviceListRetainCount !== 1) {
+			return;
+		}
+		this.subscribeDeviceList();
+	}
+
+	releaseDeviceList(): void {
+		if (this.deviceListRetainCount === 0) {
+			return;
+		}
+		this.deviceListRetainCount--;
+		if (this.deviceListRetainCount !== 0) {
+			return;
+		}
+		this.wrpcClient.device.unsubscribeDeviceList.notify();
+	}
+
+	private subscribeDeviceList(): void {
+		this.wrpcClient.device.subscribeDeviceList
+			.mutation()
+			.then((list) => {
+				if (this.deviceListRetainCount === 0) return;
+				this.handleDeviceListUpdate(list);
+			})
+			.catch((error) => {
+				console.error('Failed to subscribe to device list:', error);
+			});
+	}
+
+	private subscribeDeviceListIfRetained(): void {
+		if (this.deviceListRetainCount === 0) {
+			return;
+		}
+		this.subscribeDeviceList();
 	}
 
 	/**
@@ -758,7 +836,11 @@ export class App {
 				}
 			},
 			onConnectionStateChange: (state) => {
+				const previous = this.connectionState;
 				this.connectionState = state;
+				if (shouldResumeJudgesRoom(previous, state, this.isJudgesRoomJoined())) {
+					void this.resumeJudgesRoom();
+				}
 			}
 		};
 	}

@@ -7,7 +7,7 @@ import { drizzle, DrizzleSqliteDODatabase } from 'drizzle-orm/durable-sqlite';
 import { migrate } from 'drizzle-orm/durable-sqlite/migrator';
 import migrations from '../drizzle/migrations';
 import { broadcastDeviceListUpdate } from './routes/device';
-import { unsubscribeTopics } from './routes/subscriptions';
+import { shouldClearTopicsOnSocketClose, unsubscribeTopics } from './routes/subscriptions';
 import { metadata } from './db/schema';
 import { completePhotoUpload, getPhotoObject, listUploads } from './routes/media';
 import { createPhotosBucket } from './media/r2';
@@ -337,8 +337,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			return;
 		}
 
-		if (clientId) {
-			// Do not wait for the unsubscribe to complete
+		if (clientId && shouldClearTopicsOnSocketClose(this.ctx.getWebSockets(clientId), ws)) {
+			// Topic rows are keyed by clientId, which wrpc reuses on reconnect.
+			// Skip delete when a replacement socket already has this tag.
 			unsubscribeTopics(this.db, clientId);
 		}
 
