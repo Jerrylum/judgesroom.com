@@ -48,7 +48,7 @@
 	},
 	"dependencies": {
 		"@judgesroom.com/protocol": "workspace:*",
-		"@jerrylum/wrpc": "^1.1.0",
+		"@jerrylum/wrpc": "^1.2.0",
 		"crypto-js": "^4.2.0",
 		"dompurify": "^3.3.1",
 		"events": "^3.3.0",
