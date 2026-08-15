@@ -4,6 +4,11 @@
   "workspaces": [
     "*"
   ],
+  "scripts": {
+    "build": "bun run --cwd web build",
+    "deploy": "bun run build && bun run --cwd worker deploy",
+    "deploy:beta": "bun run build && bun run --cwd worker deploy:beta"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
   }
