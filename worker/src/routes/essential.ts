@@ -280,7 +280,7 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 
 	return transaction(db, async (tx) => {
 		await tx.delete(metadata);
-		await tx.insert(metadata).values(essentialData); // only for event name, program, event grade level, judging method
+		await tx.insert(metadata).values({ ...essentialData, updatedAt: new Date() });
 		await updateInsertAndDeleteAwards(tx, essentialData.awards);
 		await updateInsertAndDeleteTeams(tx, essentialData.teamInfos);
 		await updateInsertAndDeleteJudgeGroups(tx, essentialData.judgeGroups);

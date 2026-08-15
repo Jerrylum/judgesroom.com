@@ -3,6 +3,8 @@
 ALTER TABLE `Judges` ADD `authToken` text;--> statement-breakpoint
 UPDATE `Judges` SET `authToken` = lower(substr(hex(randomblob(9)), 1, 12)) WHERE `authToken` IS NULL;--> statement-breakpoint
 ALTER TABLE `Metadata` ADD `accessControlEnabled` integer DEFAULT false NOT NULL;--> statement-breakpoint
+-- Nullable so v2.0.0 rooms keep a null stamp; the first retention alarm adopts them.
+ALTER TABLE `Metadata` ADD `updatedAt` integer;--> statement-breakpoint
 CREATE TABLE `JudgeAdvisors` (
 	`id` text PRIMARY KEY NOT NULL,
 	`authToken` text NOT NULL

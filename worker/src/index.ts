@@ -20,6 +20,7 @@ import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 import { parseRoomId } from './room-id';
 import { incomingMessageTooLargeResponse, isIncomingWebSocketMessageTooLarge } from './ws-message-size';
+import { EMPTY_ROOM_TTL_MS, retentionDecision } from './retention';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -104,6 +105,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// that accesses the Drizzle database `this.db`.
 		ctx.blockConcurrencyWhile(async () => {
 			await migrate(this.db, migrations);
+			if ((await ctx.storage.getAlarm()) === null) {
+				await ctx.storage.setAlarm(Date.now() + EMPTY_ROOM_TTL_MS);
+			}
 		});
 	}
 
@@ -280,6 +284,21 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 		const messageCtx = await this.serverContextForWebSocket(ws);
 		await this.wsHandler.handleMessage(ws, messageStr, messageCtx);
+	}
+
+	async alarm(): Promise<void> {
+		const now = Date.now();
+		const meta = await this.getMetadata();
+		const decision = retentionDecision(now, meta !== null, meta?.updatedAt?.getTime() ?? null);
+		if (decision.action === 'destroy') {
+			await this.wsHandler.initialize();
+			await this.network.destroy();
+			return;
+		}
+		if (decision.action === 'adopt') {
+			await this.db.update(metadata).set({ updatedAt: new Date(now) });
+		}
+		await this.ctx.storage.setAlarm(decision.alarmAt);
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {

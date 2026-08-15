@@ -27,7 +27,9 @@ export const metadata = sqliteTable('Metadata', {
 	eventGradeLevel: text('eventGradeLevel', { enum: ['ES Only', 'MS Only', 'HS Only', 'Blended', 'College Only'] }).notNull(),
 	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
 	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull(),
-	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false)
+	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false),
+	/** Last event-setup save. Null on v2.0.0 rooms until the first retention alarm adopts them. */
+	updatedAt: integer('updatedAt', { mode: 'timestamp' })
 });
 
 export const judgeAdvisors = sqliteTable(

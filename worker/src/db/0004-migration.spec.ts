@@ -70,12 +70,14 @@ describe('0004 access-control migration', () => {
 
 		const judges = sqlite.prepare('SELECT COUNT(*) AS count FROM Judges').get() as { count: number };
 		const advisors = sqlite.prepare('SELECT COUNT(*) AS count FROM JudgeAdvisors').get() as { count: number };
-		const meta = sqlite.prepare('SELECT accessControlEnabled FROM Metadata').get() as {
+		const meta = sqlite.prepare('SELECT accessControlEnabled, updatedAt FROM Metadata').get() as {
 			accessControlEnabled: number;
+			updatedAt: number | null;
 		};
 
 		expect(judges.count).toBe(0);
 		expect(advisors.count).toBe(0);
 		expect(meta.accessControlEnabled).toBe(0);
+		expect(meta.updatedAt).toBeNull();
 	});
 });

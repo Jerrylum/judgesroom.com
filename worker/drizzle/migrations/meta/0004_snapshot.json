@@ -807,6 +807,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
