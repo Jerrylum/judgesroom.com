@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { isExcellenceAward, isDesignAward, type Award } from '@judgesroom.com/protocol/src/award';
+	import { isExcellenceAward, isDesignAward, getPairedExcellenceAwardName, type Award } from '@judgesroom.com/protocol/src/award';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
@@ -95,8 +95,17 @@
 		showAddDialog = false;
 	}
 
-	// Get absent team IDs (already nominated)
-	let absentTeamIds = $derived(new Set(editing.map((nom) => nom.teamId)));
+	// Teams already on this list, plus Excellence nominees when adding to Design.
+	let absentTeamIds = $derived.by(() => {
+		const ids = new Set(editing.map((nom) => nom.teamId));
+		if (isDesignAward(award.name)) {
+			const excellenceName = getPairedExcellenceAwardName(award.name);
+			for (const nom of allFinalAwardNominations[excellenceName] ?? []) {
+				ids.add(nom.teamId);
+			}
+		}
+		return ids;
+	});
 
 	// Create a map of team eligibility status for Excellence Awards
 	const teamEligibilityMap = $derived.by(() => {
