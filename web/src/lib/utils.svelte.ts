@@ -1,7 +1,7 @@
 import type { TeamData } from '@judgesroom.com/protocol/src/team';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
-import z from 'zod';
 import { v4 } from 'uuid';
 
 /**
@@ -81,7 +81,7 @@ export function parseJudgesRoomUrl(url: string): string | null {
 	try {
 		const roomId = new SvelteURL(url).searchParams.get('roomId');
 		if (!roomId) return null;
-		return z.uuidv4().parse(roomId);
+		return RoomIdSchema.parse(roomId);
 	} catch (error) {
 		console.error("Failed to parse Judges' Room URL:", error);
 		return null;

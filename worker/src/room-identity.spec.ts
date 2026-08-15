@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import { serverRouter } from './server-router';
 import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from './test-utils';
 import { Authentication } from './access/authentication';
@@ -11,7 +12,7 @@ import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 import { parseRoomId } from './room-id';
 
 const ConnectIntentionSchema = z.object({
-	roomId: z.uuidv4(),
+	roomId: RoomIdSchema,
 	clientId: z.uuidv4(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),
@@ -47,7 +48,7 @@ function makeSession(deviceId: string): Session<AnyRouter> {
 }
 
 describe('room identity — connect intention (WebSocket /ws)', () => {
-	it('requires uuid v4 roomId, clientId, and deviceId', () => {
+	it('requires a roomId (uuid v4 or 18-char token), plus uuid v4 clientId and deviceId', () => {
 		const valid = {
 			roomId: '550e8400-e29b-41d4-a716-446655440000',
 			clientId: '550e8400-e29b-41d4-a716-446655440001',
@@ -57,9 +58,11 @@ describe('room identity — connect intention (WebSocket /ws)', () => {
 			auth: null
 		};
 		expect(ConnectIntentionSchema.parse(valid).roomId).toBe(valid.roomId);
+		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: 'Ab3-_xY9QRstuvW012' }).success).toBe(true);
 		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: 'not-a-uuid' }).success).toBe(false);
 		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: '' }).success).toBe(false);
 		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: 'room-1' }).success).toBe(false);
+		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: 'abcdefghijkl' }).success).toBe(false);
 	});
 
 	it('caps deviceName at 20 characters (connect query)', () => {
@@ -190,5 +193,7 @@ describe('room identity — GET /join and /media roomId', () => {
 		expect(parseRoomId('550e8400-e29b-41d4-a716-446655440000')).toBe(
 			'550e8400-e29b-41d4-a716-446655440000'
 		);
+		expect(parseRoomId('Ab3-_xY9QRstuvW012')).toBe('Ab3-_xY9QRstuvW012');
+		expect(parseRoomId('abcdefghijkl')).toBeNull();
 	});
 });

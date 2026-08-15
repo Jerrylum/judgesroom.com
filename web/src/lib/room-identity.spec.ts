@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { Preferences } from './preferences.svelte';
+import { generateRoomId } from '@judgesroom.com/protocol/src/room-id';
 import { buildJudgesRoomJoinUrl, generateUUID, parseAuthTokenFromUrl, parseJudgesRoomUrl } from './utils.svelte';
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -28,11 +29,14 @@ describe('room identity — client mint and join URLs', () => {
 		expect(generateUUID()).toMatch(UUID_V4);
 	});
 
-	it('parseJudgesRoomUrl accepts only uuid v4 roomId query values', () => {
+	it('parseJudgesRoomUrl accepts uuid v4 and 18-char roomId query values', () => {
 		const id = '550e8400-e29b-41d4-a716-446655440000';
+		const shortId = 'Ab3-_xY9QRstuvW012';
 		expect(parseJudgesRoomUrl(`https://judgesroom.com/join?roomId=${id}`)).toBe(id);
 		expect(parseJudgesRoomUrl(`https://judgesroom.com/app?roomId=${id}&auth=abcdefghijkl`)).toBe(id);
+		expect(parseJudgesRoomUrl(`https://judgesroom.com/join?roomId=${shortId}`)).toBe(shortId);
 		expect(parseJudgesRoomUrl('https://judgesroom.com/join?roomId=not-a-uuid')).toBeNull();
+		expect(parseJudgesRoomUrl('https://judgesroom.com/join?roomId=abcdefghijkl')).toBeNull();
 		expect(parseJudgesRoomUrl('https://judgesroom.com/join?roomId=')).toBeNull();
 		expect(parseJudgesRoomUrl('https://judgesroom.com/join')).toBeNull();
 
@@ -49,11 +53,15 @@ describe('room identity — client mint and join URLs', () => {
 
 	it('buildJudgesRoomJoinUrl puts roomId (and optional auth) in the query string', () => {
 		const id = '550e8400-e29b-41d4-a716-446655440000';
+		const shortId = generateRoomId();
 		expect(buildJudgesRoomJoinUrl('https://judgesroom.com', id)).toBe(`https://judgesroom.com/join?roomId=${id}`);
 		expect(buildJudgesRoomJoinUrl('https://judgesroom.com', id, 'abcdefghijkl')).toBe(
 			`https://judgesroom.com/join?roomId=${id}&auth=abcdefghijkl`
 		);
 		expect(buildJudgesRoomJoinUrl('https://judgesroom.com', id, null)).toBe(`https://judgesroom.com/join?roomId=${id}`);
+		expect(buildJudgesRoomJoinUrl('https://judgesroom.com', shortId, 'abcdefghijkl')).toBe(
+			`https://judgesroom.com/join?roomId=${shortId}&auth=abcdefghijkl`
+		);
 	});
 
 	it('Google Analytics remains enabled by default', () => {

@@ -16,6 +16,7 @@ import { photoCacheTag, photoContentHeaders, roomPhotoCacheTag } from './media/c
 import type { ClientRouter } from './client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 import { parseRoomId } from './room-id';
@@ -25,7 +26,7 @@ import { EMPTY_ROOM_TTL_MS, retentionDecision } from './retention';
 export { CachedMedia } from './media/cached-media';
 
 const IntentionSchema = z.object({
-	roomId: z.uuidv4(),
+	roomId: RoomIdSchema,
 	clientId: z.uuidv4(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(20),

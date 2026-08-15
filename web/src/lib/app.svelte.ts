@@ -28,6 +28,7 @@ import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 import type { JoiningKit, RoomState } from '@judgesroom.com/protocol/src/room';
 import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
 import { AuthTokenSchema, isConnectAuthCloseReason } from '@judgesroom.com/protocol/src/access';
+import { RoomIdSchema, generateRoomId } from '@judgesroom.com/protocol/src/room-id';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 import { connectionResumeStep } from './session-resume';
@@ -96,7 +97,7 @@ export class AppStorage {
 }
 
 export const PermitSchema = z.object({
-	roomId: z.uuidv4(),
+	roomId: RoomIdSchema,
 	createdAt: z.number().int().positive(),
 	deviceId: z.uuidv4(),
 	deviceName: z.string().min(1).max(100),
@@ -286,7 +287,7 @@ export class App {
 				throw new Error('CRITICAL: No essential data');
 			}
 
-			const roomId = generateUUID();
+			const roomId = generateRoomId();
 			// Connect without auth; server mints the JA token and returns it in authentication.
 			this.permit = this.createNewPermit(roomId);
 			this.savePermitToStorage();

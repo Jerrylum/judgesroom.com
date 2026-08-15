@@ -14,10 +14,15 @@ export const AuthTokenSchema = z
 
 export type AuthToken = z.infer<typeof AuthTokenSchema>;
 
-export function generateAuthToken(): AuthToken {
-	const bytes = new Uint8Array(AUTH_TOKEN_LENGTH);
+/** Maps each random byte uniformly onto AUTH_TOKEN_ALPHABET (length 64). */
+export function generateAlphabetToken(length: number): string {
+	const bytes = new Uint8Array(length);
 	crypto.getRandomValues(bytes);
-	return Array.from(bytes, (byte) => AUTH_TOKEN_ALPHABET[byte % AUTH_TOKEN_ALPHABET.length]!).join('') as AuthToken;
+	return Array.from(bytes, (byte) => AUTH_TOKEN_ALPHABET[byte % AUTH_TOKEN_ALPHABET.length]!).join('');
+}
+
+export function generateAuthToken(): AuthToken {
+	return generateAlphabetToken(AUTH_TOKEN_LENGTH) as AuthToken;
 }
 
 /** Connection/session auth stored on the WebSocket attachment and returned to the owning client. */
