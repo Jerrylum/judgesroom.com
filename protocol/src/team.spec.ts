@@ -116,5 +116,17 @@ describe('Teams Schema Validation', () => {
 
 			expect(() => TeamDataSchema.parse(validData)).not.toThrow();
 		});
+
+		it('does not cap notebookLink length', () => {
+			expect(
+				TeamDataSchema.safeParse({
+					id: '550e8400-e29b-41d4-a716-446655440000',
+					notebookLink: 'https://example.com/' + 'a'.repeat(50_000),
+					hasInnovateAwardSubmissionForm: false,
+					notebookDevelopmentStatus: 'undetermined',
+					absent: false
+				}).success
+			).toBe(true);
+		});
 	});
 });

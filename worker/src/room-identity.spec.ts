@@ -62,6 +62,19 @@ describe('room identity — connect intention (WebSocket /ws)', () => {
 		expect(ConnectIntentionSchema.safeParse({ ...valid, roomId: 'room-1' }).success).toBe(false);
 	});
 
+	it('caps deviceName at 20 characters (connect query)', () => {
+		const valid = {
+			roomId: '550e8400-e29b-41d4-a716-446655440000',
+			clientId: '550e8400-e29b-41d4-a716-446655440001',
+			deviceId: '550e8400-e29b-41d4-a716-446655440002',
+			deviceName: '12345678901234567890',
+			action: 'join' as const,
+			auth: null
+		};
+		expect(ConnectIntentionSchema.safeParse(valid).success).toBe(true);
+		expect(ConnectIntentionSchema.safeParse({ ...valid, deviceName: '123456789012345678901' }).success).toBe(false);
+	});
+
 	it('accepts a 12-char auth token or null, not an empty string', () => {
 		const base = {
 			roomId: '550e8400-e29b-41d4-a716-446655440000',
