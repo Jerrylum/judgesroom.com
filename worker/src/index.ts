@@ -90,8 +90,6 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	 */
 	constructor(ctx: DurableObjectState, env: Env) {
 		super(ctx, env);
-		// Initialize the WebSocket handler with hibernation support
-		this.wsHandler.initialize().catch(console.error);
 		this.db = drizzle(this.ctx.storage);
 		this.photos = createPhotosBucket(this.env.TEAM_PHOTOS, (photoIds) => this.env.CACHED_MEDIA.purgeTags(photoIds.map(photoCacheTag)));
 		this.network = new JudgesRoomNetwork({
@@ -103,8 +101,11 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 		// Make sure all migrations complete before accepting queries.
 		// Otherwise you will need to run `this.migrate()` in any function
 		// that accesses the Drizzle database `this.db`.
+		// initialize() must finish here too: isRunning() is false until load(),
+		// and fetch() treats that as a destroyed room.
 		ctx.blockConcurrencyWhile(async () => {
 			await migrate(this.db, migrations);
+			await this.wsHandler.initialize();
 			if ((await ctx.storage.getAlarm()) === null) {
 				await ctx.storage.setAlarm(Date.now() + EMPTY_ROOM_TTL_MS);
 			}
@@ -144,6 +145,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async getMetadata() {
+		if (!this.network.isRunning()) {
+			return null;
+		}
+
 		const metadataRows = await this.db.select().from(metadata).limit(1);
 		if (metadataRows.length === 0) {
 			return null;
@@ -153,6 +158,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async handleMediaRequest(request: Request): Promise<Response> {
+		if (!this.network.isRunning()) {
+			return new Response('Not found', { status: 404 });
+		}
+
 		const url = new URL(request.url);
 		const ctx = this.httpServerContext();
 
@@ -238,6 +247,17 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
 		}
 
+		// The room is destroyed, destroy() wiped the SQLite database and later the DO instance will be
+		// evicted from memory if inactive. During this time, we refuse to handle new connections to the room.
+		// Accept the connection and close it with ROOM_DESTROYED; wrpc will not reconnect.
+		// After the Durable Object is evicted from memory, an incoming request will run the DO constructor
+		// and migrate() the database again. Same roomId is a vacant lot again.
+		if (!this.network.isRunning()) {
+			this.ctx.acceptWebSocket(server);
+			server.close(ConnectionCloseCode.ROOM_DESTROYED, 'Room destroyed');
+			return new Response(null, { status: 101, webSocket: client });
+		}
+
 		const connectAuth = await this.network.authorizeConnect(deviceId, auth);
 		if (!connectAuth.allowed) {
 			// Browser JS cannot read HTTP 401 on a failed upgrade. Accept then close with a
@@ -274,6 +294,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
+		if (!this.network.isRunning()) {
+			return;
+		}
+
 		if (isIncomingWebSocketMessageTooLarge(rawMessage)) {
 			if (ws.readyState === WebSocket.OPEN) {
 				ws.send(incomingMessageTooLargeResponse);
@@ -287,6 +311,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async alarm(): Promise<void> {
+		if (!this.network.isRunning()) {
+			return;
+		}
+
 		const now = Date.now();
 		const meta = await this.getMetadata();
 		const decision = retentionDecision(now, meta !== null, meta?.updatedAt?.getTime() ?? null);
@@ -304,6 +332,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
 		// Delegate to the WebSocket handler
 		const clientId = await this.wsHandler.handleClose(ws, code, reason);
+
+		if (code === ConnectionCloseCode.ROOM_DESTROYED) {
+			return;
+		}
 
 		if (clientId) {
 			// Do not wait for the unsubscribe to complete

@@ -227,6 +227,12 @@ describe('JudgesRoomNetwork.authorizeConnect', () => {
 		const jaStillAllowed = await context.network.authorizeConnect(jaDeviceId, jaToken);
 		expect(jaStillAllowed.allowed).toBe(true);
 	});
+
+	it('is not running after destroy', async () => {
+		expect(context.network.isRunning()).toBe(true);
+		await context.network.destroy();
+		expect(context.network.isRunning()).toBe(false);
+	});
 });
 
 function accessLinkEntries(count: number, authentication: ClientAuthentication): ClientAuthenticationEntry[] {

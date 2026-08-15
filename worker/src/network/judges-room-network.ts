@@ -149,6 +149,10 @@ export class JudgesRoomNetwork implements Network {
 		return this.opts.inner.destroy();
 	}
 
+	isRunning(): boolean {
+		return this.opts.inner.isRunning();
+	}
+
 	async isAccessControlEnabled(): Promise<boolean> {
 		const rows = await this.opts.db.select({ accessControlEnabled: metadata.accessControlEnabled }).from(metadata).limit(1);
 		return rows[0]?.accessControlEnabled ?? false;

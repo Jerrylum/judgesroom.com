@@ -119,6 +119,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 	const connectedClientIds = new Set<string>();
 	const connectedDeviceIds = new Set<string>();
 	const clientData = new Map<string, ClientData>();
+	let running = true;
 
 	const inner: Network = {
 		async sendToClient() {
@@ -148,8 +149,12 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 			connectedClientIds.delete(clientId);
 		},
 		async destroy() {
+			running = false;
 			connectedClientIds.clear();
 			clientData.clear();
+		},
+		isRunning() {
+			return running;
 		}
 	};
 
