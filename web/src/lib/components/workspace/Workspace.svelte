@@ -58,8 +58,6 @@
 	}
 
 	async function closeTab(tabId: string) {
-		console.log('closeTab', tabId);
-
 		const tab = tabs.getTab(tabId);
 
 		// Check if tab has unsaved data

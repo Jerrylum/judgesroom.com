@@ -31,9 +31,8 @@ describe('media routes', () => {
 			broadcast: () =>
 				({
 					onTeamPhotoUpdate: {
-						mutation: async (input: unknown) => {
+						notify: (input: unknown) => {
 							photoUpdates.push(input);
-							return [];
 						}
 					}
 				}) as never,

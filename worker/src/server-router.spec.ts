@@ -23,12 +23,12 @@ describe('ServerRouter', () => {
 			getClient: () => ({}) as any,
 			broadcast: () =>
 				({
-					onDeviceListUpdate: { mutation: async () => [] },
-					onEventSetupUpdate: { mutation: async () => [] },
-					onAllTeamDataUpdate: { mutation: async () => [] },
-					onTeamDataUpdate: { mutation: async () => [] },
-					onAllJudgesUpdate: { mutation: async () => [] },
-					onReassignTeams: { mutation: async () => [] }
+					onDeviceListUpdate: { notify: () => {} },
+					onEventSetupUpdate: { notify: () => {} },
+					onAllTeamDataUpdate: { notify: () => {} },
+					onTeamDataUpdate: { notify: () => {} },
+					onAllJudgesUpdate: { notify: () => {} },
+					onReassignTeams: { notify: () => {} }
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				}) as any,
 			getServer: () => {

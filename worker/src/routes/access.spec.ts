@@ -32,16 +32,16 @@ describe('access control', () => {
 				}) as never,
 			broadcast: () =>
 				({
-					onDeviceListUpdate: { mutation: async () => [] },
-					onEventSetupUpdate: { mutation: async () => [] },
-					onAllJudgesUpdate: { mutation: async () => [] },
-					onReassignTeams: { mutation: async () => [] },
-					onSubmissionCacheUpdate: { mutation: async () => [] },
-					onReviewedTeamsUpdate: { mutation: async () => [] },
-					onTeamDataUpdate: { mutation: async () => [] },
-					onAwardDeliberationStarted: { mutation: async () => [] },
-					onFinalAwardNominationsUpdate: { mutation: async () => [] },
-					onAwardRankingsUpdate: { mutation: async () => [] }
+					onDeviceListUpdate: { notify: () => {} },
+					onEventSetupUpdate: { notify: () => {} },
+					onAllJudgesUpdate: { notify: () => {} },
+					onReassignTeams: { notify: () => {} },
+					onSubmissionCacheUpdate: { notify: () => {} },
+					onReviewedTeamsUpdate: { notify: () => {} },
+					onTeamDataUpdate: { notify: () => {} },
+					onAwardDeliberationStarted: { notify: () => {} },
+					onFinalAwardNominationsUpdate: { notify: () => {} },
+					onAwardRankingsUpdate: { notify: () => {} }
 				}) as never,
 			getServer: () => {
 				throw new Error('getServer() cannot be called from server-side session');

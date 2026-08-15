@@ -27,12 +27,12 @@ function makeSession(deviceId: string): Session<AnyRouter> {
 			}) as never,
 		broadcast: () =>
 			({
-				onDeviceListUpdate: { mutation: async () => [] },
-				onEventSetupUpdate: { mutation: async () => [] },
-				onAllJudgesUpdate: { mutation: async () => [] },
-				onAllTeamDataUpdate: { mutation: async () => [] },
-				onTeamDataUpdate: { mutation: async () => [] },
-				onReassignTeams: { mutation: async () => [] }
+				onDeviceListUpdate: { notify: () => {} },
+				onEventSetupUpdate: { notify: () => {} },
+				onAllJudgesUpdate: { notify: () => {} },
+				onAllTeamDataUpdate: { notify: () => {} },
+				onTeamDataUpdate: { notify: () => {} },
+				onReassignTeams: { notify: () => {} }
 			}) as never,
 		getServer: () => {
 			throw new Error('getServer() cannot be called from server-side session');

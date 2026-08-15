@@ -50,7 +50,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judgesList) => {
-				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.notify(judgesList);
 			});
 		}),
 		removeJudge: w.procedure.input(z.object({ judgeId: z.uuidv4() })).mutation(async ({ ctx, input, session }) => {
@@ -62,7 +62,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 			await ctx.network.kickJudge(input.judgeId);
 
 			getJudges(ctx.db).then((judgesList) => {
-				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.notify(judgesList);
 			});
 
 			// Always broadcast: already-offline kicks do not get a webSocketClose update.
@@ -93,7 +93,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 
 			// Do not wait for the broadcast to complete
 			getJudges(ctx.db).then((judgesList) => {
-				session.broadcast<ClientRouter>().onAllJudgesUpdate.mutation(judgesList);
+				session.broadcast<ClientRouter>().onAllJudgesUpdate.notify(judgesList);
 			});
 
 			await Promise.all(removedJudges.map((judgeId) => ctx.network.kickJudge(judgeId)));

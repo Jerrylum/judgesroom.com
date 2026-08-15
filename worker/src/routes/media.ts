@@ -136,7 +136,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 			await ctx.db.delete(teamPhotos).where(eq(teamPhotos.id, input.photoId));
 			await ctx.photos.delete(photo.id);
 
-			session.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
+			session.broadcast<ClientRouter>().onTeamPhotoUpdate.notify({
 				action: 'deleted',
 				photoId: photo.id,
 				teamId: photo.teamId

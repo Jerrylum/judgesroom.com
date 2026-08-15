@@ -32,7 +32,7 @@ export async function getDevices(ctx: DeviceListContext) {
 export function broadcastDeviceListUpdate(ctx: DeviceListContext, source: ClientSource) {
 	getDevices(ctx).then((devices) => {
 		broadcastTopic(ctx.db, 'deviceList', source, (client) => {
-			return client.onDeviceListUpdate.mutation(devices);
+			return client.onDeviceListUpdate.notify(devices);
 		});
 	});
 }

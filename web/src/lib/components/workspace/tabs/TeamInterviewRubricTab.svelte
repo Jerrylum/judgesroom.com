@@ -162,11 +162,9 @@
 	const teamsToShow = $derived.by(() => {
 		if (isAssignedJudging && showOnlyAssignedTeams && effectiveJudgeGroup && !isSubmitted) {
 			const rtn = sortByAssignedTeams(includedTeams, effectiveJudgeGroup.assignedTeams);
-			console.log('rtn', rtn);
 			return rtn;
 		} else {
 			const rtn = sortByTeamNumber(Object.values(includedTeams));
-			console.log('rtn', rtn);
 			return rtn;
 		}
 	});

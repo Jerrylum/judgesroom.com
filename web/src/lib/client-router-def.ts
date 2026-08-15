@@ -36,45 +36,45 @@ export type ClientRouterHandlers = {
 export function buildClientRouter(handlers: ClientRouterHandlers) {
 	const w = initWRPC.createClient();
 	return w.router({
-		onEventSetupUpdate: w.procedure.input(RoomStateSchema).mutation(async ({ input }) => {
+		onEventSetupUpdate: w.procedure.input(RoomStateSchema).notify(async ({ input }) => {
 			await handlers.onEventSetupUpdate(input);
 		}),
-		onDeviceListUpdate: w.procedure.input(z.array(DeviceInfoSchema)).mutation(async ({ input }) => {
+		onDeviceListUpdate: w.procedure.input(z.array(DeviceInfoSchema)).notify(async ({ input }) => {
 			await handlers.onDeviceListUpdate(input);
 		}),
 		onClientAuthenticationChange: w.procedure.input(ClientAuthenticationSchema).mutation(async ({ input }) => {
 			await handlers.onClientAuthenticationChange(input);
 		}),
-		onAllTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ input }) => {
+		onAllTeamDataUpdate: w.procedure.input(z.array(TeamDataSchema)).notify(async ({ input }) => {
 			await handlers.onAllTeamDataUpdate(input);
 		}),
-		onTeamDataUpdate: w.procedure.input(TeamDataSchema).mutation(async ({ input }) => {
+		onTeamDataUpdate: w.procedure.input(TeamDataSchema).notify(async ({ input }) => {
 			await handlers.onTeamDataUpdate(input);
 		}),
-		onAllJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).mutation(async ({ input }) => {
+		onAllJudgesUpdate: w.procedure.input(z.array(JudgeSchema)).notify(async ({ input }) => {
 			await handlers.onAllJudgesUpdate(input);
 		}),
-		onAwardRankingsUpdate: w.procedure.input(AwardRankingsPartialUpdateSchema).mutation(async ({ input }) => {
+		onAwardRankingsUpdate: w.procedure.input(AwardRankingsPartialUpdateSchema).notify(async ({ input }) => {
 			await handlers.onAwardRankingsUpdate(input);
 		}),
-		onReviewedTeamsUpdate: w.procedure.input(z.object({ judgeGroupId: z.string(), teamId: z.string() })).mutation(async ({ input }) => {
+		onReviewedTeamsUpdate: w.procedure.input(z.object({ judgeGroupId: z.string(), teamId: z.string() })).notify(async ({ input }) => {
 			await handlers.onReviewedTeamsUpdate(input);
 		}),
-		onReassignTeams: w.procedure.input(ReassignTeamsUpdateSchema).mutation(async ({ input }) => {
+		onReassignTeams: w.procedure.input(ReassignTeamsUpdateSchema).notify(async ({ input }) => {
 			await handlers.onReassignTeams(input);
 		}),
-		onSubmissionCacheUpdate: w.procedure.input(z.array(SubmissionCacheSchema)).mutation(async ({ input }) => {
+		onSubmissionCacheUpdate: w.procedure.input(z.array(SubmissionCacheSchema)).notify(async ({ input }) => {
 			await handlers.onSubmissionCacheUpdate(input);
 		}),
 		onFinalAwardNominationsUpdate: w.procedure
 			.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
-			.mutation(async ({ input }) => {
+			.notify(async ({ input }) => {
 				await handlers.onFinalAwardNominationsUpdate(input);
 			}),
-		onAwardDeliberationStarted: w.procedure.mutation(async () => {
+		onAwardDeliberationStarted: w.procedure.notify(async () => {
 			await handlers.onAwardDeliberationStarted();
 		}),
-		onTeamPhotoUpdate: w.procedure.input(TeamPhotoUpdateSchema).mutation(async ({ input }) => {
+		onTeamPhotoUpdate: w.procedure.input(TeamPhotoUpdateSchema).notify(async ({ input }) => {
 			await handlers.onTeamPhotoUpdate(input);
 		})
 	});

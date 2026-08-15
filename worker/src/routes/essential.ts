@@ -175,12 +175,12 @@ export function broadcastReassignUpdate(
 
 	void getJudgeGroups(db).then((groups) => {
 		const assignments = Object.fromEntries(groups.map((group) => [group.id, group.assignedTeams]));
-		session.broadcast().onReassignTeams.mutation(assignments);
+		session.broadcast().onReassignTeams.notify(assignments);
 	});
 
 	if (result.movedCaches.length > 0) {
 		void broadcastTopic(db, 'submissions', session, async (client) =>
-			client.onSubmissionCacheUpdate.mutation(result.movedCaches)
+			client.onSubmissionCacheUpdate.notify(result.movedCaches)
 		);
 	}
 }
@@ -346,7 +346,7 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 					finalAwardNominations: await getFinalAwardNominations(tx)
 				} satisfies RoomState;
 			}).then((message) => {
-				session.broadcast<ClientRouter>().onEventSetupUpdate.mutation(message);
+				session.broadcast<ClientRouter>().onEventSetupUpdate.notify(message);
 			});
 		})
 	};

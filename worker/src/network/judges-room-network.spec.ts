@@ -32,12 +32,12 @@ describe('JudgesRoomNetwork.authorizeConnect', () => {
 			}) as never,
 		broadcast: () =>
 			({
-				onDeviceListUpdate: { mutation: async () => [] },
-				onEventSetupUpdate: { mutation: async () => [] },
-				onAllJudgesUpdate: { mutation: async () => [] },
-				onReassignTeams: { mutation: async () => [] },
-				onSubmissionCacheUpdate: { mutation: async () => [] },
-				onReviewedTeamsUpdate: { mutation: async () => [] }
+				onDeviceListUpdate: { notify: () => {} },
+				onEventSetupUpdate: { notify: () => {} },
+				onAllJudgesUpdate: { notify: () => {} },
+				onReassignTeams: { notify: () => {} },
+				onSubmissionCacheUpdate: { notify: () => {} },
+				onReviewedTeamsUpdate: { notify: () => {} }
 			}) as never,
 		getServer: () => {
 			throw new Error('getServer() cannot be called from server-side session');

@@ -45,36 +45,32 @@ export function shouldClearTopicsOnSocketClose(socketsTaggedWithClientId: readon
 	return !socketsTaggedWithClientId.some((socket) => socket !== closing);
 }
 
-export async function broadcastJudgeGroupTopic<T>(
+export async function broadcastJudgeGroupTopic(
 	db: DatabaseOrTransaction,
 	judgeGroupId: string,
 	topic: string,
 	source: ClientSource,
-	callback: (client: RouterProxy<ClientRouter>) => Promise<T>
-): Promise<T[]> {
+	callback: (client: RouterProxy<ClientRouter>) => void
+): Promise<void> {
 	const subscribers = await db
 		.select()
 		.from(subscriptions)
 		.where(and(eq(subscriptions.judgeGroupId, judgeGroupId), eq(subscriptions.topic, topic)));
 
-	return Promise.all(
-		subscribers.map(async (subscriber) => {
-			return callback(source.getClient(subscriber.id));
-		})
-	);
+	for (const subscriber of subscribers) {
+		callback(source.getClient(subscriber.id));
+	}
 }
 
-export async function broadcastTopic<T>(
+export async function broadcastTopic(
 	db: DatabaseOrTransaction,
 	topic: string,
 	source: ClientSource,
-	callback: (client: RouterProxy<ClientRouter>) => Promise<T>
-): Promise<T[]> {
+	callback: (client: RouterProxy<ClientRouter>) => void
+): Promise<void> {
 	const subscribers = await db.select().from(subscriptions).where(eq(subscriptions.topic, topic));
 
-	return Promise.all(
-		subscribers.map(async (subscriber) => {
-			return callback(source.getClient(subscriber.id));
-		})
-	);
+	for (const subscriber of subscribers) {
+		callback(source.getClient(subscriber.id));
+	}
 }

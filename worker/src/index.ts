@@ -190,7 +190,7 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 				}
 				const photo = await completePhotoUpload(ctx, token, body, request.headers.get('Content-Type'));
 
-				void this.wsHandler.broadcast<ClientRouter>().onTeamPhotoUpdate.mutation({
+				void this.wsHandler.broadcast<ClientRouter>().onTeamPhotoUpdate.notify({
 					action: 'added',
 					photo
 				});

@@ -32,7 +32,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 		updateTeamData: w.procedure.input(TeamDataSchema).mutation(async ({ ctx, input, session }) => {
 			await updateTeamData(ctx.db, input);
 			// Do not wait for the broadcast to complete
-			session.broadcast<ClientRouter>().onTeamDataUpdate.mutation(input);
+			session.broadcast<ClientRouter>().onTeamDataUpdate.notify(input);
 		}),
 		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
 			await transaction(ctx.db, async (tx) => {
@@ -42,7 +42,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 			});
 			// Do not wait for the broadcast to complete
 			getTeamData(ctx.db).then((teamData) => {
-				session.broadcast<ClientRouter>().onAllTeamDataUpdate.mutation(teamData);
+				session.broadcast<ClientRouter>().onAllTeamDataUpdate.notify(teamData);
 			});
 		})
 	};

@@ -116,7 +116,7 @@ export function broadcastFinalAwardNominationsUpdate(
 	broadcast: RouterBroadcastProxy<ClientRouter>
 ) {
 	getFinalAwardNominationsForAward(tx, awardName).then((nominations) => {
-		broadcast.onFinalAwardNominationsUpdate.mutation({ awardName, nominations });
+		broadcast.onFinalAwardNominationsUpdate.notify({ awardName, nominations });
 	});
 }
 
@@ -179,12 +179,12 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation([submissionCache])
+					client.onSubmissionCacheUpdate.notify([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
-						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+						client.onReviewedTeamsUpdate.notify({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
 					);
 				}
 			}),
@@ -251,12 +251,12 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation([submissionCache])
+					client.onSubmissionCacheUpdate.notify([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
-						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+						client.onReviewedTeamsUpdate.notify({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
 					);
 				}
 			}),
@@ -322,12 +322,12 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				});
 				// Do not wait for the broadcast to complete
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.mutation([submissionCache])
+					client.onSubmissionCacheUpdate.notify([submissionCache])
 				);
 				if (isReviewedNewTeam) {
 					// Do not wait for the broadcast to complete
 					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
-						client.onReviewedTeamsUpdate.mutation({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
+						client.onReviewedTeamsUpdate.notify({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
 					);
 				}
 			}),
@@ -372,7 +372,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 					});
 
 				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'awardRankings', session, async (client) =>
-					client.onAwardRankingsUpdate.mutation(input)
+					client.onAwardRankingsUpdate.notify(input)
 				);
 			}),
 
@@ -467,7 +467,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			await ctx.db.update(metadata).set({ judgingStep: 'award_deliberations' });
 
 			// Do not wait for the broadcast to complete
-			session.broadcast<ClientRouter>().onAwardDeliberationStarted.mutation();
+			session.broadcast<ClientRouter>().onAwardDeliberationStarted.notify();
 		})
 	};
 }
