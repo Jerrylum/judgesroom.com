@@ -43,11 +43,15 @@ export type ClientAuthentication = z.infer<typeof ClientAuthenticationSchema>;
 
 export const uncontrolledAuthentication = { isAccessControlled: false } as const satisfies ClientAuthentication;
 
+/** AC-on cap: live sockets per judge before authorizeConnect rejects the newcomer (S5-2). JA is uncapped. */
+export const MAX_CONNECTIONS_PER_ACCESS_LINK = 100;
+
 /** Close-reason strings for connect-time access-control denials (accept-then-close). */
 export const ConnectAuthCloseReason = {
 	ACCESS_LINK_REQUIRED: 'Access link required',
 	INVALID_ACCESS_LINK: 'Invalid or expired access link',
-	DEVICE_AUTH_CONFLICT: 'Device already authenticated with different credentials'
+	DEVICE_AUTH_CONFLICT: 'Device already authenticated with different credentials',
+	TOO_MANY_CONNECTIONS: 'Too many connections for this access link'
 } as const;
 
 export type ConnectAuthCloseReason = (typeof ConnectAuthCloseReason)[keyof typeof ConnectAuthCloseReason];

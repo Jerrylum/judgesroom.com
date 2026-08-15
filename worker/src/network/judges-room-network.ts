@@ -3,6 +3,7 @@ import {
 	uncontrolledAuthentication,
 	clientAuthenticationsEqual,
 	ConnectAuthCloseReason,
+	MAX_CONNECTIONS_PER_ACCESS_LINK,
 	type ConnectAuthCloseReason as ConnectAuthCloseReasonValue
 } from '@judgesroom.com/protocol/src/access';
 import type { Network } from '@jerrylum/wrpc/server';
@@ -35,6 +36,25 @@ export type JudgesRoomNetworkOptions = {
 	db: DrizzleSqliteDODatabase;
 	getWebSockets: () => readonly WebSocket[];
 };
+
+/** True when both attachments are the same AC-on judge. JA is not grouped. */
+export function sameAccessLinkIdentity(a: ClientAuthentication, b: ClientAuthentication): boolean {
+	return a.isAccessControlled && b.isAccessControlled && a.role === 'judge' && b.role === 'judge' && a.judgeId === b.judgeId;
+}
+
+/** Live sockets for this access-link identity. */
+export function countAccessLinkConnections(entries: readonly ClientAuthenticationEntry[], authentication: ClientAuthentication): number {
+	if (!authentication.isAccessControlled) {
+		return 0;
+	}
+	let count = 0;
+	for (const entry of entries) {
+		if (sameAccessLinkIdentity(entry.authentication, authentication)) {
+			count++;
+		}
+	}
+	return count;
+}
 
 /**
  * Room-scoped network: wraps the WRPC connection manager with DO websocket + DB access.
@@ -161,6 +181,10 @@ export class JudgesRoomNetwork implements Network {
 		const existingAuthentication = this.getClientAuthenticationByDeviceId(deviceId);
 		if (existingAuthentication && !clientAuthenticationsEqual(existingAuthentication, authentication)) {
 			return { allowed: false, reason: ConnectAuthCloseReason.DEVICE_AUTH_CONFLICT };
+		}
+		const connected = countAccessLinkConnections(this.getAllClientAuthentications(), authentication);
+		if (connected >= MAX_CONNECTIONS_PER_ACCESS_LINK) {
+			return { allowed: false, reason: ConnectAuthCloseReason.TOO_MANY_CONNECTIONS };
 		}
 		return { allowed: true, authentication };
 	}

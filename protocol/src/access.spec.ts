@@ -3,8 +3,11 @@ import {
 	AUTH_TOKEN_ALPHABET,
 	AUTH_TOKEN_LENGTH,
 	AuthTokenSchema,
+	ConnectAuthCloseReason,
+	MAX_CONNECTIONS_PER_ACCESS_LINK,
 	clientAuthenticationsEqual,
 	generateAuthToken,
+	isConnectAuthCloseReason,
 	uncontrolledAuthentication,
 	type ClientAuthentication
 } from './access';
@@ -120,5 +123,14 @@ describe('clientAuthenticationsEqual', () => {
 		const a: ClientAuthentication = { isAccessControlled: true, authToken, role: 'judge', judgeId: judgeIdA };
 		const b: ClientAuthentication = { isAccessControlled: true, authToken, role: 'judge', judgeId: judgeIdB };
 		expect(clientAuthenticationsEqual(a, b)).toBe(false);
+	});
+});
+
+describe('connect-time close reasons', () => {
+	it('recognizes the per-link connection cap', () => {
+		expect(MAX_CONNECTIONS_PER_ACCESS_LINK).toBe(100);
+		expect(isConnectAuthCloseReason(ConnectAuthCloseReason.TOO_MANY_CONNECTIONS)).toBe(true);
+		expect(isConnectAuthCloseReason(` ${ConnectAuthCloseReason.TOO_MANY_CONNECTIONS} `)).toBe(true);
+		expect(isConnectAuthCloseReason('Client already connected')).toBe(false);
 	});
 });
