@@ -76,8 +76,8 @@
 							</li>
 							<li><strong>Award Deliberations:</strong> Nominations, rankings, and final award decisions</li>
 							<li>
-								<strong>Team Interview Photos:</strong> Pictures of robots or interview context captured by judges during team interviews.
-								Photos may incidentally include people or team identifiers visible in the frame.
+								<strong>Team Interview Photos:</strong> Pictures of robots or interview context captured by judges during team interviews. Photos
+								may incidentally include people or team identifiers visible in the frame.
 							</li>
 						</ul>
 					</div>
@@ -142,9 +142,14 @@
 								the entire judges' room be destroyed. When a judges' room is destroyed, all associated data is permanently deleted —
 								including Durable Object judging state and all interview photos stored for that room in R2 — and cannot be restored.
 							</p>
+							<p class="mb-4 leading-relaxed text-gray-700">
+								As an additional safeguard, a Judges' Room is retained for a maximum of 90 days after the last Event Setup save. For rooms
+								created before version 2.1.0, the 90-day period starts the next time the room is opened.
+							</p>
 							<p class="leading-relaxed text-gray-700">
-								As an additional safeguard on the hosted service, interview photos are subject to a maximum retention of 7 days via R2
-								object lifecycle rules, even if a Judges' Room is abandoned without an explicit destroy action.
+								Interview photos are also subject to a maximum retention of 7 days via R2 object lifecycle rules, even if a Judges' Room is
+								abandoned without an explicit destroy action. Judge Advisors should destroy the room at the end of the event; do not rely on
+								these timers for confidentiality.
 							</p>
 						</div>
 					</div>
@@ -207,7 +212,7 @@
 					</div>
 
 					<div class="border-t pt-4 text-center text-sm text-gray-500">
-						<p>Last updated: July 2026</p>
+						<p>Last updated: August 2026</p>
 					</div>
 				</div>
 			</div>

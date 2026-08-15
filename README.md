@@ -45,7 +45,9 @@ This system is aligned with the GRSF VEX Competition judging guidelines, mapping
 2. Paste the Judges' Room invite link to join, or start a new event
 3. Follow the on‑screen steps: Event Setup → Role Selection → Workspace
 
-You can always return to the same room from the saved permit on your device.
+You can always return to the same room later even after closing the browser tab.
+
+Operational limits (photos per team, connections per judge link, room lifetime, and more) are listed in [docs/limits.md](docs/limits.md).
 
 ## Self‑Hosting
 
@@ -103,7 +105,7 @@ bunx wrangler r2 bucket lifecycle add judgesroom-team-photos \
   --expire-days 7
 ```
 
-When a Judges' Room is destroyed, the Worker deletes that room's photo objects (keyed by photo id) and purges their cache tags. Photos are compressed in the browser (max long edge 1600px) and rejected above 3 MB; each team is limited to 20 photos.
+When a Judges' Room is destroyed, the Worker deletes that room's photo objects (keyed by photo id) and purges their cache tags. Photos are compressed in the browser (max long edge 1600px) and rejected above 3 MB; each team is limited to 10 photos. See [docs/limits.md](docs/limits.md) for the full list.
 
 Optional: Deploy to Cloudflare (production)
 
