@@ -19,6 +19,7 @@ import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 import { parseRoomId } from './room-id';
+import { incomingMessageTooLargeResponse, isIncomingWebSocketMessageTooLarge } from './ws-message-size';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -269,10 +270,14 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	}
 
 	async webSocketMessage(ws: WebSocket, rawMessage: string | ArrayBuffer): Promise<void> {
-		// Convert ArrayBuffer to string if necessary
-		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
+		if (isIncomingWebSocketMessageTooLarge(rawMessage)) {
+			if (ws.readyState === WebSocket.OPEN) {
+				ws.send(incomingMessageTooLargeResponse);
+			}
+			return;
+		}
 
-		// The connection manager will handle finding the right client based on the WebSocket
+		const messageStr = typeof rawMessage === 'string' ? rawMessage : new TextDecoder().decode(rawMessage);
 		const messageCtx = await this.serverContextForWebSocket(ws);
 		await this.wsHandler.handleMessage(ws, messageStr, messageCtx);
 	}
