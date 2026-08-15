@@ -7,7 +7,9 @@
 	"name": "judgesroom-com",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-07-29",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	// Workers Cache: only CachedMedia is cached. Default gateway stays uncached
 	// so /ws, /join, uploads, and static assets are not served from cache / billed
 	// as if the whole Worker were cache-enabled for assets.
@@ -15,8 +17,18 @@
 		"enabled": true
 	},
 	"exports": {
-		"default": { "type": "worker", "cache": { "enabled": false } },
-		"CachedMedia": { "type": "worker", "cache": { "enabled": true } }
+		"default": {
+			"type": "worker",
+			"cache": {
+				"enabled": false
+			}
+		},
+		"CachedMedia": {
+			"type": "worker",
+			"cache": {
+				"enabled": true
+			}
+		}
 	},
 	"env": {
 		"development": {
@@ -48,7 +60,11 @@
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
 				"html_handling": "auto-trailing-slash",
-				"run_worker_first": ["/ws", "/join", "/media/*"],
+				"run_worker_first": [
+					"/ws",
+					"/join",
+					"/media/*"
+				],
 				"binding": "ASSETS"
 			},
 			"durable_objects": {
@@ -79,7 +95,11 @@
 				"directory": "../web/build",
 				"not_found_handling": "404-page",
 				"html_handling": "auto-trailing-slash",
-				"run_worker_first": ["/ws", "/join", "/media/*"],
+				"run_worker_first": [
+					"/ws",
+					"/join",
+					"/media/*"
+				],
 				"binding": "ASSETS"
 			},
 			"durable_objects": {
@@ -107,18 +127,29 @@
 	},
 	"migrations": [
 		{
-			"new_sqlite_classes": ["WebSocketHibernationServer"],
+			"new_sqlite_classes": [
+				"WebSocketHibernationServer"
+			],
 			"tag": "v1"
 		}
 	],
 	"rules": [
 		{
 			"type": "Text",
-			"globs": ["**/*.sql"],
+			"globs": [
+				"**/*.sql"
+			],
 			"fallthrough": true
 		}
 	],
 	"observability": {
 		"enabled": true
-	}
+	},
+	"r2_buckets": [
+		{
+			"bucket_name": "judgesroom-team-photos",
+			"preview_bucket_name": "judgesroom-team-photos-preview",
+			"binding": "TEAM_PHOTOS"
+		}
+	]
 }
