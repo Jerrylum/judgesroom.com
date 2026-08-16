@@ -31,10 +31,15 @@ export type ClientAuthenticationEntry = {
 	authentication: ClientAuthentication;
 };
 
+/** Hibernatable DO sockets. Avoid the DOM WebSocket type so web's svelte-check can import this file. */
+type HibernatableWebSocket = {
+	deserializeAttachment(): unknown;
+};
+
 export type JudgesRoomNetworkOptions = {
 	inner: Network;
 	db: DrizzleSqliteDODatabase;
-	getWebSockets: () => readonly WebSocket[];
+	getWebSockets: () => readonly HibernatableWebSocket[];
 };
 
 /** True when both attachments are the same AC-on judge. JA is not grouped. */
