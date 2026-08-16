@@ -274,6 +274,7 @@ async function main() {
 	writePackagedWranglerConfig(join(staging, 'worker', 'wrangler.jsonc'));
 	cpSync(webBuild, join(staging, 'web'), { recursive: true });
 	cpSync(join(TEMPLATES_DIR, 'README.txt'), join(staging, 'README.txt'));
+	cpSync(join(ROOT, 'LICENSE'), join(staging, 'LICENSE'));
 
 	console.log(`Installing wrangler@${WRANGLER_VERSION} for ${target.npmOs}/${target.npmCpu}…`);
 	writeFileSync(
