@@ -1,0 +1,106 @@
+# Judges Room Standalone zips for Windows x64 and macOS Apple Silicon.
+# Use "act" to run and test the workflow locally.
+# See https://nektosact.com/installation/homebrew.html.
+# Under act, github.actor is nektos/act, so the GitHub Release job is skipped. Build and pack still run.
+# echo '{ "ref": "refs/tags/v0.1.0" }' > .event-file.json
+# Run one matrix target at a time. act shares the host repo, so packing both at once races.
+# act --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:macos-arm64
+# act --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:windows-x64
+
+name: Judges Room Standalone Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4 # Using Node.js as it is required by Wrangler.
+        with:
+          node-version: 22
+      - run: npm install -g bun # Using Bun as it is required by the project.
+        # Removing better-sqlite3 as it takes too long to install and is not needed for the workflow.
+      - run: bun remove better-sqlite3
+      - run: bun install
+      - run: bun run build
+        working-directory: web
+        env:
+          CI: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: web/build
+          if-no-files-found: error
+
+  pack:
+    needs: build-web
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [windows-x64, macos-arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g bun
+      - run: bun remove better-sqlite3
+      - run: bun install
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: web/build
+      - name: Pack Judges Room Standalone
+        run: bun run pack:standalone -- --target ${{ matrix.target }} --skip-web-build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: judgesroom-standalone-${{ matrix.target }}
+          path: dist/judgesroom-standalone-${{ matrix.target }}.zip
+          if-no-files-found: error
+
+  release:
+    if: github.actor != 'nektos/act'
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: judgesroom-standalone-*
+          merge-multiple: true
+          path: dist
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          cat > /tmp/release-notes.md <<EOF
+          judgesroom.com ${tag}. The hosted site at https://judgesroom.com is deployed from this tag.
+
+          ## Standalone server
+
+          To run the app on a computer at the event, so judging does not depend on the public internet, download a zip, unzip it, and double-click **Start**. You do not need to install anything.
+
+          - \`judgesroom-standalone-windows-x64.zip\` — Windows 10/11
+          - \`judgesroom-standalone-macos-arm64.zip\` — Apple Silicon Macs only (M1 and later)
+
+          See \`README.txt\` in the zip for more information.
+
+          Other self-hosting options are in the [README](https://github.com/Jerrylum/judgesroom.com#selfhosting).
+          EOF
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/judgesroom-standalone-windows-x64.zip dist/judgesroom-standalone-macos-arm64.zip --clobber
+          else
+            gh release create "$tag" \
+              --title "judgesroom.com ${tag}" \
+              --notes-file /tmp/release-notes.md \
+              dist/judgesroom-standalone-windows-x64.zip \
+              dist/judgesroom-standalone-macos-arm64.zip
+          fi

@@ -7,9 +7,14 @@
   "scripts": {
     "build": "bun run --cwd web build",
     "deploy": "bun run build && bun run --cwd worker deploy",
-    "deploy:beta": "bun run build && bun run --cwd worker deploy:beta"
+    "deploy:beta": "bun run build && bun run --cwd worker deploy:beta",
+    "pack:standalone": "bun run scripts/pack-standalone.ts",
+    "check": "bun run --cwd protocol check && bun run --cwd worker check && bun run --cwd web check",
+    "test": "bun run --cwd protocol test && bun run --cwd worker test && bun run --cwd web test",
+    "tag-release": "bun run scripts/tag-release.ts"
   },
   "devDependencies": {
+    "@types/node": "^24.2.1",
     "typescript": "^5.0.0"
   }
 }

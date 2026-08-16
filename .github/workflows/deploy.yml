@@ -1,9 +1,9 @@
-# See https://nektosact.com/installation/homebrew.html to run the workflow locally.
-# To test the workflow locally, run:
-# echo { "ref": "refs/tags/v0.1.0" } > .event-file.json
-# echo CLOUDFLARE_API_TOKEN="your-token" >> .secrets
-# echo CLOUDFLARE_ACCOUNT_ID="your-account-id" >> .secrets
-# act --secret-file .secrets --eventpath .event-file.json
+# Deploy the Cloudflare Worker when a v* tag is pushed.
+# Use "act" to run and test the workflow locally.
+# See https://nektosact.com/installation/homebrew.html.
+# Under act, github.actor is nektos/act, so deploy is skipped and replaced with wrangler --dry-run.
+# echo '{ "ref": "refs/tags/v0.1.0" }' > .event-file.json
+# act --eventpath .event-file.json -W .github/workflows/deploy.yml
 
 name: Tagged Deploy Cloudflare Worker
 
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3 # Using Node.js as it is required by Wrangler.
+      - uses: actions/setup-node@v4 # Using Node.js as it is required by Wrangler.
         with:
           node-version: 22
       - run: npm install -g bun # Using Bun as it is required by the project.
@@ -28,7 +28,12 @@ jobs:
         working-directory: web
         env:
           CI: false
+      - name: Build Worker (act dry-run)
+        if: github.actor == 'nektos/act'
+        run: bunx wrangler deploy --dry-run --env production
+        working-directory: worker
       - name: Build & Deploy Worker
+        if: github.actor != 'nektos/act'
         uses: cloudflare/wrangler-action@v3.12.0 # See https://github.com/cloudflare/wrangler-action/issues/386
         with:
           workingDirectory: ${{ github.workspace }}/worker
