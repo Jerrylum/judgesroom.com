@@ -7,10 +7,9 @@ echo " ============================="
 echo " v{{VERSION}}"
 echo " Local server for your event network."
 echo
-echo " Open one of these URLs on this computer. You and the judges must use the same one."
-echo " If more than one appears, use the Wi-Fi address the judges are on."
-echo " That is usually 192.168.... Try it on a judge's phone. If it does not load, try the next URL."
-echo " Do it before you create the room. Never start on localhost."
+echo " Access the app via the URL below. If there are multiple, try them one by one "
+echo " on another device within the same network until one works. Everyone must use "
+echo " the same URL. Do this before you create a room. Never start on localhost."
 echo
 
 print_url() {
