@@ -12,31 +12,31 @@ This system is aligned with the GRSF VEX Competition judging guidelines, mapping
 
 ### Import teams and event info from VEX Events, set up awards and divisions
 
-Import and setup
+![Import and setup](/docs/assets/screenshot-import-and-setup.png)
 
 ### Invite Judges to a shared Judges' Room via link
 
-Join judges room
+![Join judges room](/docs/assets/screenshot-join-judges-room.png)
 
 ### Submit Interview and Engineering Notebook rubrics digitally
 
-Rubrics
+![Rubrics](/docs/assets/screenshot-rubrics.png)
 
 ### Shortlist nominees per award and track follow‑ups
 
-Nominations and followups
+![Nominations and followups](/docs/assets/screenshot-nominations-followups.png)
 
 ### View performance data and Excellence eligibility in real time
 
-Performance eligibility
+![Performance eligibility](/docs/assets/screenshot-performance-eligibility.png)
 
 ### Rank winners and re-order teams without worrying about duplicate judged awards
 
-Award ranking
+![Award ranking](/docs/assets/screenshot-award-ranking.gif)
 
 ### Keep confidential materials in one secure place and delete them afterward
 
-Destroy room
+![Destroy room](/docs/assets/screenshot-destroy-room.png)
 
 ## Quick Start
 
