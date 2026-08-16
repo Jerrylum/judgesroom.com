@@ -92,7 +92,7 @@ Steps:
 bun install
 ```
 
-1. Build the web app for production
+2. Build the web app for production
 
 ```bash
 cd web && bun run build
@@ -100,7 +100,7 @@ cd web && bun run build
 
 This produces static assets in `web/build` (SvelteKit adapter-static).
 
-1. Run the Worker locally in production mode (serves `web/build`)
+3. Run the Worker locally in production mode (serves `web/build`)
 
 ```bash
 cd ../worker && bunx wrangler dev --env production --ip 0.0.0.0
