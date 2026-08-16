@@ -86,7 +86,7 @@
 						<h2 class="mb-4 text-2xl font-semibold">Keeping the Information Secure</h2>
 
 						<p class="mb-4 leading-relaxed text-gray-700">
-							We treat all data stored in the judges' room as highly sensitive information that must be protected at all times.
+							We treat all data stored in the Judges' Room as highly sensitive information that must be protected at all times.
 						</p>
 						<p class="mb-4 leading-relaxed text-gray-700">
 							judgesroom.com operates using Cloudflare Workers as our server infrastructure. All data processing occurs within Cloudflare's
@@ -113,7 +113,7 @@
 						<div class="mb-6">
 							<h3 class="mb-3 text-xl font-semibold">Who Can Access Your Data</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
-								When you join a judges' room, all individuals who can access the judges' room will have access to your input information,
+								When you join a Judges' Room, all individuals who can access the Judges' Room will have access to your input information,
 								including any data you upload or create during the judging process.
 							</p>
 						</div>
@@ -121,16 +121,18 @@
 						<div class="mb-6">
 							<h3 class="mb-3 text-xl font-semibold">Confidentiality</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
-								Judges' rooms are protected by a unique room ID. Anyone who has access to the room ID can access all data and judging
-								materials in the judges' room. To protect your privacy and maintain the confidentiality of judging material, judges and
-								judge advisors should not share the invitation link beyond judges.
+								Judges' Rooms are protected by a unique room ID, and by an authentication token if access control is on. Room IDs and
+								authentication tokens are generated with a cryptographically secure random generator, so they cannot be guessed in practice.
+								The Judge Advisor and each judge receive an invitation link, or an access link that includes an authentication token, to
+								join the room. This is the only way to join. To protect your privacy and maintain the confidentiality of judging material,
+								judges and judge advisors should not share the invitation link beyond judges.
 							</p>
 						</div>
 
 						<div class="mb-6">
 							<h3 class="mb-3 text-xl font-semibold">Modifying Your Data</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
-								You can modify your data at any time while the judges' room is active. This includes updating your evaluations, notes, and
+								You can modify your data at any time while the Judges' Room is active. This includes updating your evaluations, notes, and
 								any other information you've contributed to the judging process.
 							</p>
 						</div>
@@ -139,7 +141,7 @@
 							<h3 class="mb-3 text-xl font-semibold">Deleting Your Information</h3>
 							<p class="mb-4 leading-relaxed text-gray-700">
 								To delete your information, you can ask your judge advisor to remove your name from the Event Setup page, or request that
-								the entire judges' room be destroyed. When a judges' room is destroyed, all associated data is permanently deleted —
+								the entire Judges' Room be destroyed. When a Judges' Room is destroyed, all associated data is permanently deleted —
 								including Durable Object judging state and all interview photos stored for that room in R2 — and cannot be restored.
 							</p>
 							<p class="mb-4 leading-relaxed text-gray-700">
@@ -147,9 +149,9 @@
 								created before version 2.1.0, the 90-day period starts the next time the room is opened.
 							</p>
 							<p class="leading-relaxed text-gray-700">
-								Interview photos are also subject to a maximum retention of 7 days via R2 object lifecycle rules, even if a Judges' Room is
-								abandoned without an explicit destroy action. Judge Advisors should destroy the room at the end of the event; do not rely on
-								these timers for confidentiality.
+								On judgesroom.com, interview photos are subject to a maximum retention of 7 days, even if the room is not destroyed. If you
+								host the app yourself, photos stay until you destroy the room, unless you set up a retention policy. Judge Advisors should
+								destroy the room at the end of the event; do not rely on these timers for confidentiality.
 							</p>
 						</div>
 					</div>
@@ -158,7 +160,7 @@
 						<h2 class="mb-4 text-2xl font-semibold">Compliance</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
 							In accordance with the Global Robotics &amp; Science Foundation (GRSF) VEX Competition judging guidelines confidentiality
-							principles, <strong>all judging materials are strictly confidential</strong>. We treat all data stored in the judges' room as
+							principles, <strong>all judging materials are strictly confidential</strong>. We treat all data stored in the Judges' Room as
 							highly sensitive information that must be protected at all times.
 						</p>
 

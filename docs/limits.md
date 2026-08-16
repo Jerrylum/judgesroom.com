@@ -24,8 +24,9 @@ Rotating a judge’s access link does not raise the cap. It invalidates the old 
 | Allowed types                  | JPEG, WebP, PNG | SVG and other types are rejected.                                   |
 | Upload token lifetime          | **10 minutes**  | Start the upload again if it expires.                               |
 | Cached photo URL               | **24 hours**    | Browsers and the edge may keep a copy after delete for up to a day. |
+| Photo auto-delete              | **7 days**      | On judgesroom.com only.                                             |
 
-Self-hosts should also set an R2 object lifecycle (hosted recommendation: **7 days**) so leftover objects do not sit in the bucket forever. Destroying the room deletes that room’s photos from R2.
+On judgesroom.com, leftover photos are deleted after **7 days** even if nobody destroys the room. If you host the app yourself, photos stay until you destroy the room — unless you set up the same auto-delete (see the README). Destroying the room always deletes that room’s photos.
 
 ## Room lifetime
 
