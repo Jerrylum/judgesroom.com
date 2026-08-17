@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const APP_FILE = join(ROOT, 'web', 'src', 'lib', 'app.svelte.ts');
-const VERSION_RE = /public readonly version:\s*string\s*=\s*'(\d+\.\d+\.\d+)'/;
+const VERSION_RE = /public readonly version:\s*string\s*=\s*'(\d+\.\d+\.\d+(?:-beta\.\d+)?)'/;
 const CACHE_DIR = join(ROOT, '.pack-cache');
 const DIST_DIR = join(ROOT, 'dist');
 const TEMPLATES_DIR = join(ROOT, 'scripts', 'judgesroom-standalone');

@@ -4,6 +4,8 @@
  *   bun run tag-release
  *
  * Does not bump App.version. Set that in web/src/lib/app.svelte.ts first.
+ * Use 2.2.0 for production (judgesroom.com) or 2.2.0-beta.1 for a GitHub
+ * pre-release deployed to beta.judgesroom.com.
  */
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -12,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const APP_FILE = join(ROOT, 'web', 'src', 'lib', 'app.svelte.ts');
-const VERSION_RE = /public readonly version:\s*string\s*=\s*'(\d+\.\d+\.\d+)'/;
+const VERSION_RE = /public readonly version:\s*string\s*=\s*'(\d+\.\d+\.\d+(?:-beta\.\d+)?)'/;
 
 function run(command: string, args: string[], options: { allowFail?: boolean } = {}) {
 	const result = spawnSync(command, args, { cwd: ROOT, stdio: 'inherit', encoding: 'utf8' });
@@ -85,7 +87,8 @@ function assertHeadPushed() {
 function main() {
 	const version = readAppVersion();
 	const tag = `v${version}`;
-	console.log(`Releasing ${tag}`);
+	const channel = /-beta\.\d+$/.test(version) ? 'beta.judgesroom.com (GitHub pre-release)' : 'judgesroom.com';
+	console.log(`Releasing ${tag} → ${channel}`);
 
 	assertCleanWorktree();
 	run('git', ['fetch', 'origin']);
@@ -100,7 +103,7 @@ function main() {
 	assertCleanWorktree();
 	run('git', ['tag', tag]);
 	run('git', ['push', 'origin', tag]);
-	console.log(`Pushed ${tag}. Deploy and standalone workflows should start on GitHub.`);
+	console.log(`Pushed ${tag}. Deploy (${channel}) and standalone workflows should start on GitHub.`);
 }
 
 try {

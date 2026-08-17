@@ -1,4 +1,4 @@
-# Judges Room Standalone zips for Windows x64 and macOS Apple Silicon.
+# v2.2.0 → latest GitHub Release. v2.2.0-beta.1 → GitHub pre-release (not latest).
 # Use "act" to run and test the workflow locally.
 # See https://nektosact.com/installation/homebrew.html.
 # Under act, github.actor is nektos/act, so the GitHub Release job is skipped. Build and pack still run.
@@ -81,8 +81,15 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
+          extra=()
+          if [[ "$tag" == *-beta.* ]]; then
+            extra+=(--prerelease)
+            hosted="judgesroom.com ${tag} is a pre-release. The hosted beta is at https://beta.judgesroom.com."
+          else
+            hosted="judgesroom.com ${tag}. The hosted site at https://judgesroom.com is deployed from this tag."
+          fi
           cat > /tmp/release-notes.md <<EOF
-          judgesroom.com ${tag}. The hosted site at https://judgesroom.com is deployed from this tag.
+          ${hosted}
 
           ## Standalone server
 
@@ -101,6 +108,7 @@ jobs:
             gh release create "$tag" \
               --title "judgesroom.com ${tag}" \
               --notes-file /tmp/release-notes.md \
+              "${extra[@]}" \
               dist/judgesroom-standalone-windows-x64.zip \
               dist/judgesroom-standalone-macos-arm64.zip
           fi
