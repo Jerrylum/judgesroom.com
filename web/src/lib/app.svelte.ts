@@ -130,7 +130,7 @@ export class App {
 	/** wrpc goes reconnecting → connecting → connected; remember the first hop. */
 	private reconnectPending = false;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
-	public readonly version: string = '2.1.0';
+	public readonly version: string = '2.2.0-beta.1';
 
 	// Error handling
 	private notices: Notice[] = $state([]);
