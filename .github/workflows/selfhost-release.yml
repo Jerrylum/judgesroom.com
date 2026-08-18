@@ -107,7 +107,7 @@ jobs:
             gh release upload "$tag" dist/judgesroom-standalone-windows-x64.zip dist/judgesroom-standalone-macos-arm64.zip --clobber
           else
             gh release create "$tag" \
-              --title "judgesroom.com ${tag}" \
+              --title "${tag}" \
               --notes-file /tmp/release-notes.md \
               "${extra[@]}" \
               dist/judgesroom-standalone-windows-x64.zip \
