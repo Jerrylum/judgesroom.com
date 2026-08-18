@@ -16,7 +16,12 @@ Start
      Windows:  Start.bat
      macOS:    Start.command
 3. If Windows Firewall asks, allow access on Private networks.
-   On macOS, the first run from Downloads may need Right-click → Open.
+   On macOS, there are extra steps the first time you start the server.
+   Right-click Start.command → Open. The system will show
+   "Start.command" Not Opened; click Done. Then go to Settings →
+   Privacy & Security, scroll down, find Start.command, and click
+   Open Anyway. To start the server again later, just double-click
+   Start.command.
 4. On this computer, open one of the printed URLs in a browser
    before you create the room. Never start on localhost.
    You and the judges must use the same one. If more than one

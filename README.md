@@ -68,7 +68,7 @@ Download a zip from [GitHub Releases](https://github.com/Jerrylum/judgesroom.com
 - `judgesroom-standalone-windows-x64.zip` — Windows 10/11
 - `judgesroom-standalone-macos-arm64.zip` — Apple Silicon Macs (M1 and later)
 
-Unzip it somewhere writable, then double‑click **Start**. Allow the firewall on Private networks if asked. On macOS, the first open from Downloads may need Right‑click → Open.
+Unzip it somewhere writable, then double‑click **Start**. Allow the firewall on Private networks if asked. On macOS, there are extra steps the first time you start the server. Right‑click **Start.command** → Open. The system will show “Start.command” Not Opened; click Done. Then go to Settings → Privacy & Security, scroll down, find **Start.command**, and click Open Anyway. To start the server again later, just double‑click **Start.command**.
 
 On the host computer, open the printed LAN URL (`http://<lan-ip>:8787`) before you create the room. Never start on localhost. Create the room only after that URL works, then share the invite link. The invite link should also start with your LAN IP, not `localhost` or `127.0.0.1`. Keep the window open while judges are connected. Press `x` or close the window to stop.
 
