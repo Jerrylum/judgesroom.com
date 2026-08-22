@@ -270,7 +270,7 @@
 					bind:value={inputRobotEventsSku}
 					disabled={isImporting}
 					class="classic block max-w-60"
-					placeholder="e.g., RE-VRC-23-4321"
+					placeholder="e.g., VE-V5-26-67890"
 				/>
 			</div>
 
