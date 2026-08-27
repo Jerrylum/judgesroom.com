@@ -59,7 +59,7 @@
 			<div class="aspect-video w-full overflow-hidden rounded-lg bg-slate-200">
 				<iframe
 					class="h-full w-full"
-					src="https://www.youtube.com/embed/iNEQAdeVgOM"
+					src="https://www.youtube.com/embed/5yMKsyINEV8"
 					title={m.home_introduction()}
 					frameborder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
