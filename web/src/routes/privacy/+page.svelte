@@ -55,7 +55,7 @@
 						<p class="leading-relaxed text-gray-700">
 							General usage data also helps us improve the interface and workflow efficiency, making the judging process smoother for all
 							users. All data collection is designed to improve the application without compromising the confidentiality principles required
-							by the GRSF VEX Competition judging guidelines.
+							by the GRSF Competition Judge Guide.
 						</p>
 					</div>
 
@@ -159,7 +159,7 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Compliance</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							In accordance with the Global Robotics &amp; Science Foundation (GRSF) VEX Competition judging guidelines confidentiality
+							In accordance with the Global Robotics &amp; Science Foundation (GRSF) Competition Judge Guide confidentiality
 							principles, <strong>all judging materials are strictly confidential</strong>. We treat all data stored in the Judges' Room as
 							highly sensitive information that must be protected at all times.
 						</p>
@@ -188,7 +188,7 @@
 
 						<p class="leading-relaxed text-gray-700">
 							This approach ensures complete compliance with the judging confidentiality requirements outlined in the Confidential principle
-							for judges and the Secure materials step of judging deliberations in the GRSF judging guidelines. judgesroom.com is designed
+							for judges and the Secure materials step of judging deliberations in the GRSF Competition Judge Guide. judgesroom.com is designed
 							to fully comply with GRSF requirements, particularly regarding confidentiality, impartiality, and proper handling of judging
 							materials.
 						</p>

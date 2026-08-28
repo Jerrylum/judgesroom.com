@@ -4,11 +4,11 @@ Before judgesroom.com, judging meant paper rubrics, sticky notes, and hours of s
 
 By digitizing the judging steps (interviews, rubrics, nominations, rankings), judgesroom.com streamlines the process, reduces errors, and keeps materials confidential. Judges can share the same Judges' Room across multiple devices, making collaboration faster and easier.
 
-judgesroom.com is an open source project aligned with the GRSF VEX Competition judging guidelines. The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. Self‑hosting options are described below.
+judgesroom.com is an open source project aligned with the GRSF Competition Judge Guide. The system is designed to support Judge Advisors and Judges through the process while preserving confidentiality and helping prevent errors. Event Partners may self‑host the application to have full control over the system. Self‑hosting options are described below.
 
 ## What judgesroom.com does for you
 
-This system is aligned with the GRSF VEX Competition judging guidelines, mapping app features directly to each judging activity in a typical event.
+This system is aligned with the GRSF Competition Judge Guide, mapping app features directly to each judging activity in a typical event.
 
 ### Import teams and event info from VEX Events, set up awards and divisions
 
@@ -55,7 +55,7 @@ Operational limits (photos per team, connections per judge link, room lifetime, 
 
 ## Self‑Hosting
 
-There are multiple ways to self‑host judgesroom.com. Note that the privacy policy applies only to the official hosted site at `https://judgesroom.com`. You are responsible for privacy, security, and compliance when self‑hosting. Follow the confidentiality practices in the GRSF judging guidelines (e.g., secure access, destroy materials post‑event).
+There are multiple ways to self‑host judgesroom.com. Note that the privacy policy applies only to the official hosted site at `https://judgesroom.com`. You are responsible for privacy, security, and compliance when self‑hosting. Follow the confidentiality practices in the GRSF Competition Judge Guide (e.g., secure access, destroy materials post‑event).
 
 ### Standalone server (recommended for events)
 
@@ -160,11 +160,11 @@ bunx wrangler r2 bucket lifecycle add judgesroom-team-photos \
 
 When a Judges' Room is destroyed, the Worker deletes that room's photo objects (keyed by photo id) and purges their cache tags.
 
-## How judgesroom.com aligns with GRSF judging guidelines
+## How judgesroom.com aligns with GRSF Competition Judge Guide
 
 - Confidentiality: Deliberation notes, rankings, and materials stay inside the Judges' Room; easy to delete at event end.
 - Award types: Supports Performance, Judged (Excellence, Design, Innovate, Judges Award, etc.), and Volunteer Nominated (Sportsmanship, Energy) workflows. Event Partners can add custom awards to the system if needed.
-- Deliberations: Supports the GRSF deliberation workflow — nominate candidates, gather additional information, review event data, select winners, enter winners, and secure materials. See the Judging Deliberations and Preparing For and Judging at an Event articles in the GRSF judging guidelines.
+- Deliberations: Supports the GRSF deliberation workflow — nominate candidates, gather additional information, review event data, select winners, enter winners, and secure materials. See the Judging Deliberations and Preparing For and Judging at an Event articles in the GRSF Competition Judge Guide.
 - Excellence award guardrails: Helps avoid duplicate judged awards and cascades rankings when winners change.
 
 ## Development

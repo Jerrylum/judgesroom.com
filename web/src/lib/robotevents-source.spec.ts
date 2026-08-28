@@ -39,7 +39,7 @@ describe('RobotEventsSource', () => {
 		const allDivsAllGradesJoinedTeams = await getEventJoinedTeams(client, evtId);
 		expect(allDivsAllGradesJoinedTeams.map((team) => team.id)).toMatchSnapshot();
 
-		// Ordered by rank, also the teams "at the event"/"present" according to GRSF judging guidelines
+		// Ordered by rank, also the teams "at the event"/"present" according to GRSF Competition Judge Guide
 		const allDivsAllGradesAllRankings = await getEventRankings(evt);
 		expect(allDivsAllGradesAllRankings).toMatchSnapshot();
 

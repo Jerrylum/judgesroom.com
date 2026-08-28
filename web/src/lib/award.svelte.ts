@@ -5,7 +5,7 @@ import { type TeamInfo, type NotebookDevelopmentStatus, isSubmittedNotebook } fr
 
 /**
  * GRSF award eligibility helpers.
- * Under GRSF judging guidelines, the Innovate Award Submission Form is no longer required for Innovate Award eligibility.
+ * Under GRSF Competition Judge Guide, the Innovate Award Submission Form is no longer required for Innovate Award eligibility.
  */
 export function requiresFullyDevelopedNotebook(awardName: string): boolean {
 	return isExcellenceAward(awardName) || isDesignAward(awardName) || awardName === 'Innovate Award';
