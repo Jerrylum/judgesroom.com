@@ -7,9 +7,11 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
-	import { createEmptyNotebookRubricScores, NOTEBOOK_RUBRIC_CRITERIA_COUNT } from '@judgesroom.com/protocol/src/rubric';
+	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import AwardRankingTable from './AwardRankingTable.svelte';
-	import NotebookRubricTable from './NotebookRubricTable.svelte';
+	import NotebookRubricTable1_0 from './NotebookRubricTable1_0.svelte';
+	import NotebookRubricTable2_0 from './NotebookRubricTable2_0.svelte';
+	import { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
 	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import WarningSign from './WarningSign.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
@@ -38,9 +40,10 @@
 	let isSubmitted = $state(tab.rubricId !== null);
 
 	let judgeId = $state<string | null>(null); // Store judge ID for existing rubrics
-	let rubricScores = $state<number[]>(createEmptyNotebookRubricScores());
-	let notes = $state('');
-	let innovateAwardNotes = $state('');
+	let form = $state<NotebookRubricDocument>(
+		NotebookRubricDocument.createBlank(resolveJudgeGuideVersion(app.getEssentialData()?.judgeGuideVersion))
+	);
+	let unsupportedRubric = $state(false);
 	let timestamp = $state(0);
 
 	const canEditCurrentRubric = $derived(
@@ -52,24 +55,13 @@
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
-	let initialRubricScores = $state<number[]>(createEmptyNotebookRubricScores());
-	let initialNotes = $state('');
-	let initialInnovateAwardNotes = $state('');
 
 	// Track unsaved changes
 	$effect(() => {
-		if (isSubmitted) {
-			// No unsaved changes when submitted
+		if (isSubmitted || unsupportedRubric) {
 			tab._isDataUnsaved = false;
 		} else {
-			// Check if any data has changed from initial state
-			const hasChanges =
-				tab.teamId !== initialTeamId ||
-				rubricScores.some((score, idx) => score !== initialRubricScores[idx]) ||
-				notes !== initialNotes ||
-				innovateAwardNotes !== initialInnovateAwardNotes;
-
-			tab._isDataUnsaved = hasChanges;
+			tab._isDataUnsaved = tab.teamId !== initialTeamId || form.isDirty();
 		}
 	});
 
@@ -83,19 +75,16 @@
 			const existingRubric = await app.wrpcClient.judging.getEngineeringNotebookRubrics.query({ id: tab.rubricId! });
 			tab.teamId = existingRubric.teamId;
 			judgeId = existingRubric.judgeId;
-			rubricScores =
-				existingRubric.rubric.length === NOTEBOOK_RUBRIC_CRITERIA_COUNT
-					? (existingRubric.rubric as number[])
-					: createEmptyNotebookRubricScores();
-			notes = existingRubric.notes;
-			innovateAwardNotes = existingRubric.innovateAwardNotes;
 			timestamp = existingRubric.timestamp;
+			const loaded = NotebookRubricDocument.tryLoad(existingRubric);
+			if (loaded) {
+				form = loaded;
+				unsupportedRubric = false;
+			} else {
+				unsupportedRubric = true;
+			}
 
-			// Reset initial state to loaded values
 			initialTeamId = existingRubric.teamId;
-			initialRubricScores = [...(existingRubric.rubric as number[])];
-			initialNotes = existingRubric.notes;
-			initialInnovateAwardNotes = existingRubric.innovateAwardNotes;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
 			app.addErrorNotice(m.failed_to_load_existing_rubric());
@@ -203,9 +192,7 @@
 			return;
 		}
 
-		// Check if all scores are provided
-		const missingScores = rubricScores.some((score) => score === -1);
-		if (missingScores) {
+		if (!form.isComplete()) {
 			showValidationErrors = true;
 			app.addErrorNotice(m.please_complete_all_scoring_sections());
 			return;
@@ -229,20 +216,16 @@
 					id: tab.rubricId,
 					teamId: tab.teamId,
 					judgeId,
-					rubric: rubricScores,
-					notes,
-					innovateAwardNotes,
+					rubric: form.toPayload(),
+					notes: form.notes,
 					timestamp: (timestamp = Date.now())
 				}
 			});
 
 			isSubmitted = true;
 
-			// Update initial state to current saved state
 			initialTeamId = tab.teamId;
-			initialRubricScores = [...rubricScores];
-			initialNotes = notes;
-			initialInnovateAwardNotes = innovateAwardNotes;
+			form.markSaved();
 
 			app.addSuccessNotice(m.notebook_rubric_saved_successfully());
 		} catch (error) {
@@ -275,17 +258,11 @@
 		if (!isJudgeAdvisor) {
 			judgeId = null;
 		}
-		rubricScores = createEmptyNotebookRubricScores();
-		notes = '';
-		innovateAwardNotes = '';
+		form = NotebookRubricDocument.createBlank(resolveJudgeGuideVersion(essentialData?.judgeGuideVersion));
+		unsupportedRubric = false;
 		showValidationErrors = false;
 		isSubmitted = false;
-
-		// Reset initial state to empty
 		initialTeamId = '';
-		initialRubricScores = createEmptyNotebookRubricScores();
-		initialNotes = '';
-		initialInnovateAwardNotes = '';
 
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -398,14 +375,13 @@
 			</div>
 		</div>
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<p class="mb-2 text-sm text-gray-600">
-				{@html sanitizeHTMLMessage(m.notebook_rubric_directions)}
-			</p>
-			<p class="mb-6 text-sm text-gray-600">
-				{@html sanitizeHTMLMessage(m.notebook_rubric_notes)}
-			</p>
-
-			<NotebookRubricTable bind:rubricScores bind:notes bind:innovateAwardNotes {isSubmitted} {showValidationErrors} />
+			{#if unsupportedRubric}
+				<p class="mb-6 text-sm text-gray-600">{m.rubric_version_unsupported()}</p>
+			{:else if form.version === '2.0'}
+				<NotebookRubricTable2_0 document={form} {isSubmitted} {showValidationErrors} />
+			{:else}
+				<NotebookRubricTable1_0 document={form} {isSubmitted} {showValidationErrors} />
+			{/if}
 
 			<p class="mt-2 text-center text-xs italic">
 				{m.judging_materials_strictly_confidential_description()}
@@ -421,7 +397,9 @@
 						<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
 					{/if}
 				{:else}
-					<button onclick={saveRubric} class="primary" disabled={!judgeId || !canEditCurrentRubric}>{m.submit_rubric()}</button>
+					<button onclick={saveRubric} class="primary" disabled={!judgeId || !canEditCurrentRubric || unsupportedRubric}
+						>{m.submit_rubric()}</button
+					>
 				{/if}
 			</div>
 		</div>

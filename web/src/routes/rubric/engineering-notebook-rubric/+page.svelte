@@ -1,16 +1,13 @@
 <script lang="ts">
 	import '$lib/components/workspace/tabs/rubric.css';
-	import NotebookRubricTable from '$lib/components/workspace/tabs/NotebookRubricTable.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import NotebookRubricTable2_0 from '$lib/components/workspace/tabs/NotebookRubricTable2_0.svelte';
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { createEmptyNotebookRubricScores } from '@judgesroom.com/protocol/src/rubric';
+	import { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
 
 	// Default values for the rubric
-	let rubricScores = $state(createEmptyNotebookRubricScores());
-	let notes = $state('');
-	let innovateAwardNotes = $state('');
+	const form = NotebookRubricDocument.createBlank('2.0');
 	let isSubmitted = $state(false);
 	let showValidationErrors = $state(false);
 
@@ -93,14 +90,7 @@
 					</div>
 				</div>
 
-				<!-- Rubric Table -->
-				<div class="mb-2 text-sm text-gray-600">
-					{@html sanitizeHTMLMessage(m.notebook_rubric_directions)}
-				</div>
-				<div class="mb-2 text-sm text-gray-600">
-					{@html sanitizeHTMLMessage(m.notebook_rubric_notes)}
-				</div>
-				<NotebookRubricTable bind:rubricScores bind:notes bind:innovateAwardNotes {isSubmitted} {showValidationErrors} />
+				<NotebookRubricTable2_0 document={form} {isSubmitted} {showValidationErrors} />
 				<p class="mt-2 text-center text-xs italic">
 					{m.judging_materials_strictly_confidential_description()}
 				</p>

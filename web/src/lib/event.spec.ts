@@ -180,6 +180,7 @@ describe('Integration Tests', () => {
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',
 			accessControlEnabled: false,
+			judgeGuideVersion: '1.0',
 			awards: [
 				{
 					name: 'Tournament Champions',
@@ -249,6 +250,7 @@ describe('Integration Tests', () => {
 			judgingMethod: 'walk_in',
 			judgingStep: 'beginning',
 			accessControlEnabled: false,
+			judgeGuideVersion: '1.0',
 			teamInfos: [],
 			awards: [],
 			judgeGroups: [

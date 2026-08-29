@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { formatRubricScore, notebookRubricSections, sumRubricScores } from '@judgesroom.com/protocol/src/rubric';
+	import { formatRubricScore, sumRubricScores, type NotebookProficiencyHeaderScale } from '@judgesroom.com/protocol/src/rubric';
 	import {
 		getRubricCriterionTitle,
 		getRubricProficiencyHeader,
@@ -11,36 +11,37 @@
 	} from '$lib/rubric-messages';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import ScoringSlider from './ScoringSlider.svelte';
+	import type { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
+
+	type TableSection = {
+		categoryKey: string;
+		sectionMaxPoints: number;
+		proficiencyHeaderScale: NotebookProficiencyHeaderScale;
+		criteria: { messageKeyPrefix: string; maxPoints: number }[];
+	};
 
 	interface Props {
-		rubricScores: number[];
-		notes: string;
-		innovateAwardNotes: string;
+		document: NotebookRubricDocument;
+		sections: TableSection[];
 		isSubmitted: boolean;
 		showValidationErrors: boolean;
 	}
 
-	let {
-		rubricScores = $bindable(),
-		notes = $bindable(),
-		innovateAwardNotes = $bindable(),
-		isSubmitted,
-		showValidationErrors
-	}: Props = $props();
+	let { document, sections, isSubmitted, showValidationErrors }: Props = $props();
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
 	const proficiencyLevels: ProficiencyLevel[] = ['exemplary', 'proficient', 'developing', 'beginning'];
 
-	const sectionScoreOffsets = notebookRubricSections.map((_, sectionIndex) =>
-		notebookRubricSections.slice(0, sectionIndex).reduce((sum, section) => sum + section.criteria.length, 0)
+	const sectionScoreOffsets = $derived(
+		sections.map((_, sectionIndex) => sections.slice(0, sectionIndex).reduce((sum, section) => sum + section.criteria.length, 0))
 	);
 
 	const totalScore = $derived.by(() => {
-		if (rubricScores.some((score) => score === -1)) {
+		if (document.scores.some((score) => score === -1)) {
 			return 'N/A';
 		}
-		return formatRubricScore(sumRubricScores(rubricScores));
+		return formatRubricScore(sumRubricScores(document.scores));
 	});
 </script>
 
@@ -51,7 +52,7 @@
 
 <rubric-table class="notebook-rubric">
 	<rubric-body>
-		{#each notebookRubricSections as section, sectionIndex (section.categoryKey)}
+		{#each sections as section, sectionIndex (section.categoryKey)}
 			<row class="section-title-row">
 				<div class="grow border-r-3 border-l-3 p-2 text-left text-sm font-bold">
 					{getRubricSectionHeading(section.categoryKey, section.sectionMaxPoints)}
@@ -85,9 +86,9 @@
 					</scroll-container>
 					<scoring>
 						{#if isSubmitted}
-							<p class="text-lg tabular-nums">{formatRubricScore(rubricScores[scoreIndex])}</p>
+							<p class="text-lg tabular-nums">{formatRubricScore(document.scores[scoreIndex])}</p>
 						{:else}
-							<ScoringSlider bind:variable={rubricScores[scoreIndex]} max={row.maxPoints} showError={showValidationErrors} />
+							<ScoringSlider bind:variable={document.scores[scoreIndex]} max={row.maxPoints} showError={showValidationErrors} />
 						{/if}
 					</scoring>
 				</row>
@@ -96,14 +97,7 @@
 		<row class="footer-row border-t-3! bg-gray-100">
 			<div class="p-2">
 				<p class="text-sm font-bold">{m.rubric_notes()}</p>
-				<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={notes} readonly={isSubmitted}></textarea>
-			</div>
-			<scoring></scoring>
-		</row>
-		<row class="footer-row">
-			<div class="p-2">
-				<p class="text-sm font-bold">{m.rubric_nb_innovate_award_notes()}</p>
-				<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={innovateAwardNotes} readonly={isSubmitted}
+				<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={document.notes} readonly={isSubmitted}
 				></textarea>
 			</div>
 			<scoring class="flex-col! gap-2">

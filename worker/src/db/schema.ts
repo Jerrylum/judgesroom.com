@@ -28,6 +28,8 @@ export const metadata = sqliteTable('Metadata', {
 	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
 	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull(),
 	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false),
+	/** Null in SQLite = pre-pin rooms; getEssentialData resolves that to 1.0. */
+	judgeGuideVersion: text('judgeGuideVersion', { enum: ['1.0', '2.0'] }),
 	/** Last event-setup save. Null on v2.0.0 rooms until the first retention alarm adopts them. */
 	updatedAt: integer('updatedAt', { mode: 'timestamp' })
 });
@@ -125,7 +127,6 @@ export const engineeringNotebookRubrics = sqliteTable(
 			.notNull(),
 		rubric: text('rubric', { mode: 'json' }).notNull(),
 		notes: text('notes').notNull(),
-		innovateAwardNotes: text('innovateAwardNotes').notNull(),
 		timestamp: integer('timestamp').notNull()
 	},
 	(table) => [

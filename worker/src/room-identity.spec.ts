@@ -6,6 +6,7 @@ import { serverRouter } from './server-router';
 import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from './test-utils';
 import { Authentication } from './access/authentication';
 import { metadata } from './db/schema';
+import { getEssentialData } from './routes/essential';
 import type { ServerContext } from './server-router';
 import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 
@@ -151,6 +152,7 @@ describe('room identity — handshake with only a roomId', () => {
 				judgingMethod: 'assigned' as const,
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: false,
+				judgeGuideVersion: '2.0' as const,
 				teamInfos: [team],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [team.id] }],
 				awards: []
@@ -173,6 +175,8 @@ describe('room identity — handshake with only a roomId', () => {
 			ctx: context
 		});
 		expect(first).toEqual({ isAccessControlled: false });
+		const created = await getEssentialData(context.db);
+		expect(created.judgeGuideVersion).toBe('2.0');
 
 		await expect(
 			serverRouter.handshake.createJudgesRoom._def._resolver!({

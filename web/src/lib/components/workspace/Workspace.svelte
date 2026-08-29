@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, subscriptions, tabs, dialogs } from '$lib/index.svelte';
+	import {
+		isJudgeGuideVersionOlderThanLatest,
+		LATEST_JUDGE_GUIDE_VERSION,
+		resolveJudgeGuideVersion
+	} from '@judgesroom.com/protocol/src/judge-guide';
+	import { dismissJudgeGuideNotice, wasJudgeGuideNoticeDismissed } from '$lib/judge-guide-notice';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
@@ -165,6 +171,32 @@
 			console.log('Unsubscribing from submission caches');
 			app.wrpcClient.judging.unsubscribeSubmissionCaches.notify();
 		};
+	});
+
+	let judgeGuideNoticeStarted = false;
+	$effect(() => {
+		if (!isJudgingReady || judgeGuideNoticeStarted) return;
+		const permit = app.getPermit();
+		const essential = app.getEssentialData();
+		if (!permit || !essential) return;
+		if (!isJudgeGuideVersionOlderThanLatest(essential.judgeGuideVersion)) return;
+		if (wasJudgeGuideNoticeDismissed(permit.roomId, permit.deviceId)) return;
+
+		judgeGuideNoticeStarted = true;
+		const current = resolveJudgeGuideVersion(essential.judgeGuideVersion);
+		void dialogs
+			.showAlert({
+				title: m.older_competition_judge_guide_title(),
+				message: m.older_competition_judge_guide_message({
+					current,
+					latest: LATEST_JUDGE_GUIDE_VERSION
+				}),
+				confirmText: 'OK',
+				confirmButtonClass: 'primary'
+			})
+			.then(() => {
+				dismissJudgeGuideNotice(permit.roomId, permit.deviceId);
+			});
 	});
 
 	$effect(() => {

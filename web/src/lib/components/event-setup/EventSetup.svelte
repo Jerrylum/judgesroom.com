@@ -12,6 +12,7 @@
 	import { type TeamInfoAndData } from '$lib/team.svelte';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions } from '$lib/event.svelte';
 	import EventCodeSetup from './EventCodeSetup.svelte';
@@ -41,6 +42,7 @@
 	// Judging
 	let judgingMethod: JudgingMethod = $state('assigned');
 	let judgingStep: JudgingStep = $state('beginning');
+	let judgeGuideVersion: JudgeGuideVersion = $state(LATEST_JUDGE_GUIDE_VERSION);
 	let judgeGroups: EditingJudgeGroup[] = $state([]);
 	let judges: Judge[] = $state([]);
 	let unassignedTeams: TeamInfoAndData[] = $state([]);
@@ -94,6 +96,7 @@
 
 			judgingMethod = eventSetup.judgingMethod;
 			judgingStep = eventSetup.judgingStep;
+			judgeGuideVersion = eventSetup.judgeGuideVersion;
 			accessControlEnabled = eventSetup.accessControlEnabled;
 			wasAccessControlEnabled = eventSetup.accessControlEnabled;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
@@ -146,6 +149,7 @@
 				judgingMethod,
 				judgingStep,
 				accessControlEnabled,
+				judgeGuideVersion,
 				teamInfos: teams.map((team) => ({
 					id: team.id,
 					number: team.number,

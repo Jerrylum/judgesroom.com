@@ -25,7 +25,6 @@
 	interface RubricsAndNotesPerTeam {
 		engineeringNotebookRubrics: SubmissionWithScore[];
 		teamInterviewRubrics: SubmissionWithScore[];
-		teamInterviewNotes: SubmissionWithScore[];
 	}
 
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
@@ -82,8 +81,7 @@
 		for (const sub of submissionCaches) {
 			const target = rtn[sub.teamId] || {
 				engineeringNotebookRubrics: [],
-				teamInterviewRubrics: [],
-				teamInterviewNotes: []
+				teamInterviewRubrics: []
 			};
 			if (sub.enrId) {
 				target.engineeringNotebookRubrics.push({
@@ -99,13 +97,6 @@
 					score: sub.score
 				});
 			}
-			if (sub.tnId) {
-				target.teamInterviewNotes.push({
-					id: sub.tnId,
-					judgeId: sub.judgeId,
-					score: sub.score
-				});
-			}
 			rtn[sub.teamId] = target;
 		}
 
@@ -115,8 +106,7 @@
 	function getEmptyRubricsAndNotesPerTeam(): RubricsAndNotesPerTeam {
 		return {
 			engineeringNotebookRubrics: [],
-			teamInterviewRubrics: [],
-			teamInterviewNotes: []
+			teamInterviewRubrics: []
 		};
 	}
 

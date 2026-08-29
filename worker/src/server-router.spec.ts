@@ -68,6 +68,7 @@ describe('ServerRouter', () => {
 		it('getEssentialData returns full dataset', async () => {
 			const data = await getEssentialData(context.db);
 			expect(data.eventName).toBe('Test Event');
+			expect(data.judgeGuideVersion).toBe('1.0');
 			expect(data.awards.length).toBeGreaterThan(0);
 			expect(data.teamInfos.length).toBeGreaterThan(0);
 			expect(data.judgeGroups.length).toBeGreaterThan(0);
@@ -226,7 +227,6 @@ describe('ServerRouter', () => {
 				judgeId,
 				rubric: {},
 				notes: '',
-				innovateAwardNotes: '',
 				timestamp: Date.now()
 			});
 			await context.db.insert(judgeGroupsSubmissionsCache).values({

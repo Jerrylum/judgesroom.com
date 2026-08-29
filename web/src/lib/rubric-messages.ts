@@ -1,5 +1,5 @@
 import { m } from '$lib/paraglide/messages.js';
-import type { NotebookProficiencyHeaderScale } from '@judgesroom.com/protocol/src/rubric';
+import type { NotebookProficiencyHeaderScale } from '@judgesroom.com/protocol/src/rubric-shared';
 
 export type ProficiencyLevel = 'exemplary' | 'proficient' | 'developing' | 'beginning';
 
@@ -29,7 +29,10 @@ export function getRubricSectionHeading(categoryKey: string, sectionMaxPoints: n
 }
 
 export function getRubricProficiencyHeader(scale: NotebookProficiencyHeaderScale, level: ProficiencyLevel): string {
-	return getMessage(`rubric_nb_hdr_${scale}_${level}`)?.() ?? '';
+	if (scale === '4_3_2_1') {
+		return getMessage(`rubric_nb_2_0_hdr_${level}`)?.() ?? '';
+	}
+	return getMessage(`rubric_nb_1_0_hdr_${scale}_${level}`)?.() ?? '';
 }
 
 export function getRubricProficiencyText(messageKeyPrefix: string, level: ProficiencyLevel): string {

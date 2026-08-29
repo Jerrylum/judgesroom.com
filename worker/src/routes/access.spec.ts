@@ -292,7 +292,6 @@ describe('access control', () => {
 						judgeId: otherJudgeId,
 						rubric: createEmptyNotebookRubricScores(),
 						notes: 'JA on behalf',
-						innovateAwardNotes: '',
 						timestamp: Date.now()
 					}
 				},
@@ -497,7 +496,6 @@ describe('access control', () => {
 						judgeId: otherJudgeId,
 						rubric: createEmptyNotebookRubricScores(),
 						notes: '',
-						innovateAwardNotes: '',
 						timestamp: Date.now()
 					}
 				},
@@ -532,7 +530,6 @@ describe('access control', () => {
 					judgeId: otherJudgeId,
 					rubric: createEmptyNotebookRubricScores(),
 					notes: 'mine',
-					innovateAwardNotes: '',
 					timestamp: Date.now()
 				}
 			},
@@ -558,7 +555,6 @@ describe('access control', () => {
 						judgeId,
 						rubric: createEmptyNotebookRubricScores(),
 						notes: 'hijack',
-						innovateAwardNotes: '',
 						timestamp: Date.now()
 					}
 				},
@@ -679,6 +675,7 @@ describe('access control', () => {
 				judgingMethod: 'assigned' as const,
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: true,
+				judgeGuideVersion: '2.0' as const,
 				teamInfos: [sampleTeamInfoAndData[0]!],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [sampleTeamInfoAndData[0]!.id] }],
 				awards: []
@@ -729,6 +726,7 @@ describe('access control', () => {
 				judgingMethod: 'assigned' as const,
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: false,
+				judgeGuideVersion: '2.0' as const,
 				teamInfos: [sampleTeamInfoAndData[0]!],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [sampleTeamInfoAndData[0]!.id] }],
 				awards: []

@@ -4,6 +4,7 @@ import { ProgramSchema } from './award';
 import { TeamInfoSchema } from './team';
 import { JudgingMethodSchema, JudgingStepSchema } from './judging';
 import { JudgeGroupSchema } from './judging';
+import { JudgeGuideVersionSchema } from './judge-guide';
 
 export const RobotEventsSkuSchema = z
 	.string()
@@ -35,6 +36,7 @@ export const EssentialDataSchema = z.object({
 	judgingMethod: JudgingMethodSchema,
 	judgingStep: JudgingStepSchema,
 	accessControlEnabled: z.boolean(),
+	judgeGuideVersion: JudgeGuideVersionSchema,
 	teamInfos: z.array(TeamInfoSchema),
 	judgeGroups: z.array(JudgeGroupSchema).min(1),
 	awards: z.array(AwardSchema)

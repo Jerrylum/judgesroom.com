@@ -5,8 +5,8 @@ import {
 	AwardRankingsFullUpdateSchema,
 	EngineeringNotebookRubricSchema,
 	SubmissionCacheSchema,
-	TeamInterviewNoteSchema,
 	TeamInterviewRubricSchema,
+	sumNotebookRubric,
 	sumRubricScores
 } from '@judgesroom.com/protocol/src/rubric';
 import type {
@@ -14,7 +14,6 @@ import type {
 	AwardRankingsFullUpdate,
 	EngineeringNotebookRubric,
 	SubmissionCache,
-	TeamInterviewNote,
 	TeamInterviewRubric
 } from '@judgesroom.com/protocol/src/rubric';
 import { eq, desc, and, asc } from 'drizzle-orm';
@@ -24,7 +23,6 @@ import {
 	finalAwardNominations,
 	judgeGroupsReviewedTeams,
 	judgeGroupsSubmissionsCache,
-	teamInterviewNotes,
 	teamInterviewRubrics,
 	metadata
 } from '../db/schema';
@@ -159,7 +157,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								enrId: input.submission.id,
 								tiId: null,
 								tnId: null,
-								score: sumRubricScores(input.submission.rubric)
+								score: sumNotebookRubric(input.submission.rubric)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -168,7 +166,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
 									timestamp: input.submission.timestamp,
-									score: sumRubricScores(input.submission.rubric)
+									score: sumNotebookRubric(input.submission.rubric)
 								}
 							})
 							.returning()
@@ -267,77 +265,6 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.query(async ({ ctx, input }) => {
 				const result = await ctx.db.select().from(teamInterviewRubrics).where(eq(teamInterviewRubrics.id, input.id));
 				return result[0] as TeamInterviewRubric;
-			}),
-
-		completeTeamInterviewNote: w.procedure
-			.input(
-				z.object({
-					judgeGroupId: z.uuidv4(),
-					submission: TeamInterviewNoteSchema
-				})
-			)
-			.mutation(async ({ ctx, input, session }) => {
-				assertAuthorship(ctx.auth, input.submission.judgeId);
-
-				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
-					requireAuthoredUpsert(
-						(
-							await tx
-								.insert(teamInterviewNotes)
-								.values(input.submission)
-								.onConflictDoUpdate({
-									target: [teamInterviewNotes.id],
-									setWhere: eq(teamInterviewNotes.judgeId, input.submission.judgeId),
-									set: input.submission
-								})
-								.returning()
-						)[0]
-					);
-					const submissionCache = (
-						await tx
-							.insert(judgeGroupsSubmissionsCache)
-							.values({
-								judgeGroupId: input.judgeGroupId,
-								teamId: input.submission.teamId,
-								judgeId: input.submission.judgeId,
-								timestamp: input.submission.timestamp,
-								enrId: null,
-								tiId: input.submission.id,
-								tnId: null,
-								score: null
-							})
-							.onConflictDoUpdate({
-								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
-								set: {
-									judgeGroupId: input.judgeGroupId,
-									teamId: input.submission.teamId,
-									judgeId: input.submission.judgeId,
-									timestamp: input.submission.timestamp
-								}
-							})
-							.returning()
-					)[0];
-					const isReviewedNewTeam = await addReviewedTeam(tx, input.judgeGroupId, input.submission.teamId);
-					return { submissionCache, isReviewedNewTeam };
-				});
-				// Do not wait for the broadcast to complete
-				broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'submissions', session, async (client) =>
-					client.onSubmissionCacheUpdate.notify([submissionCache])
-				);
-				if (isReviewedNewTeam) {
-					// Do not wait for the broadcast to complete
-					broadcastJudgeGroupTopic(ctx.db, input.judgeGroupId, 'reviewedTeams', session, async (client) =>
-						client.onReviewedTeamsUpdate.notify({ judgeGroupId: input.judgeGroupId, teamId: input.submission.teamId })
-					);
-				}
-			}),
-
-		getTeamInterviewNote: w.procedure
-			.input(z.object({ id: z.uuidv4() }))
-			.output(TeamInterviewNoteSchema)
-			.query(async ({ ctx, input }) => {
-				const result = await ctx.db.select().from(teamInterviewNotes).where(eq(teamInterviewNotes.id, input.id));
-				return result[0] as TeamInterviewNote;
 			}),
 
 		subscribeReviewedTeams: w.procedure

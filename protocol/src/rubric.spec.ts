@@ -6,12 +6,16 @@ import {
 	TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT,
 	TEAM_INTERVIEW_RUBRIC_MAX_SCORE,
 	TeamInterviewRubricSchema,
+	generateNotebook2_0Scores,
 	generateNotebookRubricScores,
 	generateTeamInterviewRubricScores,
+	notebook2_0ScoresToPayload,
 	notebookRubricConfig,
 	roundRubricScore,
+	sumNotebookRubric,
 	sumRubricScores,
-	teamInterviewRubricConfig
+	teamInterviewRubricConfig,
+	decodeNotebookRubric
 } from './rubric';
 
 describe('GRSF rubric config', () => {
@@ -37,7 +41,6 @@ describe('GRSF rubric schemas', () => {
 		judgeId: '00000000-0000-4000-8000-000000000003',
 		rubric: generateNotebookRubricScores(),
 		notes: '',
-		innovateAwardNotes: '',
 		timestamp: Date.now()
 	};
 
@@ -63,8 +66,7 @@ describe('GRSF rubric schemas', () => {
 		expect(
 			EngineeringNotebookRubricSchema.safeParse({
 				...notebookSubmission,
-				notes: long,
-				innovateAwardNotes: long
+				notes: long
 			}).success
 		).toBe(true);
 	});
@@ -116,7 +118,6 @@ describe('rubric score precision', () => {
 				judgeId: '00000000-0000-4000-8000-000000000003',
 				rubric,
 				notes: '',
-				innovateAwardNotes: '',
 				timestamp: Date.now()
 			}).success
 		).toBe(true);
@@ -141,5 +142,36 @@ describe('rubric score precision', () => {
 				timestamp: Date.now()
 			}).success
 		).toBe(true);
+	});
+});
+
+describe('notebook rubric 2.0 payload', () => {
+	it('decodes a 2.0 object and sums scores', () => {
+		const scores = generateNotebook2_0Scores();
+		const payload = notebook2_0ScoresToPayload(scores);
+		expect(payload.rubricVersion).toBe('2.0');
+		const decoded = decodeNotebookRubric(payload);
+		expect(decoded?.version).toBe('2.0');
+		expect(decoded?.scores).toEqual(scores);
+		expect(sumNotebookRubric(payload)).toBe(sumRubricScores(scores));
+	});
+
+	it('accepts a 2.0 notebook submission', () => {
+		const rubric = notebook2_0ScoresToPayload(generateNotebook2_0Scores());
+		expect(
+			EngineeringNotebookRubricSchema.safeParse({
+				id: '00000000-0000-4000-8000-000000000001',
+				teamId: '00000000-0000-4000-8000-000000000002',
+				judgeId: '00000000-0000-4000-8000-000000000003',
+				rubric,
+				notes: '',
+				timestamp: Date.now()
+			}).success
+		).toBe(true);
+	});
+
+	it('rejects an unknown object payload', () => {
+		expect(decodeNotebookRubric({ rubricVersion: '3.0' })).toBeNull();
+		expect(decodeNotebookRubric({ notebookOrganization: {} })).toBeNull();
 	});
 });

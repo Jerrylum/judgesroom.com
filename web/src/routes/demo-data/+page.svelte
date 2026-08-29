@@ -5,7 +5,11 @@
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
-	import { generateNotebookRubricScores, generateTeamInterviewRubricScores } from '@judgesroom.com/protocol/src/rubric';
+	import {
+		generateNotebook2_0Scores,
+		generateTeamInterviewRubricScores,
+		notebook2_0ScoresToPayload
+	} from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
@@ -123,9 +127,8 @@
 								id: uuidv4(),
 								teamId: team.id,
 								judgeId: judge.id,
-								rubric: generateNotebookRubricScores(),
+								rubric: notebook2_0ScoresToPayload(generateNotebook2_0Scores()),
 								notes: '',
-								innovateAwardNotes: '',
 								timestamp: Date.now()
 							}
 						});
