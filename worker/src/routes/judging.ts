@@ -6,8 +6,8 @@ import {
 	EngineeringNotebookRubricSchema,
 	SubmissionCacheSchema,
 	TeamInterviewRubricSchema,
-	sumNotebookRubric,
-	sumRubricScores
+	sumInterviewRubric,
+	sumNotebookRubric
 } from '@judgesroom.com/protocol/src/rubric';
 import type {
 	AwardNomination,
@@ -230,7 +230,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 								enrId: null,
 								tiId: input.submission.id,
 								tnId: null,
-								score: sumRubricScores(input.submission.rubric)
+								score: sumInterviewRubric(input.submission.rubric)
 							})
 							.onConflictDoUpdate({
 								target: [judgeGroupsSubmissionsCache.enrId, judgeGroupsSubmissionsCache.tiId, judgeGroupsSubmissionsCache.tnId],
@@ -239,7 +239,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 									teamId: input.submission.teamId,
 									judgeId: input.submission.judgeId,
 									timestamp: input.submission.timestamp,
-									score: sumRubricScores(input.submission.rubric)
+									score: sumInterviewRubric(input.submission.rubric)
 								}
 							})
 							.returning()

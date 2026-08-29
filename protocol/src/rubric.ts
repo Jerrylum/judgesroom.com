@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AwardNameSchema } from './award';
-import { type RubricRowConfig, RubricPointSchema, formatRubricScore, roundRubricScore, sumRubricScores, validateRubricArray } from './rubric-shared';
+import { type RubricRowConfig, formatRubricScore, roundRubricScore, sumRubricScores } from './rubric-shared';
 import {
 	NOTEBOOK_1_0_CRITERIA_COUNT,
 	NOTEBOOK_1_0_MAX_SCORE,
@@ -22,11 +22,33 @@ import {
 	refineNotebook2_0Payload,
 	type Notebook2_0RubricPayload
 } from './notebook-2.0';
+import {
+	INTERVIEW_1_0_CRITERIA_COUNT,
+	INTERVIEW_1_0_MAX_SCORE,
+	createEmptyInterview1_0Scores,
+	generateInterview1_0Scores,
+	interview1_0RubricArraySchema,
+	interview1_0RubricConfig,
+	refineInterview1_0Scores
+} from './interview-1.0';
+import {
+	INTERVIEW_2_0_MAX_SCORE,
+	INTERVIEW_2_0_RUBRIC_VERSION,
+	createEmptyInterview2_0Scores,
+	generateInterview2_0Scores,
+	interview2_0PayloadToScores,
+	interview2_0RubricObjectSchema,
+	interview2_0ScoresToPayload,
+	refineInterview2_0Payload,
+	type Interview2_0RubricPayload
+} from './interview-2.0';
 
 export * from './rubric-shared';
 export * from './judge-guide';
 export * from './notebook-1.0';
 export * from './notebook-2.0';
+export * from './interview-1.0';
+export * from './interview-2.0';
 
 export const SubmissionSchema = z.object({
 	id: z.uuidv4(),
@@ -61,31 +83,19 @@ export const NOTEBOOK_RUBRIC_CRITERIA_COUNT = NOTEBOOK_1_0_CRITERIA_COUNT;
 /** @deprecated Use NOTEBOOK_1_0_MAX_SCORE */
 export const NOTEBOOK_RUBRIC_MAX_SCORE = NOTEBOOK_1_0_MAX_SCORE;
 
-export const teamInterviewRubricConfig: RubricRowConfig[] = [
-	{ messageKeyPrefix: 'rubric_ti_engineering_design_process', maxPoints: 20 },
-	{ messageKeyPrefix: 'rubric_ti_game_strategy', maxPoints: 15 },
-	{ messageKeyPrefix: 'rubric_ti_robot_design', maxPoints: 15 },
-	{ messageKeyPrefix: 'rubric_ti_robot_build', maxPoints: 10 },
-	{ messageKeyPrefix: 'rubric_ti_robot_code', maxPoints: 10 },
-	{ messageKeyPrefix: 'rubric_ti_project_management', maxPoints: 10 },
-	{ messageKeyPrefix: 'rubric_ti_teamwork_communication', maxPoints: 10 },
-	{ messageKeyPrefix: 'rubric_ti_respect_courtesy', maxPoints: 10 }
-];
-
-export const TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT = 8;
-export const TEAM_INTERVIEW_RUBRIC_MAX_SCORE = teamInterviewRubricConfig.reduce((sum, row) => sum + row.maxPoints, 0);
+/** @deprecated Use interview1_0RubricConfig */
+export const teamInterviewRubricConfig = interview1_0RubricConfig;
+/** @deprecated Use INTERVIEW_1_0_CRITERIA_COUNT */
+export const TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT = INTERVIEW_1_0_CRITERIA_COUNT;
+/** @deprecated Use INTERVIEW_1_0_MAX_SCORE */
+export const TEAM_INTERVIEW_RUBRIC_MAX_SCORE = INTERVIEW_1_0_MAX_SCORE;
 
 export function createEmptyNotebookRubricScores(): number[] {
 	return createEmptyNotebook1_0Scores();
 }
 
 export function createEmptyTeamInterviewRubricScores(): number[] {
-	return Array(TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT).fill(-1);
-}
-
-function randomRubricScore(maxPoints: number): number {
-	const tenths = Math.floor(Math.random() * (maxPoints * 10 + 1));
-	return tenths / 10;
+	return createEmptyInterview1_0Scores();
 }
 
 export function generateNotebookRubricScores(): number[] {
@@ -93,7 +103,7 @@ export function generateNotebookRubricScores(): number[] {
 }
 
 export function generateTeamInterviewRubricScores(): number[] {
-	return teamInterviewRubricConfig.map((row) => randomRubricScore(row.maxPoints));
+	return generateInterview1_0Scores();
 }
 
 export { formatRubricScore, roundRubricScore, sumRubricScores };
@@ -147,7 +157,54 @@ export function notebookRubricMaxScore(version: '1.0' | '2.0'): number {
 	return version === '2.0' ? NOTEBOOK_2_0_MAX_SCORE : NOTEBOOK_1_0_MAX_SCORE;
 }
 
-const teamInterviewRubricArraySchema = z.array(RubricPointSchema).length(TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT);
+export const interviewRubricPayloadSchema = z.union([interview1_0RubricArraySchema, interview2_0RubricObjectSchema]);
+
+export type InterviewRubricPayload = number[] | Interview2_0RubricPayload;
+
+export type DecodedInterviewRubric =
+	| { version: '1.0'; scores: number[] }
+	| { version: '2.0'; scores: number[]; payload: Interview2_0RubricPayload };
+
+export function decodeInterviewRubric(payload: unknown): DecodedInterviewRubric | null {
+	if (Array.isArray(payload)) {
+		const result = interview1_0RubricArraySchema
+			.superRefine((scores, ctx) => refineInterview1_0Scores(scores, ctx))
+			.safeParse(payload);
+		if (!result.success) return null;
+		return { version: '1.0', scores: result.data };
+	}
+
+	const refined = interview2_0RubricObjectSchema.superRefine((data, ctx) => refineInterview2_0Payload(data, ctx)).safeParse(payload);
+	if (!refined.success) return null;
+	return {
+		version: '2.0',
+		scores: interview2_0PayloadToScores(refined.data),
+		payload: refined.data
+	};
+}
+
+export function encodeInterviewRubric(version: '1.0' | '2.0', scores: number[]): InterviewRubricPayload {
+	if (version === '1.0') return scores;
+	return interview2_0ScoresToPayload(scores);
+}
+
+export function createEmptyInterviewScores(version: '1.0' | '2.0'): number[] {
+	return version === '2.0' ? createEmptyInterview2_0Scores() : createEmptyInterview1_0Scores();
+}
+
+export function generateInterviewScores(version: '1.0' | '2.0'): number[] {
+	return version === '2.0' ? generateInterview2_0Scores() : generateInterview1_0Scores();
+}
+
+export function sumInterviewRubric(payload: unknown): number | null {
+	const decoded = decodeInterviewRubric(payload);
+	if (!decoded) return null;
+	return sumRubricScores(decoded.scores);
+}
+
+export function interviewRubricMaxScore(version: '1.0' | '2.0'): number {
+	return version === '2.0' ? INTERVIEW_2_0_MAX_SCORE : INTERVIEW_1_0_MAX_SCORE;
+}
 
 export const EngineeringNotebookRubricSchema = z
 	.object({
@@ -175,11 +232,19 @@ export const TeamInterviewRubricSchema = z
 		id: z.uuidv4(),
 		teamId: z.uuidv4(),
 		judgeId: z.uuidv4(),
-		rubric: teamInterviewRubricArraySchema,
+		rubric: interviewRubricPayloadSchema,
 		notes: z.string(),
 		timestamp: z.number()
 	})
-	.superRefine((data, ctx) => validateRubricArray(data.rubric, teamInterviewRubricConfig, 'rubric', ctx));
+	.superRefine((data, ctx) => {
+		if (Array.isArray(data.rubric)) {
+			refineInterview1_0Scores(data.rubric, ctx);
+			return;
+		}
+		if (data.rubric.rubricVersion === INTERVIEW_2_0_RUBRIC_VERSION) {
+			refineInterview2_0Payload(data.rubric, ctx);
+		}
+	});
 
 export type TeamInterviewRubric = z.infer<typeof TeamInterviewRubricSchema>;
 

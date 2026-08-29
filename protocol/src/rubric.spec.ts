@@ -8,13 +8,18 @@ import {
 	TeamInterviewRubricSchema,
 	generateNotebook2_0Scores,
 	generateNotebookRubricScores,
+	INTERVIEW_2_0_MAX_SCORE,
+	generateInterview2_0Scores,
 	generateTeamInterviewRubricScores,
+	interview2_0ScoresToPayload,
 	notebook2_0ScoresToPayload,
 	notebookRubricConfig,
 	roundRubricScore,
+	sumInterviewRubric,
 	sumNotebookRubric,
 	sumRubricScores,
 	teamInterviewRubricConfig,
+	decodeInterviewRubric,
 	decodeNotebookRubric
 } from './rubric';
 
@@ -29,8 +34,12 @@ describe('GRSF rubric config', () => {
 		expect(NOTEBOOK_RUBRIC_CRITERIA_COUNT).toBe(25);
 	});
 
-	it('interview max score is 100', () => {
+	it('interview 1.0 max score is 100', () => {
 		expect(TEAM_INTERVIEW_RUBRIC_MAX_SCORE).toBe(100);
+	});
+
+	it('interview 2.0 max score is 12', () => {
+		expect(INTERVIEW_2_0_MAX_SCORE).toBe(12);
 	});
 });
 
@@ -173,5 +182,44 @@ describe('notebook rubric 2.0 payload', () => {
 	it('rejects an unknown object payload', () => {
 		expect(decodeNotebookRubric({ rubricVersion: '3.0' })).toBeNull();
 		expect(decodeNotebookRubric({ notebookOrganization: {} })).toBeNull();
+	});
+});
+
+describe('interview rubric 2.0 payload', () => {
+	it('decodes a 2.0 object and sums scores', () => {
+		const scores = generateInterview2_0Scores();
+		const payload = interview2_0ScoresToPayload(scores);
+		expect(payload.rubricVersion).toBe('2.0');
+		const decoded = decodeInterviewRubric(payload);
+		expect(decoded?.version).toBe('2.0');
+		expect(decoded?.scores).toEqual(scores);
+		expect(sumInterviewRubric(payload)).toBe(sumRubricScores(scores));
+	});
+
+	it('accepts a 2.0 interview submission', () => {
+		const rubric = interview2_0ScoresToPayload(generateInterview2_0Scores());
+		expect(
+			TeamInterviewRubricSchema.safeParse({
+				id: '00000000-0000-4000-8000-000000000001',
+				teamId: '00000000-0000-4000-8000-000000000002',
+				judgeId: '00000000-0000-4000-8000-000000000003',
+				rubric,
+				notes: '',
+				timestamp: Date.now()
+			}).success
+		).toBe(true);
+	});
+
+	it('decodes a 1.0 array payload', () => {
+		const scores = generateTeamInterviewRubricScores();
+		const decoded = decodeInterviewRubric(scores);
+		expect(decoded?.version).toBe('1.0');
+		expect(decoded?.scores).toEqual(scores);
+		expect(sumInterviewRubric(scores)).toBe(sumRubricScores(scores));
+	});
+
+	it('rejects an unknown object payload', () => {
+		expect(decodeInterviewRubric({ rubricVersion: '3.0' })).toBeNull();
+		expect(decodeInterviewRubric({ explainYourLearning: {} })).toBeNull();
 	});
 });

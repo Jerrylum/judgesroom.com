@@ -1,15 +1,12 @@
 <script lang="ts">
 	import '$lib/components/workspace/tabs/rubric.css';
-	import TeamInterviewRubricTable from '$lib/components/workspace/tabs/TeamInterviewRubricTable.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import TeamInterviewRubricTable2_0 from '$lib/components/workspace/tabs/TeamInterviewRubricTable2_0.svelte';
+	import { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
 	import { app } from '$lib/index.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { createEmptyTeamInterviewRubricScores } from '@judgesroom.com/protocol/src/rubric';
 
-	// Default values for the rubric
-	let rubricScores = $state(createEmptyTeamInterviewRubricScores());
-	let notes = $state('');
+	const form = TeamInterviewRubricDocument.createBlank('2.0');
 	let isSubmitted = $state(false);
 	let showValidationErrors = $state(false);
 
@@ -92,11 +89,7 @@
 					</div>
 				</div>
 
-				<!-- Rubric Table -->
-				<p class="mb-2 text-sm text-gray-600">
-					{@html sanitizeHTMLMessage(m.team_interview_rubric_directions)}
-				</p>
-				<TeamInterviewRubricTable bind:rubricScores bind:notes {isSubmitted} {showValidationErrors} />
+				<TeamInterviewRubricTable2_0 document={form} {isSubmitted} {showValidationErrors} />
 				<p class="mt-2 text-center text-xs italic">
 					{m.judging_materials_strictly_confidential_description()}
 				</p>

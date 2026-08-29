@@ -50,6 +50,61 @@ rubric-table {
 		}
 	}
 
+	&.interview-rubric-2-0 {
+		criteria {
+			@apply w-80 max-w-80 min-w-80 grow-0 items-start justify-start text-left;
+		}
+
+		remaining {
+			@apply flex min-w-0 flex-col p-2;
+		}
+
+		> rubric-body:first-child {
+			@apply border-t-0;
+		}
+
+		rubric-body {
+			> row.section-title-row {
+				@apply border-t-3 bg-white;
+			}
+
+			> row.section-header-row {
+				@apply border-t bg-gray-200;
+
+				criteria,
+				scoring {
+					@apply items-center justify-center text-center;
+				}
+
+				> remaining.score-level-headers {
+					@apply grid grid-cols-3 p-0 text-center;
+
+					> div {
+						@apply flex min-w-0 flex-col items-center justify-center p-2;
+					}
+
+					> :not(:last-child) {
+						@apply border-r;
+					}
+				}
+			}
+
+			> row.criteria-row {
+				scoring.missing {
+					@apply bg-red-50;
+				}
+			}
+
+			> row.footer-row > div {
+				@apply grow border-r-3 border-l-3;
+			}
+
+			> row > criteria {
+				@apply w-80 max-w-80 min-w-80 grow-0;
+			}
+		}
+	}
+
 	&.notebook-rubric {
 		> rubric-body:first-child {
 			@apply border-t-0;

@@ -8,10 +8,12 @@
 	import { generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
-	import { createEmptyTeamInterviewRubricScores, TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT } from '@judgesroom.com/protocol/src/rubric';
+	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
+	import TeamInterviewRubricTable2_0 from './TeamInterviewRubricTable2_0.svelte';
+	import { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
 	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
@@ -39,8 +41,10 @@
 	let isSubmitted = $state(tab.rubricId !== null);
 
 	let judgeId = $state<string | null>(null);
-	let rubricScores = $state<number[]>(createEmptyTeamInterviewRubricScores());
-	let notes = $state('');
+	let form = $state<TeamInterviewRubricDocument>(
+		TeamInterviewRubricDocument.createBlank(resolveJudgeGuideVersion(app.getEssentialData()?.judgeGuideVersion))
+	);
+	let unsupportedRubric = $state(false);
 	let timestamp = $state(0);
 
 	const canEditCurrentRubric = $derived(
@@ -52,22 +56,15 @@
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');
-	let initialRubricScores = $state<number[]>(createEmptyTeamInterviewRubricScores());
-	let initialNotes = $state('');
 
 	let teamsSelectElement: HTMLSelectElement | null = $state(null);
 
 	// Track unsaved changes
 	$effect(() => {
-		if (isSubmitted) {
-			// No unsaved changes when submitted
+		if (isSubmitted || unsupportedRubric) {
 			tab._isDataUnsaved = false;
 		} else {
-			// Check if any data has changed from initial state
-			const hasChanges =
-				tab.teamId !== initialTeamId || rubricScores.some((score, idx) => score !== initialRubricScores[idx]) || notes !== initialNotes;
-
-			tab._isDataUnsaved = hasChanges;
+			tab._isDataUnsaved = tab.teamId !== initialTeamId || form.isDirty();
 		}
 	});
 
@@ -79,17 +76,16 @@
 			const existingRubric = await app.wrpcClient.judging.getTeamInterviewRubrics.query({ id: tab.rubricId });
 			tab.teamId = existingRubric.teamId;
 			judgeId = existingRubric.judgeId;
-			rubricScores =
-				existingRubric.rubric.length === TEAM_INTERVIEW_RUBRIC_CRITERIA_COUNT
-					? (existingRubric.rubric as number[])
-					: createEmptyTeamInterviewRubricScores();
-			notes = existingRubric.notes;
 			timestamp = existingRubric.timestamp;
+			const loaded = TeamInterviewRubricDocument.tryLoad(existingRubric);
+			if (loaded) {
+				form = loaded;
+				unsupportedRubric = false;
+			} else {
+				unsupportedRubric = true;
+			}
 
-			// Reset initial state to loaded values
 			initialTeamId = existingRubric.teamId;
-			initialRubricScores = [...(existingRubric.rubric as number[])];
-			initialNotes = existingRubric.notes;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
 			app.addErrorNotice(m.failed_to_load_existing_rubric());
@@ -214,9 +210,7 @@
 			return;
 		}
 
-		// Check if all scores are provided
-		const missingScores = rubricScores.some((score) => score === -1);
-		if (missingScores) {
+		if (!form.isComplete()) {
 			showValidationErrors = true;
 			app.addErrorNotice(m.please_complete_all_scoring_sections());
 			return;
@@ -232,18 +226,16 @@
 					id: tab.rubricId,
 					teamId: tab.teamId,
 					judgeId,
-					rubric: rubricScores,
-					notes,
+					rubric: form.toPayload(),
+					notes: form.rowNotes(),
 					timestamp: (timestamp = Date.now())
 				}
 			});
 
 			isSubmitted = true;
 
-			// Update initial state to current saved state
 			initialTeamId = tab.teamId;
-			initialRubricScores = [...rubricScores];
-			initialNotes = notes;
+			form.markSaved();
 
 			app.addSuccessNotice(m.team_interview_rubric_saved_successfully());
 		} catch (error) {
@@ -276,15 +268,12 @@
 		if (!isJudgeAdvisor) {
 			judgeId = currentJudge?.id ?? null;
 		}
-		rubricScores = createEmptyTeamInterviewRubricScores();
-		notes = '';
+		form = TeamInterviewRubricDocument.createBlank(resolveJudgeGuideVersion(essentialData?.judgeGuideVersion));
+		unsupportedRubric = false;
 		showValidationErrors = false;
 		isSubmitted = false;
 
-		// Reset initial state to empty
 		initialTeamId = '';
-		initialRubricScores = createEmptyTeamInterviewRubricScores();
-		initialNotes = '';
 
 		// Scroll to top
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -407,11 +396,16 @@
 			</div>
 		</div>
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<p class="mb-6 text-sm text-gray-600">
-				{@html sanitizeHTMLMessage(m.team_interview_rubric_directions)}
-			</p>
-
-			<TeamInterviewRubricTable bind:rubricScores bind:notes {isSubmitted} {showValidationErrors} />
+			{#if unsupportedRubric}
+				<p class="mb-6 text-sm text-gray-600">{m.rubric_version_unsupported()}</p>
+			{:else if form.version === '2.0'}
+				<TeamInterviewRubricTable2_0 document={form} {isSubmitted} {showValidationErrors} />
+			{:else}
+				<p class="mb-6 text-sm text-gray-600">
+					{@html sanitizeHTMLMessage(m.team_interview_rubric_directions)}
+				</p>
+				<TeamInterviewRubricTable bind:rubricScores={form.scores} bind:notes={form.notes} {isSubmitted} {showValidationErrors} />
+			{/if}
 
 			<p class="mt-2 text-center text-xs italic">
 				{m.judging_materials_strictly_confidential_description()}
@@ -427,7 +421,9 @@
 						<button onclick={newRubric} class="primary">{m.new_rubric()}</button>
 					{/if}
 				{:else}
-					<button onclick={saveRubric} class="primary" disabled={!judgeId || !canEditCurrentRubric}>{m.submit_rubric()}</button>
+					<button onclick={saveRubric} class="primary" disabled={!judgeId || !canEditCurrentRubric || unsupportedRubric}
+						>{m.submit_rubric()}</button
+					>
 				{/if}
 			</div>
 		</div>

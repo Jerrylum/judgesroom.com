@@ -6,8 +6,9 @@
 	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import {
+		generateInterview2_0Scores,
 		generateNotebook2_0Scores,
-		generateTeamInterviewRubricScores,
+		interview2_0ScoresToPayload,
 		notebook2_0ScoresToPayload
 	} from '@judgesroom.com/protocol/src/rubric';
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
@@ -164,7 +165,7 @@
 								id: uuidv4(),
 								teamId: team.id,
 								judgeId: judge.id,
-								rubric: generateTeamInterviewRubricScores(),
+								rubric: interview2_0ScoresToPayload(generateInterview2_0Scores()),
 								notes: '',
 								timestamp: Date.now()
 							}
