@@ -47,12 +47,8 @@
 	let unsupportedRubric = $state(false);
 	let timestamp = $state(0);
 
-	const canEditCurrentRubric = $derived(
-		!accessControlEnabled || isJudgeAdvisor || Boolean(currentJudge && judgeId === currentJudge.id)
-	);
-	const effectiveJudgeGroup = $derived(
-		currentJudgeGroup ?? (judgeId ? app.findJudgeGroupByJudgeId(judgeId) : null)
-	);
+	const canEditCurrentRubric = $derived(!accessControlEnabled || isJudgeAdvisor || Boolean(currentJudge && judgeId === currentJudge.id));
+	const effectiveJudgeGroup = $derived(currentJudgeGroup ?? (judgeId ? app.findJudgeGroupByJudgeId(judgeId) : null));
 
 	// Track initial state for unsaved changes detection
 	let initialTeamId = $state('');

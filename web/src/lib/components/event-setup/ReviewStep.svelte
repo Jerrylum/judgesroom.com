@@ -29,9 +29,7 @@
 		if (checked) {
 			const confirmed = await dialogs.showConfirmation({
 				title: m.enable_access_control_confirm_title(),
-				message: isJudgesRoomJoined
-					? m.enable_access_control_confirm_message()
-					: m.enable_access_control_confirm_message_new_room(),
+				message: isJudgesRoomJoined ? m.enable_access_control_confirm_message() : m.enable_access_control_confirm_message_new_room(),
 				confirmText: m.enable_access_control_confirm_title(),
 				cancelText: m.cancel(),
 				confirmButtonClass: 'danger'

@@ -15,12 +15,7 @@ function escapeCsvCell(value: string): string {
 /** Build a CSV string for JA mass-distribution of personal access links. */
 export function buildAccessLinksCsv(rows: AccessLinkCsvRow[]): string {
 	const header = ['Role', 'Name', 'Group', 'AccessLink'];
-	const lines = [
-		header.join(','),
-		...rows.map((row) =>
-			[row.role, row.name, row.group, row.accessLink].map(escapeCsvCell).join(',')
-		)
-	];
+	const lines = [header.join(','), ...rows.map((row) => [row.role, row.name, row.group, row.accessLink].map(escapeCsvCell).join(','))];
 	return lines.join('\n') + '\n';
 }
 

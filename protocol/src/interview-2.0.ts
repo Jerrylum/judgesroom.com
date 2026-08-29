@@ -24,11 +24,7 @@ export type Interview2_0SectionConfig = {
 	criteria: Interview2_0CriterionConfig[];
 };
 
-const criterion = (
-	messageKeyPrefix: string,
-	criterionKey: string,
-	listenForKeys: string[]
-): Interview2_0CriterionConfig => ({
+const criterion = (messageKeyPrefix: string, criterionKey: string, listenForKeys: string[]): Interview2_0CriterionConfig => ({
 	messageKeyPrefix,
 	criterionKey,
 	listenForKeys,
@@ -98,9 +94,7 @@ export const interview2_0RubricSections: Interview2_0SectionConfig[] = [
 	}
 ];
 
-export const interview2_0RubricConfig: Interview2_0CriterionConfig[] = interview2_0RubricSections.flatMap(
-	(section) => section.criteria
-);
+export const interview2_0RubricConfig: Interview2_0CriterionConfig[] = interview2_0RubricSections.flatMap((section) => section.criteria);
 
 export const INTERVIEW_2_0_CRITERIA_COUNT = interview2_0RubricConfig.length;
 export const INTERVIEW_2_0_MAX_SCORE = interview2_0RubricConfig.reduce((sum, row) => sum + row.maxPoints, 0);

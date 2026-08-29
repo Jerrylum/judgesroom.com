@@ -5,7 +5,11 @@ import type { ConnectionState } from '@jerrylum/wrpc/client';
  * Remember the reconnect so connecting → connected can resume.
  * First join/create never enters reconnecting, so they must not resume.
  */
-export function connectionResumeStep(next: ConnectionState, roomJoined: boolean, reconnectPending: boolean): {
+export function connectionResumeStep(
+	next: ConnectionState,
+	roomJoined: boolean,
+	reconnectPending: boolean
+): {
 	resume: boolean;
 	reconnectPending: boolean;
 } {

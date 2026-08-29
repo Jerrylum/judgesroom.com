@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	ALLOWED_PHOTO_CONTENT_TYPES,
-	MAX_PHOTO_BYTES,
-	MAX_PHOTOS_PER_ROOM,
-	MAX_PHOTOS_PER_TEAM,
-	buildPhotoViewPath
-} from './media';
+import { ALLOWED_PHOTO_CONTENT_TYPES, MAX_PHOTO_BYTES, MAX_PHOTOS_PER_ROOM, MAX_PHOTOS_PER_TEAM, buildPhotoViewPath } from './media';
 
 describe('buildPhotoViewPath', () => {
 	const roomId = '550e8400-e29b-41d4-a716-446655440001';

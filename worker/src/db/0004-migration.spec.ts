@@ -55,9 +55,7 @@ describe('0004 access-control migration', () => {
 		expect(new Set(tokens).size).toBe(tokens.length);
 
 		const duplicate = sqlite.prepare('INSERT INTO Judges (id, name, groupId, authToken) VALUES (?, ?, ?, ?)');
-		expect(() =>
-			duplicate.run('550e8400-e29b-41d4-a716-446655440004', 'D', 'g1', tokens[0])
-		).toThrow();
+		expect(() => duplicate.run('550e8400-e29b-41d4-a716-446655440004', 'D', 'g1', tokens[0])).toThrow();
 	});
 
 	it('succeeds on an empty Judges table', () => {

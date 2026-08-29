@@ -655,9 +655,7 @@ describe('access control', () => {
 		const otherJudgeId = uuidv4();
 		await context.db.insert(judges).values({ id: otherJudgeId, name: 'A', groupId, authToken: token });
 
-		await expect(
-			context.db.insert(judges).values({ id: uuidv4(), name: 'B', groupId, authToken: token })
-		).rejects.toThrow();
+		await expect(context.db.insert(judges).values({ id: uuidv4(), name: 'B', groupId, authToken: token })).rejects.toThrow();
 	});
 
 	it('createJudgesRoom with access control mints JA token', async () => {

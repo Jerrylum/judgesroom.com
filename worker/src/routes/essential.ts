@@ -168,11 +168,7 @@ export async function reassignTeam(db: DatabaseOrTransaction, teamId: string, to
 	return transaction(db, async (tx) => reassignTeamInTx(tx, teamId, toJudgeGroupId));
 }
 
-export function broadcastReassignUpdate(
-	db: DatabaseOrTransaction,
-	session: ReassignBroadcastSession,
-	result: ReassignTeamResult
-): void {
+export function broadcastReassignUpdate(db: DatabaseOrTransaction, session: ReassignBroadcastSession, result: ReassignTeamResult): void {
 	if (!result.didReassign) return;
 
 	void getJudgeGroups(db).then((groups) => {
@@ -181,9 +177,7 @@ export function broadcastReassignUpdate(
 	});
 
 	if (result.movedCaches.length > 0) {
-		void broadcastTopic(db, 'submissions', session, async (client) =>
-			client.onSubmissionCacheUpdate.notify(result.movedCaches)
-		);
+		void broadcastTopic(db, 'submissions', session, async (client) => client.onSubmissionCacheUpdate.notify(result.movedCaches));
 	}
 }
 

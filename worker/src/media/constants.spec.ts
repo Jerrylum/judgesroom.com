@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { photoCacheTag, photoCacheTags, photoContentHeaders, roomPhotoCacheTag, timingSafeEqualString, PHOTO_CACHE_MAX_AGE_SECONDS, UPLOAD_TOKEN_TTL_MS } from './constants';
+import {
+	photoCacheTag,
+	photoCacheTags,
+	photoContentHeaders,
+	roomPhotoCacheTag,
+	timingSafeEqualString,
+	PHOTO_CACHE_MAX_AGE_SECONDS,
+	UPLOAD_TOKEN_TTL_MS
+} from './constants';
 
 describe('media cache tag helpers', () => {
 	it('builds photo and room tags', () => {

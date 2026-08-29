@@ -193,13 +193,9 @@ describe('ServerRouter', () => {
 
 	describe('essential.reassignTeam', () => {
 		it('moves a team and its submission caches to another judge group', async () => {
-			const {
-				judgeGroups,
-				judgeGroupsAssignedTeams,
-				judgeGroupsSubmissionsCache,
-				judges,
-				engineeringNotebookRubrics
-			} = await import('./db/schema');
+			const { judgeGroups, judgeGroupsAssignedTeams, judgeGroupsSubmissionsCache, judges, engineeringNotebookRubrics } = await import(
+				'./db/schema'
+			);
 			const groupA = '11111111-1111-4111-8111-111111111111';
 			const groupB = '22222222-2222-4222-8222-222222222222';
 			const judgeId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -256,7 +252,6 @@ describe('ServerRouter', () => {
 			expect(caches).toHaveLength(1);
 			expect(caches[0]?.judgeGroupId).toBe(groupB);
 		});
-
 	});
 
 	// describe('client router', () => {

@@ -159,9 +159,9 @@
 					<div>
 						<h2 class="mb-4 text-2xl font-semibold">Compliance</h2>
 						<p class="mb-4 leading-relaxed text-gray-700">
-							In accordance with the Global Robotics &amp; Science Foundation (GRSF) Competition Judge Guide confidentiality
-							principles, <strong>all judging materials are strictly confidential</strong>. We treat all data stored in the Judges' Room as
-							highly sensitive information that must be protected at all times.
+							In accordance with the Global Robotics &amp; Science Foundation (GRSF) Competition Judge Guide confidentiality principles, <strong
+								>all judging materials are strictly confidential</strong
+							>. We treat all data stored in the Judges' Room as highly sensitive information that must be protected at all times.
 						</p>
 
 						<div class="mb-6 border-l-4 border-slate-400 bg-slate-50 p-4">
@@ -188,9 +188,9 @@
 
 						<p class="leading-relaxed text-gray-700">
 							This approach ensures complete compliance with the judging confidentiality requirements outlined in the Confidential principle
-							for judges and the Secure materials step of judging deliberations in the GRSF Competition Judge Guide. judgesroom.com is designed
-							to fully comply with GRSF requirements, particularly regarding confidentiality, impartiality, and proper handling of judging
-							materials.
+							for judges and the Secure materials step of judging deliberations in the GRSF Competition Judge Guide. judgesroom.com is
+							designed to fully comply with GRSF requirements, particularly regarding confidentiality, impartiality, and proper handling of
+							judging materials.
 						</p>
 					</div>
 

@@ -8,16 +8,8 @@ import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 import { upsertJudge } from '../routes/judge';
 import { getEssentialData } from '../routes/essential';
 import { judges } from '../db/schema';
-import {
-	ConnectAuthCloseReason,
-	MAX_CONNECTIONS_PER_ACCESS_LINK,
-	type ClientAuthentication
-} from '@judgesroom.com/protocol/src/access';
-import {
-	countAccessLinkConnections,
-	sameAccessLinkIdentity,
-	type ClientAuthenticationEntry
-} from './judges-room-network';
+import { ConnectAuthCloseReason, MAX_CONNECTIONS_PER_ACCESS_LINK, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import { countAccessLinkConnections, sameAccessLinkIdentity, type ClientAuthenticationEntry } from './judges-room-network';
 
 describe('JudgesRoomNetwork.authorizeConnect', () => {
 	let context: ServerContext & { cleanup: () => void };
@@ -265,11 +257,7 @@ describe('countAccessLinkConnections', () => {
 	};
 
 	it('counts only the same judge identity', () => {
-		const entries = [
-			...accessLinkEntries(3, judgeAuth),
-			...accessLinkEntries(2, otherJudgeAuth),
-			...accessLinkEntries(4, jaAuth)
-		];
+		const entries = [...accessLinkEntries(3, judgeAuth), ...accessLinkEntries(2, otherJudgeAuth), ...accessLinkEntries(4, jaAuth)];
 		expect(countAccessLinkConnections(entries, judgeAuth)).toBe(3);
 		expect(countAccessLinkConnections(entries, otherJudgeAuth)).toBe(2);
 		expect(countAccessLinkConnections(entries, jaAuth)).toBe(0);

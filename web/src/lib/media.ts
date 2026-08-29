@@ -15,7 +15,7 @@ export function getMediaBaseUrl(): string {
 export function getPhotoObjectUrl(photo: TeamPhoto): string {
 	const roomId = app.getPermit()?.roomId;
 	if (!roomId) {
-		throw new Error('No Judges\' Room permit');
+		throw new Error("No Judges' Room permit");
 	}
 	return `${getMediaBaseUrl()}${buildPhotoViewPath(roomId, photo.id, photo.viewSecret)}`;
 }

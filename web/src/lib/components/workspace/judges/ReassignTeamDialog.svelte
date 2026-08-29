@@ -12,14 +12,10 @@
 
 	let { teamId, teamLabel, currentGroupId }: Props = $props();
 
-	const otherGroups = $derived(
-		app.getAllJudgeGroups().filter((group: JudgeGroup) => group.id !== currentGroupId)
-	);
+	const otherGroups = $derived(app.getAllJudgeGroups().filter((group: JudgeGroup) => group.id !== currentGroupId));
 	let selectedGroupId = $state<string | null>(null);
 	const effectiveGroupId = $derived(
-		selectedGroupId && otherGroups.some((group) => group.id === selectedGroupId)
-			? selectedGroupId
-			: (otherGroups[0]?.id ?? '')
+		selectedGroupId && otherGroups.some((group) => group.id === selectedGroupId) ? selectedGroupId : (otherGroups[0]?.id ?? '')
 	);
 
 	async function handleConfirm() {

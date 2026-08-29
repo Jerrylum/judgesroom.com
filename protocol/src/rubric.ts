@@ -118,9 +118,7 @@ export type DecodedNotebookRubric =
 
 export function decodeNotebookRubric(payload: unknown): DecodedNotebookRubric | null {
 	if (Array.isArray(payload)) {
-		const result = notebook1_0RubricArraySchema
-			.superRefine((scores, ctx) => refineNotebook1_0Scores(scores, ctx))
-			.safeParse(payload);
+		const result = notebook1_0RubricArraySchema.superRefine((scores, ctx) => refineNotebook1_0Scores(scores, ctx)).safeParse(payload);
 		if (!result.success) return null;
 		return { version: '1.0', scores: result.data };
 	}
@@ -167,9 +165,7 @@ export type DecodedInterviewRubric =
 
 export function decodeInterviewRubric(payload: unknown): DecodedInterviewRubric | null {
 	if (Array.isArray(payload)) {
-		const result = interview1_0RubricArraySchema
-			.superRefine((scores, ctx) => refineInterview1_0Scores(scores, ctx))
-			.safeParse(payload);
+		const result = interview1_0RubricArraySchema.superRefine((scores, ctx) => refineInterview1_0Scores(scores, ctx)).safeParse(payload);
 		if (!result.success) return null;
 		return { version: '1.0', scores: result.data };
 	}

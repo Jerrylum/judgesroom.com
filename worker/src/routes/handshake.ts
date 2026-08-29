@@ -7,11 +7,7 @@ import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { getFinalAwardNominations } from './judging';
-import {
-	ClientAuthenticationSchema,
-	generateAuthToken,
-	uncontrolledAuthentication
-} from '@judgesroom.com/protocol/src/access';
+import { ClientAuthenticationSchema, generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
 import { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit } from '@judgesroom.com/protocol/src/room';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 

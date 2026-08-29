@@ -71,20 +71,13 @@ describe('media routes', () => {
 		it('creates a pending upload token and url', async () => {
 			const result = await createAuthorizedUpload(32);
 
-			expect(result.photoId).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-			);
-			expect(result.uploadToken).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-			);
+			expect(result.photoId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+			expect(result.uploadToken).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 			expect(result.uploadUrl).toBe(`/media/upload?roomId=${encodeURIComponent(roomId)}`);
 			expect(result.uploadUrl).not.toContain('token=');
 			expect(result.uploadUrl).not.toContain(result.uploadToken);
 
-			const pending = await context.db
-				.select()
-				.from(pendingPhotoUploads)
-				.where(eq(pendingPhotoUploads.token, result.uploadToken));
+			const pending = await context.db.select().from(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, result.uploadToken));
 			expect(pending).toHaveLength(1);
 			expect(pending[0]?.photoId).toBe(result.photoId);
 			expect(pending[0]?.byteSize).toBe(32);
@@ -165,10 +158,7 @@ describe('media routes', () => {
 			});
 
 			expect(result.photoId).toBeTruthy();
-			const pending = await context.db
-				.select()
-				.from(pendingPhotoUploads)
-				.where(eq(pendingPhotoUploads.token, result.uploadToken));
+			const pending = await context.db.select().from(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, result.uploadToken));
 			expect(pending[0]?.createdByJudgeId).toBe(boundJudgeId);
 		});
 
@@ -209,18 +199,13 @@ describe('media routes', () => {
 			expect(photo.teamId).toBe(teamId);
 			expect(photo.contentType).toBe('image/jpeg');
 			expect(photo.byteSize).toBe(8);
-			expect(photo.viewSecret).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-			);
+			expect(photo.viewSecret).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 			expect(photo.createdByDeviceId).toBe(deviceId);
 
 			const stored = await context.photos.get(photo.id);
 			expect(stored).not.toBeNull();
 
-			const pending = await context.db
-				.select()
-				.from(pendingPhotoUploads)
-				.where(eq(pendingPhotoUploads.token, auth.uploadToken));
+			const pending = await context.db.select().from(pendingPhotoUploads).where(eq(pendingPhotoUploads.token, auth.uploadToken));
 			expect(pending).toHaveLength(0);
 
 			const rows = await context.db.select().from(teamPhotos).where(eq(teamPhotos.id, photo.id));

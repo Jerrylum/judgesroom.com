@@ -194,9 +194,7 @@ describe('room identity — GET /join and /media roomId', () => {
 		expect(parseRoomId('')).toBeNull();
 		expect(parseRoomId('probe')).toBeNull();
 		expect(parseRoomId('../../../etc')).toBeNull();
-		expect(parseRoomId('550e8400-e29b-41d4-a716-446655440000')).toBe(
-			'550e8400-e29b-41d4-a716-446655440000'
-		);
+		expect(parseRoomId('550e8400-e29b-41d4-a716-446655440000')).toBe('550e8400-e29b-41d4-a716-446655440000');
 		expect(parseRoomId('Ab3-_xY9QRstuvW012')).toBe('Ab3-_xY9QRstuvW012');
 		expect(parseRoomId('abcdefghijkl')).toBeNull();
 	});

@@ -4,10 +4,7 @@ export const EMPTY_ROOM_TTL_MS = 60 * 60 * 1000;
 /** Live rooms are deleted this long after the last event-setup save (metadata.updatedAt). */
 export const IDLE_ROOM_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 
-export type RetentionDecision =
-	| { action: 'destroy' }
-	| { action: 'reschedule'; alarmAt: number }
-	| { action: 'adopt'; alarmAt: number };
+export type RetentionDecision = { action: 'destroy' } | { action: 'reschedule'; alarmAt: number } | { action: 'adopt'; alarmAt: number };
 
 /**
  * No metadata → empty probe, destroy.

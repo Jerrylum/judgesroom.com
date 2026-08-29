@@ -189,7 +189,7 @@
 	@reference 'tailwindcss';
 
 	.nav-zone {
-		@apply absolute top-0 bottom-0 flex w-1/3 items-center border-0 bg-transparent p-0 opacity-100 outline-none transition-opacity focus:outline-none focus-visible:opacity-100 focus-visible:outline-none md:opacity-0 md:hover:opacity-100;
+		@apply absolute top-0 bottom-0 flex w-1/3 items-center border-0 bg-transparent p-0 opacity-100 transition-opacity outline-none focus:outline-none focus-visible:opacity-100 focus-visible:outline-none md:opacity-0 md:hover:opacity-100;
 	}
 
 	.nav-zone.left {

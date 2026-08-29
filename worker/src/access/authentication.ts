@@ -1,7 +1,4 @@
-import {
-	type ClientAuthentication,
-	uncontrolledAuthentication
-} from '@judgesroom.com/protocol/src/access';
+import { type ClientAuthentication, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
 
 type PersistAuthentication = (authentication: ClientAuthentication) => void;
 
@@ -54,9 +51,7 @@ export class Authentication {
 	}
 
 	getJudgeId(): string | null {
-		return this.#authentication.isAccessControlled && this.#authentication.role === 'judge'
-			? this.#authentication.judgeId
-			: null;
+		return this.#authentication.isAccessControlled && this.#authentication.role === 'judge' ? this.#authentication.judgeId : null;
 	}
 
 	setAuthentication(authentication: ClientAuthentication): void {
