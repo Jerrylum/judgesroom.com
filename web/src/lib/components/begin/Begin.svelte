@@ -92,6 +92,8 @@
 			|
 			<a href="https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3" target="_blank">{m.license()}</a>
 			|
+			<a href="./changelog" target="_blank">{m.changelog()}</a>
+			|
 			<a href="./privacy" target="_blank">{m.data_protection_and_privacy()}</a> |
 			<a href="https://discord.gg/BpSDTgq7Zm" target="_blank">{m.discord_support()}</a> |
 			<a href="https://www.youtube.com/channel/UCu1sG0NWOTJMN25XpuFsttQ" target="_blank">{m.youtube_channel()}</a>
