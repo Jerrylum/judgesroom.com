@@ -180,7 +180,7 @@
 		const essential = app.getEssentialData();
 		if (!permit || !essential) return;
 		if (!isJudgeGuideVersionOlderThanLatest(essential.judgeGuideVersion)) return;
-		if (wasJudgeGuideNoticeDismissed(permit.roomId, permit.deviceId)) return;
+		if (wasJudgeGuideNoticeDismissed()) return;
 
 		judgeGuideNoticeStarted = true;
 		const current = resolveJudgeGuideVersion(essential.judgeGuideVersion);
@@ -195,7 +195,7 @@
 				confirmButtonClass: 'primary'
 			})
 			.then(() => {
-				dismissJudgeGuideNotice(permit.roomId, permit.deviceId);
+				dismissJudgeGuideNotice();
 			});
 	});
 

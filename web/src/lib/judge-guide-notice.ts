@@ -1,30 +1,28 @@
-const STORAGE_KEY = 'judgeGuideVersionNoticeDismissed';
+const STORAGE_KEY = 'judgeGuideNoticeDismissed';
 
-function permitKey(roomId: string, deviceId: string): string {
-	return `${roomId}:${deviceId}`;
-}
-
-function readDismissed(): string[] {
+export function wasJudgeGuideNoticeDismissed(): boolean {
+	if (typeof localStorage === 'undefined') return false;
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
-		const parsed = raw ? JSON.parse(raw) : [];
-		return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+		return localStorage.getItem(STORAGE_KEY) === '1';
 	} catch {
-		return [];
+		return false;
 	}
 }
 
-export function wasJudgeGuideNoticeDismissed(roomId: string, deviceId: string): boolean {
-	return readDismissed().includes(permitKey(roomId, deviceId));
+export function dismissJudgeGuideNotice(): void {
+	if (typeof localStorage === 'undefined') return;
+	try {
+		localStorage.setItem(STORAGE_KEY, '1');
+	} catch {
+		// private mode / quota
+	}
 }
 
-export function dismissJudgeGuideNotice(roomId: string, deviceId: string): void {
-	const key = permitKey(roomId, deviceId);
-	const dismissed = readDismissed();
-	if (dismissed.includes(key)) return;
+export function forgetJudgeGuideNoticeDismissals(): void {
+	if (typeof localStorage === 'undefined') return;
 	try {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify([...dismissed, key]));
-	} catch (error) {
-		console.error('Failed to save judge guide notice dismissal:', error);
+		localStorage.removeItem(STORAGE_KEY);
+	} catch {
+		// private mode / quota
 	}
 }

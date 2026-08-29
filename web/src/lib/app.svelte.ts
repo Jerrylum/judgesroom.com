@@ -32,6 +32,7 @@ import { RoomIdSchema, generateRoomId } from '@judgesroom.com/protocol/src/room-
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 import { connectionResumeStep } from './session-resume';
+import { forgetJudgeGuideNoticeDismissals } from './judge-guide-notice';
 
 export interface Notice {
 	id: string;
@@ -358,6 +359,7 @@ export class App {
 		// Clear storage
 		this.clearPermitFromStorage();
 		this.clearUserFromStorage();
+		forgetJudgeGuideNoticeDismissals();
 		this.intentionalLeave = false;
 	}
 
