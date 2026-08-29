@@ -17,7 +17,7 @@
 <p class="mb-2 text-sm text-gray-600">
 	{@html sanitizeHTMLMessage(m.notebook_rubric_directions)}
 </p>
-<p class="mb-6 text-sm text-gray-600">
+<p class="mb-4 text-sm text-gray-600 lg:mb-6">
 	{@html sanitizeHTMLMessage(m.notebook_rubric_notes)}
 </p>
 

@@ -374,7 +374,7 @@
 				{/if}
 			</div>
 		</div>
-		<div class="rounded-lg bg-white p-6 shadow-sm">
+		<div class="rounded-lg bg-white p-3 shadow-sm md:p-6">
 			{#if unsupportedRubric}
 				<p class="mb-6 text-sm text-gray-600">{m.rubric_version_unsupported()}</p>
 			{:else if form.version === '2.0'}

@@ -51,6 +51,9 @@ rubric-table {
 	}
 
 	&.interview-rubric-2-0 {
+		@media screen and (max-width: 1023px) {
+			display: none;
+		}
 		criteria {
 			@apply w-80 max-w-80 min-w-80 grow-0 items-start justify-start text-left;
 		}
@@ -168,5 +171,124 @@ rubric-table {
 		> scroll-container {
 			scrollbar-width: none;
 		}
+	}
+}
+
+.rubric-phone {
+	@apply flex flex-col gap-4;
+
+	.score-legend {
+		@apply grid grid-cols-3 divide-x divide-gray-300 overflow-hidden rounded-md border border-gray-300 bg-gray-100 text-center;
+
+		> div {
+			@apply flex flex-col justify-center px-1.5 py-2;
+		}
+
+		p {
+			@apply text-[11px] leading-snug text-gray-700;
+		}
+
+		p.font-bold {
+			@apply mb-1 text-xs text-gray-900;
+		}
+	}
+
+	.phone-section {
+		@apply flex flex-col gap-3;
+	}
+
+	.phone-section-header {
+		@apply border-b-2 border-gray-800 pb-1;
+
+		h3 {
+			@apply text-sm font-bold text-gray-900;
+		}
+	}
+
+	.sample-questions {
+		@apply rounded-md border border-gray-300 bg-gray-50 px-3 py-2;
+
+		summary {
+			@apply cursor-pointer text-xs font-semibold text-gray-800;
+		}
+
+		p {
+			@apply mt-2 text-xs text-gray-600;
+		}
+
+		ul {
+			@apply mt-1 list-disc pl-4 text-xs text-gray-700;
+		}
+	}
+
+	.phone-criterion {
+		@apply flex flex-col gap-2 rounded-md border border-gray-300 bg-white p-3;
+
+		h4 {
+			@apply text-sm font-bold text-gray-900;
+		}
+
+		.proficiency-levels {
+			@apply flex flex-col divide-y divide-gray-200 overflow-hidden rounded-md border border-gray-200;
+
+			> div {
+				@apply px-2.5 py-2;
+			}
+
+			.level-name {
+				@apply text-xs font-semibold text-gray-800;
+			}
+
+			.level-text {
+				@apply mt-1 text-xs text-gray-700;
+			}
+		}
+
+		.listen-for-label {
+			@apply text-xs font-semibold text-gray-700;
+		}
+
+		ul {
+			@apply list-disc pl-4 text-xs text-gray-700;
+		}
+
+		textarea {
+			@apply mt-1 min-h-20 w-full text-sm;
+		}
+
+		&.missing {
+			@apply border-red-400 bg-red-50;
+		}
+	}
+
+	.phone-footer {
+		@apply flex flex-col gap-2 rounded-md border border-gray-300 bg-gray-50 p-3;
+
+		h3 {
+			@apply text-sm font-bold text-gray-900;
+		}
+
+		textarea {
+			@apply min-h-24 w-full text-sm;
+		}
+	}
+
+	.phone-total {
+		@apply flex items-center justify-between text-sm font-bold text-gray-900;
+
+		span {
+			@apply text-lg tabular-nums;
+		}
+	}
+}
+
+@media print {
+	.rubric-phone {
+		display: none !important;
+	}
+
+	rubric-table.interview-rubric-2-0,
+	rubric-table.notebook-rubric {
+		display: flex !important;
 	}
 }
