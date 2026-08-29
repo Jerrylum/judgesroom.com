@@ -14,6 +14,40 @@
 					</div>
 
 					<div>
+						<h2 class="mb-1 text-2xl font-semibold">2.3.0</h2>
+						<p class="mb-4 text-sm text-gray-500">30 August 2026</p>
+						<p class="mb-4 leading-relaxed text-gray-700">
+							This release follows <strong>Competition Judge Guide 2.0</strong>. New rooms use the 2.0 Engineering Notebook and Team
+							Interview forms. Rooms created in 2.2.0 or earlier stay on 1.0 — you cannot change that pin after setup. Joining a 1.0 room
+							shows a notice so you can create a new room if you need 2.0.
+						</p>
+
+						<div class="mb-6">
+							<h3 class="mb-3 text-xl font-semibold">Added</h3>
+							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
+								<li>
+									<strong>Engineering Notebook rubric 2.0.</strong> Sixteen criteria on a 4-point scale (max <strong>64</strong>). Saved 1.0
+									notebooks still open with the scores they already have. The 2.0 form has no Innovate Award notes field.
+								</li>
+								<li>
+									<strong>Team Interview rubric 2.0.</strong> Listen-fors, sample questions, per-criterion notes, and a 0–2 scale (max
+									<strong>12</strong>). The public print pages now print the 2.0 blanks.
+								</li>
+								<li>
+									<strong>Phone layouts</strong> for notebook and interview scoring.
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h3 class="mb-3 text-xl font-semibold">Changed</h3>
+							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
+								<li>Copy now uses the official name <strong>Competition Judge Guide</strong> instead of judging guidelines.</li>
+							</ul>
+						</div>
+					</div>
+
+					<div>
 						<h2 class="mb-1 text-2xl font-semibold">2.2.0</h2>
 						<p class="mb-4 text-sm text-gray-500">17 August 2026</p>
 						<p class="mb-4 leading-relaxed text-gray-700">
