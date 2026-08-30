@@ -97,10 +97,9 @@
 						{m.home_judges_training_description()}
 					</p>
 					<a
-						onclick={() => {
-							alert('Coming soon');
-						}}
-						href="/"
+						href="https://youtu.be/edcUYB6azpo"
+						target="_blank"
+						rel="noopener noreferrer"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
 						<span>{m.home_watch_training_video()}</span>
@@ -129,10 +128,9 @@
 						{m.home_judge_advisor_training_description()}
 					</p>
 					<a
-						onclick={() => {
-							alert('Coming soon');
-						}}
-						href="/"
+						href="https://youtu.be/2Q1_JeI2i-U"
+						target="_blank"
+						rel="noopener noreferrer"
 						class="inline-flex items-center font-medium text-slate-800 transition-colors hover:text-slate-600"
 					>
 						<span>{m.home_watch_training_video()}</span>
