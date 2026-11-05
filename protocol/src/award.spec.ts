@@ -248,6 +248,34 @@ describe('Design Award helpers', () => {
 		expect(isDesignExcellenceSwapZone('Innovate Award')).toBe(false);
 	});
 
+	it('should share one design column with every excellence column', () => {
+		const present = ['Excellence Award - Middle School', 'Excellence Award - High School', 'Design Award', 'Innovate Award'];
+		expect(getDesignExcellenceSwapZone('Excellence Award - Middle School', present)).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Excellence Award - High School', present)).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Design Award', present)).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Innovate Award', present)).toBe('Innovate Award');
+	});
+
+	it('should share one excellence column with every design column', () => {
+		const present = ['Excellence Award', 'Design Award - Middle School', 'Design Award - High School'];
+		expect(getDesignExcellenceSwapZone('Excellence Award', present)).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Design Award - Middle School', present)).toBe('Design Award');
+		expect(getDesignExcellenceSwapZone('Design Award - High School', present)).toBe('Design Award');
+	});
+
+	it('should keep grade-paired columns in separate zones', () => {
+		const present = [
+			'Excellence Award - Middle School',
+			'Excellence Award - High School',
+			'Design Award - Middle School',
+			'Design Award - High School'
+		];
+		expect(getDesignExcellenceSwapZone('Excellence Award - Middle School', present)).toBe('Design Award - Middle School');
+		expect(getDesignExcellenceSwapZone('Design Award - Middle School', present)).toBe('Design Award - Middle School');
+		expect(getDesignExcellenceSwapZone('Excellence Award - High School', present)).toBe('Design Award - High School');
+		expect(getDesignExcellenceSwapZone('Design Award - High School', present)).toBe('Design Award - High School');
+	});
+
 	it('should not confuse excellence and design awards', () => {
 		expect(isExcellenceAward('Design Award')).toBe(false);
 		expect(isDesignAward('Excellence Award - Middle School')).toBe(false);

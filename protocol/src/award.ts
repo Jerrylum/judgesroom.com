@@ -72,14 +72,34 @@ export function getPairedExcellenceAwardName(designAwardName: DesignAwardName | 
 	return designAwardName.replace('Design Award', 'Excellence Award') as ExcellenceAwardName;
 }
 
-export function getDesignExcellenceSwapZone(awardName: string): string {
+function pairedDesignAwardName(excellenceAwardName: string): string {
+	if (excellenceAwardName === 'Excellence Award') return 'Design Award';
+	return excellenceAwardName.replace('Excellence Award', 'Design Award');
+}
+
+/**
+ * Drag zone shared by an Excellence column and the Design column its finalists come from.
+ * Omit presentAwardNames to map each award to its grade-paired name.
+ * When the grade-paired column is absent, an unpaired column joins the generic Design Award zone,
+ * so one Design column can feed two Excellence columns and the reverse.
+ */
+export function getDesignExcellenceSwapZone(awardName: string, presentAwardNames?: readonly string[]): string {
+	const present = presentAwardNames ?? [];
+	const has = (name: string) => present.length === 0 || present.includes(name);
+
 	if (isExcellenceAward(awardName)) {
-		if (awardName === 'Excellence Award') return 'Design Award';
-		return awardName.replace('Excellence Award', 'Design Award');
+		const pairedDesign = pairedDesignAwardName(awardName);
+		if (has(pairedDesign)) return pairedDesign;
+		if (present.includes('Design Award')) return 'Design Award';
+		return pairedDesign;
 	}
+
 	if (isDesignAward(awardName)) {
+		if (has(getPairedExcellenceAwardName(awardName))) return awardName;
+		if (present.includes('Excellence Award')) return 'Design Award';
 		return awardName;
 	}
+
 	return awardName;
 }
 

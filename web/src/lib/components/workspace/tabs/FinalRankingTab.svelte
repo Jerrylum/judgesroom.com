@@ -40,6 +40,7 @@
 	const hasRobotEventsId = $derived(!!essentialData?.robotEventsEventId && !!essentialData?.divisionId);
 
 	const allAwards = $derived(app.getAllAwards());
+	const awardNames = $derived(allAwards.map((award) => award.name));
 	const allJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged'));
 	const allExcellenceAwards = $derived(allAwards.filter((award) => isExcellenceAward(award.name)));
 	const allRemainingJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged' && !isExcellenceAward(award.name)));
@@ -240,7 +241,7 @@
 						{#each allExcellenceAwards as award (award.name)}
 							<FinalRankingColumn
 								{award}
-								zone={getDesignExcellenceSwapZone(award.name)}
+								zone={getDesignExcellenceSwapZone(award.name, awardNames)}
 								{allTeams}
 								{allJudgeGroups}
 								{allFinalAwardNominations}
@@ -255,6 +256,7 @@
 						{#each allRemainingJudgedAwards as award (award.name)}
 							<FinalRankingColumn
 								{award}
+								zone={getDesignExcellenceSwapZone(award.name, awardNames)}
 								{allTeams}
 								{allJudgeGroups}
 								{allFinalAwardNominations}
