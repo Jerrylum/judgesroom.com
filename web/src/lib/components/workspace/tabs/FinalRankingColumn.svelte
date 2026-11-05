@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { isExcellenceAward, isDesignAward, getPairedExcellenceAwardName, type Award } from '@judgesroom.com/protocol/src/award';
-	import { dndzone, TRIGGERS, type DndEvent } from 'svelte-dnd-action';
+	import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, TRIGGERS, type DndEvent } from 'svelte-dnd-action';
 	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
@@ -41,6 +41,7 @@
 		Readonly<{
 			id: string;
 			sourceAwardName: string;
+			isDndShadowItem?: boolean;
 		}>;
 
 	type DropEvent = CustomEvent<DndEvent<DraggableAwardNomination>>;
@@ -78,6 +79,47 @@
 		};
 	}
 
+	function isShadowItem(nomination: DraggableAwardNomination): boolean {
+		return Boolean(nomination[SHADOW_ITEM_MARKER_PROPERTY_NAME]);
+	}
+
+	// The drag library copies a team into a shadow row, then assigns that copy the
+	// team's id. Key the shadow separately so the list cannot see one team twice.
+	function dragItemKey(nomination: DraggableAwardNomination): string {
+		return isShadowItem(nomination) ? `${nomination.id}\0shadow` : nomination.id;
+	}
+
+	// Drop the plain row when its shadow is also present. Match on team id: the
+	// shadow's own id is still the placeholder when this list is first applied,
+	// and only later changes to the team's id. A later plain duplicate of the
+	// same team is dropped too, so a finished drop cannot save the team twice.
+	function withoutShadowDuplicates(items: DraggableAwardNomination[]): DraggableAwardNomination[] {
+		const shadowedTeamIds = new Set<string>();
+		for (const item of items) {
+			if (isShadowItem(item)) shadowedTeamIds.add(item.teamId);
+		}
+
+		const seen = new Set<string>();
+		const unique: DraggableAwardNomination[] = [];
+		for (const item of items) {
+			if (!isShadowItem(item) && shadowedTeamIds.has(item.teamId)) continue;
+			if (seen.has(item.teamId)) continue;
+			seen.add(item.teamId);
+			unique.push(item);
+		}
+		return unique.length === items.length ? items : unique;
+	}
+
+	// The shadow marker changes the row key. A finished drop must store plain rows
+	// again, or the team that was just dropped stays undraggable.
+	function plainDragItems(items: DraggableAwardNomination[]): DraggableAwardNomination[] {
+		return withoutShadowDuplicates(items).map((item) => {
+			if (!isShadowItem(item)) return item;
+			const { [SHADOW_ITEM_MARKER_PROPERTY_NAME]: _shadow, ...rest } = item;
+			return rest;
+		});
+	}
+
 	function restoreLocalDragState() {
 		editing = nominationsFromServer();
 		removeWellItems = [];
@@ -90,7 +132,7 @@
 	const flipDurationMs = 200;
 
 	function handleConsider(e: DropEvent) {
-		editing = e.detail.items;
+		editing = withoutShadowDuplicates(e.detail.items);
 	}
 
 	function handleFinalize(e: DropEvent) {
@@ -105,19 +147,20 @@
 			return;
 		}
 
-		const finalizedIds = e.detail.items.map((nomination) => nomination.id).join('\0');
-		const visibleIds = editing.map((nomination) => nomination.id).join('\0');
-		if (finalizedIds !== visibleIds) editing = e.detail.items;
+		const finalizedItems = plainDragItems(e.detail.items);
+		const finalizedKeys = finalizedItems.map(dragItemKey).join('\0');
+		const visibleKeys = editing.map(dragItemKey).join('\0');
+		if (finalizedKeys !== visibleKeys) editing = finalizedItems;
 		onDrop?.({
 			sourceAwardName: movedNomination.sourceAwardName,
 			targetAward: award,
 			movedNomination: sanitizeNomination(movedNomination),
-			targetNominations: e.detail.items.map(sanitizeNomination)
+			targetNominations: finalizedItems.map(sanitizeNomination)
 		});
 	}
 
 	function handleRemoveWellConsider(e: DropEvent) {
-		removeWellItems = e.detail.info.trigger === TRIGGERS.DRAG_STOPPED ? [] : e.detail.items;
+		removeWellItems = e.detail.info.trigger === TRIGGERS.DRAG_STOPPED ? [] : withoutShadowDuplicates(e.detail.items);
 	}
 
 	function handleRemoveWellFinalize(e: DropEvent) {
@@ -233,7 +276,7 @@
 			onconsider={(e) => handleConsider(e)}
 			onfinalize={(e) => handleFinalize(e)}
 		>
-			{#each editing as nom, index (nom.id)}
+			{#each editing as nom, index (dragItemKey(nom))}
 				{@const team = allTeams[nom.teamId]}
 				{@const isWinner = winners.includes(nom.teamId)}
 				{@const isBeforeLastWinner = winners.length > 0 && editingTeamIds.indexOf(winners[winners.length - 1]) > index}
@@ -277,7 +320,7 @@
 				onconsider={handleRemoveWellConsider}
 				onfinalize={handleRemoveWellFinalize}
 			>
-				{#each removeWellItems as item (item.id)}
+				{#each removeWellItems as item (dragItemKey(item))}
 					<div class="h-full"></div>
 				{/each}
 			</div>

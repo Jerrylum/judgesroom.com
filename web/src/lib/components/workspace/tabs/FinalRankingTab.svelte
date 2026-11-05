@@ -84,6 +84,12 @@
 		);
 	}
 
+	function sameTeamSet(current: readonly AwardNomination[], proposed: readonly AwardNomination[]): boolean {
+		if (current.length !== proposed.length) return false;
+		const teamIds = new Set(current.map((nomination) => nomination.teamId));
+		return proposed.every((nomination) => teamIds.has(nomination.teamId));
+	}
+
 	function isFinalRankingValid(awardName: string, nominations: AwardNomination[]): boolean {
 		const award = allAwards.find((a) => a.name === awardName);
 
@@ -164,6 +170,10 @@
 				return;
 			}
 		} else if (!isFinalRankingValid(targetAwardName, targetNominations)) {
+			rollbackJudgedAwardNominations();
+			return;
+		} else if (!sameTeamSet(allFinalAwardNominations[targetAwardName] ?? [], targetNominations)) {
+			// A reorder cannot add or remove a team. A drag that lost a row must not be saved.
 			rollbackJudgedAwardNominations();
 			return;
 		} else if (sameNominationOrder(allFinalAwardNominations[targetAwardName] ?? [], targetNominations)) {
