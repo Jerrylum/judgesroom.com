@@ -1,14 +1,9 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
+	import { app, dialogs } from '$lib/index.svelte';
 	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-	import {
-		isExcellenceAward,
-		getDesignExcellenceSwapZone,
-		isDesignExcellenceSwapZone,
-		type Award
-	} from '@judgesroom.com/protocol/src/award';
+	import { isExcellenceAward, getDesignExcellenceSwapZone, type Award } from '@judgesroom.com/protocol/src/award';
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
 	import { tick } from 'svelte';
 	import { getJudgedAwardWinners } from '$lib/award.svelte';
@@ -25,12 +20,18 @@
 		isActive: boolean;
 	}
 
-	// Interface for drag and drop events
-	interface DropEvent {
-		detail: {
-			items: AwardNomination[];
-		};
-	}
+	type FinalRankingDrop =
+		| Readonly<{
+				sourceAwardName: string;
+				targetAward: Award;
+				movedNomination: AwardNomination;
+				targetNominations: AwardNomination[];
+		  }>
+		| Readonly<{
+				sourceAwardName: string;
+				targetAward: null;
+				movedNomination: AwardNomination;
+		  }>;
 
 	let { tab, isActive }: Props = $props();
 	let isFetching = $state(false);
@@ -49,12 +50,7 @@
 
 	const allJudgeGroups = $derived(app.getAllJudgeGroupsInMap());
 
-	let allFinalAwardNominations = $state<Readonly<Record<string, Readonly<AwardNomination>[]>>>({});
-
-	$effect(() => {
-		// Just like using derived, this will update the allFinalAwardNominations state when the app.getAllFinalAwardNominations state changes
-		allFinalAwardNominations = app.getAllFinalAwardNominations();
-	});
+	let allFinalAwardNominations = $derived<Readonly<Record<string, Readonly<AwardNomination>[]>>>(app.getAllFinalAwardNominations());
 
 	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations));
 
@@ -70,9 +66,6 @@
 		}
 	}
 
-	let dropOut = $state<{ awardName: string; nominations: AwardNomination[] } | null>(null);
-	let dragIn = $state<{ awardName: string; nominations: AwardNomination[] } | null>(null);
-
 	function isFinalRankingValid(awardName: string, nominations: AwardNomination[]): boolean {
 		const award = allAwards.find((a) => a.name === awardName);
 
@@ -81,55 +74,81 @@
 			return false;
 		}
 
-		return nominations.every((nom) => {
+		return nominations.every((nom, index) => {
 			const team = allTeams[nom.teamId];
-
+			if (!team || nominations.findIndex((candidate) => candidate.teamId === nom.teamId) !== index) return false;
 			return award.acceptedGrades.includes(team.grade);
 		});
 	}
 
 	function rollbackJudgedAwardNominations() {
-		// force all columns to rollback their editing state
-		// IMPORTANT: to avoid rendering warnings, we need to wait for the next tick
+		// Wait a tick so this replacement does not collide with the drag library's own DOM update.
+		// Copy into new arrays so each column effect sees a new value and puts its list back.
 		tick().then(() => {
-			allFinalAwardNominations = app.getAllFinalAwardNominations();
+			const snapshot = app.getAllFinalAwardNominations();
+			allFinalAwardNominations = Object.fromEntries(
+				Object.entries(snapshot).map(([awardName, nominations]) => [awardName, nominations.map((nomination) => ({ ...nomination }))])
+			);
 		});
 	}
 
-	async function handleJudgedAwardDrop(award: Award, zone: string, e: DropEvent) {
-		if (isDesignExcellenceSwapZone(zone)) {
-			const originalState = allFinalAwardNominations[award.name] || [];
-			const proposedState = e.detail.items;
-			if (originalState.length === proposedState.length) {
-				if (isFinalRankingValid(award.name, e.detail.items)) {
-					await updateJudgedAwardNominations(award.name, e.detail.items);
-				} else {
-					rollbackJudgedAwardNominations();
-				}
-				return;
-			} else if (originalState.length > proposedState.length) {
-				dropOut = { awardName: award.name, nominations: proposedState };
-			} else {
-				dragIn = { awardName: award.name, nominations: proposedState };
-			}
+	async function confirmRemoveFinalNomination(awardName: string, teamId: string) {
+		rollbackJudgedAwardNominations();
+		const team = allTeams[teamId];
+		const confirmed = await dialogs.showConfirmation({
+			title: m.remove_final_nomination_title(),
+			message: m.remove_final_nomination_message({ team: team?.number ?? '', award: awardName }),
+			confirmText: m.remove_final_nomination_confirm(),
+			confirmButtonClass: 'danger'
+		});
+		if (!confirmed) return;
 
-			if (dropOut && dragIn) {
-				if (isFinalRankingValid(dragIn.awardName, dragIn.nominations) && isFinalRankingValid(dropOut.awardName, dropOut.nominations)) {
-					await updateJudgedAwardNominations(dragIn.awardName, dragIn.nominations);
-					await updateJudgedAwardNominations(dropOut.awardName, dropOut.nominations);
-				} else {
-					rollbackJudgedAwardNominations();
-				}
-				dropOut = null;
-				dragIn = null;
-			}
-		} else {
-			if (isFinalRankingValid(award.name, e.detail.items)) {
-				await updateJudgedAwardNominations(award.name, e.detail.items);
+		try {
+			await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName, teamId });
+		} catch (error) {
+			console.error('Failed to remove final nomination:', error);
+			app.addErrorNotice(m.failed_to_update_award_nominations());
+		}
+	}
+
+	async function handleJudgedAwardDrop(drop: FinalRankingDrop) {
+		const { sourceAwardName, targetAward, movedNomination } = drop;
+		if (!targetAward) {
+			await confirmRemoveFinalNomination(sourceAwardName, movedNomination.teamId);
+			return;
+		}
+
+		const targetAwardName = targetAward.name;
+		const targetNominations = drop.targetNominations.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }));
+
+		if (sourceAwardName === targetAwardName) {
+			if (isFinalRankingValid(targetAwardName, targetNominations)) {
+				await updateJudgedAwardNominations(targetAwardName, targetNominations);
 			} else {
 				rollbackJudgedAwardNominations();
 			}
+			return;
 		}
+
+		const currentSourceNominations = allFinalAwardNominations[sourceAwardName] ?? [];
+		const movedSourceNominations = currentSourceNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
+		const movedTargetNominations = targetNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
+		const sourceNominations = currentSourceNominations
+			.filter((nomination) => nomination.teamId !== movedNomination.teamId)
+			.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }));
+
+		if (
+			movedSourceNominations.length !== 1 ||
+			movedTargetNominations.length !== 1 ||
+			!isFinalRankingValid(sourceAwardName, sourceNominations) ||
+			!isFinalRankingValid(targetAwardName, targetNominations)
+		) {
+			rollbackJudgedAwardNominations();
+			return;
+		}
+
+		await updateJudgedAwardNominations(targetAwardName, targetNominations);
+		await updateJudgedAwardNominations(sourceAwardName, sourceNominations);
 	}
 
 	async function handleAddNomination(awardName: string, teamId: string) {
@@ -245,7 +264,7 @@
 								{allTeams}
 								{allJudgeGroups}
 								{allFinalAwardNominations}
-								onFinalize={handleJudgedAwardDrop}
+								onDrop={handleJudgedAwardDrop}
 								dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}
@@ -260,7 +279,7 @@
 								{allTeams}
 								{allJudgeGroups}
 								{allFinalAwardNominations}
-								onFinalize={handleJudgedAwardDrop}
+								onDrop={handleJudgedAwardDrop}
 								onAddNomination={handleAddNomination}
 								showAddButton={true}
 								winners={allFinalAwardWinners[award.name]}

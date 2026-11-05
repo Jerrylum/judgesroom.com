@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { isExcellenceAward, isDesignAward, getPairedExcellenceAwardName, type Award } from '@judgesroom.com/protocol/src/award';
-	import { dndzone } from 'svelte-dnd-action';
+	import { dndzone, TRIGGERS, type DndEvent } from 'svelte-dnd-action';
+	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
@@ -16,8 +17,7 @@
 		allTeams: Readonly<Record<string, Readonly<TeamInfoAndData>>>;
 		allJudgeGroups: Readonly<Record<string, Readonly<JudgeGroup>>>;
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
-		onConsider?: (award: Award, zone: string, e: DropEvent) => void;
-		onFinalize?: (award: Award, zone: string, e: DropEvent) => void;
+		onDrop?: (drop: FinalRankingDrop) => void;
 		onAddNomination?: (awardName: string, teamId: string) => void;
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
@@ -25,21 +25,26 @@
 		teamEligibilities?: Readonly<Readonly<ExcellenceAwardTeamEligibility>[]>;
 	}
 
-	type AwardNominationWithId = AwardNomination & {
-		id: string; // Required by dndzone
-	};
+	type FinalRankingDrop =
+		| Readonly<{
+				sourceAwardName: string;
+				targetAward: Award;
+				movedNomination: AwardNomination;
+				targetNominations: AwardNomination[];
+		  }>
+		| Readonly<{
+				sourceAwardName: string;
+				targetAward: null;
+				movedNomination: AwardNomination;
+		  }>;
 
-	// Interface for drag and drop events
-	interface DropEvent {
-		detail: {
-			items: AwardNominationWithId[];
-			info: {
-				trigger: string;
-				source: string;
-				id: string;
-			};
-		};
-	}
+	type DraggableAwardNomination = AwardNomination &
+		Readonly<{
+			id: string;
+			sourceAwardName: string;
+		}>;
+
+	type DropEvent = CustomEvent<DndEvent<DraggableAwardNomination>>;
 
 	let {
 		award,
@@ -47,8 +52,7 @@
 		allTeams,
 		allJudgeGroups,
 		allFinalAwardNominations,
-		onConsider,
-		onFinalize,
+		onDrop,
 		onAddNomination,
 		dropFromOthersDisabled,
 		showAddButton,
@@ -57,28 +61,75 @@
 	}: Props = $props();
 
 	let usedZone = $derived(zone ?? award.name);
-	let editing = $state<AwardNominationWithId[]>([]);
+	let editing = $derived<DraggableAwardNomination[]>(nominationsFromServer());
+	let removeWellItems = $state<DraggableAwardNomination[]>([]);
 	const editingTeamIds = $derived(editing.map((nom) => nom.teamId));
+
+	function nominationsFromServer(): DraggableAwardNomination[] {
+		return (allFinalAwardNominations[award.name] || []).map((nomination) => ({
+			...nomination,
+			id: JSON.stringify([award.name, nomination.teamId]),
+			sourceAwardName: award.name
+		}));
+	}
+
+	function sanitizeNomination(nomination: DraggableAwardNomination): AwardNomination {
+		return {
+			teamId: nomination.teamId,
+			judgeGroupId: nomination.judgeGroupId
+		};
+	}
+
+	function restoreLocalDragState() {
+		editing = nominationsFromServer();
+		removeWellItems = [];
+	}
 
 	// Dialog state
 	let showAddDialog = $state(false);
-
-	$effect(() => {
-		// Update (replace) the editing state whenever the allFinalAwardNominations state changes
-		editing = (allFinalAwardNominations[award.name] || []).map((nom) => ({ ...nom, id: nom.teamId }));
-	});
 
 	// Drag and drop functionality for judged awards
 	const flipDurationMs = 200;
 
 	function handleConsider(e: DropEvent) {
 		editing = e.detail.items;
-		onConsider?.(award, usedZone, e);
 	}
 
 	function handleFinalize(e: DropEvent) {
+		if (e.detail.info.trigger !== TRIGGERS.DROPPED_INTO_ZONE) {
+			restoreLocalDragState();
+			return;
+		}
+
+		const movedNomination = e.detail.items.find((nomination) => nomination.id === e.detail.info.id);
+		if (!movedNomination) {
+			restoreLocalDragState();
+			return;
+		}
+
 		editing = e.detail.items;
-		onFinalize?.(award, usedZone, e);
+		onDrop?.({
+			sourceAwardName: movedNomination.sourceAwardName,
+			targetAward: award,
+			movedNomination: sanitizeNomination(movedNomination),
+			targetNominations: e.detail.items.map(sanitizeNomination)
+		});
+	}
+
+	function handleRemoveWellConsider(e: DropEvent) {
+		removeWellItems = e.detail.info.trigger === TRIGGERS.DRAG_STOPPED ? [] : e.detail.items;
+	}
+
+	function handleRemoveWellFinalize(e: DropEvent) {
+		const movedNomination = e.detail.items.find((nomination) => nomination.id === e.detail.info.id);
+		removeWellItems = [];
+		if (e.detail.info.trigger === TRIGGERS.DROPPED_INTO_ZONE && movedNomination?.sourceAwardName === award.name) {
+			onDrop?.({
+				sourceAwardName: movedNomination.sourceAwardName,
+				targetAward: null,
+				movedNomination: sanitizeNomination(movedNomination)
+			});
+		}
 	}
 
 	// Dialog handler functions
@@ -211,6 +262,31 @@
 			</div>
 		{/if}
 	</div>
+	{#if !isExcellenceAward(award.name)}
+		<div class="relative">
+			<div
+				class="h-8 overflow-hidden rounded-md border border-dashed border-gray-200"
+				aria-label={m.remove_final_nomination()}
+				use:dndzone={{
+					items: removeWellItems,
+					flipDurationMs,
+					dropTargetStyle: { borderColor: '#DC2626', backgroundColor: '#FEF2F2' },
+					dropAnimationDisabled: true,
+					type: usedZone,
+					delayTouchStart: true
+				}}
+				onconsider={handleRemoveWellConsider}
+				onfinalize={handleRemoveWellFinalize}
+			>
+				{#each removeWellItems as item (item.id)}
+					<div class="h-full"></div>
+				{/each}
+			</div>
+			<div class="pointer-events-none absolute inset-0 flex items-center justify-center text-gray-400">
+				<TrashBinIcon />
+			</div>
+		</div>
+	{/if}
 	<div>
 		{#if showAddButton}
 			<button
