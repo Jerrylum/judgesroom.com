@@ -99,10 +99,17 @@
 		}
 
 		return nominations.every((nom, index) => {
-			const team = allTeams[nom.teamId];
-			if (!team || nominations.findIndex((candidate) => candidate.teamId === nom.teamId) !== index) return false;
-			return award.acceptedGrades.includes(team.grade);
+			if (!allTeams[nom.teamId]) return false;
+			return nominations.findIndex((candidate) => candidate.teamId === nom.teamId) === index;
 		});
+	}
+
+	// A team already on the award may be the wrong grade. That must not freeze the column.
+	// Grade is checked only when a team is entering the award.
+	function meetsAwardGrade(awardName: string, teamId: string): boolean {
+		const award = allAwards.find((candidate) => candidate.name === awardName);
+		const team = allTeams[teamId];
+		return Boolean(award && team && award.acceptedGrades.includes(team.grade));
 	}
 
 	function replaceFinalAwardNominations(snapshot: Readonly<Record<string, Readonly<AwardNomination[]>>>) {
@@ -164,7 +171,8 @@
 				movedSourceNominations.length !== 1 ||
 				movedTargetNominations.length !== 1 ||
 				!isFinalRankingValid(sourceAwardName, sourceNominations) ||
-				!isFinalRankingValid(targetAwardName, targetNominations)
+				!isFinalRankingValid(targetAwardName, targetNominations) ||
+				!meetsAwardGrade(targetAwardName, movedNomination.teamId)
 			) {
 				rollbackJudgedAwardNominations();
 				return;
@@ -315,6 +323,7 @@
 								{allJudgeGroups}
 								{allFinalAwardNominations}
 								onDrop={handleJudgedAwardDrop}
+								dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}
 							/>
