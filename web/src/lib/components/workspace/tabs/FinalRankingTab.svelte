@@ -54,15 +54,24 @@
 
 	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations));
 
-	async function updateJudgedAwardNominations(awardName: string, nominations: AwardNomination[]) {
-		try {
-			await app.wrpcClient.judging.updateFinalRankings.mutation({
+	let rankingSaveInFlight = false;
+
+	function cloneNominations(snapshot: Readonly<Record<string, Readonly<AwardNomination[]>>>): Record<string, AwardNomination[]> {
+		return Object.fromEntries(
+			Object.entries(snapshot).map(([awardName, nominations]) => [
 				awardName,
-				nominations
-			});
+				nominations.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }))
+			])
+		);
+	}
+
+	async function persistFinalRankings(rankings: { awardName: string; nominations: AwardNomination[] }[]) {
+		try {
+			await app.wrpcClient.judging.updateFinalRankingsBatch.mutation({ rankings });
 		} catch (error) {
 			console.error('Failed to update judged award nominations:', error);
 			app.addErrorNotice(m.failed_to_update_award_nominations());
+			throw error;
 		}
 	}
 
@@ -81,15 +90,16 @@
 		});
 	}
 
-	function rollbackJudgedAwardNominations() {
+	function replaceFinalAwardNominations(snapshot: Readonly<Record<string, Readonly<AwardNomination[]>>>) {
 		// Wait a tick so this replacement does not collide with the drag library's own DOM update.
-		// Copy into new arrays so each column effect sees a new value and puts its list back.
+		// Copy into new arrays so each column sees a new value and puts its list back.
 		tick().then(() => {
-			const snapshot = app.getAllFinalAwardNominations();
-			allFinalAwardNominations = Object.fromEntries(
-				Object.entries(snapshot).map(([awardName, nominations]) => [awardName, nominations.map((nomination) => ({ ...nomination }))])
-			);
+			allFinalAwardNominations = cloneNominations(snapshot);
 		});
+	}
+
+	function rollbackJudgedAwardNominations() {
+		replaceFinalAwardNominations(app.getAllFinalAwardNominations());
 	}
 
 	async function confirmRemoveFinalNomination(awardName: string, teamId: string) {
@@ -112,6 +122,11 @@
 	}
 
 	async function handleJudgedAwardDrop(drop: FinalRankingDrop) {
+		if (rankingSaveInFlight) {
+			replaceFinalAwardNominations(allFinalAwardNominations);
+			return;
+		}
+
 		const { sourceAwardName, targetAward, movedNomination } = drop;
 		if (!targetAward) {
 			await confirmRemoveFinalNomination(sourceAwardName, movedNomination.teamId);
@@ -120,35 +135,47 @@
 
 		const targetAwardName = targetAward.name;
 		const targetNominations = drop.targetNominations.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }));
+		let sourceNominations: AwardNomination[] | null = null;
 
-		if (sourceAwardName === targetAwardName) {
-			if (isFinalRankingValid(targetAwardName, targetNominations)) {
-				await updateJudgedAwardNominations(targetAwardName, targetNominations);
-			} else {
+		if (sourceAwardName !== targetAwardName) {
+			const currentSourceNominations = allFinalAwardNominations[sourceAwardName] ?? [];
+			const movedSourceNominations = currentSourceNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
+			const movedTargetNominations = targetNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
+			sourceNominations = currentSourceNominations
+				.filter((nomination) => nomination.teamId !== movedNomination.teamId)
+				.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }));
+
+			if (
+				movedSourceNominations.length !== 1 ||
+				movedTargetNominations.length !== 1 ||
+				!isFinalRankingValid(sourceAwardName, sourceNominations) ||
+				!isFinalRankingValid(targetAwardName, targetNominations)
+			) {
 				rollbackJudgedAwardNominations();
+				return;
 			}
-			return;
-		}
-
-		const currentSourceNominations = allFinalAwardNominations[sourceAwardName] ?? [];
-		const movedSourceNominations = currentSourceNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
-		const movedTargetNominations = targetNominations.filter((nomination) => nomination.teamId === movedNomination.teamId);
-		const sourceNominations = currentSourceNominations
-			.filter((nomination) => nomination.teamId !== movedNomination.teamId)
-			.map(({ teamId, judgeGroupId }) => ({ teamId, judgeGroupId }));
-
-		if (
-			movedSourceNominations.length !== 1 ||
-			movedTargetNominations.length !== 1 ||
-			!isFinalRankingValid(sourceAwardName, sourceNominations) ||
-			!isFinalRankingValid(targetAwardName, targetNominations)
-		) {
+		} else if (!isFinalRankingValid(targetAwardName, targetNominations)) {
 			rollbackJudgedAwardNominations();
 			return;
 		}
 
-		await updateJudgedAwardNominations(targetAwardName, targetNominations);
-		await updateJudgedAwardNominations(sourceAwardName, sourceNominations);
+		const serverSnapshot = cloneNominations(app.getAllFinalAwardNominations());
+		const nextNominations = cloneNominations(allFinalAwardNominations);
+		nextNominations[targetAwardName] = targetNominations;
+		if (sourceNominations) nextNominations[sourceAwardName] = sourceNominations;
+		allFinalAwardNominations = nextNominations;
+
+		const rankings = [{ awardName: targetAwardName, nominations: targetNominations }];
+		if (sourceNominations) rankings.push({ awardName: sourceAwardName, nominations: sourceNominations });
+
+		rankingSaveInFlight = true;
+		try {
+			await persistFinalRankings(rankings);
+		} catch {
+			allFinalAwardNominations = cloneNominations(serverSnapshot);
+		} finally {
+			rankingSaveInFlight = false;
+		}
 	}
 
 	async function handleAddNomination(awardName: string, teamId: string) {

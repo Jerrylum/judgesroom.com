@@ -118,6 +118,23 @@ export function broadcastFinalAwardNominationsUpdate(
 	});
 }
 
+const FinalAwardRankingUpdateSchema = z.object({
+	awardName: AwardNameSchema,
+	nominations: z.array(AwardNominationSchema)
+});
+
+async function replaceFinalAwardNominations(tx: DatabaseOrTransaction, awardName: string, nominations: AwardNomination[]) {
+	await tx.delete(finalAwardNominations).where(eq(finalAwardNominations.awardName, awardName));
+	for (let i = 0; i < nominations.length; i++) {
+		await tx.insert(finalAwardNominations).values({
+			awardName,
+			ranking: i,
+			teamId: nominations[i].teamId,
+			judgeGroupId: nominations[i].judgeGroupId
+		});
+	}
+}
+
 export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		completeEngineeringNotebookRubric: w.procedure
@@ -369,24 +386,33 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
 			}),
 
-		updateFinalRankings: w.procedure
-			.input(z.object({ awardName: AwardNameSchema, nominations: z.array(AwardNominationSchema) }))
+		updateFinalRankings: w.procedure.input(FinalAwardRankingUpdateSchema).mutation(async ({ ctx, input, session }) => {
+			await transaction(ctx.db, async (tx) => {
+				await replaceFinalAwardNominations(tx, input.awardName, input.nominations);
+			});
+
+			// Do not wait for the broadcast to complete
+			broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
+		}),
+
+		// One transaction so a move cannot remain on the target award after the source update fails.
+		updateFinalRankingsBatch: w.procedure
+			.input(z.object({ rankings: z.array(FinalAwardRankingUpdateSchema).min(1).max(2) }))
 			.mutation(async ({ ctx, input, session }) => {
-				// remove all existing rankings for the award, transactionally
+				const awardNames = input.rankings.map((ranking) => ranking.awardName);
+				if (new Set(awardNames).size !== awardNames.length) {
+					throw new WRPCError('Each award can only be updated once');
+				}
+
 				await transaction(ctx.db, async (tx) => {
-					await tx.delete(finalAwardNominations).where(eq(finalAwardNominations.awardName, input.awardName));
-					for (let i = 0; i < input.nominations.length; i++) {
-						await tx.insert(finalAwardNominations).values({
-							awardName: input.awardName,
-							ranking: i,
-							teamId: input.nominations[i].teamId,
-							judgeGroupId: input.nominations[i].judgeGroupId
-						});
+					for (const ranking of input.rankings) {
+						await replaceFinalAwardNominations(tx, ranking.awardName, ranking.nominations);
 					}
 				});
 
-				// Do not wait for the broadcast to complete
-				broadcastFinalAwardNominationsUpdate(ctx.db, input.awardName, session.broadcast<ClientRouter>());
+				for (const ranking of input.rankings) {
+					broadcastFinalAwardNominationsUpdate(ctx.db, ranking.awardName, session.broadcast<ClientRouter>());
+				}
 			}),
 
 		startAwardDeliberation: w.procedure.mutation(async ({ ctx, session }) => {
