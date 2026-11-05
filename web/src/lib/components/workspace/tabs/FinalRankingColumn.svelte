@@ -19,7 +19,6 @@
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
 		onDrop?: (drop: FinalRankingDrop) => void;
 		onAddNomination?: (awardName: string, teamId: string) => void;
-		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
 		winners: string[];
 		teamEligibilities?: Readonly<Readonly<ExcellenceAwardTeamEligibility>[]>;
@@ -54,7 +53,6 @@
 		allFinalAwardNominations,
 		onDrop,
 		onAddNomination,
-		dropFromOthersDisabled,
 		showAddButton,
 		winners,
 		teamEligibilities
@@ -229,7 +227,6 @@
 				items: editing,
 				flipDurationMs,
 				dropTargetStyle: { border: '1px solid #3B82F6' },
-				dropFromOthersDisabled: dropFromOthersDisabled,
 				type: usedZone,
 				delayTouchStart: true
 			}}

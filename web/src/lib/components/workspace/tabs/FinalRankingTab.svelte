@@ -305,7 +305,6 @@
 								{allJudgeGroups}
 								{allFinalAwardNominations}
 								onDrop={handleJudgedAwardDrop}
-								dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}
 							/>
