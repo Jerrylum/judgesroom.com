@@ -14,6 +14,51 @@
 					</div>
 
 					<div>
+						<h2 class="mb-1 text-2xl font-semibold">2.4.1</h2>
+						<p class="mb-4 text-sm text-gray-500">6 November 2026</p>
+
+						<div>
+							<h3 class="mb-3 text-xl font-semibold">Fixed</h3>
+							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
+								<li>
+									Dragging teams on <strong>Final Ranking</strong> no longer crashes, shows a team twice, or refuses a drop into an
+									<strong>Excellence</strong> column that already has a nominee.
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div>
+						<h2 class="mb-1 text-2xl font-semibold">2.4.0</h2>
+						<p class="mb-4 text-sm text-gray-500">5 November 2026</p>
+
+						<div class="mb-6">
+							<h3 class="mb-3 text-xl font-semibold">Added</h3>
+							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
+								<li>
+									On <strong>Final Ranking</strong>, drag a team into the remove area under its column and confirm to take that nomination
+									off the award. <strong>Excellence</strong> columns have no remove area.
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h3 class="mb-3 text-xl font-semibold">Fixed</h3>
+							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
+								<li>
+									A blended event with one <strong>Design</strong> award and two <strong>Excellence</strong> awards, or the reverse, can
+									move a team from the single column onto either of the split columns.
+								</li>
+								<li>
+									Moving a team from one award to another updates both lists together. A failed save cannot leave the team on both awards
+									or on neither.
+								</li>
+								<li>The left and right scroll buttons on wide tables now keep every row lined up.</li>
+							</ul>
+						</div>
+					</div>
+
+					<div>
 						<h2 class="mb-1 text-2xl font-semibold">2.3.0</h2>
 						<p class="mb-4 text-sm text-gray-500">30 August 2026</p>
 						<p class="mb-4 leading-relaxed text-gray-700">
@@ -240,7 +285,7 @@
 					</div>
 
 					<div class="border-t pt-4 text-center text-sm text-gray-500">
-						<p>Last updated: August 2026</p>
+						<p>Last updated: November 2026</p>
 					</div>
 				</div>
 			</div>
