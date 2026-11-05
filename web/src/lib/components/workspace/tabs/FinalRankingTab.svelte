@@ -75,6 +75,15 @@
 		}
 	}
 
+	function sameNominationOrder(current: readonly AwardNomination[], proposed: readonly AwardNomination[]): boolean {
+		return (
+			current.length === proposed.length &&
+			current.every(
+				(nomination, index) => nomination.teamId === proposed[index].teamId && nomination.judgeGroupId === proposed[index].judgeGroupId
+			)
+		);
+	}
+
 	function isFinalRankingValid(awardName: string, nominations: AwardNomination[]): boolean {
 		const award = allAwards.find((a) => a.name === awardName);
 
@@ -156,6 +165,10 @@
 			}
 		} else if (!isFinalRankingValid(targetAwardName, targetNominations)) {
 			rollbackJudgedAwardNominations();
+			return;
+		} else if (sameNominationOrder(allFinalAwardNominations[targetAwardName] ?? [], targetNominations)) {
+			// Dropping a team back where it started must not rebuild the list. A second
+			// replacement in the same drag update breaks Svelte's row links.
 			return;
 		}
 

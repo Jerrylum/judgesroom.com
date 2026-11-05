@@ -107,7 +107,9 @@
 			return;
 		}
 
-		editing = e.detail.items;
+		const finalizedIds = e.detail.items.map((nomination) => nomination.id).join('\0');
+		const visibleIds = editing.map((nomination) => nomination.id).join('\0');
+		if (finalizedIds !== visibleIds) editing = e.detail.items;
 		onDrop?.({
 			sourceAwardName: movedNomination.sourceAwardName,
 			targetAward: award,
