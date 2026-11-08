@@ -280,6 +280,8 @@
 	"mark_award_no_winner": "Mark as no winner",
 	"unmark_award_no_winner": "Restore winner selection",
 	"failed_to_update_award_no_winner": "Failed to update award winner setting",
+	"widen_final_ranking": "Show more columns",
+	"narrow_final_ranking": "Show fewer columns",
 	"remove_final_nomination": "Remove",
 	"remove_final_nomination_title": "Remove nomination",
 	"remove_final_nomination_message": "Remove {team} from {award}?",

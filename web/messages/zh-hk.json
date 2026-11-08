@@ -280,6 +280,8 @@
 	"mark_award_no_winner": "設定為沒有得獎者",
 	"unmark_award_no_winner": "設定為有得獎者",
 	"failed_to_update_award_no_winner": "更新得獎者設定失敗",
+	"widen_final_ranking": "顯示更多欄",
+	"narrow_final_ranking": "顯示較少欄",
 	"remove_final_nomination": "移除",
 	"remove_final_nomination_title": "移除提名",
 	"remove_final_nomination_message": "要將 {team} 從 {award} 移除嗎？",

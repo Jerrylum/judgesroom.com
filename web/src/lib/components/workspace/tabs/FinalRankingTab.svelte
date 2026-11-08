@@ -13,6 +13,8 @@
 		type ExcellenceAwardTeamEligibility
 	} from '$lib/robotevents-source';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
+	import EnlargeIcon from '$lib/icon/EnlargeIcon.svelte';
+	import ReduceIcon from '$lib/icon/ReduceIcon.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 
 	interface Props {
@@ -56,6 +58,7 @@
 	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations, new Set(awardsWithNoWinner)));
 
 	let rankingSaveInFlight = false;
+	let wide = $state(false);
 
 	function cloneNominations(snapshot: Readonly<Record<string, Readonly<AwardNomination[]>>>): Record<string, AwardNomination[]> {
 		return Object.fromEntries(
@@ -255,8 +258,8 @@
 	});
 </script>
 
-<div class="h-full overflow-auto p-2 md:p-6">
-	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
+<div class="h-full overflow-auto p-2 md:p-6 lg:pb-16">
+	<div class="mx-auto space-y-2 md:space-y-6" class:max-w-none={wide} class:max-w-5xl={!wide}>
 		<!-- Judged Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
 			<div class="mb-2 flex flex-row items-start justify-between gap-3">
@@ -362,5 +365,20 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<div class="fixed right-4 bottom-4 z-30">
+		<button
+			type="button"
+			class="hidden rounded-md border border-gray-300 bg-white p-2 text-gray-700 shadow-md hover:bg-gray-100 lg:block"
+			aria-label={wide ? m.narrow_final_ranking() : m.widen_final_ranking()}
+			title={wide ? m.narrow_final_ranking() : m.widen_final_ranking()}
+			onclick={() => (wide = !wide)}
+		>
+			{#if wide}
+				<ReduceIcon />
+			{:else}
+				<EnlargeIcon />
+			{/if}
+		</button>
 	</div>
 </div>
