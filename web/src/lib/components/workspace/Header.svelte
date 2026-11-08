@@ -24,11 +24,11 @@
 </script>
 
 <header class="bg-slate-200 px-2 py-2 md:px-6">
-	<div class="flex items-center justify-between">
+	<div class="flex items-center justify-between gap-2">
 		<div class="flex items-center space-x-4">
 			<div>
 				<h1
-					class="w-[calc(100vw-220px)] overflow-hidden text-xl font-semibold text-nowrap text-ellipsis text-gray-900 md:w-[calc(100vw-240px)]"
+					class="w-[calc(100vw-260px)] overflow-hidden text-xl font-semibold text-nowrap text-ellipsis text-gray-900 md:w-[calc(100vw-280px)]"
 				>
 					{app.getEventName() || "Judges' Room"}
 				</h1>

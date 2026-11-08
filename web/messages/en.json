@@ -411,6 +411,7 @@
 	"connecting": "Connecting...",
 	"reconnecting": "Reconnecting...",
 	"connection_error": "Connection Error",
+	"retry_connection": "Retry connection",
 	"offline": "Offline",
 	"unknown": "Unknown",
 	"destroying": "Destroying...",

@@ -411,6 +411,7 @@
 	"connecting": "連接中...",
 	"reconnecting": "重新連接中...",
 	"connection_error": "連接錯誤",
+	"retry_connection": "重試連接",
 	"offline": "離線",
 	"unknown": "未知",
 	"destroying": "正在銷毀...",

@@ -5,6 +5,7 @@
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let isJudgesRoomJoined = $derived(app.isJudgesRoomJoined());
+	let canRetry = $derived(connectionState === 'error' && isJudgesRoomJoined);
 
 	function getStatusColor(state: ConnectionState): string {
 		switch (state) {
@@ -47,8 +48,14 @@
 <!-- Connection Status Indicator -->
 <div class="flex items-center space-x-2">
 	<!-- Status dot -->
-	<div class="flex items-center space-x-1">
+	<div class="flex items-center space-x-1 pl-2">
 		<div class="h-2 w-2 rounded-full {getStatusColor(connectionState)}"></div>
-		<span class="text-xs text-gray-600">{getStatusText(connectionState)}</span>
+		{#if canRetry}
+			<button type="button" class="text-xs text-nowrap text-red-800 underline" onclick={() => app.retryConnection()}>
+				{m.retry_connection()}
+			</button>
+		{:else}
+			<span class="text-xs text-nowrap text-gray-600">{getStatusText(connectionState)}</span>
+		{/if}
 	</div>
 </div>

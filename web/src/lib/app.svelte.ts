@@ -162,10 +162,35 @@ export class App {
 			throw new Error("CRITICAL: already connected to a Judges' Room");
 		}
 
-		// Just to be safe, reset the client manager
 		this.clientManager.resetClient();
+		return this.loadJoiningKit();
+	}
 
-		const joiningKit = await this.wrpcClient.handshake.joinJudgesRoom.mutation();
+	/**
+	 * The socket is already connected and this page is already in the room.
+	 * Reload the room on that socket and restore subscriptions.
+	 */
+	private async rejoinJudgesRoom(): Promise<void> {
+		if (!this.isJudgesRoomJoined()) {
+			throw new Error("CRITICAL: not in a Judges' Room");
+		}
+		if (this.getConnectionState() !== 'connected') {
+			throw new Error("CRITICAL: not connected to a Judges' Room");
+		}
+
+		await this.loadJoiningKit();
+		this.sessionEpoch += 1;
+		this.subscribeDeviceListIfRetained();
+	}
+
+	private async loadJoiningKit(): Promise<JoiningKit> {
+		const generation = ++this.resumeGeneration;
+		const client = this.wrpcClient;
+		const joiningKit = await client.handshake.joinJudgesRoom.mutation();
+		if (generation !== this.resumeGeneration || this.wrpcClient !== client || !this.hasPermit()) {
+			throw new Error('Join superseded');
+		}
+
 		this.handleEventSetupUpdate(joiningKit);
 		this.handleClientAuthenticationChange(joiningKit.authentication);
 		return joiningKit;
@@ -203,28 +228,43 @@ export class App {
 	}
 
 	/**
-	 * wrpc auto-reconnect brings the socket back but not the room session.
-	 * Re-join for a fresh snapshot, then re-subscribe topics.
+	 * The header retry. The socket has already given up, so open a new one and join.
+	 * A handshake error is not reported here: the client keeps retrying, and
+	 * onConnectionStateChange joins once that socket is connected.
 	 */
 	private async resumeJudgesRoom(): Promise<void> {
-		const generation = ++this.resumeGeneration;
-		const client = this.wrpcClient;
+		if (this.connectionState !== 'error' || !this.isJudgesRoomJoined()) {
+			return;
+		}
+
+		this.clientManager.resetClient();
 		try {
-			const joiningKit = await client.handshake.joinJudgesRoom.mutation();
-			if (generation !== this.resumeGeneration || this.wrpcClient !== client || !this.isJudgesRoomJoined()) {
-				return;
-			}
-			this.handleEventSetupUpdate(joiningKit);
-			this.handleClientAuthenticationChange(joiningKit.authentication);
+			await this.joinJudgesRoom();
 			this.sessionEpoch += 1;
 			this.subscribeDeviceListIfRetained();
 		} catch (error) {
-			if (generation !== this.resumeGeneration || !this.isJudgesRoomJoined()) {
-				return;
-			}
-			const message = error instanceof Error ? error.message : 'Unknown error';
-			console.error('Failed to resume Judges Room after reconnect:', error);
-			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
+			this.reportReconnectFailure(error);
+		}
+	}
+
+	/**
+	 * A handshake error is retried by the socket. An access-link close is not:
+	 * the server already refused this connection, and the promise only says the socket closed.
+	 */
+	private reportReconnectFailure(error: unknown): void {
+		const authError = this.lastConnectAuthError;
+		this.lastConnectAuthError = null;
+		if (!this.isJudgesRoomJoined()) {
+			return;
+		}
+		const message = authError ?? (error instanceof Error ? error.message : 'Unknown error');
+		console.error('Failed to resume Judges Room after reconnect:', error);
+		if (!authError && (message === 'WebSocket connection failed' || message === 'WebSocket connection closed')) {
+			return;
+		}
+		this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
+		if (authError) {
+			AppUI.appPhase = 'leaving';
 		}
 	}
 
@@ -394,6 +434,14 @@ export class App {
 
 	getConnectionState(): ConnectionState {
 		return this.connectionState;
+	}
+
+	/**
+	 * The socket stops retrying after several failures and stays on `error`.
+	 * Open a new one and rejoin. Tabs stay mounted, so an unsaved rubric is kept.
+	 */
+	retryConnection(): void {
+		void this.resumeJudgesRoom();
 	}
 
 	getSessionEpoch(): number {
@@ -862,9 +910,12 @@ export class App {
 				this.connectionState = state;
 				const step = connectionResumeStep(state, this.isJudgesRoomJoined(), this.reconnectPending);
 				this.reconnectPending = step.reconnectPending;
-				if (step.resume) {
-					void this.resumeJudgesRoom();
+				if (!step.resume) {
+					return;
 				}
+				void this.rejoinJudgesRoom().catch((error) => {
+					this.reportReconnectFailure(error);
+				});
 			}
 		};
 	}
