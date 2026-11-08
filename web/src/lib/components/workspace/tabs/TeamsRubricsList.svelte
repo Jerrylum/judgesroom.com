@@ -17,6 +17,10 @@
 	let { subscriptionScope = $bindable() }: Props = $props();
 
 	const teams = $derived(app.getAllTeamInfoAndData());
+	const currentJudgeId = $derived.by(() => {
+		const currentUser = app.getCurrentUser();
+		return currentUser?.role === 'judge' ? currentUser.judge.id : null;
+	});
 
 	interface SubmissionWithScore extends Submission {
 		score: number | null;
@@ -120,6 +124,14 @@
 	// Get judge name by ID
 	function getJudgeName(judgeId: string): string {
 		return app.findJudgeById(judgeId)?.name ?? m.unknown_judge();
+	}
+
+	function rubricChipText(rubric: SubmissionWithScore): string {
+		const text = rubric.score !== null ? String(rubric.score) : getJudgeName(rubric.judgeId);
+		if (currentJudgeId !== null && rubric.judgeId === currentJudgeId) {
+			return `${text} (${m.you()})`;
+		}
+		return text;
 	}
 
 	// Open notebook rubric for a team
@@ -298,13 +310,13 @@
 						<div class="flex max-w-74 min-w-74 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
 							<div class="mx-auto flex w-max flex-row gap-1 p-1">
 								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
-									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric}
+									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric (rubric.id)}
 										<button
 											onclick={() => openNotebookRubric(team.id, rubric.id)}
 											title={getJudgeName(rubric.judgeId)}
 											class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
 										>
-											{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
+											{rubricChipText(rubric)}
 										</button>
 									{/each}
 								{:else}
@@ -318,13 +330,13 @@
 						<!-- Team Interview Rubrics Column -->
 						<div class="flex max-w-74 min-w-74 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
 							<div class="mx-auto flex w-max flex-row gap-1 p-1">
-								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric}
+								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric (rubric.id)}
 									<button
 										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
 										title={getJudgeName(rubric.judgeId)}
 										class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
 									>
-										{rubric.score !== null ? ` ${rubric.score}` : getJudgeName(rubric.judgeId)}
+										{rubricChipText(rubric)}
 									</button>
 								{/each}
 							</div>
