@@ -51,8 +51,9 @@
 	const allJudgeGroups = $derived(app.getAllJudgeGroupsInMap());
 
 	let allFinalAwardNominations = $derived<Readonly<Record<string, Readonly<AwardNomination>[]>>>(app.getAllFinalAwardNominations());
+	const awardsWithNoWinner = $derived(app.getAwardsWithNoWinner());
 
-	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations));
+	const allFinalAwardWinners = $derived(getJudgedAwardWinners(allJudgedAwards, allFinalAwardNominations, new Set(awardsWithNoWinner)));
 
 	let rankingSaveInFlight = false;
 
@@ -213,6 +214,15 @@
 		await app.wrpcClient.judging.nominateFinalAward.mutation({ awardName, teamId, judgeGroupId: null });
 	}
 
+	async function handleSetAwardNoWinner(awardName: string, noWinner: boolean) {
+		try {
+			await app.wrpcClient.judging.setAwardNoWinner.mutation({ awardName, noWinner });
+		} catch (error) {
+			console.error('Failed to update award no-winner:', error);
+			app.addErrorNotice(m.failed_to_update_award_no_winner());
+		}
+	}
+
 	async function fetchExcellenceAwardTeamEligibility() {
 		if (!essentialData) return;
 		const { robotEventsEventId, divisionId } = essentialData;
@@ -324,6 +334,8 @@
 								{allFinalAwardNominations}
 								onDrop={handleJudgedAwardDrop}
 								dropFromOthersDisabled={allFinalAwardNominations[award.name]?.length >= award.winnersCount}
+								noWinner={awardsWithNoWinner.includes(award.name)}
+								onSetNoWinner={handleSetAwardNoWinner}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}
 							/>
@@ -340,6 +352,8 @@
 								onDrop={handleJudgedAwardDrop}
 								onAddNomination={handleAddNomination}
 								showAddButton={true}
+								noWinner={awardsWithNoWinner.includes(award.name)}
+								onSetNoWinner={handleSetAwardNoWinner}
 								winners={allFinalAwardWinners[award.name]}
 								{teamEligibilities}
 							/>

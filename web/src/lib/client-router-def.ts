@@ -29,6 +29,7 @@ export type ClientRouterHandlers = {
 		awardName: z.infer<typeof AwardNameSchema>;
 		nominations: z.infer<typeof AwardNominationSchema>[];
 	}) => void | Promise<void>;
+	onAwardNoWinnerUpdate: (input: { awardName: z.infer<typeof AwardNameSchema>; noWinner: boolean }) => void | Promise<void>;
 	onAwardDeliberationStarted: () => void | Promise<void>;
 	onTeamPhotoUpdate: (input: z.infer<typeof TeamPhotoUpdateSchema>) => void | Promise<void>;
 };
@@ -71,6 +72,9 @@ export function buildClientRouter(handlers: ClientRouterHandlers) {
 			.notify(async ({ input }) => {
 				await handlers.onFinalAwardNominationsUpdate(input);
 			}),
+		onAwardNoWinnerUpdate: w.procedure.input(z.object({ awardName: AwardNameSchema, noWinner: z.boolean() })).notify(async ({ input }) => {
+			await handlers.onAwardNoWinnerUpdate(input);
+		}),
 		onAwardDeliberationStarted: w.procedure.notify(async () => {
 			await handlers.onAwardDeliberationStarted();
 		}),

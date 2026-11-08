@@ -131,6 +131,7 @@ export class App {
 	/** wrpc goes reconnecting → connecting → connected; remember the first hop. */
 	private reconnectPending = false;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
+	private awardsWithNoWinner: string[] = $state([]);
 	public readonly version: string = '2.4.1';
 
 	// Error handling
@@ -353,6 +354,7 @@ export class App {
 		this.resumeGeneration += 1;
 		this.reconnectPending = false;
 		this.allFinalAwardNominations = {};
+		this.awardsWithNoWinner = [];
 		// no client-held room id field to clear
 		this.clientManager.resetClient();
 
@@ -403,6 +405,7 @@ export class App {
 		this.handleAllTeamDataUpdate(data.teamData);
 		this.handleAllJudgesUpdate(data.judges);
 		this.allFinalAwardNominations = $state.snapshot(data.finalAwardNominations);
+		this.awardsWithNoWinner = $state.snapshot(data.awardsWithNoWinner);
 	}
 
 	// ============================================================================
@@ -583,6 +586,20 @@ export class App {
 
 	getAllFinalAwardNominations(): Readonly<Record<string, Readonly<AwardNomination>[]>> {
 		return $state.snapshot(this.allFinalAwardNominations);
+	}
+
+	handleAwardNoWinnerUpdate(awardName: string, noWinner: boolean): void {
+		if (noWinner) {
+			if (!this.awardsWithNoWinner.includes(awardName)) {
+				this.awardsWithNoWinner.push(awardName);
+			}
+			return;
+		}
+		this.awardsWithNoWinner = this.awardsWithNoWinner.filter((name) => name !== awardName);
+	}
+
+	getAwardsWithNoWinner(): readonly string[] {
+		return $state.snapshot(this.awardsWithNoWinner);
 	}
 
 	// ============================================================================

@@ -6,7 +6,7 @@ import { broadcastDeviceListUpdate } from './device';
 import type { ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
-import { getFinalAwardNominations } from './judging';
+import { getAwardNoWinners, getFinalAwardNominations } from './judging';
 import { ClientAuthenticationSchema, generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
 import { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit } from '@judgesroom.com/protocol/src/room';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
@@ -46,6 +46,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 					teamData: await getTeamData(tx),
 					judges: await getJudges(tx),
 					finalAwardNominations: await getFinalAwardNominations(tx),
+					awardsWithNoWinner: await getAwardNoWinners(tx),
 					authentication: ctx.auth.authentication
 				};
 			});

@@ -243,6 +243,13 @@ export const finalAwardNominations = sqliteTable(
 	]
 );
 
+export const awardNoWinners = sqliteTable('AwardNoWinners', {
+	awardName: text('awardName')
+		.primaryKey()
+		.references(() => awards.name, { onDelete: 'cascade' })
+		.notNull()
+});
+
 export const teamPhotos = sqliteTable(
 	'TeamPhotos',
 	{

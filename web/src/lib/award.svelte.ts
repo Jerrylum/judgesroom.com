@@ -475,13 +475,18 @@ export function restoreAwardOptions(awards: Award[], officialAwards: AwardOption
 
 export function getJudgedAwardWinners(
 	judgedAwards: Readonly<Award[]>,
-	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>
+	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>,
+	awardsWithNoWinner: ReadonlySet<string> = new Set()
 ): Record<string, string[]> {
 	const rtn: Record<string, string[]> = {}; // award name -> team ids
 	const allWinners: string[] = [];
 
 	for (let i = 0; i < judgedAwards.length; i++) {
 		const award = judgedAwards[i];
+		if (awardsWithNoWinner.has(award.name)) {
+			rtn[award.name] = [];
+			continue;
+		}
 		const possibleWinners = award.winnersCount;
 		const nom = nominations[award.name] || [];
 		const winners: string[] = [];
@@ -498,13 +503,21 @@ export function getJudgedAwardWinners(
 	return rtn;
 }
 
-export function getAwardWinners(allAwards: Readonly<Award[]>, nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>) {
+export function getAwardWinners(
+	allAwards: Readonly<Award[]>,
+	nominations: Readonly<Record<string, Readonly<AwardNomination>[]>>,
+	awardsWithNoWinner: ReadonlySet<string> = new Set()
+) {
 	const judgedAwards = allAwards.filter((award) => award.type === 'judged');
-	const rtn = getJudgedAwardWinners(judgedAwards, nominations); // award name -> team ids
+	const rtn = getJudgedAwardWinners(judgedAwards, nominations, awardsWithNoWinner); // award name -> team ids
 
 	const otherAwards = allAwards.filter((award) => award.type !== 'judged');
 	for (let i = 0; i < otherAwards.length; i++) {
 		const award = otherAwards[i];
+		if (awardsWithNoWinner.has(award.name)) {
+			rtn[award.name] = [];
+			continue;
+		}
 		const nom = nominations[award.name] || [];
 		const winners: string[] = [];
 		for (let j = 0; j < nom.length && j < award.winnersCount; j++) {

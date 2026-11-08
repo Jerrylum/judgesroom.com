@@ -18,6 +18,7 @@ import type {
 } from '@judgesroom.com/protocol/src/rubric';
 import { eq, desc, and, asc } from 'drizzle-orm';
 import {
+	awardNoWinners,
 	awardRankings,
 	engineeringNotebookRubrics,
 	finalAwardNominations,
@@ -106,6 +107,11 @@ export async function getFinalAwardNominationsForAward(tx: DatabaseOrTransaction
 		.where(eq(finalAwardNominations.awardName, awardName))
 		.orderBy(asc(finalAwardNominations.ranking));
 	return result;
+}
+
+export async function getAwardNoWinners(tx: DatabaseOrTransaction): Promise<string[]> {
+	const rows = await tx.select({ awardName: awardNoWinners.awardName }).from(awardNoWinners).orderBy(asc(awardNoWinners.awardName));
+	return rows.map((row) => row.awardName);
 }
 
 export function broadcastFinalAwardNominationsUpdate(
@@ -413,6 +419,23 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				for (const ranking of input.rankings) {
 					broadcastFinalAwardNominationsUpdate(ctx.db, ranking.awardName, session.broadcast<ClientRouter>());
 				}
+			}),
+
+		setAwardNoWinner: w.procedure
+			.input(z.object({ awardName: AwardNameSchema, noWinner: z.boolean() }))
+			.mutation(async ({ ctx, input, session }) => {
+				await transaction(ctx.db, async (tx) => {
+					if (input.noWinner) {
+						await tx.insert(awardNoWinners).values({ awardName: input.awardName }).onConflictDoNothing();
+					} else {
+						await tx.delete(awardNoWinners).where(eq(awardNoWinners.awardName, input.awardName));
+					}
+				});
+
+				session.broadcast<ClientRouter>().onAwardNoWinnerUpdate.notify({
+					awardName: input.awardName,
+					noWinner: input.noWinner
+				});
 			}),
 
 		startAwardDeliberation: w.procedure.mutation(async ({ ctx, session }) => {

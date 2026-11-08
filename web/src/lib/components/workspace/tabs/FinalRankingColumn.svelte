@@ -19,6 +19,8 @@
 		allFinalAwardNominations: Readonly<Record<string, Readonly<AwardNomination>[]>>;
 		onDrop?: (drop: FinalRankingDrop) => void;
 		onAddNomination?: (awardName: string, teamId: string) => void;
+		onSetNoWinner?: (awardName: string, noWinner: boolean) => void;
+		noWinner?: boolean;
 		dropFromOthersDisabled?: boolean;
 		showAddButton?: boolean;
 		winners: string[];
@@ -55,6 +57,8 @@
 		allFinalAwardNominations,
 		onDrop,
 		onAddNomination,
+		onSetNoWinner,
+		noWinner = false,
 		dropFromOthersDisabled,
 		showAddButton,
 		winners,
@@ -283,7 +287,7 @@
 				{@const team = allTeams[nom.teamId]}
 				{@const isWinner = winners.includes(nom.teamId)}
 				{@const isBeforeLastWinner = winners.length > 0 && editingTeamIds.indexOf(winners[winners.length - 1]) > index}
-				{@const isSkipped = !isWinner && isBeforeLastWinner}
+				{@const isSkipped = noWinner || (!isWinner && isBeforeLastWinner)}
 				<!-- legacy code: not sure the reason of checking team existence here -->
 				{@const excellenceAwardEligibilityStatus = team ? getExcellenceAwardEligibilityStatus(team.number) : 'no-data'}
 				{@const thinkAwardEligibilityStatus = team ? getThinkAwardEligibilityStatus(team.number) : 'no-data'}
@@ -339,6 +343,11 @@
 				class="w-full border-gray-300 text-center text-sm text-slate-600 underline hover:text-slate-800">{m.add_nomination_button()}</button
 			>
 		{/if}
+		<button
+			onclick={() => onSetNoWinner?.(award.name, !noWinner)}
+			class="w-full border-gray-300 text-center text-sm text-slate-600 underline hover:text-slate-800"
+			>{noWinner ? m.unmark_award_no_winner() : m.mark_award_no_winner()}</button
+		>
 	</div>
 </div>
 

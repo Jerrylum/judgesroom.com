@@ -89,6 +89,11 @@ export const clientRouter = buildClientRouter({
 		app.handleFinalAwardNominationsUpdate(input.awardName, input.nominations);
 	},
 
+	onAwardNoWinnerUpdate: (input) => {
+		console.log(`📊 Award no-winner updated:`, input);
+		app.handleAwardNoWinnerUpdate(input.awardName, input.noWinner);
+	},
+
 	onAwardDeliberationStarted: () => {
 		console.log(`🏆 Award deliberation started - opening award nomination tab`);
 

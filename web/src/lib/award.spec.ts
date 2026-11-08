@@ -4,9 +4,11 @@ import {
 	getOfficialAwardOptionsList,
 	createCustomAwardOptions,
 	requiresFullyDevelopedNotebook,
-	meetsAwardNotebookRequirement
+	meetsAwardNotebookRequirement,
+	getJudgedAwardWinners,
+	getAwardWinners
 } from './award.svelte';
-import { AwardSchema, type Program, type Grade } from '@judgesroom.com/protocol/src/award';
+import { AwardSchema, type Award, type Program, type Grade } from '@judgesroom.com/protocol/src/award';
 
 describe('AwardOptions Class', () => {
 	let awardOptions: AwardOptions;
@@ -549,5 +551,49 @@ describe('Fully Developed notebook eligibility', () => {
 
 	it('meetsAwardNotebookRequirement skips notebook check when not required', () => {
 		expect(meetsAwardNotebookRequirement(judgesAward, 'not_submitted')).toBe(true);
+	});
+});
+
+function award(name: string, type: Award['type'] = 'judged'): Award {
+	return {
+		name,
+		type,
+		acceptedGrades: ['High School'],
+		winnersCount: 1,
+		requireNotebook: false,
+		requireTeamInterview: false
+	};
+}
+
+describe('awards marked with no winner', () => {
+	const nominations = {
+		'Design Award': [{ teamId: 'team-a', judgeGroupId: null }],
+		'Innovate Award': [{ teamId: 'team-a', judgeGroupId: null }],
+		'Tournament Champions': [{ teamId: 'team-b', judgeGroupId: null }]
+	};
+
+	it('gives a marked judged award to nobody and lets that team win a later award', () => {
+		const winners = getJudgedAwardWinners([award('Design Award'), award('Innovate Award')], nominations, new Set(['Design Award']));
+
+		expect(winners['Design Award']).toEqual([]);
+		expect(winners['Innovate Award']).toEqual(['team-a']);
+	});
+
+	it('keeps the top nominee when the award is not marked', () => {
+		const winners = getJudgedAwardWinners([award('Design Award')], nominations);
+
+		expect(winners['Design Award']).toEqual(['team-a']);
+	});
+
+	it('clears a non-judged award without changing the nomination list', () => {
+		const winners = getAwardWinners(
+			[award('Design Award'), award('Tournament Champions', 'performance')],
+			nominations,
+			new Set(['Tournament Champions'])
+		);
+
+		expect(winners['Design Award']).toEqual(['team-a']);
+		expect(winners['Tournament Champions']).toEqual([]);
+		expect(nominations['Tournament Champions']).toEqual([{ teamId: 'team-b', judgeGroupId: null }]);
 	});
 });

@@ -18,7 +18,8 @@ export const RoomStateSchema = z.object({
 	essentialData: EssentialDataSchema,
 	teamData: z.array(TeamDataSchema),
 	judges: z.array(JudgeSchema),
-	finalAwardNominations: z.record(AwardNameSchema, z.array(AwardNominationSchema))
+	finalAwardNominations: z.record(AwardNameSchema, z.array(AwardNominationSchema)),
+	awardsWithNoWinner: z.array(AwardNameSchema)
 });
 
 export type RoomState = z.infer<typeof RoomStateSchema>;

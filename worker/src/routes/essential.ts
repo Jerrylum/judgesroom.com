@@ -13,7 +13,7 @@ import type { SQLiteInsertValue, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type { ClientRouter } from '../client-router';
 import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { transaction } from '../utils';
-import { getFinalAwardNominations } from './judging';
+import { getAwardNoWinners, getFinalAwardNominations } from './judging';
 import { getTeamData } from './team';
 import { getJudges } from './judge';
 import { generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
@@ -339,7 +339,8 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 					essentialData: await getEssentialData(tx),
 					teamData: await getTeamData(tx),
 					judges: await getJudges(tx),
-					finalAwardNominations: await getFinalAwardNominations(tx)
+					finalAwardNominations: await getFinalAwardNominations(tx),
+					awardsWithNoWinner: await getAwardNoWinners(tx)
 				} satisfies RoomState;
 			}).then((message) => {
 				session.broadcast<ClientRouter>().onEventSetupUpdate.notify(message);

@@ -22,8 +22,9 @@
 	// const allJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged'));
 	const allVolunteerNominatedAwards = $derived(allAwards.filter((award) => award.type === 'volunteer_nominated'));
 	const allFinalAwardNominations = $derived(app.getAllFinalAwardNominations());
+	const awardsWithNoWinner = $derived(app.getAwardsWithNoWinner());
 
-	const allAwardWinners = $derived(getAwardWinners(allAwards, allFinalAwardNominations)); // award name -> team ids
+	const allAwardWinners = $derived(getAwardWinners(allAwards, allFinalAwardNominations, new Set(awardsWithNoWinner))); // award name -> team ids
 	const allAwardWinnersByTeamGroup = $derived(groupAwardWinnersByTeamGroup(allAwardWinners, allTeams)); // group id -> team id -> award names
 
 	async function updateInputFinalRankings(awardName: string, position: number, teamId: string) {

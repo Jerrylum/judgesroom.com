@@ -924,5 +924,6 @@
 		}
 	],
 	"judges": [],
-	"finalAwardNominations": {}
+	"finalAwardNominations": {},
+	"awardsWithNoWinner": []
 }
