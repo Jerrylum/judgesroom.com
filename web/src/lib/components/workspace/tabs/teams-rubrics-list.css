@@ -51,7 +51,7 @@ teams-rubrics-table {
 		}
 
 		> row {
-			@apply flex h-12 flex-row;
+			@apply flex min-h-12 flex-row;
 
 			> :first-child {
 				@apply border-l-3;

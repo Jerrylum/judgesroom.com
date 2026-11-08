@@ -321,43 +321,39 @@
 						</div>
 
 						<!-- Notebook Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center overflow-hidden">
-							<div class="flex min-w-0 flex-1 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
-								<div class="mx-auto flex w-max flex-row gap-1 p-1">
-									{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
-										{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric (rubric.id)}
-											<button
-												onclick={() => openNotebookRubric(team.id, rubric.id)}
-												title={getJudgeName(rubric.judgeId)}
-												class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
-											>
-												{rubricChipText(rubric)}
-											</button>
-										{/each}
-									{:else}
-										<div class="text-xs {notebookStatus.class} px-2 py-0.5">
-											{notebookStatus.text}
-										</div>
-									{/if}
-								</div>
-							</div>
-							{@render newRubricButton(() => openNotebookRubric(team.id))}
-						</div>
-
-						<!-- Team Interview Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center overflow-hidden">
-							<div class="flex min-w-0 flex-1 items-center overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
-								<div class="mx-auto flex w-max flex-row gap-1 p-1">
-									{#each teamRubricsAndNotes.teamInterviewRubrics as rubric (rubric.id)}
+						<div class="flex max-w-74 min-w-74 items-center">
+							<div class="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1 p-1">
+								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
+									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric (rubric.id)}
 										<button
-											onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
+											onclick={() => openNotebookRubric(team.id, rubric.id)}
 											title={getJudgeName(rubric.judgeId)}
 											class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
 										>
 											{rubricChipText(rubric)}
 										</button>
 									{/each}
-								</div>
+								{:else}
+									<div class="text-xs {notebookStatus.class} px-2 py-0.5">
+										{notebookStatus.text}
+									</div>
+								{/if}
+							</div>
+							{@render newRubricButton(() => openNotebookRubric(team.id))}
+						</div>
+
+						<!-- Team Interview Rubrics Column -->
+						<div class="flex max-w-74 min-w-74 items-center">
+							<div class="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1 p-1">
+								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric (rubric.id)}
+									<button
+										onclick={() => openTeamInterviewRubric(team.id, rubric.id)}
+										title={getJudgeName(rubric.judgeId)}
+										class="flex h-8 shrink-0 items-center justify-center rounded-full bg-gray-100 px-3 text-sm whitespace-nowrap hover:bg-gray-200 active:bg-gray-300"
+									>
+										{rubricChipText(rubric)}
+									</button>
+								{/each}
 							</div>
 							{@render newRubricButton(() => openTeamInterviewRubric(team.id))}
 						</div>
