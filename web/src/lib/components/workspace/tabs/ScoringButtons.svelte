@@ -1,5 +1,10 @@
 <script lang="ts">
-	let { variable = $bindable(), showError } = $props<{ variable: number; showError: boolean }>();
+	interface Props {
+		variable: number;
+		showError: boolean;
+	}
+
+	let { variable = $bindable(), showError }: Props = $props();
 </script>
 
 {#each [0, 1, 2, 3, 4, 5] as score (score)}
