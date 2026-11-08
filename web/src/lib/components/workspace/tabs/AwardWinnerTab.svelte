@@ -121,7 +121,7 @@
 				</div>
 			{:else}
 				<div class="space-y-4">
-					{#each allPerformanceAwards as award}
+					{#each allPerformanceAwards as award (award.name)}
 						<div class="rounded-lg border border-gray-200 p-4">
 							<div class="mb-2 flex flex-wrap items-center justify-between">
 								<h3 class="text-lg font-semibold text-gray-900">{award.name}</h3>
@@ -131,7 +131,7 @@
 							</div>
 
 							<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-								{#each Array(award.winnersCount) as _, position}
+								{#each Array(award.winnersCount) as _, position (position)}
 									{@const nominations = allFinalAwardNominations[award.name] || []}
 									{@const isDisabled = nominations.length < position}
 									{@const currentSelection = nominations[position]?.teamId || ''}
@@ -149,7 +149,7 @@
 												<!-- Show currently selected team even if it would normally be filtered out -->
 												<option value={currentSelection}>{getTeamDisplayName(currentSelection)}</option>
 											{/if}
-											{#each availableTeams as team}
+											{#each availableTeams as team (team.id)}
 												<option value={team.id}>{getTeamDisplayName(team.id)}</option>
 											{/each}
 										</select>
@@ -175,7 +175,7 @@
 				</div>
 			{:else}
 				<div class="space-y-4">
-					{#each allVolunteerNominatedAwards as award}
+					{#each allVolunteerNominatedAwards as award (award.name)}
 						<div class="rounded-lg border border-gray-200 p-4">
 							<div class="mb-2 flex flex-wrap items-center justify-between">
 								<h3 class="text-lg font-semibold text-gray-900">{award.name}</h3>
@@ -185,7 +185,7 @@
 							</div>
 
 							<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-								{#each Array(award.winnersCount) as _, position}
+								{#each Array(award.winnersCount) as _, position (position)}
 									{@const nominations = allFinalAwardNominations[award.name] || []}
 									{@const isDisabled = nominations.length < position}
 									{@const currentSelection = nominations[position]?.teamId || ''}
@@ -203,7 +203,7 @@
 												<!-- Show currently selected team even if it would normally be filtered out -->
 												<option value={currentSelection}>{getTeamDisplayName(currentSelection)}</option>
 											{/if}
-											{#each availableTeams as team}
+											{#each availableTeams as team (team.id)}
 												<option value={team.id}>{getTeamDisplayName(team.id)}</option>
 											{/each}
 										</select>
@@ -227,12 +227,12 @@
 			<p class="mb-6 text-sm text-gray-600">{m.award_winner_tab_summary_of_award_winners_description()}</p>
 
 			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-				{#each Object.keys(allAwardWinnersByTeamGroup) as groupId}
+				{#each Object.keys(allAwardWinnersByTeamGroup) as groupId (groupId)}
 					{@const group = allAwardWinnersByTeamGroup[groupId]}
 					<div class="min-h-20 rounded-lg border border-gray-200 p-2">
 						<h3 class="text-lg font-semibold text-gray-900">{groupId}</h3>
 						<div class="flex flex-col gap-1">
-							{#each Object.keys(group) as teamId}
+							{#each Object.keys(group) as teamId (teamId)}
 								{@const team = allTeams[teamId]}
 								{@const awards = group[teamId]}
 								<div class="flex-colitems-center flex gap-2">
@@ -241,7 +241,7 @@
 									</div>
 									<div>
 										{#if awards.length > 0}
-											{#each awards as awardName}
+											{#each awards as awardName, index (index)}
 												<p class="text-sm text-gray-500">{awardName}</p>
 											{/each}
 										{:else}

@@ -62,7 +62,7 @@
 			<team>{m.team_number()}</team>
 			<scroll-container use:registerScrollContainer class="bg-gray-200">
 				<content>
-					{#each awardRankings.judgedAwards as award}
+					{#each awardRankings.judgedAwards as award (award)}
 						{#if isDesignAward(award)}
 							<div class="flex min-h-14 max-w-40 min-w-40 items-center justify-center p-2 text-center">
 								{award} / {getPairedExcellenceAwardName(award)}
@@ -75,13 +75,13 @@
 			</scroll-container>
 		</table-header>
 		<table-body>
-			{#each listingTeams as teamId}
+			{#each listingTeams as teamId (teamId)}
 				{@const team = teams[teamId]}
 				<row>
 					<team>{teams[teamId].number}</team>
 					<scroll-container use:registerScrollContainer>
 						<content>
-							{#each awardRankings.judgedAwards as awardName, awardIndex}
+							{#each awardRankings.judgedAwards as awardName, awardIndex (awardName)}
 								{@const award = awards[awardName]}
 								<!-- The event setup has been updated and an award is removed, but the award rankings are not updated yet -->
 								{#if award !== undefined}

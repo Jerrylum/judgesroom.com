@@ -50,7 +50,7 @@
 			</div>
 		</div>
 
-		{#each Object.values(subscriptions.allJudgeGroupsAwardRankings) as awardRankings}
+		{#each Object.values(subscriptions.allJudgeGroupsAwardRankings) as awardRankings (awardRankings.judgeGroupId)}
 			{@const judgeGroup = judgeGroups[awardRankings.judgeGroupId]}
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<AwardRankingTable title={judgeGroup.name} {judgeGroup} showingTeams={{ showAbsentTeams }} {bypassAwardRequirements} />
