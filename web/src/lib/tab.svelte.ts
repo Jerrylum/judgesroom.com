@@ -396,8 +396,11 @@ export type Tab =
 	| AwardWinnerTab;
 
 export class TabController {
+	private static readonly maxActiveTabHistory = 50;
+
 	private tabs: Tab[] = $state([]);
 	private activeTabId: string | null = $state(null);
+	private activeTabHistory: string[] = [];
 	private tabChangeHandlers = new SvelteMap<string, (tabId: string | null) => void>();
 	public readonly overviewTab: OverviewTab;
 
@@ -472,6 +475,7 @@ export class TabController {
 		const tab = this.tabs.find((t) => t.id === tabId);
 		if (tab) {
 			this.activeTabId = tabId;
+			this.rememberActiveTab(tabId);
 			this.notifyTabChange(tabId);
 		}
 	}
@@ -482,21 +486,46 @@ export class TabController {
 		const tabIndex = this.tabs.findIndex((tab) => tab.id === tabId);
 		if (tabIndex === -1) return;
 
-		// Remove the tab
+		const closingActiveTab = this.activeTabId === tabId;
 		this.tabs.splice(tabIndex, 1);
+		this.forgetActiveTab(tabId);
 
-		// If we're closing the active tab, switch to another tab
-		if (this.activeTabId === tabId) {
-			if (this.tabs.length > 0) {
-				// Switch to the previous tab, or the first tab if we were at the beginning
-				const newIndex = Math.max(0, tabIndex - 1);
-				this.activeTabId = this.tabs[newIndex].id;
-				this.notifyTabChange(this.activeTabId);
-			} else {
-				this.activeTabId = null;
-				this.notifyTabChange(null);
-			}
+		if (!closingActiveTab) return;
+
+		const previousTabId = this.mostRecentOpenTabId();
+		if (previousTabId) {
+			this.switchToTab(previousTabId);
+			return;
 		}
+
+		if (this.tabs.length > 0) {
+			const newIndex = Math.max(0, tabIndex - 1);
+			this.switchToTab(this.tabs[newIndex].id);
+			return;
+		}
+
+		this.activeTabId = null;
+		this.notifyTabChange(null);
+	}
+
+	private rememberActiveTab(tabId: string): void {
+		if (this.activeTabHistory.at(-1) === tabId) return;
+		this.activeTabHistory.push(tabId);
+		if (this.activeTabHistory.length > TabController.maxActiveTabHistory) {
+			this.activeTabHistory.splice(0, this.activeTabHistory.length - TabController.maxActiveTabHistory);
+		}
+	}
+
+	private forgetActiveTab(tabId: string): void {
+		this.activeTabHistory = this.activeTabHistory.filter((id) => id !== tabId);
+	}
+
+	private mostRecentOpenTabId(): string | null {
+		for (let index = this.activeTabHistory.length - 1; index >= 0; index--) {
+			const tabId = this.activeTabHistory[index];
+			if (this.tabs.some((tab) => tab.id === tabId)) return tabId;
+		}
+		return null;
 	}
 
 	/**
