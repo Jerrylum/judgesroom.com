@@ -17,6 +17,7 @@
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
+	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -247,6 +248,34 @@
 		mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
+	let isUpdatingNotebookStatus = $state(false);
+
+	function notebookStatusLabel(status: NotebookDevelopmentStatus): string {
+		if (status === 'fully_developed') return m.fully_developed_notebook_status();
+		if (status === 'developing') return m.developing_notebook_status();
+		if (status === 'not_submitted') return m.not_submitted_notebook_status();
+		return m.undetermined_notebook_status();
+	}
+
+	async function setNotebookStatus(notebookDevelopmentStatus: 'developing' | 'fully_developed') {
+		if (!tab.teamId || isUpdatingNotebookStatus) return;
+		const selectedTeam = includedTeams[tab.teamId];
+		if (selectedTeam.notebookDevelopmentStatus === notebookDevelopmentStatus) return;
+
+		isUpdatingNotebookStatus = true;
+		try {
+			await app.wrpcClient.team.updateTeamData.mutation({
+				...selectedTeam,
+				notebookDevelopmentStatus
+			});
+		} catch (error) {
+			console.error('Failed to update notebook status:', error);
+			app.addErrorNotice(m.failed_to_update_notebook_status());
+		} finally {
+			isUpdatingNotebookStatus = false;
+		}
+	}
+
 	function newRubric() {
 		// Reset all form data
 		tab.teamId = '';
@@ -399,6 +428,60 @@
 				{/if}
 			</div>
 		</div>
+
+		{#if tab.teamId}
+			{@const selectedTeam = includedTeams[tab.teamId]}
+			{@const notebookStatus = selectedTeam.notebookDevelopmentStatus}
+			{@const rubricTotal = form.totalScore()}
+			<div class="rounded-lg bg-white p-6 shadow-sm">
+				<h3 class="text-lg font-semibold text-gray-900">{m.notebook_development_status()}</h3>
+				<p class="mt-2 text-sm text-gray-700">{m.notebook_status_current({ status: notebookStatusLabel(notebookStatus) })}</p>
+				{#if rubricTotal !== null}
+					<p class="mt-1 text-sm text-gray-700">{m.notebook_status_current_score({ score: String(rubricTotal) })}</p>
+				{/if}
+
+				<div class="mt-4 grid gap-4 md:grid-cols-2">
+					<div
+						class="flex flex-col rounded-lg border p-4"
+						class:border-yellow-500={notebookStatus === 'developing'}
+						class:border-gray-200={notebookStatus !== 'developing'}
+					>
+						<h4 class="font-medium text-gray-900">{m.developing_notebook_status()}</h4>
+						<p class="mt-2 text-sm text-gray-600">{m.notebook_status_developing_description()}</p>
+						<button
+							onclick={() => setNotebookStatus('developing')}
+							class="tiny mt-4 self-start rounded-md"
+							class:bg-yellow-500={notebookStatus === 'developing'}
+							class:text-white={notebookStatus === 'developing'}
+							class:lightweight={notebookStatus !== 'developing'}
+							disabled={isUpdatingNotebookStatus}
+						>
+							{m.set_notebook_developing()}
+						</button>
+					</div>
+					<div
+						class="flex flex-col rounded-lg border p-4"
+						class:border-green-600={notebookStatus === 'fully_developed'}
+						class:border-gray-200={notebookStatus !== 'fully_developed'}
+					>
+						<h4 class="font-medium text-gray-900">{m.fully_developed_notebook_status()}</h4>
+						<p class="mt-2 text-sm text-gray-600">{m.notebook_status_fully_developed_description()}</p>
+						{#if form.version === '2.0'}
+							<p class="mt-2 text-sm text-gray-600">{m.notebook_status_fully_developed_score_guide()}</p>
+						{/if}
+						<button
+							onclick={() => setNotebookStatus('fully_developed')}
+							class="tiny mt-4 self-start rounded-md"
+							class:success={notebookStatus === 'fully_developed'}
+							class:lightweight={notebookStatus !== 'fully_developed'}
+							disabled={isUpdatingNotebookStatus}
+						>
+							{m.set_notebook_fully_developed()}
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
 
 		<!-- Award Rankings Section -->
 		{#if tab.teamId && effectiveJudgeGroup && subscriptions.allJudgeGroupsAwardRankings[effectiveJudgeGroup.id]}
