@@ -17,6 +17,7 @@
 
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
+	const groupJudgeNames = $derived((app.getExistingJudgesGroupedByGroup()[judgeGroup.id] ?? []).map((judge) => judge.name).join(', '));
 
 	// This assume that the award rankings are subscribed to
 	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]);
@@ -40,9 +41,14 @@
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 </script>
 
-<div class="flex flex-row items-center justify-between">
-	<h3 class="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
-	<div class="mb-2 flex flex-row justify-end gap-2 text-sm">
+<div class="flex flex-row items-start justify-between gap-4">
+	<div class="mb-2 min-w-0">
+		<h3 class="text-lg font-semibold text-gray-900">{title}</h3>
+		{#if title && groupJudgeNames}
+			<p class="mt-1 text-sm text-gray-600">{groupJudgeNames}</p>
+		{/if}
+	</div>
+	<div class="mb-2 flex shrink-0 flex-row justify-end gap-2 text-sm">
 		<button class="lightweight tiny" onclick={scrollLeft}>{m.scroll_left()}</button>
 		<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 	</div>
