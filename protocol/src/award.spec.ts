@@ -12,6 +12,7 @@ import {
 	getDesignExcellenceSwapZone,
 	isDesignExcellenceSwapZone,
 	formatGradeShort,
+	formatGradeMark,
 	formatGradesShort
 } from './award';
 
@@ -74,6 +75,15 @@ describe('Awards Schema Validation', () => {
 
 		it('should join multiple grades', () => {
 			expect(formatGradesShort(['Elementary School', 'Middle School'])).toBe('ES, MS');
+		});
+	});
+
+	describe('formatGradeMark', () => {
+		it('should mark school grades and leave college unmarked', () => {
+			expect(formatGradeMark('Elementary School')).toBe('ES');
+			expect(formatGradeMark('Middle School')).toBe('MS');
+			expect(formatGradeMark('High School')).toBe('HS');
+			expect(formatGradeMark('College')).toBe('');
 		});
 	});
 

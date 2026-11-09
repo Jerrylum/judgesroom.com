@@ -31,6 +31,10 @@ award-rankings-table {
 		@apply flex max-w-30 min-w-30 flex-grow flex-col items-center justify-center p-2 text-center text-sm;
 	}
 
+	&.with-team-grade team {
+		@apply max-w-36 min-w-36 whitespace-nowrap;
+	}
+
 	table-header {
 		@apply flex flex-row;
 

@@ -4,7 +4,7 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import NominationButtons from './NominationButtons.svelte';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
-	import { getPairedExcellenceAwardName, isDesignAward } from '@judgesroom.com/protocol/src/award';
+	import { formatGradeMark, getPairedExcellenceAwardName, isDesignAward } from '@judgesroom.com/protocol/src/award';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
 
@@ -19,6 +19,7 @@
 
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
+	const isBlendedEvent = $derived(app.getEssentialData()?.eventGradeLevel === 'Blended');
 	const groupJudgeNames = $derived((app.getExistingJudgesGroupedByGroup()[judgeGroup.id] ?? []).map((judge) => judge.name).join(', '));
 	const finalAwardNominations = $derived(app.getAllFinalAwardNominations());
 	const awardRankings = $derived(subscriptions.allJudgeGroupsAwardRankings[judgeGroup.id]) as AwardRankingsFullUpdate | undefined;
@@ -63,7 +64,7 @@
 	</div>
 </div>
 {#if awardRankings}
-	<award-rankings-table>
+	<award-rankings-table class={{ 'with-team-grade': isBlendedEvent }}>
 		<table-header>
 			<team>{m.team_number()}</team>
 			<scroll-container use:registerScrollContainer class="bg-gray-200">
@@ -83,8 +84,9 @@
 		<table-body>
 			{#each listingTeams as teamId (teamId)}
 				{@const team = teams[teamId]}
+				{@const gradeMark = isBlendedEvent ? formatGradeMark(team.grade) : ''}
 				<row>
-					<team>{teams[teamId].number}</team>
+					<team>{gradeMark ? `${team.number} (${gradeMark})` : team.number}</team>
 					<scroll-container use:registerScrollContainer>
 						<content>
 							{#each awardRankings.judgedAwards as awardName, awardIndex (awardName)}

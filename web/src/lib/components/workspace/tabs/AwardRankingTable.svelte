@@ -4,6 +4,7 @@
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import RankingButtons from './RankingButtons.svelte';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+	import { formatGradeMark } from '@judgesroom.com/protocol/src/award';
 	import { sortByTeamNumberInMap } from '$lib/team.svelte';
 
 	interface Props {
@@ -17,6 +18,7 @@
 
 	const awards = $derived(app.getAllAwardsInMap());
 	const teams = $derived(app.getAllTeamInfoAndData());
+	const isBlendedEvent = $derived(app.getEssentialData()?.eventGradeLevel === 'Blended');
 	const groupJudgeNames = $derived((app.getExistingJudgesGroupedByGroup()[judgeGroup.id] ?? []).map((judge) => judge.name).join(', '));
 
 	// This assume that the award rankings are subscribed to
@@ -53,7 +55,7 @@
 		<button class="lightweight tiny" onclick={scrollRight}>{m.scroll_right()}</button>
 	</div>
 </div>
-<award-rankings-table>
+<award-rankings-table class={{ 'with-team-grade': isBlendedEvent }}>
 	<table-header>
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
@@ -67,8 +69,9 @@
 	<table-body>
 		{#each listingTeams as teamId (teamId)}
 			{@const team = teams[teamId]}
+			{@const gradeMark = isBlendedEvent ? formatGradeMark(team.grade) : ''}
 			<row>
-				<team>{team.number}</team>
+				<team>{gradeMark ? `${team.number} (${gradeMark})` : team.number}</team>
 				<scroll-container use:registerScrollContainer>
 					<content>
 						{#each awardRankings.judgedAwards as awardName, awardIndex (awardName)}

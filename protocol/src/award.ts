@@ -23,6 +23,12 @@ export function formatGradeShort(grade: Grade): string {
 	}
 }
 
+/** Grade mark beside a team number. College has no mark. */
+export function formatGradeMark(grade: Grade): string {
+	if (grade === 'College') return '';
+	return formatGradeShort(grade);
+}
+
 export function formatGradesShort(grades: readonly Grade[]): string {
 	return grades.map(formatGradeShort).join(', ');
 }
