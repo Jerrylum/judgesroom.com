@@ -340,7 +340,7 @@
 	"developing_notebook_status": "開發中",
 	"not_submitted_notebook_status": "未提交",
 	"innovate_award_submission_form": "創新獎提交表單",
-	"you_submitted": "(你已提交)",
+	"you_submitted": "你已提交（{score}）",
 	"start_rubric": "開始評分",
 	"notebook_link_table": "工程筆記連結",
 	"notebook_status_table": "狀態",

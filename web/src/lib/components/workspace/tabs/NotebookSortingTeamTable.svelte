@@ -10,12 +10,17 @@
 	import QRCodeButton from './QRCodeButton.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 
-	interface Props {
-		teams: TeamInfoAndData[];
-		submittedNotebookRubricsOfCurrentJudge: string[];
+	interface SubmittedNotebook {
+		rubricId: string;
+		score: number | null;
 	}
 
-	let { teams, submittedNotebookRubricsOfCurrentJudge }: Props = $props();
+	interface Props {
+		teams: TeamInfoAndData[];
+		submittedNotebookByTeam: Record<string, SubmittedNotebook>;
+	}
+
+	let { teams, submittedNotebookByTeam }: Props = $props();
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
@@ -31,9 +36,13 @@
 		}
 	}
 
-	// Function to open notebook rubric for a team
-	function openNotebookRubric(teamId: string) {
-		tabs.addOrReuseTab(new NotebookRubricTab({ teamId }));
+	function submittedScoreText(score: number | null): string {
+		return score === null ? '—' : String(score);
+	}
+
+	function openNotebookRubric(teamId: string, rubricId: string | null) {
+		const tab = rubricId ? new NotebookRubricTab({ rubricId }) : new NotebookRubricTab({ teamId });
+		tabs.addOrReuseTab(tab);
 	}
 
 	// Open team data edit dialog
@@ -62,7 +71,7 @@
 		{#each teams as team (team.id)}
 			{@const devStatus = team.notebookDevelopmentStatus}
 			{@const isSubmittedNotebookStatus = isSubmittedNotebook(devStatus)}
-			{@const isSubmitted = submittedNotebookRubricsOfCurrentJudge.includes(team.id)}
+			{@const submittedNotebook = submittedNotebookByTeam[team.id]}
 			<row>
 				<team>
 					<div class="flex items-center justify-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -111,9 +120,13 @@
 						<!-- Actions Column -->
 						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
 							{#if isSubmittedNotebookStatus}
-								<button onclick={() => openNotebookRubric(team.id)} class="primary tiny" class:bg-green-800!={isSubmitted}>
-									{#if isSubmitted}
-										{m.you_submitted()}
+								<button
+									onclick={() => openNotebookRubric(team.id, submittedNotebook?.rubricId ?? null)}
+									class="primary tiny text-nowrap"
+									class:bg-green-800!={submittedNotebook !== undefined}
+								>
+									{#if submittedNotebook}
+										{m.you_submitted({ score: submittedScoreText(submittedNotebook.score) })}
 									{:else}
 										{m.start_rubric()}
 									{/if}

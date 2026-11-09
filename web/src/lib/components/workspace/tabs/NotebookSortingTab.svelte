@@ -26,13 +26,18 @@
 	const currentJudge = $derived(app.getCurrentUserJudge());
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 
-	const submittedNotebookRubricsOfCurrentJudge = $derived(
-		currentJudge
-			? Object.values(subscriptions.allSubmissionCaches)
-					.filter((sub) => sub.enrId && sub.judgeId === currentJudge.id)
-					.map((sub) => sub.teamId)
-			: []
-	);
+	const submittedNotebookByTeam = $derived.by(() => {
+		const byTeam: Record<string, { rubricId: string; score: number | null }> = {};
+		if (!currentJudge) return byTeam;
+
+		for (const sub of Object.values(subscriptions.allSubmissionCaches)) {
+			if (!sub.enrId || sub.judgeId !== currentJudge.id) continue;
+			// Later entries overwrite earlier ones. Object order is insertion order, not submission time.
+			byTeam[sub.teamId] = { rubricId: sub.enrId, score: sub.score };
+		}
+
+		return byTeam;
+	});
 
 	// State for showing only assigned teams
 	let showOnlyAssignedTeams = $state(true);
@@ -82,7 +87,7 @@
 		}).length;
 
 		// 3. Teams current judge finished / evaluable notebooks
-		const currentJudgeFinishedCount = evaluableTeams.filter((team) => submittedNotebookRubricsOfCurrentJudge.includes(team.id)).length;
+		const currentJudgeFinishedCount = evaluableTeams.filter((team) => submittedNotebookByTeam[team.id] !== undefined).length;
 
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
@@ -333,11 +338,11 @@
 			{:else if viewMode === 'grid'}
 				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 					{#each teamsToShow as team (team.id)}
-						<NotebookSortingTeamGrid {team} isSubmitted={submittedNotebookRubricsOfCurrentJudge.includes(team.id)} />
+						<NotebookSortingTeamGrid {team} submittedNotebook={submittedNotebookByTeam[team.id] ?? null} />
 					{/each}
 				</div>
 			{:else}
-				<NotebookSortingTeamTable teams={teamsToShow} {submittedNotebookRubricsOfCurrentJudge} />
+				<NotebookSortingTeamTable teams={teamsToShow} {submittedNotebookByTeam} />
 			{/if}
 		</div>
 	</div>

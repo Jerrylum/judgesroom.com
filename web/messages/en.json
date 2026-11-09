@@ -340,7 +340,7 @@
 	"developing_notebook_status": "Developing",
 	"not_submitted_notebook_status": "Not Submitted",
 	"innovate_award_submission_form": "Innovate Award Submission Form",
-	"you_submitted": "(You Submitted)",
+	"you_submitted": "You Submitted ({score})",
 	"start_rubric": "Start Rubric",
 	"notebook_link_table": "NOTEBOOK LINK",
 	"notebook_status_table": "STATUS",

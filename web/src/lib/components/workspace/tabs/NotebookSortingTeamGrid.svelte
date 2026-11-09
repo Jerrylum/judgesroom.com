@@ -10,10 +10,10 @@
 
 	interface Props {
 		team: TeamInfoAndData;
-		isSubmitted: boolean;
+		submittedNotebook: { rubricId: string; score: number | null } | null;
 	}
 
-	let { team, isSubmitted }: Props = $props();
+	let { team, submittedNotebook }: Props = $props();
 
 	const devStatus = $derived(team.notebookDevelopmentStatus);
 	const isSubmittedNotebookStatus = $derived(isSubmittedNotebook(devStatus));
@@ -30,9 +30,11 @@
 		}
 	}
 
-	// Function to open notebook rubric for a team
 	function openNotebookRubric() {
-		tabs.addOrReuseTab(new NotebookRubricTab({ teamId: team.id }));
+		const tab = submittedNotebook
+			? new NotebookRubricTab({ rubricId: submittedNotebook.rubricId })
+			: new NotebookRubricTab({ teamId: team.id });
+		tabs.addOrReuseTab(tab);
 	}
 
 	// Open team data edit dialog
@@ -117,9 +119,9 @@
 	</div>
 
 	{#if isSubmittedNotebookStatus}
-		<button onclick={() => openNotebookRubric()} class="primary tiny mt-2 w-full" class:bg-green-800!={isSubmitted}>
-			{#if isSubmitted}
-				{m.you_submitted()}
+		<button onclick={openNotebookRubric} class="primary tiny mt-2 w-full" class:bg-green-800!={submittedNotebook !== null}>
+			{#if submittedNotebook}
+				{m.you_submitted({ score: submittedNotebook.score === null ? '—' : String(submittedNotebook.score) })}
 			{:else}
 				{m.start_rubric()}
 			{/if}
