@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { type TeamInfoAndData } from './team.svelte';
-import { type Judge } from '@judgesroom.com/protocol/src/judging';
+import { type Judge, type JudgingMethod } from '@judgesroom.com/protocol/src/judging';
 
 export class EditingJudgeGroup {
 	public readonly id: string;
@@ -24,6 +24,16 @@ export class EditingJudgeGroup {
 			this.assignedTeams.splice(index, 1);
 		}
 	}
+}
+
+export function isJudgeSetupReady(
+	judgingMethod: JudgingMethod,
+	judgeGroups: { assignedTeams: { id: string }[] }[],
+	teams: { id: string; absent: boolean }[]
+): boolean {
+	if (judgingMethod === 'walk_in') return judgeGroups.length > 0;
+	const assignedIds = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.id)));
+	return teams.filter((team) => !team.absent).every((team) => assignedIds.has(team.id));
 }
 
 export function createJudge(id: string, name: string, groupId: string): Judge {

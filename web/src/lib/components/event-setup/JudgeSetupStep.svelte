@@ -4,8 +4,8 @@
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { tick, untrack } from 'svelte';
-	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup } from '$lib/judging.svelte';
+	import { tick } from 'svelte';
+	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup, isJudgeSetupReady } from '$lib/judging.svelte';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
 	import type { JudgingMethod, Judge } from '@judgesroom.com/protocol/src/judging';
 	import { dialogs } from '$lib/index.svelte';
@@ -17,6 +17,7 @@
 		judgeGroups: EditingJudgeGroup[];
 		unassignedTeams: TeamInfoAndData[];
 		judges: Judge[];
+		allowIncompleteNext?: boolean;
 		onNext: () => void;
 		onPrev: () => void;
 	}
@@ -28,6 +29,7 @@
 		judgeGroups = $bindable(),
 		unassignedTeams = $bindable(),
 		judges = $bindable(),
+		allowIncompleteNext = false,
 		onNext,
 		onPrev
 	}: Props = $props();
@@ -39,36 +41,8 @@
 	const allTeamsHaveSameGrade = $derived(teamsProp.every((team) => team.grade === teamsProp[0]?.grade));
 
 	const unassignedZoneId = 'unassigned-teams';
-
-	// Initialize with default group if none exist
-	// There must be at least one group
-	$effect(() => {
-		if (judgeGroups.length === 0) {
-			judgeGroups.push(new EditingJudgeGroup('Group 1'));
-		}
-	});
-
-	// If teams are updated, we need to convert TeamInfoAndData to EditingTeam for judge groups
-	// Since judgeGroups still use EditingTeam internally, we need conversion logic
-	$effect(() => {
-		const allIncludedTeams = teamsProp.filter((team) => !team.absent);
-		const allIncludedTeamIds = new Set(allIncludedTeams.map((team) => team.id));
-
-		untrack(() => {
-			// Update judge groups - remove teams that are no longer included
-			judgeGroups.forEach((group) => {
-				group.assignedTeams = group.assignedTeams.filter((team) => allIncludedTeamIds.has(team.id));
-			});
-
-			// Update unassigned teams - only include teams that aren't assigned to any group
-			const assignedTeamIds = new Set();
-			judgeGroups.forEach((group) => {
-				group.assignedTeams.forEach((team) => assignedTeamIds.add(team.id));
-			});
-
-			unassignedTeams = allIncludedTeams.filter((team) => !assignedTeamIds.has(team.id));
-		});
-	});
+	const canProceed = $derived(isJudgeSetupReady(judgingMethod, judgeGroups, teamsProp));
+	const nextDisabled = $derived(!canProceed && !allowIncompleteNext);
 
 	interface DropEvent {
 		detail: {
@@ -211,16 +185,6 @@
 		unassignedTeams = [];
 	}
 
-	function canProceed(): boolean {
-		if (judgingMethod === 'walk_in') {
-			return judgeGroups.length > 0;
-		} else {
-			// For assigned method, all non-absent teams must be assigned
-			const totalActiveTeams = unassignedTeams.length;
-			return totalActiveTeams === 0;
-		}
-	}
-
 	const flipDurationMs = 200;
 </script>
 
@@ -344,7 +308,7 @@
 		</div>
 	{/if}
 
-	{#if !canProceed()}
+	{#if !canProceed}
 		<div class="rounded border border-yellow-400 bg-yellow-100 px-4 py-3 text-yellow-700">
 			{#if judgingMethod === 'walk_in'}
 				{m.please_create_at_least_one_judge_group()}
@@ -358,13 +322,7 @@
 	<div class="flex justify-between">
 		<button onclick={onPrev} class="secondary">{m.back()}</button>
 
-		<button
-			onclick={onNext}
-			disabled={!canProceed()}
-			class="primary"
-			class:opacity-50={!canProceed()}
-			class:cursor-not-allowed={!canProceed()}
-		>
+		<button type="button" onclick={onNext} disabled={nextDisabled} class={['primary', nextDisabled && 'cursor-not-allowed opacity-50']}>
 			{m.next_awards_setup()}
 		</button>
 	</div>

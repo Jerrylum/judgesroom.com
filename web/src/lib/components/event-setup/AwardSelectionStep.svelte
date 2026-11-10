@@ -9,7 +9,7 @@
 	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
 	import DesignAwardOptions from './DesignAwardOptions.svelte';
 	import AwardSelectionColumn from './AwardSelectionColumn.svelte';
-	import { tick, untrack } from 'svelte';
+	import { onDestroy, tick, untrack } from 'svelte';
 	import { gtag } from '$lib/index.svelte';
 
 	gtag('event', 'award_selection_step_loaded');
@@ -147,6 +147,8 @@
 			...localState.volunteer_nominated
 		];
 	}
+
+	onDestroy(submit);
 </script>
 
 <div class="space-y-6">

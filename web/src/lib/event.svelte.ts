@@ -7,6 +7,11 @@ export interface EventGradeLevelOptions {
 	grades: Grade[];
 }
 
+export function isCompetitionSetupReady(eventName: string, robotEventsEventId: number | null, teamCount: number): boolean {
+	const trimmed = eventName.trim();
+	return trimmed.length > 0 && eventName === trimmed && eventName.length <= 200 && (robotEventsEventId !== null || teamCount > 0);
+}
+
 export function getEventGradeLevelOptions(program: Program): EventGradeLevelOptions[] {
 	switch (program) {
 		case 'VIQRC':

@@ -5,16 +5,16 @@
 	import TeamGroupsStep from './TeamGroupsStep.svelte';
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { app, AppUI, dialogs, gtag } from '$lib/index.svelte';
 	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
-	import { EditingJudgeGroup } from '$lib/judging.svelte';
+	import { EditingJudgeGroup, isJudgeSetupReady } from '$lib/judging.svelte';
 	import { type TeamInfoAndData } from '$lib/team.svelte';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
-	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
 	import EventCodeSetup from './EventCodeSetup.svelte';
 	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
 
@@ -23,6 +23,7 @@
 	const totalSteps = 6;
 
 	let isEditingEventSetup = $state(false);
+	let loaded = $state(false);
 	let accessControlEnabled = $state(false);
 	let wasAccessControlEnabled = $state(false);
 
@@ -92,8 +93,6 @@
 			});
 
 			// Load judging setup
-			const assignedTeamIds = new Set<string>();
-
 			judgingMethod = eventSetup.judgingMethod;
 			judgingStep = eventSetup.judgingStep;
 			judgeGuideVersion = eventSetup.judgeGuideVersion;
@@ -112,9 +111,65 @@
 			// Load judges
 			judges = [...allJudges];
 
-			// Update unassigned teams
-			unassignedTeams = teams.filter((team) => !assignedTeamIds.has(team.id));
+			const assignedTeamIds = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.id)));
+			unassignedTeams = teams.filter((team) => !team.absent && !assignedTeamIds.has(team.id));
 		}
+	}
+
+	const canJumpSteps = $derived(isEditingEventSetup && app.isJudgesRoomJoined());
+	const competitionReady = $derived(isCompetitionSetupReady(eventName, robotEventsEventId, teams.length));
+	const judgesReady = $derived(isJudgeSetupReady(judgingMethod, judgeGroups, teams));
+	const setupBlockers = $derived.by(() => {
+		if (!canJumpSteps) return [];
+		const blockers: { step: number; label: string }[] = [];
+		if (!competitionReady) blockers.push({ step: 2, label: m.competition_setup() });
+		if (!judgesReady) blockers.push({ step: 4, label: m.judge_setup() });
+		return blockers;
+	});
+
+	function stepLabel(step: number): string {
+		switch (step) {
+			case 1:
+				return m.event_code();
+			case 2:
+				return m.competition_setup();
+			case 3:
+				return m.team_groups();
+			case 4:
+				return m.judge_setup();
+			case 5:
+				return m.awards_setup();
+			default:
+				return m.other_settings();
+		}
+	}
+
+	function selectedAwardNames(options: { name: string; isSelected: boolean }[]): string[] {
+		return options.filter((award) => award.isSelected).map((award) => award.name);
+	}
+
+	const removedSavedAwardNames = $derived.by(() => {
+		if (!app.isJudgesRoomJoined()) return [];
+		const saved = app.getEssentialData();
+		if (!saved) return [];
+		const kept = new Set(selectedAwardNames(awardOptions));
+		return saved.awards.map((award) => award.name).filter((name) => !kept.has(name));
+	});
+
+	function goToStep(step: number) {
+		if (!canJumpSteps || step < 1 || step > totalSteps || step === currentStep) return;
+		currentStep = step;
+	}
+
+	async function requestExit() {
+		const confirmed = await dialogs.showConfirmation({
+			title: m.discard_event_setup_changes_title(),
+			message: m.discard_event_setup_changes_message(),
+			confirmText: m.back_to_judges_room(),
+			cancelText: m.cancel(),
+			confirmButtonClass: 'danger'
+		});
+		if (confirmed) cancelSetup();
 	}
 
 	function nextStep() {
@@ -247,10 +302,36 @@
 		}
 	}
 
+	// A room always has at least one judge group, even while that step is closed.
+	$effect(() => {
+		if (!loaded) return;
+		if (judgeGroups.length === 0) {
+			judgeGroups.push(new EditingJudgeGroup('Group 1'));
+		}
+	});
+
+	// Drop assignments for teams that were removed, and keep the unassigned list current.
+	$effect(() => {
+		if (!loaded) return;
+
+		const activeTeams = teams.filter((team) => !team.absent);
+		const activeIds = new Set(activeTeams.map((team) => team.id));
+
+		untrack(() => {
+			for (const group of judgeGroups) {
+				group.assignedTeams = group.assignedTeams.filter((team) => activeIds.has(team.id));
+			}
+
+			const assignedIds = new Set(judgeGroups.flatMap((group) => group.assignedTeams.map((team) => team.id)));
+			unassignedTeams = activeTeams.filter((team) => !assignedIds.has(team.id));
+		});
+	});
+
 	// Initialize component
 	onMount(async () => {
 		// Load current data from app
 		loadCurrentData();
+		loaded = true;
 
 		currentStep = 1; // IMPORTANT: set to 1 after loading current data
 	});
@@ -264,39 +345,35 @@
 	<div class="mx-auto max-w-5xl space-y-2 md:space-y-6">
 		<!-- Step Indicator -->
 		<div class="mb-4 md:mb-8">
-			<!-- Mobile: Simple text indicator -->
-			<div class="flex items-center justify-between md:hidden">
-				<h1 class="text-xl font-bold text-gray-900">{m.event_setup()}</h1>
-				<div class="text-sm font-medium text-gray-600">
-					{m.step_of({ current: currentStep, total: totalSteps })}
+			<!-- Mobile -->
+			<div class="space-y-3 md:hidden">
+				<div class="flex items-center justify-between gap-3">
+					<h1 class="text-xl font-bold text-gray-900">{m.event_setup()}</h1>
+					{#if !canJumpSteps}
+						<div class="text-sm font-medium text-gray-600">
+							{m.step_of({ current: currentStep, total: totalSteps })}
+						</div>
+					{/if}
 				</div>
+				{#if canJumpSteps}
+					<button type="button" onclick={requestExit} class="text-sm font-medium text-slate-600 underline hover:text-slate-900">
+						{m.back_to_judges_room()}
+					</button>
+					{@render setupSteps(true)}
+				{/if}
 			</div>
 
-			<!-- Desktop: Full visual indicator -->
-			<div class="hidden items-center justify-between md:flex">
-				<h1 class="text-3xl font-bold text-gray-900">{m.event_setup()}</h1>
-				<div class="flex items-center">
-					{#each Array(totalSteps) as _, i (i)}
-						<div class="flex items-center">
-							<div
-								class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors"
-								class:bg-slate-900={i + 1 <= currentStep}
-								class:text-white={i + 1 <= currentStep}
-								class:bg-gray-200={i + 1 > currentStep}
-								class:text-gray-500={i + 1 > currentStep}
-							>
-								{i + 1}
-							</div>
-							{#if i < totalSteps - 1}
-								<div
-									class="mx-2 h-0.5 w-12 transition-colors"
-									class:bg-slate-900={i + 1 < currentStep}
-									class:bg-gray-200={i + 1 >= currentStep}
-								></div>
-							{/if}
-						</div>
-					{/each}
+			<!-- Desktop -->
+			<div class="hidden items-center justify-between gap-6 md:flex">
+				<div class="space-y-2">
+					<h1 class="text-3xl font-bold text-gray-900">{m.event_setup()}</h1>
+					{#if canJumpSteps}
+						<button type="button" onclick={requestExit} class="text-sm font-medium text-slate-600 underline hover:text-slate-900">
+							{m.back_to_judges_room()}
+						</button>
+					{/if}
 				</div>
+				{@render setupSteps(false)}
 			</div>
 		</div>
 
@@ -314,11 +391,11 @@
 					bind:teams
 					bind:awardOptions
 					onNext={nextStep}
-					onCancel={cancelSetup}
 				/>
 			{:else if currentStep === 2}
 				<CompetitionSetupStep
 					{robotEventsEventId}
+					allowIncompleteNext={canJumpSteps}
 					bind:eventName
 					bind:selectedProgram
 					bind:selectedEventGradeLevel
@@ -332,6 +409,7 @@
 			{:else if currentStep === 4}
 				<JudgeSetupStep
 					{isEditingEventSetup}
+					allowIncompleteNext={canJumpSteps}
 					{teams}
 					bind:judgingMethod
 					bind:judgeGroups
@@ -352,7 +430,9 @@
 				<ReviewStep
 					onPrev={prevStep}
 					onComplete={completeSetup}
-					onCancel={cancelSetup}
+					onJumpToStep={goToStep}
+					removedAwardNames={removedSavedAwardNames}
+					blockers={setupBlockers}
 					isJudgesRoomJoined={app.isJudgesRoomJoined()}
 					bind:accessControlEnabled
 				/>
@@ -360,6 +440,47 @@
 		</div>
 	</div>
 </div>
+
+{#snippet setupSteps(compact: boolean)}
+	<div class={['flex items-center', compact && 'overflow-x-auto p-1.5']}>
+		{#each Array(totalSteps) as _, i (i)}
+			{@const step = i + 1}
+			{@const reached = step <= currentStep}
+			{@const incomplete = setupBlockers.some((blocker) => blocker.step === step)}
+			<div class="flex items-center">
+				{#if canJumpSteps}
+					<button
+						type="button"
+						aria-current={step === currentStep ? 'step' : undefined}
+						aria-label={m.go_to_step({ step, name: stepLabel(step) })}
+						onclick={() => goToStep(step)}
+						class={[
+							'flex items-center justify-center rounded-full font-medium transition-colors',
+							compact ? 'h-7 w-7 text-xs' : 'h-8 w-8 text-sm',
+							incomplete ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white',
+							step === currentStep && 'ring-2 ring-slate-900 ring-offset-2'
+						]}
+					>
+						{step}
+					</button>
+				{:else}
+					<div
+						class={[
+							'flex items-center justify-center rounded-full font-medium',
+							compact ? 'h-7 w-7 text-xs' : 'h-8 w-8 text-sm',
+							reached ? 'bg-slate-900 text-white' : 'bg-gray-200 text-gray-500'
+						]}
+					>
+						{step}
+					</div>
+				{/if}
+				{#if step < totalSteps}
+					<div class={['mx-2 h-0.5', compact ? 'w-3' : 'w-12', !canJumpSteps && step < currentStep ? 'bg-slate-900' : 'bg-gray-200']}></div>
+				{/if}
+			</div>
+		{/each}
+	</div>
+{/snippet}
 
 <style lang="postcss">
 	@reference 'tailwindcss';

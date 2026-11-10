@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
+	import RemoveAwardsDialog from './RemoveAwardsDialog.svelte';
 
 	interface Props {
 		onPrev: () => void;
 		onComplete: () => Promise<void>;
-		onCancel: () => void;
+		onJumpToStep: (step: number) => void;
+		removedAwardNames?: string[];
+		blockers?: { step: number; label: string }[];
 		isJudgesRoomJoined: boolean;
 		accessControlEnabled?: boolean;
 		onAccessControlEnabledChange?: (value: boolean) => void;
@@ -14,7 +17,9 @@
 	let {
 		onPrev,
 		onComplete,
-		onCancel,
+		onJumpToStep,
+		removedAwardNames = [],
+		blockers = [],
 		isJudgesRoomJoined,
 		accessControlEnabled = $bindable(false),
 		onAccessControlEnabledChange
@@ -58,6 +63,19 @@
 	}
 
 	async function handleComplete() {
+		if (removedAwardNames.length > 0) {
+			const confirmed = await dialogs.showCustom(RemoveAwardsDialog, {
+				props: {
+					title: m.remove_saved_awards_title(),
+					message: m.remove_saved_awards_message(),
+					awardNames: removedAwardNames,
+					detail: m.removed_awards_consequence(),
+					confirmText: m.remove_awards_and_complete()
+				}
+			});
+			if (confirmed !== true) return;
+		}
+
 		isLoading = true;
 		try {
 			app.getPreferences().set('isGoogleAnalyticsEnabled', enableGoogleAnalytics);
@@ -117,17 +135,32 @@
 		</div>
 	</div>
 
+	{#if blockers.length > 0}
+		<div class="rounded border border-yellow-400 bg-yellow-100 px-4 py-3 text-yellow-800">
+			<p>{m.complete_setup_needs_steps()}</p>
+			<div class="mt-2 flex flex-wrap gap-2">
+				{#each blockers as blocker (blocker.step)}
+					<button type="button" class="font-medium underline" onclick={() => onJumpToStep(blocker.step)}>
+						{m.go_to_step({ step: blocker.step, name: blocker.label })}
+					</button>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
 	<div class="flex justify-between pt-4">
 		{#if !isLoading}
 			<div class="flex space-x-3">
-				<button onclick={onPrev} class="secondary">{m.back()}</button>
-				{#if isJudgesRoomJoined}
-					<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-						{m.cancel()}
-					</button>
-				{/if}
+				<button type="button" onclick={onPrev} class="secondary">{m.back()}</button>
 			</div>
-			<button onclick={handleComplete} class="success">{m.complete_setup()}</button>
+			<button
+				type="button"
+				onclick={handleComplete}
+				class={['success', blockers.length > 0 && 'cursor-not-allowed opacity-50']}
+				disabled={blockers.length > 0}
+			>
+				{m.complete_setup()}
+			</button>
 		{:else}
 			<div></div>
 			<button disabled class="success cursor-not-allowed opacity-75">

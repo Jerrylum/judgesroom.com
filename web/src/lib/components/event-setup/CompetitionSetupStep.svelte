@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import { onDestroy } from 'svelte';
+	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
+	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
 	import { type Program, ProgramSchema } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { parseTournamentManagerCSV, type TeamInfoAndData } from '$lib/team.svelte';
-	import type { AwardOptions } from '$lib/award.svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import { gtag } from '$lib/index.svelte';
 
@@ -17,6 +18,7 @@
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: TeamInfoAndData[];
 		awardOptions: AwardOptions[];
+		allowIncompleteNext?: boolean;
 		onNext: () => void;
 		onPrev: () => void;
 	}
@@ -28,12 +30,14 @@
 		selectedEventGradeLevel = $bindable(),
 		teams = $bindable(),
 		awardOptions = $bindable(),
+		allowIncompleteNext = false,
 		onNext,
 		onPrev
 	}: Props = $props();
 
-	const originalSelectedEventGradeLevel = selectedEventGradeLevel;
+	// Values from when this step opened. A later change replaces the award list on leave.
 	const originalSelectedProgram = selectedProgram;
+	const originalSelectedEventGradeLevel = selectedEventGradeLevel;
 
 	// Computed grade options based on program
 	const gradeOptions = $derived(getEventGradeLevelOptions(selectedProgram));
@@ -43,11 +47,10 @@
 	const hasLeadingTrailingWhitespace = $derived(eventName.length > 0 && eventName !== eventName.trim());
 	const isEventNameTooLong = $derived(eventName.length > 200);
 
-	const canProceed = $derived(
-		isEventNameValid && !hasLeadingTrailingWhitespace && !isEventNameTooLong && (robotEventsEventId !== null || teams.length > 0) // For unofficial events, teams must be imported
-	);
+	const canProceed = $derived(isCompetitionSetupReady(eventName, robotEventsEventId, teams.length));
+	const nextDisabled = $derived(!canProceed && !allowIncompleteNext);
 
-	const isEditable = robotEventsEventId === null;
+	const isEditable = $derived(robotEventsEventId === null);
 
 	// Manual CSV import state (for unofficial events)
 	let csvContent = $state('');
@@ -152,13 +155,17 @@
 	}
 
 	function handleNext() {
-		if (canProceed) {
-			if (originalSelectedEventGradeLevel !== selectedEventGradeLevel || originalSelectedProgram !== selectedProgram) {
-				awardOptions = []; // reset awards, the award options will be re-generated based on the new program and grade level
-			}
-			onNext();
-		}
+		if (!canProceed && !allowIncompleteNext) return;
+		onNext();
 	}
+
+	function commitProgramChange() {
+		if (originalSelectedEventGradeLevel === selectedEventGradeLevel && originalSelectedProgram === selectedProgram) return;
+		const possibleGrades = gradeOptions.find((option) => option.value === selectedEventGradeLevel)?.grades ?? [];
+		awardOptions = getOfficialAwardOptionsList(selectedProgram, possibleGrades);
+	}
+
+	onDestroy(commitProgramChange);
 
 	// Reset grade level when program changes
 	$effect(() => {
@@ -286,11 +293,10 @@
 			<button onclick={onPrev} class="secondary">{m.back()}</button>
 		</div>
 		<button
+			type="button"
 			onclick={handleNext}
-			class="primary"
-			class:opacity-50={!canProceed}
-			class:cursor-not-allowed={!canProceed}
-			disabled={!canProceed}
+			class={['primary', nextDisabled && 'cursor-not-allowed opacity-50']}
+			disabled={nextDisabled}
 		>
 			{m.next_team_groups()}
 		</button>

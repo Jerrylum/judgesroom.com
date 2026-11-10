@@ -29,7 +29,6 @@
 		teams: TeamInfoAndData[];
 		awardOptions: AwardOptions[];
 		onNext: () => void;
-		onCancel: () => void;
 	}
 
 	let {
@@ -42,8 +41,7 @@
 		selectedEventGradeLevel = $bindable(),
 		teams = $bindable(),
 		awardOptions = $bindable(),
-		onNext,
-		onCancel
+		onNext
 	}: Props = $props();
 
 	let importMethod = $state<'robotevents' | 'manual'>(
@@ -312,12 +310,9 @@
 
 	<div class="flex justify-between pt-4">
 		<div class="flex space-x-3">
-			{#if isEditingEventSetup}
-				<button onclick={onCancel} class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-					{m.cancel()}
-				</button>
-			{:else}
+			{#if !isEditingEventSetup}
 				<button
+					type="button"
 					onclick={handleBackToBegin}
 					class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 				>
