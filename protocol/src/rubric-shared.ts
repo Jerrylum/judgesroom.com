@@ -22,6 +22,14 @@ export function roundRubricScore(score: number): number {
 	return Math.round(score * 10) / 10;
 }
 
+/** Snap a score to the event's rubric step. Scores are stored in tenths. */
+export function roundRubricScoreToStep(score: number, step: number): number {
+	if (!(step > 0) || !Number.isFinite(step) || !Number.isFinite(score)) return roundRubricScore(score);
+	const stepTenths = Math.max(1, Math.round(step * 10));
+	const scoreTenths = Math.round(score * 10);
+	return (Math.round(scoreTenths / stepTenths) * stepTenths) / 10;
+}
+
 export function formatRubricScore(score: number): string {
 	return score.toFixed(1);
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatRubricScore } from '@judgesroom.com/protocol/src/rubric';
+	import { formatRubricScore, roundRubricScoreToStep } from '@judgesroom.com/protocol/src/rubric';
 
 	let {
 		variable = $bindable(),
@@ -19,7 +19,7 @@
 
 	function onInput(event: Event) {
 		const target = event.target as HTMLInputElement;
-		variable = Math.round(parseFloat(target.value) * 10) / 10;
+		variable = roundRubricScoreToStep(parseFloat(target.value), step);
 	}
 </script>
 

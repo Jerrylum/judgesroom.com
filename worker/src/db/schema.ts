@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, primaryKey, index, uniqueIndex, unique } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, real, text, primaryKey, index, uniqueIndex, unique } from 'drizzle-orm/sqlite-core';
 
 // JERRY: To prevent potential issues, do not limit the length of the text columns
 
@@ -28,6 +28,10 @@ export const metadata = sqliteTable('Metadata', {
 	judgingMethod: text('judgingMethod', { enum: ['assigned', 'walk_in'] }).notNull(),
 	judgingStep: text('judgingStep', { enum: ['beginning', 'award_deliberations'] }).notNull(),
 	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false),
+	/** Slider increment for notebook rubrics. Existing rooms stay on 0.1. */
+	notebookRubricScoreStep: real('notebookRubricScoreStep').notNull().default(0.1),
+	/** Slider increment for interview rubrics. Existing rooms stay on 0.1. */
+	interviewRubricScoreStep: real('interviewRubricScoreStep').notNull().default(0.1),
 	/** Null in SQLite = pre-pin rooms; getEssentialData resolves that to 1.0. */
 	judgeGuideVersion: text('judgeGuideVersion', { enum: ['1.0', '2.0'] }),
 	/** Last event-setup save. Null on v2.0.0 rooms until the first retention alarm adopts them. */

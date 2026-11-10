@@ -1,4 +1,4 @@
-import type { EssentialData } from '@judgesroom.com/protocol/src/event';
+import { normalizeRubricScoreStep, type EssentialData } from '@judgesroom.com/protocol/src/event';
 import { EssentialDataSchema } from '@judgesroom.com/protocol/src/event';
 import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 import { awards, judgeGroups, judgeGroupsAssignedTeams, judgeGroupsSubmissionsCache, metadata, teams } from '../db/schema';
@@ -114,6 +114,8 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 			judgingStep: metadataRows[0].judgingStep,
 			accessControlEnabled: metadataRows[0].accessControlEnabled,
 			judgeGuideVersion: resolveJudgeGuideVersion(metadataRows[0].judgeGuideVersion),
+			notebookRubricScoreStep: normalizeRubricScoreStep(metadataRows[0].notebookRubricScoreStep),
+			interviewRubricScoreStep: normalizeRubricScoreStep(metadataRows[0].interviewRubricScoreStep),
 			awards: await getAwards(tx),
 			teamInfos: await getTeamInfos(tx),
 			judgeGroups: await getJudgeGroups(tx)

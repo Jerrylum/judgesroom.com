@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
+	import { rubricScoreStepOptions } from '@judgesroom.com/protocol/src/event';
 	import RemoveAwardsDialog from './RemoveAwardsDialog.svelte';
 
 	interface Props {
@@ -11,6 +12,8 @@
 		blockers?: { step: number; label: string }[];
 		isJudgesRoomJoined: boolean;
 		accessControlEnabled?: boolean;
+		notebookRubricScoreStep?: number;
+		interviewRubricScoreStep?: number;
 		onAccessControlEnabledChange?: (value: boolean) => void;
 	}
 
@@ -22,8 +25,13 @@
 		blockers = [],
 		isJudgesRoomJoined,
 		accessControlEnabled = $bindable(false),
+		notebookRubricScoreStep = $bindable(0.1),
+		interviewRubricScoreStep = $bindable(0.1),
 		onAccessControlEnabledChange
 	}: Props = $props();
+
+	const notebookScoreStepOptions = $derived(rubricScoreStepOptions(notebookRubricScoreStep));
+	const interviewScoreStepOptions = $derived(rubricScoreStepOptions(interviewRubricScoreStep));
 
 	let enableGoogleAnalytics = $state(true);
 	let isLoading = $state(false);
@@ -88,6 +96,40 @@
 
 <div class="space-y-6">
 	<h2 class="text-xl font-semibold text-gray-900">{m.other_settings()}</h2>
+
+	<label class="block max-w-sm">
+		<div class="font-medium text-gray-900">{m.notebook_rubric_score_step()}</div>
+		<p class="mt-1 text-sm text-gray-600">{m.notebook_rubric_score_step_description()}</p>
+		<select
+			class="classic mt-2"
+			value={notebookRubricScoreStep}
+			disabled={isLoading}
+			onchange={(event) => {
+				notebookRubricScoreStep = Number(event.currentTarget.value);
+			}}
+		>
+			{#each notebookScoreStepOptions as step (step)}
+				<option value={step}>{step}</option>
+			{/each}
+		</select>
+	</label>
+
+	<label class="block max-w-sm">
+		<div class="font-medium text-gray-900">{m.interview_rubric_score_step()}</div>
+		<p class="mt-1 text-sm text-gray-600">{m.interview_rubric_score_step_description()}</p>
+		<select
+			class="classic mt-2"
+			value={interviewRubricScoreStep}
+			disabled={isLoading}
+			onchange={(event) => {
+				interviewRubricScoreStep = Number(event.currentTarget.value);
+			}}
+		>
+			{#each interviewScoreStepOptions as step (step)}
+				<option value={step}>{step}</option>
+			{/each}
+		</select>
+	</label>
 
 	<label class="flex cursor-pointer items-start space-x-3">
 		<input

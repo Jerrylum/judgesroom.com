@@ -5,6 +5,7 @@
 	import { getRubricCriterionTitle, getRubricProficiencyText, type ProficiencyLevel } from '$lib/rubric-messages';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import ScoringSlider from './ScoringSlider.svelte';
+	import { app } from '$lib/index.svelte';
 
 	interface Props {
 		rubricScores: number[];
@@ -14,6 +15,8 @@
 	}
 
 	let { rubricScores = $bindable(), notes = $bindable(), isSubmitted, showValidationErrors }: Props = $props();
+
+	const scoreStep = $derived(app.getInterviewRubricScoreStep());
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
@@ -78,7 +81,7 @@
 					{#if isSubmitted}
 						<p class="text-lg tabular-nums">{formatRubricScore(rubricScores[index])}</p>
 					{:else}
-						<ScoringSlider bind:variable={rubricScores[index]} max={row.maxPoints} showError={showValidationErrors} />
+						<ScoringSlider bind:variable={rubricScores[index]} max={row.maxPoints} step={scoreStep} showError={showValidationErrors} />
 					{/if}
 				</scoring>
 			</row>

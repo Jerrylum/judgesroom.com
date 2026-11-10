@@ -674,6 +674,8 @@ describe('access control', () => {
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: true,
 				judgeGuideVersion: '2.0' as const,
+				notebookRubricScoreStep: 0.1,
+				interviewRubricScoreStep: 0.1,
 				teamInfos: [sampleTeamInfoAndData[0]!],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [sampleTeamInfoAndData[0]!.id] }],
 				awards: []
@@ -725,6 +727,8 @@ describe('access control', () => {
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: false,
 				judgeGuideVersion: '2.0' as const,
+				notebookRubricScoreStep: 0.1,
+				interviewRubricScoreStep: 0.1,
 				teamInfos: [sampleTeamInfoAndData[0]!],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [sampleTeamInfoAndData[0]!.id] }],
 				awards: []

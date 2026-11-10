@@ -153,6 +153,8 @@ describe('room identity — handshake with only a roomId', () => {
 				judgingStep: 'beginning' as const,
 				accessControlEnabled: false,
 				judgeGuideVersion: '2.0' as const,
+				notebookRubricScoreStep: 0.1,
+				interviewRubricScoreStep: 0.1,
 				teamInfos: [team],
 				judgeGroups: [{ id: groupId, name: 'Group 1', assignedTeams: [team.id] }],
 				awards: []

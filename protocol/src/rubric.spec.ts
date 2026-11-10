@@ -15,6 +15,7 @@ import {
 	notebook2_0ScoresToPayload,
 	notebookRubricConfig,
 	roundRubricScore,
+	roundRubricScoreToStep,
 	sumInterviewRubric,
 	sumNotebookRubric,
 	sumRubricScores,
@@ -22,6 +23,17 @@ import {
 	decodeInterviewRubric,
 	decodeNotebookRubric
 } from './rubric';
+
+describe('rubric score steps', () => {
+	it('snaps a score to the event step', () => {
+		expect(roundRubricScoreToStep(2.4, 1)).toBe(2);
+		expect(roundRubricScoreToStep(2.6, 1)).toBe(3);
+		expect(roundRubricScoreToStep(1.2, 0.5)).toBe(1);
+		expect(roundRubricScoreToStep(1.3, 0.5)).toBe(1.5);
+		expect(roundRubricScoreToStep(0.3, 0.2)).toBe(0.4);
+		expect(roundRubricScoreToStep(0.14, 0.1)).toBe(0.1);
+	});
+});
 
 describe('GRSF rubric config', () => {
 	it('has expected row counts', () => {

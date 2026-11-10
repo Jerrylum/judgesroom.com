@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AwardNameSchema } from './award';
-import { type RubricRowConfig, formatRubricScore, roundRubricScore, sumRubricScores } from './rubric-shared';
+import { type RubricRowConfig, formatRubricScore, roundRubricScore, roundRubricScoreToStep, sumRubricScores } from './rubric-shared';
 import {
 	NOTEBOOK_1_0_CRITERIA_COUNT,
 	NOTEBOOK_1_0_MAX_SCORE,
@@ -106,7 +106,7 @@ export function generateTeamInterviewRubricScores(): number[] {
 	return generateInterview1_0Scores();
 }
 
-export { formatRubricScore, roundRubricScore, sumRubricScores };
+export { formatRubricScore, roundRubricScore, roundRubricScoreToStep, sumRubricScores };
 
 export const notebookRubricPayloadSchema = z.union([notebook1_0RubricArraySchema, notebook2_0RubricObjectSchema]);
 

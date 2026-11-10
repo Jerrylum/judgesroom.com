@@ -15,6 +15,7 @@
 	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
+	import { DEFAULT_RUBRIC_SCORE_STEP } from '@judgesroom.com/protocol/src/event';
 	import EventCodeSetup from './EventCodeSetup.svelte';
 	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
 
@@ -26,6 +27,8 @@
 	let loaded = $state(false);
 	let accessControlEnabled = $state(false);
 	let wasAccessControlEnabled = $state(false);
+	let notebookRubricScoreStep = $state(DEFAULT_RUBRIC_SCORE_STEP);
+	let interviewRubricScoreStep = $state(DEFAULT_RUBRIC_SCORE_STEP);
 
 	// RobotEvents import state
 	let robotEventsSku: string | null = $state(null);
@@ -98,6 +101,8 @@
 			judgeGuideVersion = eventSetup.judgeGuideVersion;
 			accessControlEnabled = eventSetup.accessControlEnabled;
 			wasAccessControlEnabled = eventSetup.accessControlEnabled;
+			notebookRubricScoreStep = eventSetup.notebookRubricScoreStep;
+			interviewRubricScoreStep = eventSetup.interviewRubricScoreStep;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
@@ -205,6 +210,8 @@
 				judgingStep,
 				accessControlEnabled,
 				judgeGuideVersion,
+				notebookRubricScoreStep,
+				interviewRubricScoreStep,
 				teamInfos: teams.map((team) => ({
 					id: team.id,
 					number: team.number,
@@ -435,6 +442,8 @@
 					blockers={setupBlockers}
 					isJudgesRoomJoined={app.isJudgesRoomJoined()}
 					bind:accessControlEnabled
+					bind:notebookRubricScoreStep
+					bind:interviewRubricScoreStep
 				/>
 			{/if}
 		</div>

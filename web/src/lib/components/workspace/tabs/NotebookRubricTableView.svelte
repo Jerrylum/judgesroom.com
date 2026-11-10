@@ -12,6 +12,7 @@
 	} from '$lib/rubric-messages';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import ScoringSlider from './ScoringSlider.svelte';
+	import { app } from '$lib/index.svelte';
 	import type { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
 
 	type TableSection = {
@@ -29,6 +30,8 @@
 	}
 
 	let { document, sections, isSubmitted, showValidationErrors }: Props = $props();
+
+	const scoreStep = $derived(app.getNotebookRubricScoreStep());
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
@@ -75,7 +78,12 @@
 						{#if isSubmitted}
 							<p class="text-center text-lg font-semibold tabular-nums">{formatRubricScore(document.scores[scoreIndex])}</p>
 						{:else}
-							<ScoringSlider bind:variable={document.scores[scoreIndex]} max={row.maxPoints} showError={showValidationErrors} />
+							<ScoringSlider
+								bind:variable={document.scores[scoreIndex]}
+								max={row.maxPoints}
+								step={scoreStep}
+								showError={showValidationErrors}
+							/>
 						{/if}
 					</article>
 				{/each}
@@ -135,7 +143,12 @@
 							{#if isSubmitted}
 								<p class="text-lg tabular-nums">{formatRubricScore(document.scores[scoreIndex])}</p>
 							{:else}
-								<ScoringSlider bind:variable={document.scores[scoreIndex]} max={row.maxPoints} showError={showValidationErrors} />
+								<ScoringSlider
+								bind:variable={document.scores[scoreIndex]}
+								max={row.maxPoints}
+								step={scoreStep}
+								showError={showValidationErrors}
+							/>
 							{/if}
 						</scoring>
 					</row>

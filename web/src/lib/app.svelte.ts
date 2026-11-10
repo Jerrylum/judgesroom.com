@@ -8,7 +8,7 @@ import {
 } from '@jerrylum/wrpc/client';
 import type { Judge, JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
-import type { EssentialData } from '@judgesroom.com/protocol/src/event';
+import { normalizeRubricScoreStep, type EssentialData } from '@judgesroom.com/protocol/src/event';
 import type { TeamData, TeamInfo } from '@judgesroom.com/protocol/src/team';
 import type { Award } from '@judgesroom.com/protocol/src/award';
 import type { ServerRouter } from '@judgesroom.com/worker/src/server-router';
@@ -290,6 +290,14 @@ export class App {
 
 	isAccessControlEnabled(): boolean {
 		return this.essentialData?.accessControlEnabled ?? false;
+	}
+
+	getNotebookRubricScoreStep(): number {
+		return normalizeRubricScoreStep(this.essentialData?.notebookRubricScoreStep);
+	}
+
+	getInterviewRubricScoreStep(): number {
+		return normalizeRubricScoreStep(this.essentialData?.interviewRubricScoreStep);
 	}
 
 	handleClientAuthenticationChange(authentication: ClientAuthentication): void {

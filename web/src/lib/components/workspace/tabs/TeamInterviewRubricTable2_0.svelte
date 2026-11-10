@@ -11,6 +11,7 @@
 	import { getRubricCriterionTitle, getRubricSectionHeading } from '$lib/rubric-messages';
 	import type { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
 	import ScoringSlider from './ScoringSlider.svelte';
+	import { app } from '$lib/index.svelte';
 
 	interface Props {
 		document: TeamInterviewRubricDocument;
@@ -19,6 +20,8 @@
 	}
 
 	let { document, isSubmitted, showValidationErrors }: Props = $props();
+
+	const scoreStep = $derived(app.getInterviewRubricScoreStep());
 
 	const narrowViewport = new MediaQuery('max-width: 1023px');
 	let printing = $state(false);
@@ -82,7 +85,12 @@
 						{#if isSubmitted}
 							<p class="text-center text-lg font-semibold tabular-nums">{formatRubricScore(criterion.points)}</p>
 						{:else}
-							<ScoringSlider bind:variable={criterion.points} max={INTERVIEW_2_0_CRITERION_MAX} showError={showValidationErrors} />
+							<ScoringSlider
+								bind:variable={criterion.points}
+								max={INTERVIEW_2_0_CRITERION_MAX}
+								step={scoreStep}
+								showError={showValidationErrors}
+							/>
 						{/if}
 						<textarea
 							class="classic"
@@ -164,7 +172,12 @@
 							{#if isSubmitted}
 								<p class="text-lg tabular-nums">{formatRubricScore(criterion.points)}</p>
 							{:else}
-								<ScoringSlider bind:variable={criterion.points} max={INTERVIEW_2_0_CRITERION_MAX} showError={showValidationErrors} />
+								<ScoringSlider
+								bind:variable={criterion.points}
+								max={INTERVIEW_2_0_CRITERION_MAX}
+								step={scoreStep}
+								showError={showValidationErrors}
+							/>
 							{/if}
 						</scoring>
 					</row>
