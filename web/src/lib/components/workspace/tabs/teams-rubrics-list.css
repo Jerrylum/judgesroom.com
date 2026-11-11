@@ -18,7 +18,11 @@ teams-rubrics-table {
 			@apply flex grow flex-row justify-start text-left text-sm;
 
 			> * {
-				@apply flex-1 p-2;
+				@apply shrink-0 p-2;
+			}
+
+			> .col-flex {
+				@apply min-w-48 flex-1 basis-0;
 			}
 
 			> :not(:first-child) {

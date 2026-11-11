@@ -6,6 +6,7 @@
 	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
+	import { formatGradeShort, type Grade } from '@judgesroom.com/protocol/src/award';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import QRCodeButton from './QRCodeButton.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
@@ -36,8 +37,9 @@
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 	let showOnlyAssignedTeams = $state(true); // Default to true as requested
-	let showOnlyFullyDeveloped = $state(false);
-	let showOnlyInterviewed = $state(false);
+	let gradeFilter = $state<'all' | Grade>('all');
+	let notebookFilter = $state<'all' | NotebookDevelopmentStatus>('all');
+	let interviewFilter = $state<'all' | 'interviewed' | 'not_interviewed'>('all');
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
@@ -53,28 +55,18 @@
 			teamIdsInOrder = sortByTeamNumber(Object.values(includedTeams)).map((team) => team.id);
 		}
 
-		// Apply filters
-		if (showOnlyFullyDeveloped || showOnlyInterviewed) {
-			teamIdsInOrder = teamIdsInOrder.filter((teamId) => {
-				const team = teams[teamId];
-				if (!team) return false;
-
-				let passesFilter = true;
-
-				if (showOnlyFullyDeveloped) {
-					passesFilter = passesFilter && team.notebookDevelopmentStatus === 'fully_developed';
-				}
-
-				if (showOnlyInterviewed) {
-					const teamRubricsAndNotes = data[teamId] ?? getEmptyRubricsAndNotesPerTeam();
-					passesFilter = passesFilter && teamRubricsAndNotes.teamInterviewRubrics.length > 0;
-				}
-
-				return passesFilter;
-			});
-		}
-
-		return teamIdsInOrder;
+		return teamIdsInOrder.filter((teamId) => {
+			const team = teams[teamId];
+			if (!team) return false;
+			if (gradeFilter !== 'all' && team.grade !== gradeFilter) return false;
+			if (notebookFilter !== 'all' && team.notebookDevelopmentStatus !== notebookFilter) return false;
+			if (interviewFilter !== 'all') {
+				const interviewed = (data[teamId] ?? getEmptyRubricsAndNotesPerTeam()).teamInterviewRubrics.length > 0;
+				if (interviewFilter === 'interviewed' && !interviewed) return false;
+				if (interviewFilter === 'not_interviewed' && interviewed) return false;
+			}
+			return true;
+		});
 	});
 
 	const data = $derived.by(() => {
@@ -118,7 +110,8 @@
 	function getNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
 		if (notebookDevelopmentStatus === 'fully_developed') return { text: m.fully_developed_notebook_status(), class: 'text-green-600' };
 		if (notebookDevelopmentStatus === 'developing') return { text: m.developing_notebook_status(), class: 'text-yellow-600' };
-		return { text: m.no_notebook_or_not_reviewed(), class: 'text-gray-600' };
+		if (notebookDevelopmentStatus === 'not_submitted') return { text: m.not_submitted_notebook_status(), class: 'text-gray-600' };
+		return { text: m.undetermined_notebook_status(), class: 'text-gray-600' };
 	}
 
 	// Get judge name by ID
@@ -208,24 +201,34 @@
 		</label>
 	{/if}
 
-	<div>
-		<label class="flex items-center space-x-2">
-			<input
-				type="checkbox"
-				bind:checked={showOnlyFullyDeveloped}
-				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-			/>
-			<span class="text-sm text-gray-700">{m.only_show_fully_developed_notebooks()}</span>
+	<div class="flex flex-wrap items-end gap-3">
+		<label class="flex flex-col gap-1 text-sm text-gray-700">
+			<span>{m.teams_rubrics_filter_grade()}</span>
+			<select bind:value={gradeFilter} class="rounded border border-gray-300 px-2 py-1">
+				<option value="all">{m.teams_rubrics_filter_all()}</option>
+				<option value="Elementary School">{formatGradeShort('Elementary School')}</option>
+				<option value="Middle School">{formatGradeShort('Middle School')}</option>
+				<option value="High School">{formatGradeShort('High School')}</option>
+				<option value="College">{formatGradeShort('College')}</option>
+			</select>
 		</label>
-	</div>
-	<div>
-		<label class="flex items-center space-x-2">
-			<input
-				type="checkbox"
-				bind:checked={showOnlyInterviewed}
-				class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-			/>
-			<span class="text-sm text-gray-700">{m.only_show_interviewed_teams()}</span>
+		<label class="flex flex-col gap-1 text-sm text-gray-700">
+			<span>{m.teams_rubrics_filter_notebook_state()}</span>
+			<select bind:value={notebookFilter} class="rounded border border-gray-300 px-2 py-1">
+				<option value="all">{m.teams_rubrics_filter_all()}</option>
+				<option value="undetermined">{m.undetermined_notebook_status()}</option>
+				<option value="not_submitted">{m.not_submitted_notebook_status()}</option>
+				<option value="developing">{m.developing_notebook_status()}</option>
+				<option value="fully_developed">{m.fully_developed_notebook_status()}</option>
+			</select>
+		</label>
+		<label class="flex flex-col gap-1 text-sm text-gray-700">
+			<span>{m.teams_rubrics_filter_interview()}</span>
+			<select bind:value={interviewFilter} class="rounded border border-gray-300 px-2 py-1">
+				<option value="all">{m.teams_rubrics_filter_all()}</option>
+				<option value="interviewed">{m.teams_rubrics_filter_interviewed()}</option>
+				<option value="not_interviewed">{m.teams_rubrics_filter_not_interviewed()}</option>
+			</select>
 		</label>
 	</div>
 </div>
@@ -279,10 +282,12 @@
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex max-w-40 min-w-40 flex-col items-center justify-center">{m.notebook_link_table()}</div>
-				<div class="flex max-w-74 min-w-74 items-center justify-center">{m.notebook_rubrics_table()}</div>
-				<div class="flex max-w-74 min-w-74 items-center justify-center">{m.team_interview_rubrics_table()}</div>
-				<div class="flex max-w-20 min-w-20 items-center justify-center">{m.photos_album()}</div>
+				<div class="col-grade flex w-16 max-w-16 min-w-16 items-center justify-center">{m.grade_table()}</div>
+				<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center">{m.notebook_status_table()}</div>
+				<div class="col-link flex w-40 max-w-40 min-w-40 items-center justify-center">{m.notebook_link_table()}</div>
+				<div class="col-flex flex items-center justify-center">{m.notebook_rubrics_table()}</div>
+				<div class="col-flex flex items-center justify-center">{m.team_interview_rubrics_table()}</div>
+				<div class="col-photos flex w-20 max-w-20 min-w-20 items-center justify-center">{m.photos_album()}</div>
 			</content>
 		</scroll-container>
 	</table-header>
@@ -303,8 +308,14 @@
 				</team>
 				<scroll-container use:registerScrollContainer>
 					<content>
+						<div class="col-grade flex w-16 max-w-16 min-w-16 items-center justify-center" title={team.grade}>
+							{formatGradeShort(team.grade)}
+						</div>
+						<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center text-center text-xs">
+							<span class={notebookStatus.class}>{notebookStatus.text}</span>
+						</div>
 						<!-- Notebook Link Column -->
-						<div class="flex max-w-40 min-w-40 items-center gap-2 p-2">
+						<div class="col-link flex w-40 max-w-40 min-w-40 items-center gap-2 p-2">
 							{#if team.notebookLink}
 								<a
 									href={team.notebookLink}
@@ -321,7 +332,7 @@
 						</div>
 
 						<!-- Notebook Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center">
+						<div class="col-flex flex items-center">
 							<div class="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1 p-1">
 								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric (rubric.id)}
@@ -333,17 +344,13 @@
 											{rubricChipText(rubric)}
 										</button>
 									{/each}
-								{:else}
-									<div class="text-xs {notebookStatus.class} px-2 py-0.5">
-										{notebookStatus.text}
-									</div>
 								{/if}
 							</div>
 							{@render newRubricButton(() => openNotebookRubric(team.id))}
 						</div>
 
 						<!-- Team Interview Rubrics Column -->
-						<div class="flex max-w-74 min-w-74 items-center">
+						<div class="col-flex flex items-center">
 							<div class="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1 p-1">
 								{#each teamRubricsAndNotes.teamInterviewRubrics as rubric (rubric.id)}
 									<button
@@ -359,7 +366,7 @@
 						</div>
 
 						<!-- Team Photos Column -->
-						<div class="flex max-w-20 min-w-20 items-center justify-center overflow-hidden p-1">
+						<div class="col-photos flex w-20 max-w-20 min-w-20 items-center justify-center overflow-hidden p-1">
 							<TeamPhotoAlbum teamId={team.id} compact={true} allowCapture={false} />
 						</div>
 					</content>
