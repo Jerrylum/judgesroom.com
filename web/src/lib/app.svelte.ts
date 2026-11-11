@@ -132,7 +132,7 @@ export class App {
 	private reconnectPending = false;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
 	private awardsWithNoWinner: string[] = $state([]);
-	public readonly version: string = '2.4.1';
+	public readonly version: string = '2.5.0-beta.1';
 
 	// Error handling
 	private notices: Notice[] = $state([]);
