@@ -63,7 +63,7 @@ export const SubscribeRobotEventsCacheInputSchema = z.object({
 });
 
 export const UnsubscribeRobotEventsCacheInputSchema = z.object({
-	resource: RobotEventsResourceSchema
+	resources: z.array(RobotEventsResourceSchema).min(1)
 });
 
 export const RobotEventsResourceStatusSchema = z.object({

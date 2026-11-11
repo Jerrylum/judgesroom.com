@@ -83,11 +83,13 @@ class RobotEventsCacheStore {
 	}
 
 	release(resources: readonly RobotEventsResource[]): void {
+		const released: RobotEventsResource[] = [];
 		for (const resource of resources) {
 			this.holders[resource] = Math.max(0, this.holders[resource] - 1);
-			if (this.holders[resource] === 0) {
-				app.wrpcClient.robotevents.unsubscribeRobotEventsCache.notify({ resource });
-			}
+			if (this.holders[resource] === 0) released.push(resource);
+		}
+		if (released.length > 0) {
+			app.wrpcClient.robotevents.unsubscribeRobotEventsCache.notify({ resources: released });
 		}
 	}
 

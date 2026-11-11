@@ -5,7 +5,7 @@ import type { RobotEventsCachePayload, RobotEventsCacheUpdate, RobotEventsResour
 import { ROBOT_EVENTS_CACHE_FETCH_MS } from '@judgesroom.com/protocol/src/robotevents-insight';
 import { serverRouter, type ServerContext } from '../server-router';
 import { createTestServerContext, seedTestDatabase } from '../test-utils';
-import { robotEventsCache } from '../db/schema';
+import { robotEventsCache, subscriptions } from '../db/schema';
 
 const lists: RobotEventsCachePayload = {
 	teams: [{ number: '123A', grade: 'Middle School' }],
@@ -59,6 +59,14 @@ describe('VEX Events cache', () => {
 		});
 	}
 
+	async function unsubscribe(clientId: string, resources: RobotEventsResource[]) {
+		return serverRouter.robotevents.unsubscribeRobotEventsCache._def._resolver!({
+			input: { resources },
+			session: sessionFor(clientId),
+			ctx: context
+		});
+	}
+
 	beforeEach(async () => {
 		context = createTestServerContext();
 		await seedTestDatabase(context);
@@ -93,6 +101,14 @@ describe('VEX Events cache', () => {
 		const waiting = await subscribe('judge-b', ['rankings'], false);
 		expect(waiting).toEqual([{ resource: 'rankings', state: 'MISSED', requireRefetch: false }]);
 		expect(updates).toEqual([]);
+	});
+
+	it('unsubscribes multiple resources in one call', async () => {
+		await subscribe('judge-a', ['teams', 'rankings', 'skills'], false);
+		await unsubscribe('judge-a', ['teams', 'skills']);
+
+		const remaining = await context.db.select().from(subscriptions).where(eq(subscriptions.id, 'judge-a'));
+		expect(remaining.map((row) => row.topic)).toEqual(['robotEventsCache:rankings']);
 	});
 
 	it('refetches a fresh rankings list when refresh is requested', async () => {

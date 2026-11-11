@@ -1,5 +1,5 @@
 import type { WRPCRootObject } from '@jerrylum/wrpc/server';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import {
 	ROBOT_EVENTS_CACHE_FETCH_MS,
 	ROBOT_EVENTS_CACHE_FRESH_MS,
@@ -20,7 +20,7 @@ import {
 import { robotEventsCache, subscriptions as subscriptionRows } from '../db/schema';
 import type { ServerContext, DatabaseOrTransaction } from '../server-router';
 import { transaction } from '../utils';
-import { broadcastTopic, subscribeTopic, unsubscribeTopic, type ClientSource } from './subscriptions';
+import { broadcastTopic, subscribeTopic, type ClientSource } from './subscriptions';
 
 type CacheRow = typeof robotEventsCache.$inferSelect;
 
@@ -153,7 +153,10 @@ export function buildRobotEventsRoute(w: WRPCRootObject<object, ServerContext, R
 			}),
 
 		unsubscribeRobotEventsCache: w.procedure.input(UnsubscribeRobotEventsCacheInputSchema).notify(async ({ ctx, input, session }) => {
-			await unsubscribeTopic(ctx.db, session.currentClient.clientId, robotEventsCacheTopic(input.resource));
+			const topics = [...new Set(input.resources)].map(robotEventsCacheTopic);
+			await ctx.db
+				.delete(subscriptionRows)
+				.where(and(eq(subscriptionRows.id, session.currentClient.clientId), inArray(subscriptionRows.topic, topics)));
 		}),
 
 		provideRobotEventsCache: w.procedure.input(ProvideRobotEventsCacheInputSchema).mutation(async ({ ctx, input, session }) => {
