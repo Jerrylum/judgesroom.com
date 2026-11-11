@@ -35,11 +35,25 @@
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
+	const judgeGroups = $derived(essentialData?.judgeGroups ?? []);
+	const showAssignedGroup = $derived(isJudgeAdvisor && isAssignedJudging);
 	let showOnlyAssignedTeams = $state(true); // Default to true as requested
 	let gradeFilter = $state<'all' | Grade>('all');
 	let notebookFilter = $state<'all' | NotebookDevelopmentStatus>('all');
 	let interviewFilter = $state<'all' | 'interviewed' | 'not_interviewed'>('all');
+	let judgeGroupFilter = $state('all');
+
+	const teamGroupById = $derived.by(() => {
+		const map = new Map<string, { id: string; name: string }>();
+		for (const group of judgeGroups) {
+			for (const teamId of group.assignedTeams) {
+				map.set(teamId, group);
+			}
+		}
+		return map;
+	});
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
 
@@ -58,6 +72,10 @@
 		return teamIdsInOrder.filter((teamId) => {
 			const team = teams[teamId];
 			if (!team) return false;
+			if (showAssignedGroup && judgeGroupFilter !== 'all') {
+				const groupId = teamGroupById.get(teamId)?.id ?? null;
+				if (judgeGroupFilter === 'unassigned' ? groupId !== null : groupId !== judgeGroupFilter) return false;
+			}
 			if (gradeFilter !== 'all' && team.grade !== gradeFilter) return false;
 			if (notebookFilter !== 'all' && team.notebookDevelopmentStatus !== notebookFilter) return false;
 			if (interviewFilter !== 'all') {
@@ -202,6 +220,18 @@
 	{/if}
 
 	<div class="flex flex-wrap items-end gap-3">
+		{#if showAssignedGroup}
+			<label class="flex flex-col gap-1 text-sm text-gray-700">
+				<span>{m.teams_rubrics_filter_judge_group()}</span>
+				<select bind:value={judgeGroupFilter} class="rounded border border-gray-300 px-2 py-1">
+					<option value="all">{m.teams_rubrics_filter_all()}</option>
+					{#each judgeGroups as group (group.id)}
+						<option value={group.id}>{group.name}</option>
+					{/each}
+					<option value="unassigned">{m.teams_rubrics_unassigned_group()}</option>
+				</select>
+			</label>
+		{/if}
 		<label class="flex flex-col gap-1 text-sm text-gray-700">
 			<span>{m.teams_rubrics_filter_grade()}</span>
 			<select bind:value={gradeFilter} class="rounded border border-gray-300 px-2 py-1">
@@ -283,6 +313,9 @@
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				<div class="col-grade flex w-16 max-w-16 min-w-16 items-center justify-center">{m.grade_table()}</div>
+				{#if showAssignedGroup}
+					<div class="col-group flex w-32 max-w-32 min-w-32 items-center justify-center">{m.assigned_group_table()}</div>
+				{/if}
 				<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center">{m.notebook_status_table()}</div>
 				<div class="col-link flex w-40 max-w-40 min-w-40 items-center justify-center">{m.notebook_link_table()}</div>
 				<div class="col-flex flex items-center justify-center">{m.notebook_rubrics_table()}</div>
@@ -311,6 +344,16 @@
 						<div class="col-grade flex w-16 max-w-16 min-w-16 items-center justify-center" title={team.grade}>
 							{formatGradeShort(team.grade)}
 						</div>
+						{#if showAssignedGroup}
+							{@const assignedGroup = teamGroupById.get(team.id)}
+							<div class="col-group flex w-32 max-w-32 min-w-32 items-center justify-center px-2 text-center text-xs">
+								{#if assignedGroup}
+									<span class="truncate" title={assignedGroup.name}>{assignedGroup.name}</span>
+								{:else}
+									<span class="text-gray-400">{m.teams_rubrics_unassigned_group()}</span>
+								{/if}
+							</div>
+						{/if}
 						<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center text-center text-xs">
 							<span class={notebookStatus.class}>{notebookStatus.text}</span>
 						</div>
