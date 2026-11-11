@@ -10,6 +10,8 @@
 		"judgingStep": "beginning",
 		"accessControlEnabled": false,
 		"judgeGuideVersion": "2.0",
+		"notebookRubricScoreStep": 0.1,
+		"interviewRubricScoreStep": 0.1,
 		"teamInfos": [
 			{
 				"id": "8f4a249a-3767-4f49-9077-f94638f1c017",
