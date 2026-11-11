@@ -10,6 +10,7 @@ import { buildEssentialRoute } from './routes/essential';
 import { buildDeviceRoute } from './routes/device';
 import { buildMediaRoute } from './routes/media';
 import { buildAccessRoute } from './routes/access';
+import { buildRobotEventsRoute } from './routes/robotevents';
 import type { PhotosBucket } from './media/types';
 
 export interface ServerContext {
@@ -37,7 +38,8 @@ const serverRouter = w.router({
 	judging: buildJudgingRoute(w),
 	device: buildDeviceRoute(w),
 	media: buildMediaRoute(w),
-	access: buildAccessRoute(w)
+	access: buildAccessRoute(w),
+	robotevents: buildRobotEventsRoute(w)
 });
 
 export { serverRouter };

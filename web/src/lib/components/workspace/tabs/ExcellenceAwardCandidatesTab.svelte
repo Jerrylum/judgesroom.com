@@ -4,12 +4,8 @@
 	import type { ExcellenceAwardCandidatesTab } from '$lib/tab.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
 	import { app } from '$lib/index.svelte';
-	import {
-		getEventDivisionExcellenceAwardCandidatesReport,
-		getRobotEventsClient,
-		sortByTeamNumberAndEligibility,
-		type ExcellenceAwardCandidatesReport
-	} from '$lib/robotevents-source';
+	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
+	import { excellenceReportsFromInsight, sortByTeamNumberAndEligibility } from '$lib/robotevents-source';
 	import { isExcellenceAward } from '@judgesroom.com/protocol/src/award';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
@@ -19,44 +15,37 @@
 		isActive: boolean;
 	}
 
-	let isFetching = $state(false);
 	let { tab, isActive }: Props = $props();
-	let reports = $state<Record<string, ExcellenceAwardCandidatesReport>>({});
 
 	const essentialData = $derived(app.getEssentialData());
 	const hasRobotEventsId = $derived(!!essentialData?.robotEventsEventId && !!essentialData?.divisionId);
 	const excellenceAwards = $derived(app.getAllAwards().filter((a) => isExcellenceAward(a.name)));
+	const isFetching = $derived(robotEventsCache.isFetching(EXCELLENCE_ROBOT_EVENTS_RESOURCES));
+	const reports = $derived(
+		robotEventsCache.excellencePayload ? excellenceReportsFromInsight(robotEventsCache.excellencePayload, excellenceAwards) : {}
+	);
 
-	async function fetchExcellenceAwardTeamEligibility() {
-		if (!essentialData) return;
-		const { robotEventsEventId, divisionId } = essentialData;
-		if (!robotEventsEventId || !divisionId) return;
+	function reportFailure(): void {
+		console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
+	}
 
-		isFetching = true;
-		try {
-			const client = getRobotEventsClient();
-			const result = await getEventDivisionExcellenceAwardCandidatesReport(client, robotEventsEventId, divisionId, excellenceAwards);
-
-			if (result.error) {
-				console.error('Failed to get event from RobotEvents:', result.error);
-				app.addErrorNotice(m.failed_to_get_event_from_robotevents());
-				return;
-			}
-
-			reports = result;
-			// $inspect(eligibilityReport);
-		} catch (error) {
-			// TODO show alert
-			console.error('Failed to get event from RobotEvents', error);
-		} finally {
-			isFetching = false;
-		}
+	async function refreshFromRobotEvents() {
+		const status = await robotEventsCache.refresh(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
+		if (status === 'failed') reportFailure();
 	}
 
 	$effect(() => {
-		if (isActive && essentialData) {
-			fetchExcellenceAwardTeamEligibility();
-		}
+		if (!isActive || !essentialData?.robotEventsEventId || !essentialData.divisionId) return;
+		const eventId = essentialData.robotEventsEventId;
+		const divisionId = essentialData.divisionId;
+		let cancelled = false;
+		void robotEventsCache.retain(eventId, divisionId, EXCELLENCE_ROBOT_EVENTS_RESOURCES).then((status) => {
+			if (!cancelled && status === 'failed') reportFailure();
+		});
+		return () => {
+			cancelled = true;
+			robotEventsCache.release(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
+		};
 	});
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
@@ -72,7 +61,7 @@
 						<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.excellence_award_candidates()}</h2>
 					</div>
 					{#if hasRobotEventsId}
-						<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
+						<button onclick={refreshFromRobotEvents} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 							{#if isFetching}
 								<RefreshIcon class="h-4 w-4 animate-spin" />
 								<span class="text-nowrap">{m.fetching()}</span>

@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
-import type { Award, Program } from '@judgesroom.com/protocol/src/award';
+import { GradeSchema, type Award, type Program } from '@judgesroom.com/protocol/src/award';
 import { Client, type Division, type Event, type Grade, type TeamData, type VexEventsClient } from 'events.vex';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
 import { getEventGradeLevelOptions } from './event.svelte';
+import type { RobotEventsCachePayload, RobotEventsResource } from '@judgesroom.com/protocol/src/robotevents-insight';
 
 // This is a public token
 const ROBOTEVENTS_TOKEN = `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiMTdmMzZkZTUyOGI1ODE4YzMzMWY0YTM4YWE3MGYyMjNkYzdlNTY0OWQxMWFjZmZkNGFiZmU1NDM4NWYwYmQzMmUzNzIyY2RjODAyMjU5ZWQiLCJpYXQiOjE3NjAwMzA1NjMuMzA1MzkzOSwibmJmIjoxNzYwMDMwNTYzLjMwNTM5NjEsImV4cCI6MjcwNjcxNTM2My4yOTYyNzYxLCJzdWIiOiIxNTIwNzAiLCJzY29wZXMiOltdfQ.fU2Yb5sGBwWWQuXSPxTM7U0hPqr02hVUJnFiQBhlxGX3s6vwIiD9g7SBMH1Wmyhpwqw4a-9pmYYrFQV6tMX4MY2Aq7jUvieyTm5Jj763ybV_du_5lPQRMhCjpsJnWJ1YEMszqaKsUBleahlOOtdIjmSz3c3v6eEC-52rmrKNNf2Oke1vlufaCxjYl42MZxg8EFSKr2KK8_6FQ9jI8loXx9I51KV927Na3exdca09t80qqfFtsTo9BLja7YYw7WAuVozM9fZWe39zc0R2W9VpJO8LYVsNCF72J2SzGmoj5mkpFd1L2cxCWSeAw3qHSxdwsYRwf5WS25bu5qlA_z9mpGzFW-hYhDLTdkLLiwRUTCr7MUEiKvZmi8O8qb1J1od_Mh6oyesrW11QYoXze1BCgt-aExgn70_shiCGxMfZMIV32CzEFxE32YnqZx5eMrTgTqrVjsZ9EvQ-oyCkxYUUwhyy_JZDeywKs-aZU9uhG2-D8LYvDgemTAZMzcn0groFYgG23OVYFfCkrRDsji5D8Jna7Tvm5ogFz6J2GhJ8kCfpSYrmBI6dYcs34XDFcBJO9tPtiG8aURzVHlB8WpukqIBU7a04UqaYi5yWl9_G6Y51phuy64KFKor3jB08b-Pg66P5eN6yqRPRXXwy5flXjCVPe2Xxw3GERUBdbgLDxDw`;
@@ -367,6 +368,45 @@ export async function getEventDivisionExcellenceAwardCandidatesReport(
 		);
 	}
 
+	return rtn;
+}
+
+/** Download the requested VEX lists for one division, in a fixed order, without calling the room. */
+export async function downloadRobotEventsResources(
+	client: VexEventsClient,
+	evtId: number,
+	divisionId: number,
+	resources: readonly RobotEventsResource[]
+): Promise<Partial<RobotEventsCachePayload>> {
+	const wanted = new Set(resources);
+	const payload: Partial<RobotEventsCachePayload> = {};
+
+	if (wanted.has('teams')) {
+		const joined = await getEventJoinedTeams(client, evtId);
+		payload.teams = joined.flatMap((team) => {
+			if (!team.number) return [];
+			const grade = GradeSchema.safeParse(team.grade);
+			return [{ number: team.number, grade: grade.success ? grade.data : null }];
+		});
+	}
+	if (wanted.has('rankings')) payload.rankings = await getEventDivisionRankings(client, evtId, divisionId);
+	if (wanted.has('skills')) payload.skills = await getEventSkills(client, evtId);
+
+	return payload;
+}
+
+/** Rebuild the eligibility report from cached VEX lists. Rankings are this division only. */
+export function excellenceReportsFromInsight(
+	payload: RobotEventsCachePayload,
+	excellenceAwards: Award[]
+): Record<string, ExcellenceAwardCandidatesReport> {
+	const rtn = {} as Record<string, ExcellenceAwardCandidatesReport>;
+	for (const award of excellenceAwards) {
+		const registered = payload.teams.filter((team) => team.grade != null && award.acceptedGrades.includes(team.grade));
+		const rankingsInGroup = filterRankingsOrRecordsBySubset(payload.rankings, registered);
+		const skillsInGroup = filterRankingsOrRecordsBySubset(payload.skills, registered);
+		rtn[award.name] = getExcellenceAwardCandidatesReport(rankingsInGroup, skillsInGroup, rankingsInGroup.length);
+	}
 	return rtn;
 }
 

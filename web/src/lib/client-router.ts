@@ -1,5 +1,6 @@
 import { buildClientRouter } from './client-router-def';
 import { app, subscriptions } from './index.svelte';
+import { robotEventsCache } from './robot-events-cache.svelte';
 
 export type { ClientRouter } from './client-router-def';
 
@@ -112,5 +113,9 @@ export const clientRouter = buildClientRouter({
 		} else {
 			delete subscriptions.allTeamPhotos[input.photoId];
 		}
+	},
+
+	onRobotEventsCache: (input) => {
+		robotEventsCache.applyUpdate(input);
 	}
 });

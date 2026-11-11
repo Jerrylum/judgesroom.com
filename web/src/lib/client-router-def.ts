@@ -8,6 +8,7 @@ import { AwardNominationSchema, AwardRankingsPartialUpdateSchema, SubmissionCach
 import { AwardNameSchema } from '@judgesroom.com/protocol/src/award';
 import { TeamPhotoUpdateSchema } from '@judgesroom.com/protocol/src/media';
 import { RoomStateSchema } from '@judgesroom.com/protocol/src/room';
+import { RobotEventsCacheUpdateSchema } from '@judgesroom.com/protocol/src/robotevents-insight';
 
 /**
  * Single client-router shape (procedure names + inputs).
@@ -32,6 +33,7 @@ export type ClientRouterHandlers = {
 	onAwardNoWinnerUpdate: (input: { awardName: z.infer<typeof AwardNameSchema>; noWinner: boolean }) => void | Promise<void>;
 	onAwardDeliberationStarted: () => void | Promise<void>;
 	onTeamPhotoUpdate: (input: z.infer<typeof TeamPhotoUpdateSchema>) => void | Promise<void>;
+	onRobotEventsCache: (input: z.infer<typeof RobotEventsCacheUpdateSchema>) => void | Promise<void>;
 };
 
 export function buildClientRouter(handlers: ClientRouterHandlers) {
@@ -80,6 +82,9 @@ export function buildClientRouter(handlers: ClientRouterHandlers) {
 		}),
 		onTeamPhotoUpdate: w.procedure.input(TeamPhotoUpdateSchema).notify(async ({ input }) => {
 			await handlers.onTeamPhotoUpdate(input);
+		}),
+		onRobotEventsCache: w.procedure.input(RobotEventsCacheUpdateSchema).notify(async ({ input }) => {
+			await handlers.onRobotEventsCache(input);
 		})
 	});
 }

@@ -7,11 +7,8 @@
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
 	import { tick } from 'svelte';
 	import { getJudgedAwardWinners } from '$lib/award.svelte';
-	import {
-		getEventDivisionExcellenceAwardCandidatesReport,
-		getRobotEventsClient,
-		type ExcellenceAwardTeamEligibility
-	} from '$lib/robotevents-source';
+	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
+	import { excellenceReportsFromInsight, type ExcellenceAwardTeamEligibility } from '$lib/robotevents-source';
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import EnlargeIcon from '$lib/icon/EnlargeIcon.svelte';
 	import ReduceIcon from '$lib/icon/ReduceIcon.svelte';
@@ -36,8 +33,7 @@
 		  }>;
 
 	let { tab, isActive }: Props = $props();
-	let isFetching = $state(false);
-	let teamEligibilities = $state<ExcellenceAwardTeamEligibility[] | undefined>(undefined);
+	const isFetching = $derived(robotEventsCache.isFetching(EXCELLENCE_ROBOT_EVENTS_RESOURCES));
 
 	const essentialData = $derived(app.getEssentialData());
 	const hasRobotEventsId = $derived(!!essentialData?.robotEventsEventId && !!essentialData?.divisionId);
@@ -46,6 +42,11 @@
 	const awardNames = $derived(allAwards.map((award) => award.name));
 	const allJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged'));
 	const allExcellenceAwards = $derived(allAwards.filter((award) => isExcellenceAward(award.name)));
+	const teamEligibilities = $derived<ExcellenceAwardTeamEligibility[] | undefined>(
+		robotEventsCache.excellencePayload && allExcellenceAwards.length > 0
+			? Object.values(excellenceReportsFromInsight(robotEventsCache.excellencePayload, allExcellenceAwards)).flatMap((report) => report.teamsInGroup)
+			: undefined
+	);
 	const allRemainingJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged' && !isExcellenceAward(award.name)));
 
 	const allTeams = $derived(app.getAllTeamInfoAndData());
@@ -226,35 +227,28 @@
 		}
 	}
 
-	async function fetchExcellenceAwardTeamEligibility() {
-		if (!essentialData) return;
-		const { robotEventsEventId, divisionId } = essentialData;
-		if (!robotEventsEventId || !divisionId) return;
-
-		isFetching = true;
-		try {
-			const client = getRobotEventsClient();
-			const result = await getEventDivisionExcellenceAwardCandidatesReport(client, robotEventsEventId, divisionId, allExcellenceAwards);
-
-			if (result.error) {
-				console.error('Failed to get event from RobotEvents:', result.error);
-				app.addErrorNotice(m.failed_to_get_event_from_robotevents());
-				return;
-			}
-
-			teamEligibilities = Object.values(result).flatMap((report) => report.teamsInGroup);
-		} catch (error) {
-			console.error('Failed to get event from RobotEvents', error);
+	async function refreshFromRobotEvents() {
+		const status = await robotEventsCache.refresh(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
+		if (status === 'failed') {
+			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
 			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents());
-		} finally {
-			isFetching = false;
 		}
 	}
 
 	$effect(() => {
-		if (isActive && essentialData && hasRobotEventsId && allExcellenceAwards.length > 0) {
-			fetchExcellenceAwardTeamEligibility();
-		}
+		if (!isActive || !essentialData?.robotEventsEventId || !essentialData.divisionId || allExcellenceAwards.length === 0) return;
+		const eventId = essentialData.robotEventsEventId;
+		const divisionId = essentialData.divisionId;
+		let cancelled = false;
+		void robotEventsCache.retain(eventId, divisionId, EXCELLENCE_ROBOT_EVENTS_RESOURCES).then((status) => {
+			if (cancelled || status !== 'failed') return;
+			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
+			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents());
+		});
+		return () => {
+			cancelled = true;
+			robotEventsCache.release(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
+		};
 	});
 </script>
 
@@ -267,7 +261,7 @@
 					<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.final_ranking()}</h2>
 				</div>
 				{#if hasRobotEventsId && allExcellenceAwards.length > 0}
-					<button onclick={fetchExcellenceAwardTeamEligibility} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
+					<button onclick={refreshFromRobotEvents} disabled={isFetching} class="lightweight tiny flex items-center gap-2">
 						{#if isFetching}
 							<RefreshIcon class="h-4 w-4 animate-spin" />
 							<span class="text-nowrap">{m.fetching()}</span>

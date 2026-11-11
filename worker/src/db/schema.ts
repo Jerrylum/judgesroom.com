@@ -271,6 +271,14 @@ export const teamPhotos = sqliteTable(
 	(table) => [index('team_photos_teamId').on(table.teamId)]
 );
 
+/** One row per VEX list. Rankings are shared by attendance and Excellence. */
+export const robotEventsCache = sqliteTable('RobotEventsCache', {
+	resource: text('resource', { enum: ['teams', 'rankings', 'skills'] }).primaryKey(),
+	payload: text('payload', { mode: 'json' }).$type<unknown[] | null>(),
+	fetchedAt: integer('fetchedAt'),
+	fetchingStarted: integer('fetchingStarted').notNull().default(0)
+});
+
 export const pendingPhotoUploads = sqliteTable('PendingPhotoUploads', {
 	token: text('token').primaryKey(),
 	photoId: text('photoId').notNull(),
