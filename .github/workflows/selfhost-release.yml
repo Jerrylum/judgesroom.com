@@ -4,8 +4,9 @@
 # Under act, github.actor is nektos/act, so the GitHub Release job is skipped. Build and pack still run.
 # echo '{ "ref": "refs/tags/v0.1.0" }' > .event-file.json
 # Run one matrix target at a time. act shares the host repo, so packing both at once races.
-# act --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:macos-arm64
-# act --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:windows-x64
+# act does not map ubuntu-26.04 by default.
+# act -P ubuntu-26.04=catthehacker/ubuntu:act-latest --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:macos-arm64
+# act -P ubuntu-26.04=catthehacker/ubuntu:act-latest --artifact-server-path /tmp/act-artifacts --eventpath .event-file.json -W .github/workflows/selfhost-release.yml --matrix target:windows-x64
 
 name: Judges Room Standalone Release
 
@@ -19,10 +20,10 @@ permissions:
 
 jobs:
   build-web:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4 # Using Node.js as it is required by Wrangler.
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7 # Using Node.js as it is required by Wrangler.
         with:
           node-version: 22
       - run: npm install -g bun # Using Bun as it is required by the project.
@@ -33,7 +34,9 @@ jobs:
         working-directory: web
         env:
           CI: false
-      - uses: actions/upload-artifact@v4
+      # v5, not v6+: act rejects the signed blob URL that upload-artifact v6 and v7 send.
+      # v5 still declares Node 20; GitHub runs it on Node 24 and prints a deprecation notice.
+      - uses: actions/upload-artifact@v5
         with:
           name: web-build
           path: web/build
@@ -41,25 +44,25 @@ jobs:
 
   pack:
     needs: build-web
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         target: [windows-x64, macos-arm64]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - run: npm install -g bun
       - run: bun remove better-sqlite3
       - run: bun install
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: web-build
           path: web/build
       - name: Pack Judges Room Standalone
         run: bun run pack:standalone -- --target ${{ matrix.target }} --skip-web-build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: judgesroom-standalone-${{ matrix.target }}
           path: dist/judgesroom-standalone-${{ matrix.target }}.zip
@@ -68,9 +71,9 @@ jobs:
   release:
     if: github.actor != 'nektos/act'
     needs: pack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           pattern: judgesroom-standalone-*
           merge-multiple: true
