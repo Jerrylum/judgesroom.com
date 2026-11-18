@@ -43,9 +43,10 @@ jobs:
         working-directory: worker
       - name: Build & Deploy Worker
         if: github.actor != 'nektos/act'
-        uses: cloudflare/wrangler-action@v3.12.0 # See https://github.com/cloudflare/wrangler-action/issues/386
+        uses: cloudflare/wrangler-action@v4.1.3
         with:
           workingDirectory: ${{ github.workspace }}/worker
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           environment: ${{ steps.cf.outputs.env }}
+          packageManager: bun
