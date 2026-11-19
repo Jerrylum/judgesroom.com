@@ -15,13 +15,18 @@ import type { PhotosBucket } from './media/types';
 import { photoCacheTag, photoContentHeaders, roomPhotoCacheTag } from './media/constants';
 import type { ClientRouter } from './client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
-import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
+import { AuthTokenSchema, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import type { StarterKit } from '@judgesroom.com/protocol/src/room';
 import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 import { parseRoomId } from './room-id';
 import { incomingMessageTooLargeResponse, isIncomingWebSocketMessageTooLarge } from './ws-message-size';
+import { sqliteRoomWasInitialized } from './durable-room-state';
 import { EMPTY_ROOM_TTL_MS, retentionDecision } from './retention';
+import { handleCreateRoom } from './create-room';
+import { hasEssentialData } from './routes/essential';
+import { createJudgesRoomRecord } from './routes/handshake';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -81,10 +86,13 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 	private db: DrizzleSqliteDODatabase;
 	private photos: PhotosBucket;
 	private network: JudgesRoomNetwork;
+	/** Set when setup finishes and left set after destroy, so this live instance is not migrated again. */
+	private isRoomInitialized = false;
 
 	/**
-	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
-	 * 	`DurableObjectStub::get` for a given identifier (no-op constructors can be omitted)
+	 * The constructor runs when an RPC or event first reaches this Durable Object, not when the stub is created.
+	 * A brand-new room id only reads sqlite_schema here. Migrations run for a room that already has a database.
+	 * A verified new room is migrated later by createJudgesRoom().
 	 *
 	 * @param ctx - The interface for interacting with Durable Object state
 	 * @param env - The interface to reference bindings declared in wrangler.jsonc
@@ -99,17 +107,44 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			getWebSockets: () => this.ctx.getWebSockets()
 		});
 
-		// Make sure all migrations complete before accepting queries.
-		// Otherwise you will need to run `this.migrate()` in any function
-		// that accesses the Drizzle database `this.db`.
-		// initialize() must finish here too: isRunning() is false until load(),
-		// and fetch() treats that as a destroyed room.
-		ctx.blockConcurrencyWhile(async () => {
+		// isRunning() is false until wrpc loads. An existing room must load before its handler runs.
+		// A new id has no schema, so this read returns without writing or taking the concurrency gate.
+		// initializeRoom() registers blockConcurrencyWhile before returning.
+		if (sqliteRoomWasInitialized(this.ctx.storage.sql)) {
+			void this.initializeRoom();
+		}
+	}
+
+	/** True once setup has finished on this instance, including after destroy. */
+	roomInitialized(): boolean {
+		return this.isRoomInitialized;
+	}
+
+	/** Initialize a new room and write its starter kit. The HTTP handler verifies Turnstile before calling this. */
+	async createJudgesRoom(input: StarterKit): Promise<ClientAuthentication> {
+		await this.initializeRoom();
+		return createJudgesRoomRecord(this.db, input);
+	}
+
+	/**
+	 * Migrate and load wrpc. The constructor calls this for a room that already has a database.
+	 * createJudgesRoom calls it before writing a new room.
+	 * The returned promise is the blockConcurrencyWhile gate, registered before this method returns.
+	 */
+	private initializeRoom(): Promise<void> {
+		if (this.isRoomInitialized) {
+			return Promise.resolve();
+		}
+		return this.ctx.blockConcurrencyWhile(async () => {
+			if (this.isRoomInitialized) {
+				return;
+			}
 			await migrate(this.db, migrations);
 			await this.wsHandler.initialize();
-			if ((await ctx.storage.getAlarm()) === null) {
-				await ctx.storage.setAlarm(Date.now() + EMPTY_ROOM_TTL_MS);
+			if ((await this.ctx.storage.getAlarm()) === null) {
+				await this.ctx.storage.setAlarm(Date.now() + EMPTY_ROOM_TTL_MS);
 			}
+			this.isRoomInitialized = true;
 		});
 	}
 
@@ -248,11 +283,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
 		}
 
-		// The room is destroyed, destroy() wiped the SQLite database and later the DO instance will be
-		// evicted from memory if inactive. During this time, we refuse to handle new connections to the room.
-		// Accept the connection and close it with ROOM_DESTROYED; wrpc will not reconnect.
-		// After the Durable Object is evicted from memory, an incoming request will run the DO constructor
-		// and migrate() the database again. Same roomId is a vacant lot again.
+		// The worker fetch rejects a room that was never created. !isRunning() here is a destroyed
+		// instance that is still in memory. After eviction, deleteAll() left no schema, so the same roomId is a vacant lot again.
 		if (!this.network.isRunning()) {
 			this.ctx.acceptWebSocket(server);
 			server.close(ConnectionCloseCode.ROOM_DESTROYED, 'Room destroyed');
@@ -389,14 +421,17 @@ export default {
 			}
 			const { roomId } = intention;
 
-			// Create a `DurableObjectId` for the WebSocket
+			// Creation is POST /rooms. A socket to a room that was never created is rejected before any migration.
 			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
-
-			// Create a stub to open a communication channel with the Durable Object instance
 			const stub = env.WEBSOCKET_HIBERNATION_SERVER.get(id);
-
-			// Forward the request to the Durable Object
+			if (!(await stub.roomInitialized())) {
+				return new Response("Judges' Room not found", { status: 404 });
+			}
 			return stub.fetch(request);
+		}
+
+		if (url.pathname === '/rooms') {
+			return handleCreateRoom(request, env.TURNSTILE_SECRET_KEY, env.WEBSOCKET_HIBERNATION_SERVER);
 		}
 
 		if (url.pathname.startsWith('/media/')) {

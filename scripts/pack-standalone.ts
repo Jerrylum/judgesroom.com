@@ -91,8 +91,13 @@ function parseArgs(argv: string[]) {
 	return { target: TARGETS[target], skipWebBuild, skipWorkerBuild };
 }
 
-function run(command: string, args: string[], cwd: string) {
-	const result = spawnSync(command, args, { cwd, stdio: 'inherit', encoding: 'utf8' });
+function run(command: string, args: string[], cwd: string, extraEnv?: Record<string, string>) {
+	const result = spawnSync(command, args, {
+		cwd,
+		stdio: 'inherit',
+		encoding: 'utf8',
+		env: extraEnv ? { ...process.env, ...extraEnv } : process.env
+	});
 	if (result.status !== 0) {
 		throw new Error(`${command} ${args.join(' ')} failed with exit ${result.status ?? 'null'}`);
 	}
@@ -219,7 +224,8 @@ async function main() {
 	const webBuild = join(ROOT, 'web', 'build');
 	if (!skipWebBuild || !existsSync(join(webBuild, 'index.html'))) {
 		console.log('Building web app…');
-		run('bun', ['run', 'build'], join(ROOT, 'web'));
+		// A developer web/.env must not bake the hosted site key into the standalone zip.
+		run('bun', ['run', 'build'], join(ROOT, 'web'), { PUBLIC_TURNSTILE_SITE_KEY: '' });
 	}
 	if (!existsSync(join(webBuild, 'index.html'))) {
 		throw new Error('web/build is missing. Run bun run build in web/ first.');

@@ -165,7 +165,7 @@ export class JudgesRoomNetwork implements Network {
 
 	/**
 	 * Gate WebSocket accept and return the attachment authentication to persist.
-	 * Empty room (create path) and AC-off always allow with uncontrolled auth.
+	 * A room with no Metadata row is not access-controlled, so connect is allowed.
 	 * When AC is on, auth must resolve to a controlled ClientAuthentication.
 	 *
 	 * Together with kicking all other clients when AC is toggled (essential.ts), this is
@@ -176,7 +176,7 @@ export class JudgesRoomNetwork implements Network {
 		deviceId: string,
 		auth: string | null
 	): Promise<{ allowed: true; authentication: ClientAuthentication } | ConnectAuthDenial> {
-		// Empty room (create path): no Metadata yet — allow connect; createJudgesRoom mints JA auth.
+		// No Metadata row means access control is off.
 		if (!(await this.isAccessControlEnabled())) {
 			return { allowed: true, authentication: uncontrolledAuthentication };
 		}

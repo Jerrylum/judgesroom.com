@@ -7,6 +7,7 @@ import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from
 import { Authentication } from './access/authentication';
 import { metadata } from './db/schema';
 import { getEssentialData } from './routes/essential';
+import { createJudgesRoomRecord } from './routes/handshake';
 import type { ServerContext } from './server-router';
 import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 
@@ -171,22 +172,12 @@ describe('room identity — handshake with only a roomId', () => {
 			judges: []
 		};
 
-		const first = await serverRouter.handshake.createJudgesRoom._def._resolver!({
-			input,
-			session,
-			ctx: context
-		});
+		const first = await createJudgesRoomRecord(context.db, input);
 		expect(first).toEqual({ isAccessControlled: false });
 		const created = await getEssentialData(context.db);
 		expect(created.judgeGuideVersion).toBe('2.0');
 
-		await expect(
-			serverRouter.handshake.createJudgesRoom._def._resolver!({
-				input,
-				session,
-				ctx: context
-			})
-		).rejects.toThrow(/already exists/);
+		await expect(createJudgesRoomRecord(context.db, input)).rejects.toThrow(/already exists/);
 	});
 });
 

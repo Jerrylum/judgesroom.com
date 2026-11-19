@@ -8,6 +8,7 @@ import { judges, metadata } from '../db/schema';
 import { getEssentialData } from './essential';
 import { upsertJudge } from './judge';
 import { generateAuthToken, getJudgeAdvisorAuthToken, resolveClientAuthentication } from '../access/tokens';
+import { createJudgesRoomRecord } from './handshake';
 import { Authentication } from '../access/authentication';
 import { createEmptyNotebookRubricScores } from '@judgesroom.com/protocol/src/rubric';
 import { uuidv4 } from '@judgesroom.com/protocol/src/utils';
@@ -681,22 +682,18 @@ describe('access control', () => {
 				awards: []
 			};
 
-			const result = await serverRouter.handshake.createJudgesRoom._def._resolver!({
-				input: {
-					essentialData: essential,
-					teamData: [
-						{
-							id: sampleTeamInfoAndData[0]!.id,
-							notebookLink: '',
-							hasInnovateAwardSubmissionForm: false,
-							notebookDevelopmentStatus: 'undetermined',
-							absent: false
-						}
-					],
-					judges: [{ id: judgeId, name: 'Judge One', groupId }]
-				},
-				session: jaSession,
-				ctx: fresh
+			const result = await createJudgesRoomRecord(fresh.db, {
+				essentialData: essential,
+				teamData: [
+					{
+						id: sampleTeamInfoAndData[0]!.id,
+						notebookLink: '',
+						hasInnovateAwardSubmissionForm: false,
+						notebookDevelopmentStatus: 'undetermined',
+						absent: false
+					}
+				],
+				judges: [{ id: judgeId, name: 'Judge One', groupId }]
 			});
 
 			expect(result).toMatchObject({ isAccessControlled: true, role: 'judge_advisor' });
@@ -734,22 +731,18 @@ describe('access control', () => {
 				awards: []
 			};
 
-			const result = await serverRouter.handshake.createJudgesRoom._def._resolver!({
-				input: {
-					essentialData: essential,
-					teamData: [
-						{
-							id: sampleTeamInfoAndData[0]!.id,
-							notebookLink: '',
-							hasInnovateAwardSubmissionForm: false,
-							notebookDevelopmentStatus: 'undetermined',
-							absent: false
-						}
-					],
-					judges: [{ id: judgeId, name: 'Judge One', groupId }]
-				},
-				session: jaSession,
-				ctx: fresh
+			const result = await createJudgesRoomRecord(fresh.db, {
+				essentialData: essential,
+				teamData: [
+					{
+						id: sampleTeamInfoAndData[0]!.id,
+						notebookLink: '',
+						hasInnovateAwardSubmissionForm: false,
+						notebookDevelopmentStatus: 'undetermined',
+						absent: false
+					}
+				],
+				judges: [{ id: judgeId, name: 'Judge One', groupId }]
 			});
 
 			expect(result).toEqual({ isAccessControlled: false });

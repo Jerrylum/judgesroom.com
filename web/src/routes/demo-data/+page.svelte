@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { app, dialogs } from '$lib/index.svelte';
+	import { env } from '$env/dynamic/public';
+	import { m } from '$lib/paraglide/messages.js';
+	import TurnstileWidget from '$lib/components/event-setup/TurnstileWidget.svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
@@ -36,6 +39,12 @@
 	]);
 	let stepMessages = $state<string[]>(['', '', '', '', '', '', '']);
 	let judges: any[] = [];
+	let turnstileToken = $state<string | null>(null);
+	let turnstileReset = $state(0);
+	let turnstileFailure = $state<string | null>(null);
+	const turnstileSiteKey = $derived((env.PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
+	const turnstileRequired = $derived(turnstileSiteKey.length > 0);
+	const turnstileError = $derived(turnstileToken ? null : turnstileFailure);
 
 	// Demo data injection steps
 	const steps = [
@@ -43,12 +52,22 @@
 			title: 'Initialize Event Setup',
 			description: 'Load essential event data, teams, and judge groups. This sets up the basic structure for the judging system.',
 			action: async () => {
-				app.handleEssentialDataUpdate(initialData.essentialData as EssentialData);
-				app.handleAllTeamDataUpdate(initialData.teamData as TeamData[]);
-				app.handleAllJudgesUpdate(initialData.judges as Judge[]);
-				await app.createJudgesRoom();
-				await app.selectUser({ role: 'judge_advisor' });
-				return 'Event setup completed with teams and judge groups initialized.';
+				const token = turnstileToken ?? undefined;
+				try {
+					await app.createJudgesRoom({
+						essentialData: initialData.essentialData as EssentialData,
+						teamData: initialData.teamData as TeamData[],
+						judges: initialData.judges as Judge[],
+						turnstileToken: token
+					});
+					await app.selectUser({ role: 'judge_advisor' });
+					return 'Event setup completed with teams and judge groups initialized.';
+				} finally {
+					if (turnstileSiteKey) {
+						turnstileToken = null;
+						turnstileReset += 1;
+					}
+				}
 			}
 		},
 		{
@@ -207,6 +226,12 @@
 
 		// Check if we need permission for the first step
 		if (stepIndex === 0) {
+			if (turnstileRequired && !turnstileToken) {
+				stepStatus[stepIndex] = 'error';
+				stepMessages[stepIndex] = m.turnstile_verification_failed();
+				turnstileFailure = m.turnstile_verification_failed();
+				return;
+			}
 			const hasPermit = app.hasPermit();
 			if (hasPermit) {
 				const answer = await dialogs.showConfirmation({
@@ -241,6 +266,9 @@
 		} catch (error) {
 			stepStatus[stepIndex] = 'error';
 			stepMessages[stepIndex] = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+			if (stepIndex === 0 && turnstileRequired) {
+				turnstileFailure = m.turnstile_verification_failed();
+			}
 			console.error('Step execution failed:', error);
 		}
 	}
@@ -303,9 +331,25 @@
 			<h1 class="mb-2 text-3xl font-bold text-gray-900">Demo Data Injection</h1>
 			<p class="mb-6 text-gray-600">Set up a complete judging session with sample data.</p>
 
+			{#if turnstileRequired}
+				<div class="mb-6">
+					{#key turnstileReset}
+						<TurnstileWidget siteKey={turnstileSiteKey} bind:token={turnstileToken} />
+					{/key}
+					{#if turnstileError}
+						<p class="mt-2 text-sm text-red-700">{turnstileError}</p>
+					{/if}
+				</div>
+			{/if}
+
 			<!-- Control Buttons -->
 			<div class="mb-8 flex gap-4">
-				<button onclick={() => executeAllSteps()} class="primary" disabled={stepStatus.some((status) => status === 'running')}>
+				<button
+					onclick={() => executeAllSteps()}
+					class="primary"
+					disabled={stepStatus.some((status) => status === 'running') ||
+						(stepStatus[0] !== 'completed' && turnstileRequired && !turnstileToken)}
+				>
 					Execute All Steps
 				</button>
 				<button onclick={() => resetSteps()} class="secondary" disabled={stepStatus.some((status) => status === 'running')}>
@@ -316,7 +360,7 @@
 
 		<!-- Steps List -->
 		<div class="space-y-4">
-			{#each steps as step, index}
+			{#each steps as step, index (step.title)}
 				<div class="rounded-md bg-white shadow-sm {getStepClass(stepStatus[index])} transition-all duration-200">
 					<div class="p-6">
 						<div class="flex items-start justify-between">
@@ -356,7 +400,9 @@
 							<div class="ml-4">
 								<button
 									onclick={() => executeStep(index)}
-									disabled={stepStatus[index] === 'running' || stepStatus.some((status) => status === 'running')}
+									disabled={stepStatus[index] === 'running' ||
+										stepStatus.some((status) => status === 'running') ||
+										(index === 0 && turnstileRequired && !turnstileToken)}
 									class="primary tiny"
 								>
 									{#if stepStatus[index] === 'completed'}

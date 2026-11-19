@@ -34,6 +34,7 @@ jobs:
         working-directory: web
         env:
           CI: false
+          PUBLIC_TURNSTILE_SITE_KEY: ''
       # v5, not v6+: act rejects the signed blob URL that upload-artifact v6 and v7 send.
       # v5 still declares Node 20; GitHub runs it on Node 24 and prints a deprecation notice.
       - uses: actions/upload-artifact@v5

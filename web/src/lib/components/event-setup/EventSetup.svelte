@@ -196,7 +196,7 @@
 		}
 	}
 
-	async function completeSetup() {
+	async function completeSetup(turnstileToken?: string): Promise<boolean> {
 		try {
 			// Create the event setup object
 			const essentialData = {
@@ -232,18 +232,18 @@
 				awards: awardOptions.filter((award) => award.isSelected).map((award) => award.generateAward())
 			} satisfies EssentialData;
 
+			const teamData = teams.map((team) => ({
+				id: team.id,
+				notebookLink: team.notebookLink,
+				hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
+				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+				absent: team.absent
+			}));
+
 			// Redirect based on whether user is judging ready
 			if (app.isJudgesRoomJoined()) {
 				await app.wrpcClient.essential.updateEssentialData.mutation(essentialData);
-				await app.wrpcClient.team.updateAllTeamData.mutation(
-					teams.map((team) => ({
-						id: team.id,
-						notebookLink: team.notebookLink,
-						hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
-						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
-						absent: team.absent
-					}))
-				);
+				await app.wrpcClient.team.updateAllTeamData.mutation(teamData);
 
 				// Just in case: keep judges that are created during the event setup
 				const currentJudges = app.getAllJudges();
@@ -263,19 +263,12 @@
 					});
 				}
 			} else {
-				app.handleEssentialDataUpdate(essentialData);
-				app.handleAllTeamDataUpdate(
-					teams.map((team) => ({
-						id: team.id,
-						notebookLink: team.notebookLink,
-						hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
-						notebookDevelopmentStatus: team.notebookDevelopmentStatus,
-						absent: team.absent
-					}))
-				);
-				app.handleAllJudgesUpdate(judges);
-
-				await app.createJudgesRoom();
+				await app.createJudgesRoom({
+					essentialData,
+					teamData,
+					judges,
+					turnstileToken
+				});
 				if (accessControlEnabled) {
 					app.setCurrentUserLocally({ role: 'judge_advisor' });
 				} else {
@@ -302,10 +295,12 @@
 				judgingMethod,
 				isImportingFromRobotEvents: robotEventsSku && robotEventsEventId && divisionId
 			});
+			return true;
 		} catch (error) {
 			console.error('Failed to complete setup:', error);
 			// You might want to show an error message to the user here
 			// TODO: This will be a major issue, ask the user to report the issue to the developer
+			return false;
 		}
 	}
 

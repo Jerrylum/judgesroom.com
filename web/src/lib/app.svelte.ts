@@ -25,10 +25,14 @@ import {
 import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-import type { JoiningKit, RoomState } from '@judgesroom.com/protocol/src/room';
-import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
-import { AuthTokenSchema, isConnectAuthCloseReason } from '@judgesroom.com/protocol/src/access';
-import { RoomIdSchema, generateRoomId } from '@judgesroom.com/protocol/src/room-id';
+import type { JoiningKit, RoomState, StarterKit } from '@judgesroom.com/protocol/src/room';
+import {
+	AuthTokenSchema,
+	ClientAuthenticationSchema,
+	isConnectAuthCloseReason,
+	type ClientAuthentication
+} from '@judgesroom.com/protocol/src/access';
+import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 import { connectionResumeStep } from './session-resume';
@@ -106,6 +110,11 @@ export const PermitSchema = z.object({
 });
 
 export type Permit = z.infer<typeof PermitSchema>;
+
+const CreateRoomResponseSchema = z.object({
+	roomId: RoomIdSchema,
+	authentication: ClientAuthenticationSchema
+});
 
 export class App {
 	private readonly storage: AppStorage;
@@ -322,36 +331,45 @@ export class App {
 	}
 
 	/**
-	 * Create a new Judges' Room
+	 * Create a new Judges' Room over HTTP, then join it. Local state is applied by the join.
 	 */
-	async createJudgesRoom(): Promise<void> {
+	async createJudgesRoom(input: StarterKit & { turnstileToken?: string }): Promise<void> {
+		this.lastConnectAuthError = null;
+		let roomCreated = false;
 		try {
 			this.currentUser = null;
 			this.clientManager.resetClient();
-
-			// Clear storage
 			this.clearPermitFromStorage();
 			this.clearUserFromStorage();
 
-			if (!this.essentialData) {
-				throw new Error('CRITICAL: No essential data');
+			const response = await fetch(`${this.getWorkerOrigin()}/rooms`, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(input)
+			});
+
+			if (response.status === 403) {
+				throw new Error('Turnstile verification failed');
+			}
+			if (!response.ok) {
+				throw new Error((await response.text()) || 'Failed to create room');
 			}
 
-			const roomId = generateRoomId();
-			// Connect without auth; server mints the JA token and returns it in authentication.
-			this.permit = this.createNewPermit(roomId);
+			const created = CreateRoomResponseSchema.parse(await response.json());
+			const authToken = created.authentication.isAccessControlled ? created.authentication.authToken : undefined;
+			this.permit = this.createNewPermit(created.roomId, authToken);
 			this.savePermitToStorage();
-
-			const authentication = await this.wrpcClient.handshake.createJudgesRoom.mutation({
-				essentialData: this.essentialData,
-				teamData: [...Object.values(this.allTeamData)],
-				judges: [...this.allJudges]
-			});
-			this.handleClientAuthenticationChange(authentication);
+			roomCreated = true;
+			await this.joinJudgesRoom();
 		} catch (error) {
-			this.permit = null;
-			this.clearPermitFromStorage();
-			this.addErrorNotice(m.failed_to_create_judges_room({ error: error instanceof Error ? error.message : 'Unknown error' }));
+			const message = this.lastConnectAuthError ?? (error instanceof Error ? error.message : 'Unknown error');
+			this.lastConnectAuthError = null;
+			if (!roomCreated) {
+				this.permit = null;
+				this.clearPermitFromStorage();
+				this.clearUserFromStorage();
+			}
+			this.addErrorNotice(m.failed_to_create_judges_room({ error: message }));
 			throw error;
 		}
 	}
@@ -861,12 +879,20 @@ export class App {
 		return this.isDevelopment;
 	}
 
-	getMediaOrigin(): string {
-		return this.isDevelopment
-			? `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:8787`
-			: typeof window !== 'undefined'
-				? window.location.origin
-				: '';
+	/**
+	 * HTTP origin of the Worker. Vite serves the page in development, so the Worker is on port 8787.
+	 * Sockets use the same origin with the WebSocket scheme.
+	 */
+	getWorkerOrigin(): string {
+		if (this.isDevelopment) {
+			const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+			return `http://${hostname}:8787`;
+		}
+		return typeof window !== 'undefined' ? window.location.origin : '';
+	}
+
+	private workerWebSocketUrl(): string {
+		return `${this.getWorkerOrigin().replace(/^http/, 'ws')}/ws`;
 	}
 
 	// ============================================================================
@@ -878,13 +904,16 @@ export class App {
 			throw new Error('CRITICAL: No permit');
 		}
 
-		const baseWsUrl = this.isDevelopment
-			? `ws://${window.location.hostname}:8787/ws` // Local development server
-			: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`; // Production Cloudflare Worker
+		const baseWsUrl = this.workerWebSocketUrl();
 
-		const wsUrl = this.permit.authToken ? `${baseWsUrl}?auth=${encodeURIComponent(this.permit.authToken)}` : baseWsUrl;
+		const params = new URLSearchParams();
+		if (this.permit.authToken) {
+			params.set('auth', this.permit.authToken);
+		}
+		const query = params.toString();
+		const wsUrl = query ? `${baseWsUrl}?${query}` : baseWsUrl;
 
-		return {
+		const options: ClientOptions<ClientRouter> = {
 			wsUrl,
 			clientId: generateUUID(),
 			roomId: this.permit.roomId,
@@ -926,6 +955,7 @@ export class App {
 				});
 			}
 		};
+		return options;
 	}
 
 	/**

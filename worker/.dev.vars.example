@@ -1,0 +1,3 @@
+# Wrangler loads .dev.vars automatically for local hosted dev.
+# Leave empty to skip verification (self-host). Do not commit a real secret.
+TURNSTILE_SECRET_KEY=

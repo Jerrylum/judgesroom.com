@@ -132,6 +132,7 @@
 	"interview_rubric_score_step": "Interview rubric step",
 	"interview_rubric_score_step_description": "Scores on the interview rubric change by this amount.",
 	"complete_setup": "Complete Setup",
+	"turnstile_verification_failed": "Verification failed. Complete the check and try again.",
 	"review_license_description1": "This software is licensed under the GNU General Public License v3 (GPLv3). Join our",
 	"review_license_description2": "server or visit our",
 	"github_repository": "GitHub repository",

@@ -3,9 +3,9 @@ import { eq } from 'drizzle-orm';
 import { serverRouter } from './server-router';
 import { createTestServerContext, seedTestDatabase, sampleTeamInfoAndData } from './test-utils';
 import { getAwards, getTeamInfos, getEssentialData } from './routes/essential';
+import { createJudgesRoomRecord } from './routes/handshake';
 import { getTeamData } from './routes/team';
 import { getJudges } from './routes/judge';
-import { Authentication } from './access/authentication';
 import type { ServerContext } from './server-router';
 import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 
@@ -85,17 +85,11 @@ describe('ServerRouter', () => {
 		});
 
 		it('createJudgesRoom rejects when metadata present', async () => {
-			const resolver = serverRouter.handshake.createJudgesRoom._def._resolver!;
-			context.auth = Authentication.withFixture();
 			await expect(
-				resolver({
-					input: {
-						essentialData: await getEssentialData(context.db),
-						teamData: [],
-						judges: []
-					},
-					session,
-					ctx: context
+				createJudgesRoomRecord(context.db, {
+					essentialData: await getEssentialData(context.db),
+					teamData: [],
+					judges: []
 				})
 			).rejects.toThrow(/already exists/);
 		});

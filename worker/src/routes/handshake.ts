@@ -3,11 +3,11 @@ import { WRPCError, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
 import { getJudges, upsertJudge } from './judge';
 import { broadcastDeviceListUpdate } from './device';
-import type { ServerContext } from '../server-router';
+import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { getAwardNoWinners, getFinalAwardNominations } from './judging';
-import { ClientAuthenticationSchema, generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
+import { generateAuthToken, uncontrolledAuthentication, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
 import { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit } from '@judgesroom.com/protocol/src/room';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 
@@ -52,56 +52,6 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 			});
 		}),
 
-		createJudgesRoom: w.procedure
-			.input(StarterKitSchema)
-			.output(ClientAuthenticationSchema)
-			.mutation(async ({ ctx, input, session }) => {
-				const hasExistingEssentialData = await hasEssentialData(ctx.db);
-				if (hasExistingEssentialData) {
-					throw new WRPCError("Judges' Room already exists");
-				}
-
-				const judgeAdvisorAuthToken = generateAuthToken();
-
-				const offlineDevice = {
-					deviceId: session.currentClient.deviceId,
-					deviceName: session.currentClient.deviceName,
-					connectedAt: new Date()
-				};
-
-				// insert or update
-				await ctx.db
-					.insert(offlineDevices)
-					.values(offlineDevice)
-					.onConflictDoUpdate({
-						target: [offlineDevices.deviceId],
-						set: offlineDevice
-					});
-
-				// No need to broadcast device list update since it is a new Judges\' Room
-
-				return transaction(ctx.db, async (tx) => {
-					await updateEssentialData(tx, input.essentialData);
-
-					await Promise.all(input.teamData.map((team) => updateTeamData(tx, team)));
-
-					await Promise.all(input.judges.map((judge) => upsertJudge(tx, judge)));
-
-					await upsertJudgeAdvisorAuthToken(tx, judgeAdvisorAuthToken);
-					const authentication = input.essentialData.accessControlEnabled
-						? ({
-								isAccessControlled: true,
-								authToken: judgeAdvisorAuthToken,
-								role: 'judge_advisor'
-							} as const)
-						: uncontrolledAuthentication;
-
-					ctx.auth.setAuthentication(authentication);
-
-					return authentication;
-				});
-			}),
-
 		leaveJudgesRoom: w.procedure.mutation(async ({ ctx, session }) => {
 			// Same as kickDevice for this device: close every socket (including the leaver) and
 			// forget OfflineDevices. leaveJudgesRoom is the self-service path (no JA check).
@@ -119,4 +69,28 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 			return { success: true, message: "Judges' Room destroyed" };
 		})
 	};
+}
+
+/** Write a new room. The caller initializes the database first. The joining socket records the device. */
+export async function createJudgesRoomRecord(db: DatabaseOrTransaction, input: StarterKit): Promise<ClientAuthentication> {
+	if (await hasEssentialData(db)) {
+		throw new Error("Judges' Room already exists");
+	}
+
+	const judgeAdvisorAuthToken = generateAuthToken();
+
+	return transaction(db, async (tx) => {
+		await updateEssentialData(tx, input.essentialData);
+		await Promise.all(input.teamData.map((team) => updateTeamData(tx, team)));
+		await Promise.all(input.judges.map((judge) => upsertJudge(tx, judge)));
+		await upsertJudgeAdvisorAuthToken(tx, judgeAdvisorAuthToken);
+
+		return input.essentialData.accessControlEnabled
+			? {
+					isAccessControlled: true as const,
+					authToken: judgeAdvisorAuthToken,
+					role: 'judge_advisor' as const
+				}
+			: uncontrolledAuthentication;
+	});
 }

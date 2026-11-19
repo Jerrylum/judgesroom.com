@@ -132,6 +132,7 @@
 	"interview_rubric_score_step": "團隊面談評分間距",
 	"interview_rubric_score_step_description": "團隊面談每一項的分數以這個間距增減。",
 	"complete_setup": "完成設置",
+	"turnstile_verification_failed": "驗證失敗。請完成驗證後再試。",
 	"review_license_description1": "這個軟件是根據 GNU 通用公共許可證 v3 (GPLv3) 授權的。加入我們的",
 	"review_license_description2": "伺服器或訪問我們的",
 	"github_repository": "GitHub 倉庫",

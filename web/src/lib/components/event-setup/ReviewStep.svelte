@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
+	import { env } from '$env/dynamic/public';
 	import { app, dialogs } from '$lib/index.svelte';
 	import { rubricScoreStepOptions } from '@judgesroom.com/protocol/src/event';
 	import RemoveAwardsDialog from './RemoveAwardsDialog.svelte';
+	import TurnstileWidget from './TurnstileWidget.svelte';
 
 	interface Props {
 		onPrev: () => void;
-		onComplete: () => Promise<void>;
+		onComplete: (turnstileToken?: string) => Promise<boolean>;
 		onJumpToStep: (step: number) => void;
 		removedAwardNames?: string[];
 		blockers?: { step: number; label: string }[];
@@ -35,6 +37,12 @@
 
 	let enableGoogleAnalytics = $state(true);
 	let isLoading = $state(false);
+	let turnstileToken = $state<string | null>(null);
+	let turnstileReset = $state(0);
+	let turnstileFailure = $state<string | null>(null);
+	const turnstileSiteKey = $derived((env.PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
+	const turnstileRequired = $derived(!isJudgesRoomJoined && turnstileSiteKey.length > 0);
+	const turnstileError = $derived(turnstileToken ? null : turnstileFailure);
 
 	async function handleAccessControlChange(input: HTMLInputElement) {
 		const checked = input.checked;
@@ -87,7 +95,12 @@
 		isLoading = true;
 		try {
 			app.getPreferences().set('isGoogleAnalyticsEnabled', enableGoogleAnalytics);
-			await onComplete();
+			const ok = await onComplete(turnstileRequired ? (turnstileToken ?? undefined) : undefined);
+			if (!ok && turnstileRequired) {
+				turnstileToken = null;
+				turnstileFailure = m.turnstile_verification_failed();
+				turnstileReset += 1;
+			}
 		} finally {
 			isLoading = false;
 		}
@@ -190,6 +203,17 @@
 		</div>
 	{/if}
 
+	{#if turnstileRequired}
+		<div class="pt-4">
+			{#key turnstileReset}
+				<TurnstileWidget siteKey={turnstileSiteKey} bind:token={turnstileToken} />
+			{/key}
+			{#if turnstileError}
+				<p class="mt-2 text-sm text-red-700">{turnstileError}</p>
+			{/if}
+		</div>
+	{/if}
+
 	<div class="flex justify-between pt-4">
 		{#if !isLoading}
 			<div class="flex space-x-3">
@@ -198,8 +222,8 @@
 			<button
 				type="button"
 				onclick={handleComplete}
-				class={['success', blockers.length > 0 && 'cursor-not-allowed opacity-50']}
-				disabled={blockers.length > 0}
+				class={['success', (blockers.length > 0 || (turnstileRequired && !turnstileToken)) && 'cursor-not-allowed opacity-50']}
+				disabled={blockers.length > 0 || (turnstileRequired && !turnstileToken)}
 			>
 				{m.complete_setup()}
 			</button>

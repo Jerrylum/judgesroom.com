@@ -9,7 +9,7 @@ import {
 import { app } from './index.svelte';
 
 export function getMediaBaseUrl(): string {
-	return app.getMediaOrigin();
+	return app.getWorkerOrigin();
 }
 
 export function getPhotoObjectUrl(photo: TeamPhoto): string {

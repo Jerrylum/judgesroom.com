@@ -30,6 +30,7 @@ jobs:
         working-directory: web
         env:
           CI: false
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
       - name: Pick Cloudflare environment
         id: cf
         run: |
