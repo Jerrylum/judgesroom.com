@@ -19,8 +19,6 @@
 		}
 
 		try {
-			// Stay in joining state - App will request sync automatically when connected
-			// UI will update via reactive app.hasAppData() when sync completes
 			AppUI.appPhase = 'joining_judges_room';
 			await app.leaveJudgesRoom();
 			await app.joinJudgesRoomFromUrl(judgesRoomUrl);
@@ -28,8 +26,8 @@
 			console.error("Error joining Judges' Room:", error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
-				title: m.nimble_fine_sheep_bubble(),
-				message: m.fine_game_firefox_spin({ error: error + '' })
+				title: m.failed_to_join(),
+				message: m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : String(error) })
 			});
 		}
 	}

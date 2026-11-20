@@ -4,6 +4,9 @@ import { generateAlphabetToken } from './access';
 /** New rooms use this length. Existing UUID v4 room ids remain valid. */
 export const ROOM_ID_LENGTH = 18;
 
+/** Accept-then-close reason when a socket names a room that was never created. */
+export const RoomNotFoundCloseReason = "Judges' Room not found";
+
 const ShortRoomIdSchema = z
 	.string()
 	.length(ROOM_ID_LENGTH)

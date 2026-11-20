@@ -83,20 +83,18 @@
 
 	async function handleJudgesRoomUrl() {
 		try {
+			AppUI.appPhase = 'joining_judges_room';
 			await app.leaveJudgesRoom();
 			await app.joinJudgesRoomFromUrl(window.location.href);
 
 			// Clear join params from the address bar (roomId / auth)
 			replaceState('/app', {});
-
-			// Wait for sync to complete
-			AppUI.appPhase = 'joining_judges_room';
 		} catch (error) {
 			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
 			dialogs.showAlert({
 				title: m.failed_to_join(),
-				message: m.failed_to_join_judges_room({ error: error + '' }),
+				message: m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : String(error) }),
 				confirmButtonClass: 'primary'
 			});
 		}
@@ -104,9 +102,8 @@
 
 	async function useStoredPermit() {
 		try {
-			await app.joinJudgesRoomWithStoredPermit();
-
 			AppUI.appPhase = 'joining_judges_room';
+			await app.joinJudgesRoomWithStoredPermit();
 		} catch (error) {
 			// Permit in storage but couldn't be used, show choice
 			// TODO: handle this case

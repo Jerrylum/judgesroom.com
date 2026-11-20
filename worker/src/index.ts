@@ -17,7 +17,7 @@ import type { ClientRouter } from './client-router';
 import { MAX_PHOTO_BYTES } from '@judgesroom.com/protocol/src/media';
 import { AuthTokenSchema, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
 import type { StarterKit } from '@judgesroom.com/protocol/src/room';
-import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
+import { RoomIdSchema, RoomNotFoundCloseReason } from '@judgesroom.com/protocol/src/room-id';
 import { Authentication } from './access/authentication';
 import { JudgesRoomNetwork, type WsAttachment } from './network/judges-room-network';
 import { parseRoomId } from './room-id';
@@ -283,8 +283,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			return new Response('Failed to create WebSocket pair', { status: 500 });
 		}
 
-		// The worker fetch rejects a room that was never created. !isRunning() here is a destroyed
-		// instance that is still in memory. After eviction, deleteAll() left no schema, so the same roomId is a vacant lot again.
+		// The worker fetch closes unknown rooms before forwarding. !isRunning() here
+		// is a destroyed instance that is still in memory. After eviction, deleteAll() left no schema, so the same roomId is a vacant lot again.
 		if (!this.network.isRunning()) {
 			this.ctx.acceptWebSocket(server);
 			server.close(ConnectionCloseCode.ROOM_DESTROYED, 'Room destroyed');
@@ -421,11 +421,19 @@ export default {
 			}
 			const { roomId } = intention;
 
-			// Creation is POST /rooms. A socket to a room that was never created is rejected before any migration.
+			// Creation is POST /rooms. A socket to a room that was never created is closed here, before any migration.
+			// KICKED stops wrpc from reconnecting. The reason is the message the join dialog shows.
 			const id: DurableObjectId = env.WEBSOCKET_HIBERNATION_SERVER.idFromName(roomId);
 			const stub = env.WEBSOCKET_HIBERNATION_SERVER.get(id);
 			if (!(await stub.roomInitialized())) {
-				return new Response("Judges' Room not found", { status: 404 });
+				const pair = new WebSocketPair();
+				const [client, server] = Object.values(pair);
+				if (!client || !server) {
+					return new Response('Failed to create WebSocket pair', { status: 500 });
+				}
+				server.accept();
+				server.close(ConnectionCloseCode.KICKED, RoomNotFoundCloseReason);
+				return new Response(null, { status: 101, webSocket: client });
 			}
 			return stub.fetch(request);
 		}
