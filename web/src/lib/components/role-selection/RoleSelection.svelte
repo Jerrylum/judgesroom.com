@@ -110,7 +110,7 @@
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
 
 				<p class="text-center text-gray-700">
-					{m.quaint_stock_seahorse_fetch()}
+					{m.site_description()}
 				</p>
 			</div>
 

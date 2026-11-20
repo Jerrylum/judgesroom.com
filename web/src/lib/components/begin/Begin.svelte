@@ -12,8 +12,8 @@
 	async function handleJoinJudgesRoom() {
 		if (!judgesRoomUrl.trim()) {
 			dialogs.showAlert({
-				title: m.white_these_swan_attend(),
-				message: m.knotty_brave_nils_ascend()
+				title: m.invalid_url(),
+				message: m.please_enter_judges_room_url()
 			});
 			return;
 		}
@@ -57,18 +57,18 @@
 				<h2 class="text-3xl font-medium text-gray-900">judgesroom.com</h2>
 
 				<p class="text-center text-gray-700">
-					{m.quaint_stock_seahorse_fetch()}
+					{m.site_description()}
 				</p>
 			</div>
 
 			<div class="max-w-lg rounded-2xl bg-white p-4 shadow-sm sm:p-6">
-				<h3 class="text-2xl font-medium text-gray-900">{m.minor_early_hedgehog_amuse()}</h3>
+				<h3 class="text-2xl font-medium text-gray-900">{m.join_judges_room()}</h3>
 				<p class="mt-4 mb-2 text-sm leading-relaxed text-gray-700">
-					{m.still_honest_koala_dance()}
+					{m.join_by_invite_description()}
 				</p>
 				<div class="mb-6 space-y-4">
-					<input type="text" bind:value={judgesRoomUrl} placeholder={m.direct_brave_pug_boil()} class="classic w-full" />
-					<button onclick={handleJoinJudgesRoom} class="primary w-full">{m.mean_icy_albatross_drip()}</button>
+					<input type="text" bind:value={judgesRoomUrl} placeholder={m.paste_invite_link_here()} class="classic w-full" />
+					<button onclick={handleJoinJudgesRoom} class="primary w-full">{m.join()}</button>
 				</div>
 				<p class="text-gray-700"></p>
 				<div class="mt-4 flex justify-center">
@@ -76,7 +76,7 @@
 						class="cursor-pointer text-center text-sm text-gray-500 underline hover:text-gray-800 active:text-gray-900"
 						onclick={handleStartNewEvent}
 					>
-						{m.round_heavy_turtle_explore()}
+						{m.or_start_a_new_one()}
 					</button>
 				</div>
 			</div>
