@@ -292,6 +292,7 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			await ctx.limits.consumeWriteBudget(2);
 			const result = await reassignTeam(ctx.db, input.teamId, input.toJudgeGroupId);
 			broadcastReassignUpdate(ctx.db, session, result);
 		}),

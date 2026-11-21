@@ -80,6 +80,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 			.input(CreatePhotoUploadInputSchema)
 			.output(CreatePhotoUploadResultSchema)
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(2);
 				await cleanupExpiredUploadTokens(ctx.db);
 				// AC-on auth is guaranteed by authorizeConnect + kick-on-AC-toggle (see essential.ts).
 				assertAuthorship(ctx.auth, input.judgeId);

@@ -59,6 +59,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			await ctx.limits.consumeWriteBudget(2);
 			await removeJudge(ctx.db, input.judgeId);
 			await ctx.network.kickJudge(input.judgeId);
 

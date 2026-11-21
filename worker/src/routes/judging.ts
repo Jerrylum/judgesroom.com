@@ -153,6 +153,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.mutation(async ({ ctx, input, session }) => {
 				assertAuthorship(ctx.auth, input.submission.judgeId);
 
+				await ctx.limits.consumeWriteBudget(3);
 				// insert or update (setWhere keeps judgeId sticky / blocks foreign overwrite)
 				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
 					requireAuthoredUpsert(
@@ -228,6 +229,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.mutation(async ({ ctx, input, session }) => {
 				assertAuthorship(ctx.auth, input.submission.judgeId);
 
+				await ctx.limits.consumeWriteBudget(3);
 				const { submissionCache, isReviewedNewTeam } = await transaction(ctx.db, async (tx) => {
 					requireAuthoredUpsert(
 						(
