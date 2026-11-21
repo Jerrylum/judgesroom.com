@@ -1,15 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { eq } from 'drizzle-orm';
-import { createTestServerContext, seedTestDatabase } from '../test-utils';
+import type { AnyRouter, Network, Session } from '@jerrylum/wrpc/server';
+import { ConnectAuthCloseReason, MAX_CONNECTIONS_PER_ACCESS_LINK, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import { LeftJudgesRoomCloseReason } from '@judgesroom.com/protocol/src/room-id';
+import { createTestDatabase, createTestServerContext, seedTestDatabase } from '../test-utils';
 import type { ServerContext } from '../server-router';
 import { generateAuthToken, getJudgeAdvisorAuthToken } from '../access/tokens';
 import { serverRouter } from '../server-router';
-import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
 import { upsertJudge } from '../routes/judge';
 import { getEssentialData } from '../routes/essential';
 import { judges } from '../db/schema';
-import { ConnectAuthCloseReason, MAX_CONNECTIONS_PER_ACCESS_LINK, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
-import { countAccessLinkConnections, sameAccessLinkIdentity, type ClientAuthenticationEntry } from './judges-room-network';
+import {
+	JudgesRoomNetwork,
+	countAccessLinkConnections,
+	sameAccessLinkIdentity,
+	type ClientAuthenticationEntry
+} from './judges-room-network';
 
 describe('JudgesRoomNetwork.authorizeConnect', () => {
 	let context: ServerContext & { cleanup: () => void };
@@ -271,3 +277,50 @@ describe('countAccessLinkConnections', () => {
 		expect(sameAccessLinkIdentity(jaAuth, jaAuth)).toBe(false);
 	});
 });
+
+describe('JudgesRoomNetwork.kickDevice', () => {
+	it('passes the leave reason only for the calling client', async () => {
+		const { db, cleanup } = createTestDatabase();
+		const kicked: { clientId: string; reason?: string }[] = [];
+		const network = new JudgesRoomNetwork({
+			inner: fakeInner(kicked),
+			db,
+			getWebSockets: () => []
+		});
+
+		await network.kickDevice('device-1', { clientId: 'self', reason: LeftJudgesRoomCloseReason });
+
+		expect(kicked).toEqual([
+			{ clientId: 'self', reason: LeftJudgesRoomCloseReason },
+			{ clientId: 'sibling', reason: undefined }
+		]);
+		cleanup();
+	});
+});
+
+function fakeInner(kicked: { clientId: string; reason?: string }[]): Network {
+	const clients = [
+		{ clientId: 'self', deviceId: 'device-1', deviceName: 'Device', connectedAt: 1 },
+		{ clientId: 'sibling', deviceId: 'device-1', deviceName: 'Device', connectedAt: 1 }
+	];
+	return {
+		async sendToClient() {
+			return { kind: 'response', id: 'test', result: { type: 'data', data: null } };
+		},
+		async broadcast() {
+			return [];
+		},
+		sendNotification() {},
+		broadcastNotification() {},
+		getConnectedClients: () => clients.map((client) => client.clientId),
+		isClientConnected: () => true,
+		isDeviceConnected: () => true,
+		getAllClientData: () => clients,
+		getClientData: (clientId) => clients.find((client) => client.clientId === clientId) ?? null,
+		async kickClient(clientId, reason) {
+			kicked.push({ clientId, reason });
+		},
+		async destroy() {},
+		isRunning: () => true
+	};
+}

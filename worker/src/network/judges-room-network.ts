@@ -36,6 +36,12 @@ type HibernatableWebSocket = {
 	deserializeAttachment(): unknown;
 };
 
+/** When set, that socket is closed with `reason` instead of wrpc's "Client kicked". */
+export type KickDeviceOptions = {
+	clientId: string;
+	reason: string;
+};
+
 export type JudgesRoomNetworkOptions = {
 	inner: Network;
 	db: DrizzleSqliteDODatabase;
@@ -103,9 +109,9 @@ export class JudgesRoomNetwork implements Network {
 		return this.opts.inner.getClientData(clientId);
 	}
 
-	async kickClient(clientId: string): Promise<void> {
+	async kickClient(clientId: string, reason?: string): Promise<void> {
 		const client = this.getClientData(clientId);
-		await this.opts.inner.kickClient(clientId);
+		await this.opts.inner.kickClient(clientId, reason);
 		if (client && !this.isDeviceConnected(client.deviceId)) {
 			await this.opts.db.delete(offlineDevices).where(eq(offlineDevices.deviceId, client.deviceId));
 		}
@@ -125,12 +131,14 @@ export class JudgesRoomNetwork implements Network {
 		}
 	}
 
-	async kickDevice(deviceId: string): Promise<void> {
+	async kickDevice(deviceId: string, leavingClient?: KickDeviceOptions): Promise<void> {
 		if (this.isDeviceConnected(deviceId)) {
 			for (const client of this.getAllClientData()) {
-				if (client.deviceId === deviceId) {
-					await this.opts.inner.kickClient(client.clientId);
+				if (client.deviceId !== deviceId) {
+					continue;
 				}
+				const reason = leavingClient?.clientId === client.clientId ? leavingClient.reason : undefined;
+				await this.opts.inner.kickClient(client.clientId, reason);
 			}
 		}
 		await this.opts.db.delete(offlineDevices).where(eq(offlineDevices.deviceId, deviceId));

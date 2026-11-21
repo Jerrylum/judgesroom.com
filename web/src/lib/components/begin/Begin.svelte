@@ -2,6 +2,8 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
 	import { app, AppUI, dialogs } from '$lib/index.svelte';
+	import { errorToString } from '$lib/utils.svelte';
+	import { translateConnectionCloseReason } from '$lib/app.svelte';
 
 	let judgesRoomUrl = $state('');
 
@@ -25,10 +27,9 @@
 		} catch (error) {
 			console.error("Error joining Judges' Room:", error);
 			AppUI.appPhase = 'begin';
-			dialogs.showAlert({
-				title: m.failed_to_join(),
-				message: m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : String(error) })
-			});
+
+			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			dialogs.showAlert({ title: m.failed_to_join(), message: message || m.unknown() });
 		}
 	}
 

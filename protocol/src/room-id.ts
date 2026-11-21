@@ -4,8 +4,22 @@ import { generateAlphabetToken } from './access';
 /** New rooms use this length. Existing UUID v4 room ids remain valid. */
 export const ROOM_ID_LENGTH = 18;
 
+/** Close reason during room creation when the turnstile verification fails. */
+export const TurnstileVerificationFailedCloseReason = 'Turnstile verification failed';
+
+/**
+ * Close reason for the socket that called leaveJudgesRoom.
+ * Other sockets of that device are still closed as a normal kick.
+ */
+export const LeftJudgesRoomCloseReason = "Left the Judges' Room";
+
 /** Accept-then-close reason when a socket names a room that was never created. */
 export const RoomNotFoundCloseReason = "Judges' Room not found";
+
+/**
+ * Close reason for the socket that failed to connect to the WebSocket server.
+ */
+export const WebSocketConnectionFailedCloseReason = 'WebSocket connection failed';
 
 const ShortRoomIdSchema = z
 	.string()

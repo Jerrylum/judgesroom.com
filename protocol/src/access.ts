@@ -61,7 +61,10 @@ export const ConnectAuthCloseReason = {
 
 export type ConnectAuthCloseReason = (typeof ConnectAuthCloseReason)[keyof typeof ConnectAuthCloseReason];
 
-export function isConnectAuthCloseReason(reason: string): boolean {
+export function isConnectAuthCloseReason(reason: string | null): boolean {
+	if (!reason) {
+		return false;
+	}
 	return (Object.values(ConnectAuthCloseReason) as string[]).includes(reason.trim());
 }
 

@@ -16,6 +16,7 @@ import { clientRouter, type ClientRouter } from './client-router';
 import type { User } from './user.svelte';
 import {
 	buildJudgesRoomJoinUrl,
+	errorToString,
 	generateUUID,
 	getDeviceNameFromUserAgent,
 	parseAuthTokenFromUrl,
@@ -29,10 +30,17 @@ import type { JoiningKit, RoomState, StarterKit } from '@judgesroom.com/protocol
 import {
 	AuthTokenSchema,
 	ClientAuthenticationSchema,
+	ConnectAuthCloseReason,
 	isConnectAuthCloseReason,
 	type ClientAuthentication
 } from '@judgesroom.com/protocol/src/access';
-import { RoomIdSchema, RoomNotFoundCloseReason } from '@judgesroom.com/protocol/src/room-id';
+import {
+	LeftJudgesRoomCloseReason,
+	RoomIdSchema,
+	RoomNotFoundCloseReason,
+	TurnstileVerificationFailedCloseReason,
+	WebSocketConnectionFailedCloseReason
+} from '@judgesroom.com/protocol/src/room-id';
 import z from 'zod';
 import { Preferences } from './preferences.svelte';
 import { connectionResumeStep } from './session-resume';
@@ -122,10 +130,12 @@ export class App {
 	private readonly clientManager: WRPCClientManager<ServerRouter, ClientRouter>;
 	private readonly preferences: Preferences;
 	private connectionState: ConnectionState = $state('offline');
-	/** Suppress kick toast when the server closes us as part of leaveJudgesRoom. */
-	private intentionalLeave = false;
-	/** Set from onClosed when the server rejects connect with an auth close code/reason. */
-	private lastConnectionCloseError: string | null = null;
+	/**
+	 * Stores the server's close reason for the current operation.
+	 * Each operation clears the old value before connecting. If `onClosed` records a new reason,
+	 * the caller can consume it with `takeConnectionCloseReason()` after the operation rejects.
+	 */
+	private connectionCloseReason: string | null = $state(null);
 	private permit: Permit | null = $state(null);
 	private currentUser: User | null = $state(null);
 	private essentialData: EssentialData | null = $state(null);
@@ -206,11 +216,13 @@ export class App {
 	}
 
 	/**
-	 * Join a Judges' Room from URL
+	 * Join a Judges' Room from URL.
+	 * After rejection, callers may call `takeConnectionCloseReason()` for a more specific server close reason.
 	 */
 	async joinJudgesRoomFromUrl(url: string): Promise<void> {
-		this.lastConnectionCloseError = null;
 		try {
+			this.connectionCloseReason = null;
+
 			if (this.hasPermit()) {
 				throw new Error("CRITICAL: already in a Judges' Room");
 			}
@@ -226,58 +238,55 @@ export class App {
 
 			await this.joinJudgesRoom();
 		} catch (error) {
-			const connectError = this.lastConnectionCloseError;
-			this.lastConnectionCloseError = null;
-			const message = connectError ?? (error instanceof Error ? error.message : 'Unknown error');
 			this.permit = null;
 			this.clearPermitFromStorage();
 			this.clearUserFromStorage();
-			// The join screen shows this failure in a dialog. A connect close already has that text.
-			if (!connectError) {
-				this.addErrorNotice(m.failed_to_join_judges_room({ error: message }));
-			}
-			throw new Error(message);
+
+			throw error;
 		}
 	}
 
 	/**
-	 * The header retry. The socket has already given up, so open a new one and join.
-	 * A handshake error is not reported here: the client keeps retrying, and
-	 * onConnectionStateChange joins once that socket is connected.
+	 * Reconnect to a stored Judges' Room.
+	 * After rejection, callers may call `takeConnectionCloseReason()` for a more specific server close reason.
+	 * This method inspects the reason when deciding whether to discard the permit, but does not consume it.
 	 */
-	private async resumeJudgesRoom(): Promise<void> {
+	async joinJudgesRoomWithStoredPermit(): Promise<void> {
+		try {
+			// Discard any reason from an earlier connection.
+			this.connectionCloseReason = null;
+			await this.joinJudgesRoom();
+		} catch (error) {
+			const reason = this.connectionCloseReason || errorToString(error);
+			if (isConnectAuthCloseReason(reason) && reason !== ConnectAuthCloseReason.TOO_MANY_CONNECTIONS) {
+				this.permit = null;
+				this.clearPermitFromStorage();
+				this.clearUserFromStorage();
+			}
+			throw error;
+		}
+	}
+
+	/**
+	 * The socket stops retrying after several failures and stays on `error`.
+	 * Open a new one and rejoin. Tabs stay mounted, so an unsaved rubric is kept.
+	 * After rejection, callers may call `takeConnectionCloseReason()` for a more specific server close reason.
+	 */
+	async resumeJudgesRoom(): Promise<void> {
 		if (this.connectionState !== 'error' || !this.isJudgesRoomJoined()) {
 			return;
 		}
 
+		this.connectionCloseReason = null;
 		this.clientManager.resetClient();
 		try {
+			this.connectionCloseReason = null;
+
 			await this.joinJudgesRoom();
 			this.sessionEpoch += 1;
 			this.subscribeDeviceListIfRetained();
 		} catch (error) {
-			this.reportReconnectFailure(error);
-		}
-	}
-
-	/**
-	 * A handshake error is retried by the socket. An access-link close is not:
-	 * the server already refused this connection, and the promise only says the socket closed.
-	 */
-	private reportReconnectFailure(error: unknown): void {
-		const authError = this.lastConnectionCloseError;
-		this.lastConnectionCloseError = null;
-		if (!this.isJudgesRoomJoined()) {
-			return;
-		}
-		const message = authError ?? (error instanceof Error ? error.message : 'Unknown error');
-		console.error('Failed to resume Judges Room after reconnect:', error);
-		if (!authError && (message === 'WebSocket connection failed' || message === 'WebSocket connection closed')) {
-			return;
-		}
-		this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
-		if (authError) {
-			AppUI.appPhase = 'leaving';
+			throw error;
 		}
 	}
 
@@ -336,11 +345,13 @@ export class App {
 
 	/**
 	 * Create a new Judges' Room over HTTP, then join it. Local state is applied by the join.
+	 * After rejection, callers may call `takeConnectionCloseReason()` for a more specific server close reason.
 	 */
 	async createJudgesRoom(input: StarterKit & { turnstileToken?: string }): Promise<void> {
-		this.lastConnectionCloseError = null;
 		let roomCreated = false;
 		try {
+			// Discard any reason from an earlier connection.
+			this.connectionCloseReason = null;
 			this.currentUser = null;
 			this.clientManager.resetClient();
 			this.clearPermitFromStorage();
@@ -353,10 +364,10 @@ export class App {
 			});
 
 			if (response.status === 403) {
-				throw new Error('Turnstile verification failed');
+				throw new Error(TurnstileVerificationFailedCloseReason);
 			}
 			if (!response.ok) {
-				throw new Error((await response.text()) || 'Failed to create room');
+				throw new Error(await response.text());
 			}
 
 			const created = CreateRoomResponseSchema.parse(await response.json());
@@ -366,14 +377,11 @@ export class App {
 			roomCreated = true;
 			await this.joinJudgesRoom();
 		} catch (error) {
-			const message = this.lastConnectionCloseError ?? (error instanceof Error ? error.message : 'Unknown error');
-			this.lastConnectionCloseError = null;
 			if (!roomCreated) {
 				this.permit = null;
 				this.clearPermitFromStorage();
 				this.clearUserFromStorage();
 			}
-			this.addErrorNotice(m.failed_to_create_judges_room({ error: message }));
 			throw error;
 		}
 	}
@@ -401,14 +409,14 @@ export class App {
 	 */
 	async leaveJudgesRoom(): Promise<void> {
 		// Ask the server to kick siblings, forget this device, and force-close this socket.
-		// The mutation often rejects when kickClient closes us; that is expected.
-		this.intentionalLeave = true;
+		// The mutation often rejects when that close lands; that is expected.
+		// onClosed tells this leave from a real kick by LeftJudgesRoomCloseReason.
 		try {
 			if (this.getConnectionState() === 'connected') {
 				await this.wrpcClient.handshake.leaveJudgesRoom.mutation();
 			}
 		} catch (error) {
-			// Socket may already be closed by kickClient — ignore.
+			// Socket may already be closed by the leave close — ignore.
 			console.debug('leaveJudgesRoom server notify finished:', error);
 		}
 
@@ -432,7 +440,8 @@ export class App {
 		this.clearPermitFromStorage();
 		this.clearUserFromStorage();
 		forgetJudgeGuideNoticeDismissals();
-		this.intentionalLeave = false;
+		// Leave consumes and clears any recorded close reason before returning.
+		this.connectionCloseReason = null;
 	}
 
 	/**
@@ -442,36 +451,17 @@ export class App {
 		await this.wrpcClient.handshake.destroyJudgesRoom.mutation();
 	}
 
-	/**
-	 * Reconnect to stored Judges' Room
-	 */
-	async joinJudgesRoomWithStoredPermit(): Promise<void> {
-		this.lastConnectionCloseError = null;
-		try {
-			await this.joinJudgesRoom();
-		} catch (error) {
-			const message = this.lastConnectionCloseError ?? (error instanceof Error ? error.message : 'Unknown error');
-			this.lastConnectionCloseError = null;
-			if (message.includes('Access link') || message.includes('Invalid or expired') || message.includes('already bound')) {
-				this.permit = null;
-				this.clearPermitFromStorage();
-				this.clearUserFromStorage();
-			}
-			this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
-			throw new Error(message);
-		}
-	}
-
 	getConnectionState(): ConnectionState {
 		return this.connectionState;
 	}
 
 	/**
-	 * The socket stops retrying after several failures and stays on `error`.
-	 * Open a new one and rejoin. Tabs stay mounted, so an unsaved rubric is kept.
+	 * Consume and clear the recorded server close reason, if any.
 	 */
-	retryConnection(): void {
-		void this.resumeJudgesRoom();
+	takeConnectionCloseReason(): string | null {
+		const reason = this.connectionCloseReason;
+		this.connectionCloseReason = null;
+		return reason;
 	}
 
 	getSessionEpoch(): number {
@@ -926,29 +916,34 @@ export class App {
 			onContext: async () => ({}),
 			onOpen: () => {},
 			onClosed: (code, reason) => {
+				// Save reasons that the in-flight operation may need to report.
 				if (code === ConnectionCloseCode.KICKED) {
-					if (this.intentionalLeave) {
+					if (reason === LeftJudgesRoomCloseReason) {
 						// Server closed us as part of leaveJudgesRoom — cleanup continues there.
+						this.connectionCloseReason = reason;
 						return;
-					}
-					if (isConnectAuthCloseReason(reason)) {
-						// Accept-then-close auth denial — join/reconnect catch uses this over the generic WS error.
-						this.lastConnectionCloseError = reason;
+					} else if (isConnectAuthCloseReason(reason)) {
+						// Connection closed us due to auth denial
+						// Server first accepts the connection, then closes it with an auth close reason.
+						this.connectionCloseReason = reason;
 						return;
-					}
-					if (reason === RoomNotFoundCloseReason) {
-						this.lastConnectionCloseError = m.judges_room_not_found();
+					} else if (reason === RoomNotFoundCloseReason) {
+						// Server closed us due to room not found.
+						this.connectionCloseReason = reason;
 						return;
+					} else {
+						// Unintentional connection close by the server.
+						// This could be, for example, the Judge Advisor kicking us out.
+						this.addErrorNotice(m.you_have_been_kicked_from_the_judges_room());
+						AppUI.appPhase = 'leaving'; // leaveJudgesRoom will be executed there.
 					}
-					this.permit = null;
-					this.currentUser = null;
-					this.clearPermitFromStorage();
-					this.clearUserFromStorage();
-					this.addErrorNotice(m.you_have_been_kicked_from_the_judges_room());
-					AppUI.appPhase = 'leaving';
 				} else if (code === ConnectionCloseCode.ROOM_DESTROYED) {
+					// Server closed us due to Judge Advisor destroying the room.
 					this.addErrorNotice(m.the_judges_room_has_been_destroyed());
-					AppUI.appPhase = 'leaving';
+					AppUI.appPhase = 'leaving'; // leaveJudgesRoom will be executed there.
+				} else {
+					// Unintentional connection close by various reasons.
+					// We keep the error silent here.
 				}
 			},
 			onConnectionStateChange: (state) => {
@@ -958,8 +953,24 @@ export class App {
 				if (!step.resume) {
 					return;
 				}
+				// Only a close during this rejoin counts. A reason from an earlier socket is stale.
+				this.connectionCloseReason = null;
 				void this.rejoinJudgesRoom().catch((error) => {
-					this.reportReconnectFailure(error);
+					// Automatic reconnect consumes and clears the recorded reason internally.
+					const closeReason = this.connectionCloseReason;
+					this.connectionCloseReason = null;
+					const reason = closeReason ?? errorToString(error);
+					const message = translateConnectionCloseReason(reason);
+					console.error('Failed to resume Judges Room after reconnect:', error);
+
+					if (message) {
+						this.addErrorNotice(m.failed_to_reconnect_to_judges_room({ error: message }));
+					}
+					// Auth denial and a missing room will not succeed on another retry.
+					// closeReason is null for a plain socket drop; isConnectAuthCloseReason expects a string.
+					if (closeReason && (isConnectAuthCloseReason(closeReason) || closeReason === RoomNotFoundCloseReason)) {
+						AppUI.appPhase = 'leaving';
+					}
 				});
 			}
 		};
@@ -1023,4 +1034,24 @@ export class App {
 	private clearUserFromStorage(): void {
 		this.storage.remove('currentUser');
 	}
+}
+
+export function translateConnectionCloseReason(reason: string | null): string | null {
+	// No reason, no message.
+	if (!reason) return null;
+
+	if (reason === TurnstileVerificationFailedCloseReason) return m.turnstile_verification_failed_close_reason();
+
+	// Intentional leave, part of the leaveJudgesRoom process.
+	if (reason === LeftJudgesRoomCloseReason) return null;
+
+	if (reason === ConnectAuthCloseReason.ACCESS_LINK_REQUIRED) return m.access_link_required();
+	if (reason === ConnectAuthCloseReason.INVALID_ACCESS_LINK) return m.invalid_or_expired_access_link();
+	if (reason === ConnectAuthCloseReason.DEVICE_AUTH_CONFLICT) return m.device_already_authenticated_with_different_credentials();
+	if (reason === ConnectAuthCloseReason.TOO_MANY_CONNECTIONS) return m.too_many_connections_for_this_access_link();
+	if (reason === RoomNotFoundCloseReason) return m.judges_room_not_found();
+
+	if (reason === WebSocketConnectionFailedCloseReason) return m.websocket_connection_failed();
+
+	return reason;
 }

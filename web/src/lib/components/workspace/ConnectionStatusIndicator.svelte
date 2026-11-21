@@ -2,6 +2,9 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
+	import { translateConnectionCloseReason } from '$lib/app.svelte';
+	import { errorToString } from '$lib/utils.svelte';
+	import { WebSocketConnectionFailedCloseReason } from '@judgesroom.com/protocol/src/room-id';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let isJudgesRoomJoined = $derived(app.isJudgesRoomJoined());
@@ -43,6 +46,23 @@
 				return m.unknown();
 		}
 	}
+
+	async function handleRetryConnection() {
+		try {
+			await app.resumeJudgesRoom();
+		} catch (error) {
+			const closeReason = app.takeConnectionCloseReason();
+			const reason = closeReason || errorToString(error);
+
+			// No need to show a message for this error.
+			if (!closeReason && reason === WebSocketConnectionFailedCloseReason) return;
+
+			const message = translateConnectionCloseReason(reason);
+			if (message) {
+				app.addErrorNotice(message);
+			}
+		}
+	}
 </script>
 
 <!-- Connection Status Indicator -->
@@ -51,7 +71,7 @@
 	<div class="flex items-center space-x-1 pl-2">
 		<div class="h-2 w-2 rounded-full {getStatusColor(connectionState)}"></div>
 		{#if canRetry}
-			<button type="button" class="text-xs text-nowrap text-red-800 underline" onclick={() => app.retryConnection()}>
+			<button type="button" class="text-xs text-nowrap text-red-800 underline" onclick={handleRetryConnection}>
 				{m.retry_connection()}
 			</button>
 		{:else}

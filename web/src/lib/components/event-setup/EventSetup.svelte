@@ -18,6 +18,8 @@
 	import { DEFAULT_RUBRIC_SCORE_STEP } from '@judgesroom.com/protocol/src/event';
 	import EventCodeSetup from './EventCodeSetup.svelte';
 	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
+	import { translateConnectionCloseReason } from '$lib/app.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 
 	// Step management
 	let currentStep = $state(0);
@@ -298,7 +300,12 @@
 			return true;
 		} catch (error) {
 			console.error('Failed to complete setup:', error);
-			// You might want to show an error message to the user here
+
+			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			if (message) {
+				app.addErrorNotice(message);
+			}
+
 			// TODO: This will be a major issue, ask the user to report the issue to the developer
 			return false;
 		}

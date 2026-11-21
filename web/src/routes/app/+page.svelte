@@ -12,10 +12,11 @@
 	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
 	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
 	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
-	import { parseAuthTokenFromUrl, parseJudgesRoomUrl } from '$lib/utils.svelte';
+	import { errorToString, parseAuthTokenFromUrl, parseJudgesRoomUrl } from '$lib/utils.svelte';
 	import Notice from '$lib/components/notice/Notice.svelte';
 	import Leaving from '$lib/components/leaving/Leaving.svelte';
 	import I18n from '$lib/components/i18n/I18n.svelte';
+	import { translateConnectionCloseReason } from '$lib/app.svelte';
 
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
@@ -92,11 +93,11 @@
 		} catch (error) {
 			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
-			dialogs.showAlert({
-				title: m.failed_to_join(),
-				message: m.failed_to_join_judges_room({ error: error instanceof Error ? error.message : String(error) }),
-				confirmButtonClass: 'primary'
-			});
+
+			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			if (message) {
+				dialogs.showAlert({ title: m.failed_to_join(), message: message, confirmButtonClass: 'primary' });
+			}
 		}
 	}
 
@@ -105,15 +106,14 @@
 			AppUI.appPhase = 'joining_judges_room';
 			await app.joinJudgesRoomWithStoredPermit();
 		} catch (error) {
-			// Permit in storage but couldn't be used, show choice
-			// TODO: handle this case
+			// Permit in storage but couldn't be used
 			console.error('Error rejoining stored permit:', error);
 			AppUI.appPhase = 'begin';
-			dialogs.showAlert({
-				title: m.failed_to_rejoin(),
-				message: m.failed_to_rejoin_judges_room({ error: error + '' }),
-				confirmButtonClass: 'primary'
-			});
+
+			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			if (message) {
+				dialogs.showAlert({ title: m.failed_to_rejoin(), message: message, confirmButtonClass: 'primary' });
+			}
 		}
 	}
 

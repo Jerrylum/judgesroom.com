@@ -5,6 +5,7 @@
     "": {
       "name": "judgesroom.com",
       "devDependencies": {
+        "@types/node": "^24.2.1",
         "typescript": "^5.0.0",
       },
     },
@@ -30,7 +31,7 @@
       "name": "@judgesroom.com/web",
       "version": "0.0.0",
       "dependencies": {
-        "@jerrylum/wrpc": "^1.2.0",
+        "@jerrylum/wrpc": "^1.3.0",
         "@judgesroom.com/protocol": "workspace:*",
         "crypto-js": "^4.2.0",
         "dompurify": "^3.3.1",
@@ -79,7 +80,7 @@
       "name": "@judgesroom.com/worker",
       "version": "0.0.0",
       "dependencies": {
-        "@jerrylum/wrpc": "^1.2.0",
+        "@jerrylum/wrpc": "^1.3.0",
         "@judgesroom.com/protocol": "workspace:*",
         "@judgesroom.com/web": "workspace:*",
         "drizzle-orm": "^0.45.2",
@@ -274,7 +275,7 @@
 
     "@inlang/sdk": ["@inlang/sdk@2.4.10", "", { "dependencies": { "@lix-js/sdk": "0.4.7", "@sinclair/typebox": "^0.31.17", "kysely": "^0.27.4", "sqlite-wasm-kysely": "0.3.0", "uuid": "^10.0.0" } }, "sha512-MLcYSb9ERwvyfxMsMXGjmAYfh6Bn/rkT58ffkibWxbFLiL3ejSdmLGP8Wl7118dMo6nj2PXTcEPzUw+2YPQ62Q=="],
 
-    "@jerrylum/wrpc": ["@jerrylum/wrpc@1.2.0", "", { "peerDependencies": { "zod": "^4.0.0" } }, "sha512-nYd7nBY2kVFeD4M7AmjxnvhHw0O68ztXhOw9DtS+26IgQ7MFu177SJOl2GaMG6fOf6Wk6iI22QpV1OioL3C/nw=="],
+    "@jerrylum/wrpc": ["@jerrylum/wrpc@1.3.0", "", { "peerDependencies": { "zod": "^4.0.0" } }, "sha512-//z5+HH/H17Pv9IitcFODivEiQZhx/qvMSy5AvmSeAcjGQUw2Z14+yxuHw+n30OktWfeCtE6ldJe/BEdqs0Djw=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 
@@ -1024,7 +1025,7 @@
 
     "ws": ["ws@8.18.3", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg=="],
 
-    "xlsx": ["xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz", { "bin": { "xlsx": "./bin/xlsx.njs" } }],
+    "xlsx": ["xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz", { "bin": { "xlsx": "./bin/xlsx.njs" } }, "sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA=="],
 
     "y18n": ["y18n@4.0.3", "", {}, "sha512-JKhqTOwSrqNA1NY5lSztJ1GrBiUodLMmIZuLiDaMRJ+itFd+ABVE8XBjOvIWL+rSqNDC74LCSFmlb/U4UZ4hJQ=="],
 

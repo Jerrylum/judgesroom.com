@@ -8,6 +8,7 @@ import { offlineDevices } from '../db/schema';
 import { transaction } from '../utils';
 import { getAwardNoWinners, getFinalAwardNominations } from './judging';
 import { generateAuthToken, uncontrolledAuthentication, type ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import { LeftJudgesRoomCloseReason } from '@judgesroom.com/protocol/src/room-id';
 import { JoiningKitSchema, StarterKitSchema, type JoiningKit, type RoomState, type StarterKit } from '@judgesroom.com/protocol/src/room';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
 
@@ -55,7 +56,11 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 		leaveJudgesRoom: w.procedure.mutation(async ({ ctx, session }) => {
 			// Same as kickDevice for this device: close every socket (including the leaver) and
 			// forget OfflineDevices. leaveJudgesRoom is the self-service path (no JA check).
-			await ctx.network.kickDevice(session.currentClient.deviceId);
+			// The calling socket gets a distinct close reason so it can skip the kick notice.
+			await ctx.network.kickDevice(session.currentClient.deviceId, {
+				clientId: session.currentClient.clientId,
+				reason: LeftJudgesRoomCloseReason
+			});
 			broadcastDeviceListUpdate(ctx, session);
 		}),
 
