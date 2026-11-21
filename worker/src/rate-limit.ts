@@ -9,9 +9,7 @@ export const TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS';
  */
 export async function consumeWriteBudget(limiter: RateLimit, roomId: string, weight: number): Promise<void> {
 	const delta = Math.max(1, Math.floor(weight));
-	// Weight 1 is the binding default. Omit delta so Wrangler 4.118 local dev does not need the weighted-request API.
-	const options = delta === 1 ? { key: roomId } : ({ key: roomId, delta } as RateLimitOptions);
-	const { success } = await limiter.limit(options);
+	const { success } = await limiter.limit({ key: roomId, delta });
 	if (!success) {
 		throw new WRPCError('Too Many Requests', TOO_MANY_REQUESTS);
 	}

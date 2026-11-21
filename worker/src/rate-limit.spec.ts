@@ -13,7 +13,15 @@ describe('consumeWriteBudget', () => {
 
 		await consumeWriteBudget(binding, 'room-1', 1);
 
-		expect(limit).toHaveBeenCalledWith({ key: 'room-1' });
+		expect(limit).toHaveBeenCalledWith({ key: 'room-1', delta: 1 });
+	});
+
+	it('charges the requested weight', async () => {
+		const { limit, binding } = limiter(true);
+
+		await consumeWriteBudget(binding, 'room-1', 3);
+
+		expect(limit).toHaveBeenCalledWith({ key: 'room-1', delta: 3 });
 	});
 
 	it('throws Too Many Requests when the limiter rejects', async () => {
