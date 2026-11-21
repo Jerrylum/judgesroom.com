@@ -6,6 +6,7 @@
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import { mutationNotice, errorToString } from '$lib/utils.svelte';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');
@@ -28,9 +29,14 @@
 
 		const judge = app.findJudgeById(selectedJudgeId);
 		if (judge) {
-			const user: User = { role: 'judge', judge };
-			await app.selectUser(user);
-			dialogs.closeDialog();
+			try {
+				const user: User = { role: 'judge', judge };
+				await app.selectUser(user);
+				dialogs.closeDialog();
+			} catch (error) {
+				console.error('Failed to select existing judge:', error);
+				app.addErrorNotice(mutationNotice(error, errorToString(error)));
+			}
 		}
 	}
 
@@ -50,6 +56,7 @@
 			dialogs.closeDialog();
 		} catch (error) {
 			console.error('Failed to create new judge:', error);
+			app.addErrorNotice(mutationNotice(error, errorToString(error)));
 		}
 	}
 

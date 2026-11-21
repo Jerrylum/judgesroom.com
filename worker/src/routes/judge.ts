@@ -46,6 +46,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			await ctx.limits.consumeWriteBudget(1);
 			await upsertJudge(ctx.db, input);
 
 			// Do not wait for the broadcast to complete

@@ -13,11 +13,17 @@ import { buildAccessRoute } from './routes/access';
 import { buildRobotEventsRoute } from './routes/robotevents';
 import type { PhotosBucket } from './media/types';
 
+export interface ServerLimits {
+	/** Charge the room write budget before a SQLite write. Weight 1 is one write statement. */
+	consumeWriteBudget: (weight: number) => Promise<void>;
+}
+
 export interface ServerContext {
 	db: DrizzleSqliteDODatabase;
 	network: JudgesRoomNetwork;
 	photos: PhotosBucket;
 	auth: Authentication;
+	limits: ServerLimits;
 }
 
 export type Transaction = Parameters<Parameters<DrizzleSqliteDODatabase['transaction']>[0]>[0];

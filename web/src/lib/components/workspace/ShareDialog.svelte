@@ -6,7 +6,7 @@
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
 
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state(m.copy());
@@ -28,6 +28,7 @@
 			await app.kickDevice(targetDeviceId);
 		} catch (error) {
 			console.error('Failed to kick device:', error);
+			app.addErrorNotice(m.failed_to_kick_device({ error: errorToString(error) }));
 		}
 	}
 

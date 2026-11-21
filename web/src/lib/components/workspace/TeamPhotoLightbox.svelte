@@ -6,6 +6,7 @@
 	import { deleteTeamPhoto, getPhotoObjectUrl } from '$lib/media';
 	import { app, dialogs, subscriptions } from '$lib/index.svelte';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
+	import { mutationNotice } from '$lib/utils.svelte';
 
 	interface Props {
 		open: boolean;
@@ -103,8 +104,7 @@
 			if (nextPhoto) onPhotoIdChange(nextPhoto.id);
 			delete subscriptions.allTeamPhotos[deletedId];
 		} catch (error) {
-			const message = error instanceof Error ? error.message : m.photo_delete_failed();
-			app.addErrorNotice(message);
+			app.addErrorNotice(mutationNotice(error, error instanceof Error ? error.message : m.photo_delete_failed()));
 		}
 	}
 </script>

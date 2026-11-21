@@ -2,6 +2,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { mutationNotice } from '$lib/utils.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 
 	interface Props {
@@ -63,8 +64,8 @@
 			dialogs.closeDialog(true);
 		} catch (error) {
 			console.error('Failed to update team data:', error);
-			validationError = m.failed_to_save_team_data_please_try_again();
-			app.addErrorNotice(m.failed_to_save_team_data());
+			validationError = mutationNotice(error, m.failed_to_save_team_data_please_try_again());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_save_team_data()));
 		} finally {
 			isSaving = false;
 		}

@@ -6,6 +6,7 @@
 	import { type User } from '$lib/user.svelte';
 	import { app, AppUI } from '$lib/index.svelte';
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
+	import { mutationNotice, errorToString } from '$lib/utils.svelte';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');
@@ -27,9 +28,14 @@
 
 		const judge = app.findJudgeById(selectedJudgeId);
 		if (judge) {
-			const user: User = { role: 'judge', judge };
-			await app.selectUser(user);
-			AppUI.appPhase = 'workspace';
+			try {
+				const user: User = { role: 'judge', judge };
+				await app.selectUser(user);
+				AppUI.appPhase = 'workspace';
+			} catch (error) {
+				console.error('Failed to select existing judge:', error);
+				app.addErrorNotice(mutationNotice(error, errorToString(error)));
+			}
 		}
 	}
 
@@ -49,6 +55,7 @@
 			AppUI.appPhase = 'workspace';
 		} catch (error) {
 			console.error('Failed to create new judge:', error);
+			app.addErrorNotice(mutationNotice(error, errorToString(error)));
 		}
 	}
 

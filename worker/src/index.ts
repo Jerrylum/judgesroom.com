@@ -25,8 +25,8 @@ import { incomingMessageTooLargeResponse, isIncomingWebSocketMessageTooLarge } f
 import { sqliteRoomWasInitialized } from './durable-room-state';
 import { EMPTY_ROOM_TTL_MS, retentionDecision } from './retention';
 import { handleCreateRoom } from './create-room';
-import { hasEssentialData } from './routes/essential';
 import { createJudgesRoomRecord } from './routes/handshake';
+import { consumeWriteBudget } from './rate-limit';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -153,7 +153,9 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			db: this.db,
 			network: this.network,
 			photos: this.photos,
-			auth: Authentication.unauthenticated()
+			auth: Authentication.unauthenticated(),
+			// HTTP media routes are not wrpc writes. They do not draw on this budget.
+			limits: { consumeWriteBudget: async () => {} }
 		};
 	}
 
@@ -176,7 +178,10 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 					}
 					ws.serializeAttachment({ ...current, authentication: nextAuthentication } satisfies WsAttachment);
 				}
-			})
+			}),
+			limits: {
+				consumeWriteBudget: (weight) => consumeWriteBudget(this.env.DB_WRITE_LIMITER, attachment.roomId, weight)
+			}
 		};
 	}
 

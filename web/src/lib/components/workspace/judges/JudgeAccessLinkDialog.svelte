@@ -101,6 +101,7 @@
 			await app.kickDevice(targetDeviceId);
 		} catch (error) {
 			console.error('Failed to kick device:', error);
+			app.addErrorNotice(m.failed_to_kick_device({ error: errorToString(error) }));
 		}
 	}
 

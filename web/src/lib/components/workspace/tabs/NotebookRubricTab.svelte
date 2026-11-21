@@ -4,7 +4,7 @@
 	import './rubric.css';
 	import { app, tabs, subscriptions } from '$lib/index.svelte';
 	import type { NotebookRubricTab } from '$lib/tab.svelte';
-	import { generateUUID } from '$lib/utils.svelte';
+	import { generateUUID, mutationNotice } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
@@ -227,7 +227,7 @@
 			app.addSuccessNotice(m.notebook_rubric_saved_successfully());
 		} catch (error) {
 			console.error('Failed to save notebook rubric:', error);
-			app.addErrorNotice(m.failed_to_save_notebook_rubric());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_save_notebook_rubric()));
 		}
 	}
 
@@ -270,7 +270,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to update notebook status:', error);
-			app.addErrorNotice(m.failed_to_update_notebook_status());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_notebook_status()));
 		} finally {
 			isUpdatingNotebookStatus = false;
 		}

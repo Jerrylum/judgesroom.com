@@ -15,6 +15,7 @@
 	} from '$lib/tab.svelte';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
 	import { gtag } from '$lib/index.svelte';
+	import { mutationNotice } from '$lib/utils.svelte';
 	import NotebookIcon from '$lib/icon/NotebookIcon.svelte';
 	import ChatIcon from '$lib/icon/ChatIcon.svelte';
 
@@ -96,7 +97,7 @@
 			app.addSuccessNotice(m.award_deliberation_started());
 		} catch (error) {
 			console.error('Failed to start award deliberation:', error);
-			app.addErrorNotice(m.failed_to_start_award_deliberation());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_start_award_deliberation()));
 		}
 	}
 </script>

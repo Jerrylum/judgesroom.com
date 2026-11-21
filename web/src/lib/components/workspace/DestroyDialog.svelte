@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, dialogs } from '$lib/index.svelte';
+	import { mutationNotice } from '$lib/utils.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 
 	let destroyConfirmText = $state('');
@@ -17,6 +18,7 @@
 
 			await app.destroyJudgesRoomData(); // It will throw error
 		} catch (error) {
+			app.addErrorNotice(mutationNotice(error, m.failed_to_destroy_judges_room_data()));
 			dialogs.closeDialog(true);
 		} finally {
 			isDestroying = false;

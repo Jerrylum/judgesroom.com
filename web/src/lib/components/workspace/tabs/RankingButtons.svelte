@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
+	import { errorToString, mutationNotice } from '$lib/utils.svelte';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
@@ -40,6 +41,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to update award ranking:', error);
+			app.addErrorNotice(mutationNotice(error, errorToString(error)));
 		}
 	}
 

@@ -9,6 +9,7 @@
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
 	import { scrollSync } from '$lib/scroll-sync.svelte';
+	import { mutationNotice } from '$lib/utils.svelte';
 
 	interface SubmittedNotebook {
 		rubricId: string;
@@ -32,7 +33,7 @@
 				notebookDevelopmentStatus
 			});
 		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_notebook_status());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_notebook_status()));
 		}
 	}
 

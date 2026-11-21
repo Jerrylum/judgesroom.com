@@ -13,6 +13,7 @@
 	import EnlargeIcon from '$lib/icon/EnlargeIcon.svelte';
 	import ReduceIcon from '$lib/icon/ReduceIcon.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { mutationNotice } from '$lib/utils.svelte';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -44,7 +45,9 @@
 	const allExcellenceAwards = $derived(allAwards.filter((award) => isExcellenceAward(award.name)));
 	const teamEligibilities = $derived<ExcellenceAwardTeamEligibility[] | undefined>(
 		robotEventsCache.excellencePayload && allExcellenceAwards.length > 0
-			? Object.values(excellenceReportsFromInsight(robotEventsCache.excellencePayload, allExcellenceAwards)).flatMap((report) => report.teamsInGroup)
+			? Object.values(excellenceReportsFromInsight(robotEventsCache.excellencePayload, allExcellenceAwards)).flatMap(
+					(report) => report.teamsInGroup
+				)
 			: undefined
 	);
 	const allRemainingJudgedAwards = $derived(allAwards.filter((award) => award.type === 'judged' && !isExcellenceAward(award.name)));
@@ -144,7 +147,7 @@
 			await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName, teamId });
 		} catch (error) {
 			console.error('Failed to remove final nomination:', error);
-			app.addErrorNotice(m.failed_to_update_award_nominations());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
 		}
 	}
 
@@ -215,7 +218,12 @@
 	}
 
 	async function handleAddNomination(awardName: string, teamId: string) {
-		await app.wrpcClient.judging.nominateFinalAward.mutation({ awardName, teamId, judgeGroupId: null });
+		try {
+			await app.wrpcClient.judging.nominateFinalAward.mutation({ awardName, teamId, judgeGroupId: null });
+		} catch (error) {
+			console.error('Failed to nominate final award:', error);
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
+		}
 	}
 
 	async function handleSetAwardNoWinner(awardName: string, noWinner: boolean) {
@@ -223,7 +231,7 @@
 			await app.wrpcClient.judging.setAwardNoWinner.mutation({ awardName, noWinner });
 		} catch (error) {
 			console.error('Failed to update award no-winner:', error);
-			app.addErrorNotice(m.failed_to_update_award_no_winner());
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_no_winner()));
 		}
 	}
 

@@ -1,8 +1,21 @@
 import type { TeamData } from '@judgesroom.com/protocol/src/team';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
+import { m } from '$lib/paraglide/messages.js';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import { v4 } from 'uuid';
+
+/** wrpc error code for a room write-budget rejection. */
+export const TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS';
+
+export function isTooManyRequests(error: unknown): boolean {
+	return typeof error === 'object' && error !== null && 'code' in error && (error as { code?: unknown }).code === TOO_MANY_REQUESTS;
+}
+
+/** Localized rate-limit notice, or the caller's existing message. */
+export function mutationNotice(error: unknown, fallback: string): string {
+	return isTooManyRequests(error) ? m.too_many_requests() : fallback;
+}
 
 /**
  * Clipboard write (navigator.clipboard) requires a secure context.
@@ -109,6 +122,9 @@ export function buildJudgesRoomJoinUrl(origin: string, roomId: string, authToken
 }
 
 export function errorToString(error: unknown): string {
+	if (isTooManyRequests(error)) {
+		return m.too_many_requests();
+	}
 	if (error instanceof Error) {
 		return error.message;
 	}

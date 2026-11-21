@@ -44,6 +44,7 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 		}),
 
 		subscribeDeviceList: w.procedure.output(z.array(DeviceInfoSchema)).mutation(async ({ ctx, session }) => {
+			await ctx.limits.consumeWriteBudget(1);
 			await subscribeTopic(ctx.db, session.currentClient.clientId, 'deviceList');
 			return getDevices(ctx);
 		}),
@@ -56,6 +57,7 @@ export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record
 			if (await ctx.network.isAccessControlEnabled()) {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
+			await ctx.limits.consumeWriteBudget(1);
 			await ctx.network.kickDevice(input.deviceId);
 			// Always broadcast: already-offline kicks do not get a webSocketClose update.
 			broadcastDeviceListUpdate(ctx, session);

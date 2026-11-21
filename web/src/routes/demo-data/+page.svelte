@@ -2,6 +2,7 @@
 	import { app, dialogs } from '$lib/index.svelte';
 	import { env } from '$env/dynamic/public';
 	import { m } from '$lib/paraglide/messages.js';
+	import { errorToString } from '$lib/utils.svelte';
 	import TurnstileWidget from '$lib/components/event-setup/TurnstileWidget.svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
@@ -265,7 +266,7 @@
 			}
 		} catch (error) {
 			stepStatus[stepIndex] = 'error';
-			stepMessages[stepIndex] = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+			stepMessages[stepIndex] = `Error: ${errorToString(error)}`;
 			if (stepIndex === 0 && turnstileRequired) {
 				turnstileFailure = m.turnstile_verification_failed();
 			}

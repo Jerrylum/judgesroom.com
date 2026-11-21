@@ -132,6 +132,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 				throw new Error('Photo not found');
 			}
 
+			await ctx.limits.consumeWriteBudget(1);
 			// Drop the DB row first so clients stop listing the photo even if R2/purge fails.
 			await ctx.db.delete(teamPhotos).where(eq(teamPhotos.id, input.photoId));
 			await ctx.photos.delete(photo.id);

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app, AppUI } from '$lib/index.svelte';
+	import { mutationNotice, errorToString } from '$lib/utils.svelte';
 
 	// Watch for app data to become available and transition UI automatically
 	$effect(() => {
@@ -8,7 +9,12 @@
 			const currentUser = app.getCurrentUser();
 			if (currentUser) {
 				if (!app.isAccessControlEnabled()) {
-					void app.selectUser(currentUser);
+					// The stored role is already local. A failed roster upsert still enters the workspace.
+					// selectUser shows the notice; this catch only keeps the rejection handled.
+					void app.selectUser(currentUser).catch((error) => {
+						console.error('Failed to refresh the current user:', error);
+						app.addErrorNotice(mutationNotice(error, errorToString(error)));
+					});
 				}
 				AppUI.appPhase = 'workspace';
 			} else if (app.isAccessControlEnabled()) {

@@ -22,6 +22,8 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				throw new WRPCError("Judges' Room not found");
 			}
 
+			await ctx.limits.consumeWriteBudget(1);
+
 			const offlineDevice = {
 				deviceId: session.currentClient.deviceId,
 				deviceName: session.currentClient.deviceName,
@@ -54,6 +56,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 		}),
 
 		leaveJudgesRoom: w.procedure.mutation(async ({ ctx, session }) => {
+			await ctx.limits.consumeWriteBudget(1);
 			// Same as kickDevice for this device: close every socket (including the leaver) and
 			// forget OfflineDevices. leaveJudgesRoom is the self-service path (no JA check).
 			// The calling socket gets a distinct close reason so it can skip the kick notice.
@@ -69,6 +72,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			await ctx.limits.consumeWriteBudget(1);
 			await ctx.network.destroy();
 
 			return { success: true, message: "Judges' Room destroyed" };

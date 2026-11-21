@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
+	import { mutationNotice } from '$lib/utils.svelte';
 	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
@@ -36,10 +37,15 @@
 	}
 
 	async function onClick() {
-		if (isNominated || showExcellenceAwardWinners) {
-			await removeNomination();
-		} else if (!isDisabled) {
-			await addNomination();
+		try {
+			if (isNominated || showExcellenceAwardWinners) {
+				await removeNomination();
+			} else if (!isDisabled) {
+				await addNomination();
+			}
+		} catch (error) {
+			console.error('Failed to update final nomination:', error);
+			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
 		}
 	}
 

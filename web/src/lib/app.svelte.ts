@@ -18,10 +18,12 @@ import {
 	buildJudgesRoomJoinUrl,
 	errorToString,
 	generateUUID,
+	isTooManyRequests,
 	getDeviceNameFromUserAgent,
 	parseAuthTokenFromUrl,
 	parseJudgesRoomUrl,
-	processTeamDataArray
+	processTeamDataArray,
+	mutationNotice
 } from './utils.svelte';
 import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
@@ -424,7 +426,10 @@ export class App {
 				await this.wrpcClient.handshake.leaveJudgesRoom.mutation();
 			}
 		} catch (error) {
-			// Socket may already be closed by the leave close — ignore.
+			// Finish the local leave anyway.
+			// A successful server leave closes this socket, and that close rejects the in-flight call.
+			// TOO_MANY_REQUESTS means kickDevice never ran: the OfflineDevices row stays, and other
+			// tabs on this device stay in the room. This tab still disconnects below.
 			console.debug('leaveJudgesRoom server notify finished:', error);
 		}
 
@@ -629,6 +634,7 @@ export class App {
 			})
 			.catch((error) => {
 				console.error('Failed to subscribe to device list:', error);
+				this.addErrorNotice(mutationNotice(error, errorToString(error)));
 			});
 	}
 
@@ -650,12 +656,7 @@ export class App {
 	 * Kick a client from Judges' Room
 	 */
 	async kickDevice(deviceId: string): Promise<void> {
-		try {
-			await this.wrpcClient.device.kickDevice.mutation({ deviceId });
-		} catch (error) {
-			this.addErrorNotice(m.failed_to_kick_device({ error: error instanceof Error ? error.message : 'Unknown error' }));
-			throw error;
-		}
+		await this.wrpcClient.device.kickDevice.mutation({ deviceId });
 	}
 
 	// ============================================================================

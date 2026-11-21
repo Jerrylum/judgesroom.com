@@ -312,6 +312,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 		updateAwardRanking: w.procedure
 			.input(z.object({ judgeGroupId: z.uuidv4(), teamId: z.uuidv4(), awardName: AwardNameSchema, ranking: RankSchema }))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1);
 				// insert or update
 				await ctx.db
 					.insert(awardRankings)
@@ -359,6 +360,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 		nominateFinalAward: w.procedure
 			.input(z.object({ awardName: AwardNameSchema, teamId: z.uuidv4(), judgeGroupId: z.uuidv4().nullable() }))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1);
 				await transaction(ctx.db, async (tx) => {
 					const lastRanking =
 						(
@@ -382,6 +384,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 		removeFromFinalAwardNominations: w.procedure
 			.input(z.object({ awardName: AwardNameSchema, teamId: z.uuidv4() }))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1);
 				await transaction(ctx.db, async (tx) => {
 					await tx
 						.delete(finalAwardNominations)
@@ -424,6 +427,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 		setAwardNoWinner: w.procedure
 			.input(z.object({ awardName: AwardNameSchema, noWinner: z.boolean() }))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1);
 				await transaction(ctx.db, async (tx) => {
 					if (input.noWinner) {
 						await tx.insert(awardNoWinners).values({ awardName: input.awardName }).onConflictDoNothing();
@@ -439,6 +443,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			}),
 
 		startAwardDeliberation: w.procedure.mutation(async ({ ctx, session }) => {
+			await ctx.limits.consumeWriteBudget(1);
 			// Update the judging step to 'award_deliberations' in the event metadata
 			await ctx.db.update(metadata).set({ judgingStep: 'award_deliberations' });
 

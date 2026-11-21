@@ -41,6 +41,7 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 			.mutation(async ({ ctx, input, session }) => {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 
+				await ctx.limits.consumeWriteBudget(1);
 				const authToken = generateAuthToken();
 				const updated = await ctx.db.update(judges).set({ authToken }).where(eq(judges.id, input.judgeId)).returning();
 				if (updated.length === 0) {
@@ -58,6 +59,7 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 		rotateJudgeAdvisorAuth: w.procedure.output(z.object({ authToken: AuthTokenSchema })).mutation(async ({ ctx, session }) => {
 			assertAuthenticatedJudgeAdvisor(ctx.auth);
 
+			await ctx.limits.consumeWriteBudget(1);
 			const authToken = generateAuthToken();
 			const authentication = {
 				isAccessControlled: true as const,
