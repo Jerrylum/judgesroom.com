@@ -6,7 +6,7 @@
 	import CloseIcon from '$lib/icon/CloseIcon.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		name: string;
@@ -78,7 +78,7 @@
 			dialogs.closeDialog(app.getJudgesRoomUrl(authToken));
 		} catch (error) {
 			console.error('Failed to rotate access link:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 

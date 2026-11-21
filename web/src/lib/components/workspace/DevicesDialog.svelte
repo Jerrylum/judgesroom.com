@@ -7,7 +7,7 @@
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
 	import type { DeviceAuthenticated } from '@judgesroom.com/protocol/src/access';
 	import type { DeviceInfo } from '@judgesroom.com/protocol/src/client';
 
@@ -114,7 +114,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to rotate access link:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 

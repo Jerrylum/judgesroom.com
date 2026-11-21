@@ -5,7 +5,7 @@
 	import RemoveJudgeConfirmDialog from './RemoveJudgeConfirmDialog.svelte';
 	import RowOverflowMenu from './RowOverflowMenu.svelte';
 	import { JudgeNameSchema } from '@judgesroom.com/protocol/src/judging';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		rowKey: string;
@@ -41,7 +41,7 @@
 			app.addSuccessNotice(m.copied());
 		} catch (error) {
 			console.error('Failed to copy access link:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 
@@ -77,7 +77,7 @@
 			await openAccessLinkDialog(app.getJudgesRoomUrl(nextToken));
 		} catch (error) {
 			console.error('Failed to rotate access link:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 
@@ -99,7 +99,7 @@
 			await app.wrpcClient.judge.updateJudge.mutation({ id: judgeId, name: parsed.data, groupId });
 		} catch (error) {
 			console.error('Failed to rename judge:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 
@@ -139,7 +139,7 @@
 			onAccessLinksChanged?.();
 		} catch (error) {
 			console.error('Failed to remove judge:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 </script>

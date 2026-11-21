@@ -4,7 +4,7 @@
 	import JudgeRow from './JudgeRow.svelte';
 	import TeamRow from './TeamRow.svelte';
 	import { JudgeNameSchema } from '@judgesroom.com/protocol/src/judging';
-	import { generateUUID } from '$lib/utils.svelte';
+	import { errorToString, generateUUID } from '$lib/utils.svelte';
 
 	interface Props {
 		groupId: string;
@@ -86,7 +86,7 @@
 			onAccessLinksChanged?.();
 		} catch (error) {
 			console.error('Failed to add judge:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		} finally {
 			adding = false;
 		}

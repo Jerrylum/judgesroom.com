@@ -3,6 +3,7 @@
 	import { app, dialogs } from '$lib/index.svelte';
 	import Dialog from '$lib/components/dialog/Dialog.svelte';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
+	import { errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		teamId: string;
@@ -28,7 +29,7 @@
 			dialogs.closeDialog(true);
 		} catch (error) {
 			console.error('Failed to reassign team:', error);
-			app.addErrorNotice(error instanceof Error ? error.message : String(error));
+			app.addErrorNotice(errorToString(error));
 		}
 	}
 
