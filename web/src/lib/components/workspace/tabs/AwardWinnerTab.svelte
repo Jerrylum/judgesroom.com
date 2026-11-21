@@ -4,6 +4,7 @@
 	import type { AwardWinnerTab } from '$lib/tab.svelte';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import { sortByTeamNumber } from '$lib/team.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '$lib/award.svelte';
 	import AwardWinnersReportDialog, { type TeamPresentationConfig } from './AwardWinnersReportDialog.svelte';
 
@@ -42,7 +43,7 @@
 			});
 		} catch (error) {
 			console.error('Failed to update final rankings:', error);
-			app.addErrorNotice(m.failed_to_update_award_selections());
+			app.addErrorNotice(m.failed_to_update_award_selections({ error: errorToString(error) }));
 		}
 	}
 

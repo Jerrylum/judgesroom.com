@@ -18,12 +18,10 @@ import {
 	buildJudgesRoomJoinUrl,
 	errorToString,
 	generateUUID,
-	isTooManyRequests,
 	getDeviceNameFromUserAgent,
 	parseAuthTokenFromUrl,
 	parseJudgesRoomUrl,
-	processTeamDataArray,
-	mutationNotice
+	processTeamDataArray
 } from './utils.svelte';
 import { AppUI } from './index.svelte';
 import type { TeamInfoAndData } from './team.svelte';
@@ -634,7 +632,7 @@ export class App {
 			})
 			.catch((error) => {
 				console.error('Failed to subscribe to device list:', error);
-				this.addErrorNotice(mutationNotice(error, errorToString(error)));
+				this.addErrorNotice(errorToString(error));
 			});
 	}
 

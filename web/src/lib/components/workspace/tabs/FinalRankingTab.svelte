@@ -13,7 +13,7 @@
 	import EnlargeIcon from '$lib/icon/EnlargeIcon.svelte';
 	import ReduceIcon from '$lib/icon/ReduceIcon.svelte';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { mutationNotice } from '$lib/utils.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -78,7 +78,7 @@
 			await app.wrpcClient.judging.updateFinalRankingsBatch.mutation({ rankings });
 		} catch (error) {
 			console.error('Failed to update judged award nominations:', error);
-			app.addErrorNotice(m.failed_to_update_award_nominations());
+			app.addErrorNotice(m.failed_to_update_award_nominations({ error: errorToString(error) }));
 			throw error;
 		}
 	}
@@ -147,7 +147,7 @@
 			await app.wrpcClient.judging.removeFromFinalAwardNominations.mutation({ awardName, teamId });
 		} catch (error) {
 			console.error('Failed to remove final nomination:', error);
-			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
+			app.addErrorNotice(m.failed_to_update_award_nominations({ error: errorToString(error) }));
 		}
 	}
 
@@ -222,7 +222,7 @@
 			await app.wrpcClient.judging.nominateFinalAward.mutation({ awardName, teamId, judgeGroupId: null });
 		} catch (error) {
 			console.error('Failed to nominate final award:', error);
-			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
+			app.addErrorNotice(m.failed_to_update_award_nominations({ error: errorToString(error) }));
 		}
 	}
 
@@ -231,7 +231,7 @@
 			await app.wrpcClient.judging.setAwardNoWinner.mutation({ awardName, noWinner });
 		} catch (error) {
 			console.error('Failed to update award no-winner:', error);
-			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_no_winner()));
+			app.addErrorNotice(m.failed_to_update_award_no_winner({ error: errorToString(error) }));
 		}
 	}
 
@@ -239,7 +239,9 @@
 		const status = await robotEventsCache.refresh(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
 		if (status === 'failed') {
 			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
-			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents());
+			app.addErrorNotice(
+				m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError })
+			);
 		}
 	}
 
@@ -251,7 +253,9 @@
 		void robotEventsCache.retain(eventId, divisionId, EXCELLENCE_ROBOT_EVENTS_RESOURCES).then((status) => {
 			if (cancelled || status !== 'failed') return;
 			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
-			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents());
+			app.addErrorNotice(
+				m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError })
+			);
 		});
 		return () => {
 			cancelled = true;

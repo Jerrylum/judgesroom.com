@@ -7,7 +7,7 @@
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
-	import { mutationNotice } from '$lib/utils.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		team: TeamInfoAndData;
@@ -27,7 +27,7 @@
 				notebookDevelopmentStatus
 			});
 		} catch (error) {
-			app.addErrorNotice(mutationNotice(error, m.failed_to_update_notebook_status()));
+			app.addErrorNotice(m.failed_to_update_notebook_status({ error: errorToString(error) }));
 		}
 	}
 

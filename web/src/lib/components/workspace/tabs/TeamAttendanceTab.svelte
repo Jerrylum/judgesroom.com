@@ -7,7 +7,7 @@
 	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
 	import { sortByTeamNumber } from '$lib/team.svelte';
 	import { ATTENDANCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
-	import { isTooManyRequests } from '$lib/utils.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		isActive: boolean;
@@ -114,12 +114,10 @@
 			}
 		} catch (error) {
 			app.addErrorNotice(
-				isTooManyRequests(error)
-					? m.too_many_requests()
-					: m.failed_to_update_attendance_for_team({
-							teamNumber: team.number,
-							error: error instanceof Error ? error.message : 'Unknown error'
-						})
+				m.failed_to_update_attendance_for_team({
+					teamNumber: team.number,
+					error: errorToString(error)
+				})
 			);
 		}
 	}
@@ -142,7 +140,7 @@
 
 			app.addSuccessNotice(m.team_attendance_synchronized_with_robotevents());
 		} catch (error) {
-			app.addErrorNotice(m.failed_to_sync_attendance({ error: error instanceof Error ? error.message : 'Unknown error' }));
+			app.addErrorNotice(m.failed_to_sync_attendance({ error: errorToString(error) }));
 		}
 	}
 </script>

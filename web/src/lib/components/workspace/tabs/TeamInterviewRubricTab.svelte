@@ -5,7 +5,7 @@
 	import { app, tabs, subscriptions } from '$lib/index.svelte';
 	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
 	import { NotebookRubricTab } from '$lib/tab.svelte';
-	import { generateUUID } from '$lib/utils.svelte';
+	import { errorToString, generateUUID } from '$lib/utils.svelte';
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
@@ -84,7 +84,7 @@
 			initialTeamId = existingRubric.teamId;
 		} catch (error) {
 			console.error('Failed to load existing rubric:', error);
-			app.addErrorNotice(m.failed_to_load_existing_rubric());
+			app.addErrorNotice(m.failed_to_load_existing_rubric({ error: errorToString(error) }));
 		}
 	}
 
@@ -236,7 +236,7 @@
 			app.addSuccessNotice(m.team_interview_rubric_saved_successfully());
 		} catch (error) {
 			console.error('Failed to save team interview rubric:', error);
-			app.addErrorNotice(m.failed_to_save_team_interview_rubric());
+			app.addErrorNotice(m.failed_to_save_team_interview_rubric({ error: errorToString(error) }));
 		}
 	}
 

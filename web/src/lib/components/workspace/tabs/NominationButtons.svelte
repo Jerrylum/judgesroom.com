@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
-	import { mutationNotice } from '$lib/utils.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { TeamInfoAndData } from '$lib/team.svelte';
 	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
@@ -45,7 +45,7 @@
 			}
 		} catch (error) {
 			console.error('Failed to update final nomination:', error);
-			app.addErrorNotice(mutationNotice(error, m.failed_to_update_award_nominations()));
+			app.addErrorNotice(m.failed_to_update_award_nominations({ error: errorToString(error) }));
 		}
 	}
 

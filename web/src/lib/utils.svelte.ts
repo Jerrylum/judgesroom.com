@@ -12,11 +12,6 @@ export function isTooManyRequests(error: unknown): boolean {
 	return typeof error === 'object' && error !== null && 'code' in error && (error as { code?: unknown }).code === TOO_MANY_REQUESTS;
 }
 
-/** Localized rate-limit notice, or the caller's existing message. */
-export function mutationNotice(error: unknown, fallback: string): string {
-	return isTooManyRequests(error) ? m.too_many_requests() : fallback;
-}
-
 /**
  * Clipboard write (navigator.clipboard) requires a secure context.
  * False on plain HTTP LAN hosts (e.g. http://192.168.x.x); true on https and localhost.
