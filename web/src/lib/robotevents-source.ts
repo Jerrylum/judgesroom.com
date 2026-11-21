@@ -453,17 +453,18 @@ export async function importFromRobotEvents(client: VexEventsClient, evtSku: str
 		throw new Error(`Unable to get team info from RobotEvents for team ${team.number} because it is missing required fields`);
 	};
 
+	const clip = (value: string) => value.trim().slice(0, 100);
 	const teamInfos = teams.map(
 		(team) =>
 			({
 				id: uuidv4(),
 				number: team.number,
-				name: team.team_name ?? '(Not Provided)',
-				city: team.location?.city ?? '(Not Provided)',
-				state: team.location?.region ?? '',
-				country: team.location?.country ?? '(Not Provided)',
-				shortName: team.team_name ?? '(Not Provided)',
-				school: team.organization ?? '(Not Provided)',
+				name: clip(team.team_name ?? '(Not Provided)'),
+				city: clip(team.location?.city ?? '(Not Provided)'),
+				state: clip(team.location?.region ?? ''),
+				country: clip(team.location?.country ?? '(Not Provided)'),
+				shortName: clip(team.team_name ?? '(Not Provided)'),
+				school: clip(team.organization ?? '(Not Provided)'),
 				grade: team.grade ?? throwTeamError(team),
 				group: extractGroupFromTeamNumber(team.number),
 				notebookLink: '',

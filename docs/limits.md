@@ -43,11 +43,17 @@ Destroy the room at the end of the event. Do not rely on the 90-day idle timer f
 | --------------------------------------------------------- | --------------------------- |
 | Event name                                                | 200 characters              |
 | Judge name, judge group name, award name, team group name | 100 characters              |
+| Team name, city, state, country, short name, school       | 100 characters              |
 | Team number                                               | 10 characters (A–Z and 0–9) |
+| VEX Events team number in the insight cache               | 10 characters               |
+| Access token                                              | 12 characters               |
+| Device id, photo id, upload token                         | UUID                        |
+| Photo upload URL                                          | 200 characters              |
 | VEX Events SKU                                            | 12–20 characters            |
 | Award winners count                                       | 1–10,000                    |
 | Judge groups                                              | At least 1                  |
-| Rubric notes and notebook links                           | Not capped                  |
+| Interview rubric notes (guide 2.0)                        | 5,000 characters            |
+| Notebook rubric notes and notebook links                  | Not capped                  |
 
 ## Networking
 

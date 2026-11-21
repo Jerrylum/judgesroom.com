@@ -304,7 +304,8 @@ describe('readNotebookLinksExcel', () => {
 
 		const result = readNotebookLinksExcel(new Uint8Array(data));
 
-		expect(result).matchSnapshot();
+		expect(result.rows).matchSnapshot();
+		expect(result.errors).toEqual(['Row 4: team: Team number is required']);
 	});
 });
 

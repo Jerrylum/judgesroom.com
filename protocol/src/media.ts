@@ -37,8 +37,8 @@ export type CreatePhotoUploadInput = z.infer<typeof CreatePhotoUploadInputSchema
 
 export const CreatePhotoUploadResultSchema = z.object({
 	photoId: z.uuidv4(),
-	uploadToken: z.string().min(1),
-	uploadUrl: z.string().min(1)
+	uploadToken: z.uuidv4(),
+	uploadUrl: z.string().min(1).max(200)
 });
 
 export type CreatePhotoUploadResult = z.infer<typeof CreatePhotoUploadResultSchema>;

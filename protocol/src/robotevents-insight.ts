@@ -17,18 +17,18 @@ export function robotEventsCacheTopic(resource: RobotEventsResource): string {
 }
 
 export const RobotEventsTeamSchema = z.object({
-	number: z.string(),
+	number: z.string().max(10),
 	grade: GradeSchema.nullable()
 });
 
 export const RobotEventsRankingSchema = z.object({
-	teamNumber: z.string(),
+	teamNumber: z.string().max(10),
 	divisionId: z.number(),
 	rank: z.number()
 });
 
 export const RobotEventsSkillsSchema = z.object({
-	teamNumber: z.string(),
+	teamNumber: z.string().max(10),
 	rank: z.number(),
 	driverScore: z.number(),
 	programmingScore: z.number(),

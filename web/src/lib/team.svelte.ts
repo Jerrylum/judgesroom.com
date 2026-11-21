@@ -112,28 +112,60 @@ export function parseTournamentManagerCSV(csvContent: string): Partial<TeamInfoA
 	return teams;
 }
 
+function isBlankExcelRow(row: unknown): boolean {
+	if (row == null || typeof row !== 'object') return true;
+	return Object.values(row).every((value) => value == null || String(value).trim() === '');
+}
+
+function excelCell(value: unknown): unknown {
+	if (value == null) return value;
+	return String(value).trim();
+}
+
+const ExcelTeamNumberSchema = z.string().superRefine((value, ctx) => {
+	const parsed = TeamNumberSchema.safeParse(value);
+	if (parsed.success) return;
+	ctx.addIssue({
+		code: 'custom',
+		message: value === '' ? 'Team number is required' : parsed.error.issues[0].message
+	});
+});
+
 export const NotebookLinksExcelRowSchema = z.object({
-	team: z.string(),
-	// program: z.string(),
-	// grade_level: z.string(),
-	// update_time: z.string(),
-	notebook_link: z.string()
+	team: z.preprocess((value) => {
+		const cell = excelCell(value);
+		return typeof cell === 'string' ? cell.toUpperCase() : '';
+	}, ExcelTeamNumberSchema),
+	notebook_link: z.preprocess(excelCell, z.string())
 });
 
 export type NotebookLinksExcelRow = z.infer<typeof NotebookLinksExcelRowSchema>;
 
-export function readNotebookLinksExcel(excelContent: Uint8Array): NotebookLinksExcelRow[] {
+export type NotebookLinksExcelRead = {
+	rows: NotebookLinksExcelRow[];
+	errors: string[];
+};
+
+export function readNotebookLinksExcel(excelContent: Uint8Array): NotebookLinksExcelRead {
 	const workbook = XLSX.read(excelContent, { type: 'array' });
 	const sheet = workbook.Sheets[workbook.SheetNames[0]];
 	const data = XLSX.utils.sheet_to_json(sheet);
 
 	const rows: NotebookLinksExcelRow[] = [];
-	for (const row of data) {
+	const errors: string[] = [];
+	for (const [index, row] of data.entries()) {
+		if (isBlankExcelRow(row)) continue;
 		const result = NotebookLinksExcelRowSchema.safeParse(row);
-		if (!result.success) continue;
+		if (!result.success) {
+			const reason = result.error.issues
+				.map((issue) => `${issue.path.join('.') || 'row'}: ${issue.message}`)
+				.join('; ');
+			errors.push(`Row ${index + 2}: ${reason}`);
+			continue;
+		}
 		rows.push(result.data);
 	}
-	return rows;
+	return { rows, errors };
 }
 
 export function extractGroupFromTeamNumber(teamNumber: string): string {

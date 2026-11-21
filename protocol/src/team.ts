@@ -20,12 +20,12 @@ export const TeamGroupNameSchema = z
 export const TeamInfoSchema = z.object({
 	id: z.uuidv4(),
 	number: TeamNumberSchema,
-	name: z.string(),
-	city: z.string(),
-	state: z.string(),
-	country: z.string(),
-	shortName: z.string(),
-	school: z.string(),
+	name: z.string().max(100),
+	city: z.string().max(100),
+	state: z.string().max(100),
+	country: z.string().max(100),
+	shortName: z.string().max(100),
+	school: z.string().max(100),
 	grade: GradeSchema,
 	group: TeamGroupNameSchema
 });

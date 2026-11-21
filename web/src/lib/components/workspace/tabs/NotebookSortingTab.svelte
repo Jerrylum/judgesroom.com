@@ -9,6 +9,7 @@
 	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
 	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { errorToString } from '$lib/utils.svelte';
 
 	interface Props {
 		tab: NotebookSortingTab;
@@ -118,7 +119,8 @@
 
 		try {
 			const buffer = await file.arrayBuffer();
-			const excelRows = readNotebookLinksExcel(new Uint8Array(buffer));
+			const excel = readNotebookLinksExcel(new Uint8Array(buffer));
+			const excelRows = excel.rows;
 
 			// Get all current team data
 			const allTeamInfoAndData = app.getAllTeamInfoAndData();
@@ -151,16 +153,22 @@
 				updatedCount++;
 			}
 
+			if (excel.errors.length > 0) {
+				const shown = excel.errors.slice(0, 5).join('; ');
+				const extra = excel.errors.length > 5 ? `; and ${excel.errors.length - 5} more` : '';
+				importError = m.notebook_links_import_error_message({ error: `${shown}${extra}` });
+			} else if (teamDataUpdates.length === 0) {
+				importError = m.notebook_links_import_error();
+			}
+
 			// Update team data
 			if (teamDataUpdates.length > 0) {
 				await app.wrpcClient.team.updateAllTeamData.mutation(teamDataUpdates);
 				importSuccess = m.notebook_links_import_success({ count: updatedCount, notFoundCount: notFoundCount });
-			} else {
-				importError = m.notebook_links_import_error();
 			}
 		} catch (error) {
 			console.error('Error processing notebook links file:', error);
-			importError = m.notebook_links_import_error_message({ error: error instanceof Error ? error.message : 'Unknown error' });
+			importError = m.notebook_links_import_error_message({ error: errorToString(error) });
 		} finally {
 			isImporting = false;
 		}

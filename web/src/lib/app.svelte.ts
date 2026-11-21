@@ -113,7 +113,7 @@ export const PermitSchema = z.object({
 	roomId: RoomIdSchema,
 	createdAt: z.number().int().positive(),
 	deviceId: z.uuidv4(),
-	deviceName: z.string().min(1).max(100),
+	deviceName: z.string().min(1).max(20),
 	authToken: AuthTokenSchema.optional()
 });
 

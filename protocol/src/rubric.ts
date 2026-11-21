@@ -229,7 +229,7 @@ export const TeamInterviewRubricSchema = z
 		teamId: z.uuidv4(),
 		judgeId: z.uuidv4(),
 		rubric: interviewRubricPayloadSchema,
-		notes: z.string(),
+		notes: z.string().max(5000),
 		timestamp: z.number()
 	})
 	.superRefine((data, ctx) => {

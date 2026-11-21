@@ -100,7 +100,7 @@ export const INTERVIEW_2_0_CRITERIA_COUNT = interview2_0RubricConfig.length;
 export const INTERVIEW_2_0_MAX_SCORE = interview2_0RubricConfig.reduce((sum, row) => sum + row.maxPoints, 0);
 
 const criterionBodySchema = z.object({
-	notes: z.string(),
+	notes: z.string().max(5000),
 	points: RubricPointSchema
 });
 
@@ -116,7 +116,7 @@ export const interview2_0RubricObjectSchema = z.object({
 		decisionsWereMadeTogether: criterionBodySchema,
 		outsideIdeasWereMadeTheirOwn: criterionBodySchema
 	}),
-	additionalNotes: z.string()
+	additionalNotes: z.string().max(5000)
 });
 
 export type Interview2_0RubricPayload = z.infer<typeof interview2_0RubricObjectSchema>;

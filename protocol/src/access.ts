@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { JudgeNameSchema } from './judging';
 
 export const AUTH_TOKEN_LENGTH = 12;
 /** 64 URL-safe characters so each random byte maps uniformly via `% 64`. */
@@ -110,7 +111,7 @@ export function toDeviceAuthenticated(authentication: ClientAuthentication): Dev
 
 export const AccessLinkJudgeSchema = z.object({
 	judgeId: z.uuidv4(),
-	name: z.string(),
+	name: JudgeNameSchema,
 	authToken: AuthTokenSchema
 });
 
