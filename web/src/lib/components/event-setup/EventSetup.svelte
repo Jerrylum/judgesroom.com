@@ -301,7 +301,7 @@
 		} catch (error) {
 			console.error('Failed to complete setup:', error);
 
-			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			const message = translateConnectionCloseReason(errorToString(error));
 			if (message) {
 				app.addErrorNotice(message);
 			}

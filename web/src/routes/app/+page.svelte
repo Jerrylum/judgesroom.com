@@ -94,7 +94,7 @@
 			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
 
-			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			const message = translateConnectionCloseReason(errorToString(error));
 			if (message) {
 				dialogs.showAlert({ title: m.failed_to_join(), message: message, confirmButtonClass: 'primary' });
 			}
@@ -110,7 +110,7 @@
 			console.error('Error rejoining stored permit:', error);
 			AppUI.appPhase = 'begin';
 
-			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			const message = translateConnectionCloseReason(errorToString(error));
 			if (message) {
 				dialogs.showAlert({ title: m.failed_to_rejoin(), message: message, confirmButtonClass: 'primary' });
 			}

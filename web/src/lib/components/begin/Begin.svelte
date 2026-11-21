@@ -28,7 +28,7 @@
 			console.error("Error joining Judges' Room:", error);
 			AppUI.appPhase = 'begin';
 
-			const message = translateConnectionCloseReason(app.takeConnectionCloseReason() || errorToString(error));
+			const message = translateConnectionCloseReason(errorToString(error));
 			dialogs.showAlert({ title: m.failed_to_join(), message: message || m.unknown() });
 		}
 	}

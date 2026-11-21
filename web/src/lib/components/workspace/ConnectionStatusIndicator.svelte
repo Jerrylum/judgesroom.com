@@ -51,11 +51,10 @@
 		try {
 			await app.resumeJudgesRoom();
 		} catch (error) {
-			const closeReason = app.takeConnectionCloseReason();
-			const reason = closeReason || errorToString(error);
+			const reason = errorToString(error);
 
 			// No need to show a message for this error.
-			if (!closeReason && reason === WebSocketConnectionFailedCloseReason) return;
+			if (reason === WebSocketConnectionFailedCloseReason) return;
 
 			const message = translateConnectionCloseReason(reason);
 			if (message) {
