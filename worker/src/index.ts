@@ -26,7 +26,7 @@ import { sqliteRoomWasInitialized } from './durable-room-state';
 import { EMPTY_ROOM_TTL_MS, retentionDecision } from './retention';
 import { handleCreateRoom } from './create-room';
 import { createJudgesRoomRecord } from './routes/handshake';
-import { consumeWriteBudget } from './rate-limit';
+import { consumeReadBudget, consumeWriteBudget } from './rate-limit';
 
 export { CachedMedia } from './media/cached-media';
 
@@ -154,8 +154,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 			network: this.network,
 			photos: this.photos,
 			auth: Authentication.unauthenticated(),
-			// HTTP media routes are not wrpc writes. They do not draw on this budget.
-			limits: { consumeWriteBudget: async () => {} }
+			// HTTP media routes are not wrpc calls. They do not draw on these budgets.
+			limits: { consumeWriteBudget: async () => {}, consumeReadBudget: async () => {} }
 		};
 	}
 
@@ -180,7 +180,8 @@ export class WebSocketHibernationServer extends DurableObject<Env> {
 				}
 			}),
 			limits: {
-				consumeWriteBudget: (weight) => consumeWriteBudget(this.env.DB_WRITE_LIMITER, attachment.roomId, weight)
+				consumeWriteBudget: (weight) => consumeWriteBudget(this.env.DB_WRITE_LIMITER, attachment.roomId, weight),
+				consumeReadBudget: (weight) => consumeReadBudget(this.env.DB_READ_LIMITER, attachment.roomId, weight)
 			}
 		};
 	}

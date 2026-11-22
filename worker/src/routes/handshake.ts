@@ -22,6 +22,7 @@ export function buildHandshakeRoute(w: WRPCRootObject<object, ServerContext, Rec
 				throw new WRPCError("Judges' Room not found");
 			}
 
+			await ctx.limits.consumeReadBudget(1);
 			await ctx.limits.consumeWriteBudget(1);
 
 			const offlineDevice = {

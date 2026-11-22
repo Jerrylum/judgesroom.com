@@ -16,6 +16,8 @@ import type { PhotosBucket } from './media/types';
 export interface ServerLimits {
 	/** Charge the room write budget before a SQLite write. Weight 1 is one write statement. */
 	consumeWriteBudget: (weight: number) => Promise<void>;
+	/** Charge the room read budget on a wrpc read. Weight 1 is one user action. */
+	consumeReadBudget: (weight: number) => Promise<void>;
 }
 
 export interface ServerContext {

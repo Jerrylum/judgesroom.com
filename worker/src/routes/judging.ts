@@ -215,6 +215,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ id: z.uuidv4() }))
 			.output(EngineeringNotebookRubricSchema)
 			.query(async ({ ctx, input }) => {
+				await ctx.limits.consumeReadBudget(1);
 				const result = await ctx.db.select().from(engineeringNotebookRubrics).where(eq(engineeringNotebookRubrics.id, input.id));
 				return result[0] as EngineeringNotebookRubric;
 			}),
@@ -288,6 +289,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ id: z.uuidv4() }))
 			.output(TeamInterviewRubricSchema)
 			.query(async ({ ctx, input }) => {
+				await ctx.limits.consumeReadBudget(1);
 				const result = await ctx.db.select().from(teamInterviewRubrics).where(eq(teamInterviewRubrics.id, input.id));
 				return result[0] as TeamInterviewRubric;
 			}),

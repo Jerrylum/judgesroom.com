@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
 	import { app } from '$lib/index.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 	import DenialIcon from '$lib/icon/DenialIcon.svelte';
 	import JudgeGroupSection from './JudgeGroupSection.svelte';
 	import { buildAccessLinksCsv, downloadTextFile } from '$lib/judges-csv';
@@ -45,6 +46,8 @@
 			accessLinks = await app.wrpcClient.access.listAccessLinks.query();
 		} catch (error) {
 			console.error('Failed to load access links:', error);
+			accessLinks = null;
+			app.addErrorNotice(errorToString(error));
 		} finally {
 			loadingLinks = false;
 		}

@@ -58,6 +58,7 @@ Destroy the room at the end of the event. Do not rely on the 90-day idle timer f
 
 ## Networking
 
-| Limit                      | Value    | Notes                                           |
-| -------------------------- | -------- | ----------------------------------------------- |
-| Incoming WebSocket message | **1 MB** | Oversized frames are dropped before JSON parse. |
+| Limit                      | Value              | Notes                                                                         |
+| -------------------------- | ------------------ | ----------------------------------------------------------------------------- |
+| Incoming WebSocket message | **1 MB**           | Oversized frames are dropped before JSON parse.                              |
+| Reads per room             | **500** per minute | Loading rubrics, photos, and the room snapshot. Saves use a separate budget. |

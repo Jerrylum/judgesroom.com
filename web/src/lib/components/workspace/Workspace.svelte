@@ -223,15 +223,21 @@
 		sessionEpoch;
 
 		console.log('Loading team photos');
-		app.wrpcClient.media.listAllTeamPhotos.query().then((photos) => {
-			subscriptions.allTeamPhotos = photos.reduce(
-				(acc, photo) => {
-					acc[photo.id] = photo;
-					return acc;
-				},
-				{} as Record<string, TeamPhoto>
-			);
-		});
+		app.wrpcClient.media.listAllTeamPhotos
+			.query()
+			.then((photos) => {
+				subscriptions.allTeamPhotos = photos.reduce(
+					(acc, photo) => {
+						acc[photo.id] = photo;
+						return acc;
+					},
+					{} as Record<string, TeamPhoto>
+				);
+			})
+			.catch((error) => {
+				console.error('Failed to load team photos:', error);
+				app.addErrorNotice(errorToString(error));
+			});
 	});
 </script>
 

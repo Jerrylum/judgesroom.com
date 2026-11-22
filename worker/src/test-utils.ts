@@ -169,7 +169,7 @@ export function createTestServerContext(): ServerContext & { cleanup: () => void
 		network,
 		photos: createMockPhotosBucket(),
 		auth: Authentication.unauthenticated(),
-		limits: { consumeWriteBudget: async () => {} },
+		limits: { consumeWriteBudget: async () => {}, consumeReadBudget: async () => {} },
 		cleanup
 	};
 }

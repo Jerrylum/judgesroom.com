@@ -45,6 +45,7 @@ export async function removeJudge(db: DatabaseOrTransaction, judgeId: string): P
 export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getJudges: w.procedure.output(z.array(JudgeSchema)).query(async ({ ctx }) => {
+			await ctx.limits.consumeReadBudget(1);
 			return getJudges(ctx.db);
 		}),
 		updateJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input, session }) => {

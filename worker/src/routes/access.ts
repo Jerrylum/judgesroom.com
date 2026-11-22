@@ -17,6 +17,7 @@ export function buildAccessRoute(w: WRPCRootObject<object, ServerContext, Record
 	return {
 		listAccessLinks: w.procedure.output(AccessLinksSchema).query(async ({ ctx }) => {
 			assertAuthenticatedJudgeAdvisor(ctx.auth);
+			await ctx.limits.consumeReadBudget(1);
 
 			const judgeAdvisorAuthToken = await getJudgeAdvisorAuthToken(ctx.db);
 			if (!judgeAdvisorAuthToken) {

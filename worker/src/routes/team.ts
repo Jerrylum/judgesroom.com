@@ -27,6 +27,7 @@ export async function updateTeamData(db: DatabaseOrTransaction, teamData: TeamDa
 export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getTeamData: w.procedure.output(z.array(TeamDataSchema)).query(async ({ ctx }) => {
+			await ctx.limits.consumeReadBudget(1);
 			return getTeamData(ctx.db);
 		}),
 		updateTeamData: w.procedure.input(TeamDataSchema).mutation(async ({ ctx, input, session }) => {

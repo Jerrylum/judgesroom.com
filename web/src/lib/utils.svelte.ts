@@ -12,12 +12,19 @@ export { isWRPCError };
 /** wrpc error code for a room write-budget rejection. */
 export const TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS';
 
+/** wrpc error code for a room read-budget rejection. */
+export const TOO_MANY_READS = 'TOO_MANY_READS';
+
 export function isTooManyJudges(error: unknown): boolean {
 	return isWRPCError(error) && error.code === TOO_MANY_JUDGES;
 }
 
 export function isTooManyRequests(error: unknown): boolean {
 	return isWRPCError(error) && error.code === TOO_MANY_REQUESTS;
+}
+
+export function isTooManyReads(error: unknown): boolean {
+	return isWRPCError(error) && error.code === TOO_MANY_READS;
 }
 
 /**
@@ -130,6 +137,9 @@ export function errorToString(error: unknown): string {
 	}
 	if (isTooManyJudges(error)) {
 		return m.too_many_judges({ count: MAX_JUDGES_PER_ROOM });
+	}
+	if (isTooManyReads(error)) {
+		return m.too_many_reads();
 	}
 	if (error instanceof Error) {
 		return error.message;

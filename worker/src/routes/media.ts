@@ -66,6 +66,7 @@ async function cleanupExpiredUploadTokens(db: DatabaseOrTransaction): Promise<vo
 export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		listAllTeamPhotos: w.procedure.output(z.array(TeamPhotoSchema)).query(async ({ ctx }) => {
+			await ctx.limits.consumeReadBudget(1);
 			return listAllTeamPhotos(ctx.db);
 		}),
 
@@ -73,6 +74,7 @@ export function buildMediaRoute(w: WRPCRootObject<object, ServerContext, Record<
 			.input(z.object({ teamId: z.uuidv4() }))
 			.output(z.array(TeamPhotoSchema))
 			.query(async ({ ctx, input }) => {
+				await ctx.limits.consumeReadBudget(1);
 				return listTeamPhotos(ctx.db, input.teamId);
 			}),
 

@@ -40,6 +40,7 @@ export function broadcastDeviceListUpdate(ctx: DeviceListContext, source: Client
 export function buildDeviceRoute(w: WRPCRootObject<object, ServerContext, Record<string, never>>) {
 	return {
 		getDevices: w.procedure.output(z.array(DeviceInfoSchema)).query(async ({ ctx }) => {
+			await ctx.limits.consumeReadBudget(1);
 			return getDevices(ctx);
 		}),
 

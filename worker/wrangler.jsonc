@@ -62,6 +62,14 @@
 						"limit": 1000,
 						"period": 60
 					}
+				},
+				{
+					"name": "DB_READ_LIMITER",
+					"namespace_id": "31002",
+					"simple": {
+						"limit": 500,
+						"period": 60
+					}
 				}
 			]
 		},
@@ -103,6 +111,14 @@
 				{
 					"name": "DB_WRITE_LIMITER",
 					"namespace_id": "31001",
+					"simple": {
+						"limit": 500,
+						"period": 60
+					}
+				},
+				{
+					"name": "DB_READ_LIMITER",
+					"namespace_id": "31002",
 					"simple": {
 						"limit": 500,
 						"period": 60
@@ -151,6 +167,14 @@
 						"limit": 500,
 						"period": 60
 					}
+				},
+				{
+					"name": "DB_READ_LIMITER",
+					"namespace_id": "31002",
+					"simple": {
+						"limit": 500,
+						"period": 60
+					}
 				}
 			]
 		}
@@ -186,6 +210,14 @@
 		{
 			"name": "DB_WRITE_LIMITER",
 			"namespace_id": "31001",
+			"simple": {
+				"limit": 500,
+				"period": 60
+			}
+		},
+		{
+			"name": "DB_READ_LIMITER",
+			"namespace_id": "31002",
 			"simple": {
 				"limit": 500,
 				"period": 60
