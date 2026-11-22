@@ -131,6 +131,25 @@ describe('handleCreateRoom', () => {
 		expect(calls).toEqual([]);
 	});
 
+	it('creates the room when siteverify used a testing key', async () => {
+		const { namespace, calls } = createNamespace();
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () =>
+				Response.json({
+					success: true,
+					hostname: 'example.com',
+					metadata: { result_with_testing_key: true }
+				})
+			)
+		);
+
+		const response = await handleCreateRoom(createRequest({ ...starterKit, turnstileToken: 'token' }), 'secret', namespace);
+
+		expect(response.status).toBe(200);
+		expect(calls).toContain('create');
+	});
+
 	it('creates the room after siteverify succeeds', async () => {
 		const { namespace, calls, captured } = createNamespace();
 		const fetchMock = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {

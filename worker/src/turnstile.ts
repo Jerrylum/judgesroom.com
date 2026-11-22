@@ -35,11 +35,16 @@ export async function verifyTurnstileToken(token: string, turnstileSecretKey: st
 		return false;
 	}
 
-	let result: { success?: boolean; hostname?: string };
+	let result: { success?: boolean; hostname?: string; metadata?: { result_with_testing_key?: boolean } };
 	try {
-		result = (await response.json()) as { success?: boolean; hostname?: string };
+		result = (await response.json()) as { success?: boolean; hostname?: string; metadata?: { result_with_testing_key?: boolean } };
 	} catch {
 		return false;
+	}
+
+	// Cloudflare's always-pass test secret reports hostname "example.com".
+	if (result.success === true && result.metadata?.result_with_testing_key === true) {
+		return true;
 	}
 
 	if (result.success !== true || !result.hostname) {
