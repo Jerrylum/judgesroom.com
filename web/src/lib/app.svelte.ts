@@ -150,7 +150,7 @@ export class App {
 	private reconnectPending = false;
 	private allFinalAwardNominations: Record<string, AwardNomination[]> = $state({});
 	private awardsWithNoWinner: string[] = $state([]);
-	public readonly version: string = '2.6.0-beta.2';
+	public readonly version: string = '2.6.0-beta.3';
 
 	// Error handling
 	private notices: Notice[] = $state([]);
