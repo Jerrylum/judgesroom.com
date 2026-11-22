@@ -100,13 +100,12 @@
 </script>
 
 <div
-	class="relative max-w-40 min-w-40 cursor-pointer p-2 text-center select-none"
+	class={['relative max-w-40 min-w-40 p-2 text-center select-none', isDisabled ? 'cursor-not-allowed' : 'cursor-pointer']}
 	role="button"
 	tabindex="0"
 	onmouseenter={handleMouseEnter}
 	onmouseleave={handleMouseLeave}
 	onclick={handleTouch}
-	class:cursor-default!={isDisabled}
 	onkeydown={(e) => e.key === 'Enter' && handleTouch()}
 >
 	{#if isDisabled}

@@ -56,8 +56,10 @@
 </script>
 
 <button
-	class="group relative max-w-40 min-w-40 p-2 text-center select-none"
-	class:cursor-default!={(isDisabled && !isNominated) || showExcellenceAwardWinners}
+	class={[
+		'group relative max-w-40 min-w-40 p-2 text-center select-none',
+		isDisabled && !isNominated ? 'cursor-not-allowed!' : showExcellenceAwardWinners && 'cursor-default!'
+	]}
 	onclick={onClick}
 >
 	<div class="flex min-h-6 items-center justify-center text-lg text-gray-300">
