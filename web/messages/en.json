@@ -485,6 +485,7 @@
 	"device_already_authenticated_with_different_credentials": "Device already authenticated with different credentials",
 	"too_many_connections_for_this_access_link": "Too many connections for this access link",
 	"too_many_requests": "Too many changes were saved just now. Wait a moment and try again.",
+	"too_many_judges": "A Judges' Room can have at most {count} judges.",
 	"websocket_connection_failed": "Connection failed.",
 	"step_of": "Step {current} of {total}",
 	"back_to_judges_room": "Back to Judges' Room",

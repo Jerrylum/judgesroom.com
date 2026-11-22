@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+/** A Judges' Room stores at most this many judges. */
+export const MAX_JUDGES_PER_ROOM = 100;
+
+/** wrpc error code when a save would exceed MAX_JUDGES_PER_ROOM. */
+export const TOO_MANY_JUDGES = 'TOO_MANY_JUDGES';
+
 export const JudgingMethodSchema = z.enum(['walk_in', 'assigned']);
 export type JudgingMethod = z.infer<typeof JudgingMethodSchema>;
 

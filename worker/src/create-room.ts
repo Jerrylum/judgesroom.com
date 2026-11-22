@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import type { ClientAuthentication } from '@judgesroom.com/protocol/src/access';
+import { TOO_MANY_JUDGES } from '@judgesroom.com/protocol/src/judging';
+import { isWRPCError } from '@judgesroom.com/protocol/src/wrpc-error';
 import { StarterKitSchema, type StarterKit } from '@judgesroom.com/protocol/src/room';
 import { generateRoomId } from '@judgesroom.com/protocol/src/room-id';
 import { verifyTurnstileToken } from './turnstile';
@@ -60,7 +62,7 @@ export async function handleCreateRoom(
 		return withCreateCors(request, Response.json({ roomId, authentication }));
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Failed to create room';
-		const status = message.includes('already exists') ? 409 : 500;
+		const status = message.includes('already exists') ? 409 : isWRPCError(error) && error.code === TOO_MANY_JUDGES ? 400 : 500;
 		return withCreateCors(request, new Response(message, { status }));
 	}
 }

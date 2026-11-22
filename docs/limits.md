@@ -9,6 +9,7 @@ Operational caps for Judge Advisors and Event Partners. They apply to the hosted
 | Live connections per **judge** access link (access control **on**) | **100**           | Extra browser tabs and devices on the same judge link count. A 101st connection is refused. |
 | Live connections for the **Judge Advisor** link                    | No cap            | Only judge links are capped.                                                                |
 | Live connections when access control is **off**                    | No per-person cap | Anyone with the room link can join.                                                         |
+| Judges per Judges' Room                                            | **100**           | Adding another judge is refused. Renaming or moving an existing judge is still allowed.     |
 | Device name on the connection                                      | **20** characters | Longer names are rejected when the device connects.                                         |
 
 Rotating a judge’s access link does not raise the cap. It invalidates the old link; new connections use the new link and start a new count.

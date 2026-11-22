@@ -485,6 +485,7 @@
 	"device_already_authenticated_with_different_credentials": "此裝置已使用其他登入資料驗證",
 	"too_many_connections_for_this_access_link": "此存取連結的連線數量已達上限",
 	"too_many_requests": "剛剛儲存的變更太多。請稍候再試。",
+	"too_many_judges": "一個評審室最多只能有 {count} 位評判。",
 	"websocket_connection_failed": "連接失敗。",
 	"step_of": "步驟 {current}/{total}",
 	"back_to_judges_room": "返回評審室",

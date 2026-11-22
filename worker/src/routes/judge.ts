@@ -1,6 +1,6 @@
 import type { Judge } from '@judgesroom.com/protocol/src/judging';
-import { JudgeSchema } from '@judgesroom.com/protocol/src/judging';
-import type { WRPCRootObject } from '@jerrylum/wrpc/server';
+import { JudgeSchema, MAX_JUDGES_PER_ROOM, TOO_MANY_JUDGES } from '@judgesroom.com/protocol/src/judging';
+import { WRPCError, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { judges } from '../db/schema';
 import { eq } from 'drizzle-orm';
@@ -32,6 +32,12 @@ export async function upsertJudge(db: DatabaseOrTransaction, judge: Judge): Prom
 		});
 }
 
+export function assertJudgeRosterSize(size: number): void {
+	if (size > MAX_JUDGES_PER_ROOM) {
+		throw new WRPCError(`A Judges' Room can have at most ${MAX_JUDGES_PER_ROOM} judges`, TOO_MANY_JUDGES);
+	}
+}
+
 export async function removeJudge(db: DatabaseOrTransaction, judgeId: string): Promise<void> {
 	await db.delete(judges).where(eq(judges.id, judgeId));
 }
@@ -44,6 +50,11 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 		updateJudge: w.procedure.input(JudgeSchema).mutation(async ({ ctx, input, session }) => {
 			if (ctx.auth.isAuthenticated()) {
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
+			}
+
+			const roster = await getJudges(ctx.db);
+			if (!roster.some((judge) => judge.id === input.id)) {
+				assertJudgeRosterSize(roster.length + 1);
 			}
 
 			await ctx.limits.consumeWriteBudget(1);
@@ -75,6 +86,7 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			assertJudgeRosterSize(input.length);
 			await ctx.limits.consumeWriteBudget(Math.max(1, input.length)); // Ignore removed judges.
 
 			const removedJudges = await transaction(ctx.db, async (tx) => {

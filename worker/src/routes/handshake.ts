@@ -1,7 +1,7 @@
 import { getEssentialData, hasEssentialData, updateEssentialData } from './essential';
 import { WRPCError, type WRPCRootObject } from '@jerrylum/wrpc/server';
 import { getTeamData, updateTeamData } from './team';
-import { getJudges, upsertJudge } from './judge';
+import { assertJudgeRosterSize, getJudges, upsertJudge } from './judge';
 import { broadcastDeviceListUpdate } from './device';
 import type { DatabaseOrTransaction, ServerContext } from '../server-router';
 import { offlineDevices } from '../db/schema';
@@ -85,6 +85,8 @@ export async function createJudgesRoomRecord(db: DatabaseOrTransaction, input: S
 	if (await hasEssentialData(db)) {
 		throw new Error("Judges' Room already exists");
 	}
+
+	assertJudgeRosterSize(input.judges.length);
 
 	const judgeAdvisorAuthToken = generateAuthToken();
 

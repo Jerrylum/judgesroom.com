@@ -7,8 +7,8 @@
 	import { tick } from 'svelte';
 	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup, isJudgeSetupReady } from '$lib/judging.svelte';
 	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
-	import type { JudgingMethod, Judge } from '@judgesroom.com/protocol/src/judging';
-	import { dialogs } from '$lib/index.svelte';
+	import { MAX_JUDGES_PER_ROOM, type JudgingMethod, type Judge } from '@judgesroom.com/protocol/src/judging';
+	import { app, dialogs } from '$lib/index.svelte';
 
 	interface Props {
 		isEditingEventSetup: boolean;
@@ -156,6 +156,10 @@
 
 	// Judge management functions that will be passed to JudgeGroup components
 	function addJudgesToGroup(groupId: string, judgeNames: string[]) {
+		if (judges.length + judgeNames.length > MAX_JUDGES_PER_ROOM) {
+			app.addErrorNotice(m.too_many_judges({ count: MAX_JUDGES_PER_ROOM }));
+			return;
+		}
 		judgeNames.forEach((name) => {
 			const judge = createJudgeFromString(name, groupId);
 			judges.push(judge);

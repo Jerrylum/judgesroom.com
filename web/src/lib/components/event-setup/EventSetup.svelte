@@ -13,7 +13,7 @@
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
-	import type { JudgingMethod, Judge, JudgingStep } from '@judgesroom.com/protocol/src/judging';
+	import { MAX_JUDGES_PER_ROOM, type JudgingMethod, type Judge, type JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
 	import { DEFAULT_RUBRIC_SCORE_STEP } from '@judgesroom.com/protocol/src/event';
 	import EventCodeSetup from './EventCodeSetup.svelte';
@@ -199,6 +199,11 @@
 	}
 
 	async function completeSetup(turnstileToken?: string): Promise<boolean> {
+		if (judges.length > MAX_JUDGES_PER_ROOM) {
+			app.addErrorNotice(m.too_many_judges({ count: MAX_JUDGES_PER_ROOM }));
+			return false;
+		}
+
 		try {
 			// Create the event setup object
 			const essentialData = {
