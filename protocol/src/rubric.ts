@@ -208,7 +208,7 @@ export const EngineeringNotebookRubricSchema = z
 		teamId: z.uuidv4(),
 		judgeId: z.uuidv4(),
 		rubric: notebookRubricPayloadSchema,
-		notes: z.string(),
+		notes: z.string().max(5000),
 		timestamp: z.number()
 	})
 	.superRefine((data, ctx) => {

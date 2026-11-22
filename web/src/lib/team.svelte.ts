@@ -136,7 +136,7 @@ export const NotebookLinksExcelRowSchema = z.object({
 		const cell = excelCell(value);
 		return typeof cell === 'string' ? cell.toUpperCase() : '';
 	}, ExcelTeamNumberSchema),
-	notebook_link: z.preprocess(excelCell, z.string())
+	notebook_link: z.preprocess(excelCell, z.string().max(200))
 });
 
 export type NotebookLinksExcelRow = z.infer<typeof NotebookLinksExcelRowSchema>;

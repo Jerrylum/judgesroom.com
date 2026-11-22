@@ -92,7 +92,7 @@
 
 		<section class="phone-footer">
 			<h3>{m.rubric_notes()}</h3>
-			<textarea class="classic" bind:value={document.notes} readonly={isSubmitted}></textarea>
+			<textarea class="classic" maxlength="5000" bind:value={document.notes} readonly={isSubmitted}></textarea>
 			<p class="phone-total">
 				{@html sanitizeHTMLMessage(m.rubric_total_score)}
 				<span>{totalScore}</span>
@@ -157,7 +157,7 @@
 			<row class="footer-row border-t-3! bg-gray-100">
 				<div class="p-2">
 					<p class="text-sm font-bold">{m.rubric_notes()}</p>
-					<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" bind:value={document.notes} readonly={isSubmitted}
+					<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" maxlength="5000" bind:value={document.notes} readonly={isSubmitted}
 					></textarea>
 				</div>
 				<scoring class="flex-col! gap-2">

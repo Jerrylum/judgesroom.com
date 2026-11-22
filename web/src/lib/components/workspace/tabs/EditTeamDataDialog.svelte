@@ -95,6 +95,7 @@
 			<input
 				id="team-notebook-link"
 				type="url"
+				maxlength="200"
 				bind:value={editedTeam.notebookLink}
 				class="classic block w-full"
 				placeholder="https://..."

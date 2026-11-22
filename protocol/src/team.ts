@@ -38,7 +38,7 @@ export type NotebookDevelopmentStatus = z.infer<typeof NotebookDevelopmentStatus
 
 export const TeamDataSchema = z.object({
 	id: z.uuidv4(),
-	notebookLink: z.string(),
+	notebookLink: z.string().max(200),
 	hasInnovateAwardSubmissionForm: z.boolean(),
 	notebookDevelopmentStatus: NotebookDevelopmentStatusSchema,
 	absent: z.boolean()

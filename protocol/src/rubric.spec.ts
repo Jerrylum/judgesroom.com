@@ -82,14 +82,19 @@ describe('GRSF rubric schemas', () => {
 		expect(TeamInterviewRubricSchema.safeParse(interviewSubmission).success).toBe(true);
 	});
 
-	it('does not cap notebook note length (stored in the room DO)', () => {
-		const long = 'n'.repeat(50_000);
+	it('caps notebook notes at 5000 characters', () => {
 		expect(
 			EngineeringNotebookRubricSchema.safeParse({
 				...notebookSubmission,
-				notes: long
+				notes: 'n'.repeat(5000)
 			}).success
 		).toBe(true);
+		expect(
+			EngineeringNotebookRubricSchema.safeParse({
+				...notebookSubmission,
+				notes: 'n'.repeat(5001)
+			}).success
+		).toBe(false);
 	});
 
 	it('rejects notebook rubric with wrong length', () => {
