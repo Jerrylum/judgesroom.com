@@ -12,6 +12,7 @@
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
 	import { JudgesTab, type Tab } from '$lib/tab.svelte';
+	import { errorToString } from '$lib/utils.svelte';
 
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);
@@ -113,15 +114,21 @@
 		sessionEpoch;
 
 		console.log('Subscribing to award rankings', $state.snapshot(targetJudgeGroupIds));
-		app.wrpcClient.judging.subscribeAwardRankings.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
-			subscriptions.allJudgeGroupsAwardRankings = data.reduce(
-				(acc, curr) => {
-					acc[curr.judgeGroupId] = curr;
-					return acc;
-				},
-				{} as Record<string, AwardRankingsFullUpdate>
-			);
-		});
+		app.wrpcClient.judging.subscribeAwardRankings
+			.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true })
+			.then((data) => {
+				subscriptions.allJudgeGroupsAwardRankings = data.reduce(
+					(acc, curr) => {
+						acc[curr.judgeGroupId] = curr;
+						return acc;
+					},
+					{} as Record<string, AwardRankingsFullUpdate>
+				);
+			})
+			.catch((error) => {
+				console.error('Failed to subscribe to award rankings:', error);
+				app.addErrorNotice(errorToString(error));
+			});
 
 		return () => {
 			console.log('Unsubscribing from award rankings');
@@ -135,15 +142,21 @@
 
 		console.log('Subscribing to reviewed teams', $state.snapshot(targetJudgeGroupIds));
 
-		app.wrpcClient.judging.subscribeReviewedTeams.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
-			subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
-				(acc, curr) => {
-					acc[curr.judgeGroupId] = curr.teamIds;
-					return acc;
-				},
-				{} as Record<string, string[]>
-			);
-		});
+		app.wrpcClient.judging.subscribeReviewedTeams
+			.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true })
+			.then((data) => {
+				subscriptions.allJudgeGroupsReviewedTeams = data.reduce(
+					(acc, curr) => {
+						acc[curr.judgeGroupId] = curr.teamIds;
+						return acc;
+					},
+					{} as Record<string, string[]>
+				);
+			})
+			.catch((error) => {
+				console.error('Failed to subscribe to reviewed teams:', error);
+				app.addErrorNotice(errorToString(error));
+			});
 
 		return () => {
 			console.log('Unsubscribing from reviewed teams');
@@ -157,15 +170,21 @@
 
 		console.log('Subscribing to submission caches', $state.snapshot(targetJudgeGroupIds));
 
-		app.wrpcClient.judging.subscribeSubmissionCaches.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true }).then((data) => {
-			subscriptions.allSubmissionCaches = data.reduce(
-				(acc, curr) => {
-					acc[curr.tiId ?? curr.enrId ?? curr.tnId ?? 'null'] = curr;
-					return acc;
-				},
-				{} as Record<string, SubmissionCache>
-			);
-		});
+		app.wrpcClient.judging.subscribeSubmissionCaches
+			.mutation({ judgeGroupIds: targetJudgeGroupIds, exclusive: true })
+			.then((data) => {
+				subscriptions.allSubmissionCaches = data.reduce(
+					(acc, curr) => {
+						acc[curr.tiId ?? curr.enrId ?? curr.tnId ?? 'null'] = curr;
+						return acc;
+					},
+					{} as Record<string, SubmissionCache>
+				);
+			})
+			.catch((error) => {
+				console.error('Failed to subscribe to submission caches:', error);
+				app.addErrorNotice(errorToString(error));
+			});
 
 		return () => {
 			console.log('Unsubscribing from submission caches');

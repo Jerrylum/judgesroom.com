@@ -4,7 +4,7 @@
 	import { getPhotoObjectUrl, uploadTeamPhoto } from '$lib/media';
 	import { MAX_PHOTOS_PER_TEAM } from '@judgesroom.com/protocol/src/media';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
-	import { generateUUID } from '$lib/utils.svelte';
+	import { errorToString, generateUUID } from '$lib/utils.svelte';
 	import ImagesIcon from '$lib/icon/ImagesIcon.svelte';
 	import TeamPhotoLightbox from './TeamPhotoLightbox.svelte';
 
@@ -66,7 +66,7 @@
 				}
 			}
 		} catch (error) {
-			errorMessage = error instanceof Error ? error.message : m.photo_upload_failed();
+			errorMessage = errorToString(error) || m.photo_upload_failed();
 			app.addErrorNotice(errorMessage);
 		} finally {
 			uploading = false;

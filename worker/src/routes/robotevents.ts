@@ -142,6 +142,7 @@ export function buildRobotEventsRoute(w: WRPCRootObject<object, ServerContext, R
 			.input(SubscribeRobotEventsCacheInputSchema)
 			.output(SubscribeRobotEventsCacheResultSchema)
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(Math.max(1, 3 * input.resources.length));
 				const { result, updates } = await subscribeRobotEventsCache(
 					ctx.db,
 					session.currentClient.clientId,
@@ -160,6 +161,11 @@ export function buildRobotEventsRoute(w: WRPCRootObject<object, ServerContext, R
 		}),
 
 		provideRobotEventsCache: w.procedure.input(ProvideRobotEventsCacheInputSchema).mutation(async ({ ctx, input, session }) => {
+			const weight =
+				input.state === 'FETCH_FAILED'
+					? input.resources.length
+					: Number(input.teams != null) + Number(input.rankings != null) + Number(input.skills != null);
+			await ctx.limits.consumeWriteBudget(Math.max(1, weight));
 			const updates = await provideRobotEventsCache(ctx.db, input);
 			for (const update of updates) await broadcastUpdate(ctx.db, session, update);
 		})

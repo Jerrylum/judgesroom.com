@@ -75,6 +75,8 @@ export function buildJudgeRoute(w: WRPCRootObject<object, ServerContext, Record<
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
+			await ctx.limits.consumeWriteBudget(Math.max(1, input.length)); // Ignore removed judges.
+
 			const removedJudges = await transaction(ctx.db, async (tx) => {
 				const allJudges = await tx.select().from(judges);
 				const rtn = new Set<string>();

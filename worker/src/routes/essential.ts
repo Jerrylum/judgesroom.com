@@ -302,26 +302,37 @@ export function buildEssentialRoute(w: WRPCRootObject<object, ServerContext, Rec
 				assertAuthenticatedJudgeAdvisor(ctx.auth);
 			}
 
-			if (wasAccessControlEnabled !== input.accessControlEnabled) {
-				if (input.accessControlEnabled) {
-					const authentication = {
-						isAccessControlled: true as const,
-						authToken: generateAuthToken(),
-						role: 'judge_advisor' as const
-					};
+			const accessControlToggled = wasAccessControlEnabled !== input.accessControlEnabled;
+			const turningOnAuthentication =
+				accessControlToggled && input.accessControlEnabled
+					? {
+							isAccessControlled: true as const,
+							authToken: generateAuthToken(),
+							role: 'judge_advisor' as const
+						}
+					: undefined;
 
-					// Client ACK first — if this fails, leave AC flag and attachment unchanged.
-					await session.getClient<ClientRouter>(session.currentClient.clientId).onClientAuthenticationChange.mutation(authentication);
+			// Charge before the client stores a new token. A rejection leaves the saved permit unchanged.
+			await ctx.limits.consumeWriteBudget(Math.max(1, 2 + input.awards.length + input.teamInfos.length + input.judgeGroups.length));
 
-					await upsertJudgeAdvisorAuthToken(ctx.db, authentication.authToken);
-					ctx.auth.setAuthentication(authentication);
+			if (turningOnAuthentication) {
+				// If this ACK fails, leave the AC flag and attachment unchanged.
+				await session
+					.getClient<ClientRouter>(session.currentClient.clientId)
+					.onClientAuthenticationChange.mutation(turningOnAuthentication);
+			} else if (accessControlToggled) {
+				// If this ACK fails, leave the AC flag and attachment unchanged.
+				await session
+					.getClient<ClientRouter>(session.currentClient.clientId)
+					.onClientAuthenticationChange.mutation(uncontrolledAuthentication);
+			}
+
+			if (accessControlToggled) {
+				if (turningOnAuthentication) {
+					await upsertJudgeAdvisorAuthToken(ctx.db, turningOnAuthentication.authToken);
+					ctx.auth.setAuthentication(turningOnAuthentication);
 				} else {
-					const authentication = uncontrolledAuthentication;
-
-					// Client ACK first — if this fails, leave AC flag and attachment unchanged.
-					await session.getClient<ClientRouter>(session.currentClient.clientId).onClientAuthenticationChange.mutation(authentication);
-
-					ctx.auth.setAuthentication(authentication);
+					ctx.auth.setAuthentication(uncontrolledAuthentication);
 				}
 
 				// SAFETY: Must kick every other client when AC toggles.

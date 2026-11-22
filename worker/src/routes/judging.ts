@@ -296,6 +296,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ judgeGroupIds: z.array(z.uuidv4()), exclusive: z.boolean() }))
 			.output(z.array(z.object({ judgeGroupId: z.uuidv4(), teamIds: z.array(z.uuidv4()) })))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1 + input.judgeGroupIds.length);
 				return transaction(ctx.db, async (tx) => {
 					await subscribeJudgeGroupTopic(tx, session.currentClient.clientId, input.judgeGroupIds, 'reviewedTeams', input.exclusive);
 					return Promise.all(
@@ -333,6 +334,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ judgeGroupIds: z.array(z.uuidv4()), exclusive: z.boolean() }))
 			.output(z.array(AwardRankingsFullUpdateSchema))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1 + input.judgeGroupIds.length);
 				return transaction(ctx.db, async (tx) => {
 					await subscribeJudgeGroupTopic(tx, session.currentClient.clientId, input.judgeGroupIds, 'awardRankings', input.exclusive);
 					return Promise.all(input.judgeGroupIds.map((judgeGroupId) => getAwardRankings(tx, judgeGroupId)));
@@ -347,6 +349,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			.input(z.object({ judgeGroupIds: z.array(z.uuidv4()), exclusive: z.boolean() }))
 			.output(z.array(SubmissionCacheSchema))
 			.mutation(async ({ ctx, input, session }) => {
+				await ctx.limits.consumeWriteBudget(1 + input.judgeGroupIds.length);
 				return transaction(ctx.db, async (tx) => {
 					await subscribeJudgeGroupTopic(tx, session.currentClient.clientId, input.judgeGroupIds, 'submissions', input.exclusive);
 					return Promise.all(input.judgeGroupIds.map((judgeGroupId) => getSubmissionCaches(tx, judgeGroupId))).then((submissionCaches) => {
@@ -398,6 +401,7 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 			}),
 
 		updateFinalRankings: w.procedure.input(FinalAwardRankingUpdateSchema).mutation(async ({ ctx, input, session }) => {
+			await ctx.limits.consumeWriteBudget(1 + input.nominations.length);
 			await transaction(ctx.db, async (tx) => {
 				await replaceFinalAwardNominations(tx, input.awardName, input.nominations);
 			});
@@ -414,6 +418,9 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 				if (new Set(awardNames).size !== awardNames.length) {
 					throw new WRPCError('Each award can only be updated once');
 				}
+
+				const weight = input.rankings.reduce((sum, ranking) => sum + 1 + ranking.nominations.length, 0);
+				await ctx.limits.consumeWriteBudget(Math.max(1, weight));
 
 				await transaction(ctx.db, async (tx) => {
 					for (const ranking of input.rankings) {

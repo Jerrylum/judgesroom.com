@@ -36,6 +36,7 @@ export function buildTeamRoute(w: WRPCRootObject<object, ServerContext, Record<s
 			session.broadcast<ClientRouter>().onTeamDataUpdate.notify(input);
 		}),
 		updateAllTeamData: w.procedure.input(z.array(TeamDataSchema)).mutation(async ({ ctx, input, session }) => {
+			await ctx.limits.consumeWriteBudget(Math.max(1, input.length));
 			await transaction(ctx.db, async (tx) => {
 				for (const teamData of input) {
 					await tx.update(teams).set(teamData).where(eq(teams.id, teamData.id));

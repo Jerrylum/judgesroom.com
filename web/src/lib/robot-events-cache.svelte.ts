@@ -9,6 +9,7 @@ import {
 } from '@judgesroom.com/protocol/src/robotevents-insight';
 import { downloadRobotEventsResources, getRobotEventsClient } from './robotevents-source';
 import { app } from './index.svelte';
+import { errorToString } from './utils.svelte';
 
 export type InsightSyncStatus = 'fetched' | 'cached' | 'waiting' | 'failed';
 
@@ -108,10 +109,17 @@ class RobotEventsCacheStore {
 	}
 
 	private async sync(resources: readonly RobotEventsResource[], refresh: boolean): Promise<InsightSyncStatus> {
-		const result = await app.wrpcClient.robotevents.subscribeRobotEventsCache.mutation({
-			resources: [...resources],
-			refresh
-		});
+		let result;
+		try {
+			result = await app.wrpcClient.robotevents.subscribeRobotEventsCache.mutation({
+				resources: [...resources],
+				refresh
+			});
+		} catch (error) {
+			this.lastError = errorToString(error);
+			console.error('Failed to subscribe to VEX Events cache:', error);
+			return 'failed';
+		}
 		for (const status of result) this.applyStatus(status);
 
 		const needed = result.filter((status) => status.requireRefetch).map((status) => status.resource);
@@ -231,6 +239,7 @@ class RobotEventsCacheStore {
 				}
 			}
 		} catch (error) {
+			this.lastError = errorToString(error);
 			console.error('Failed to report VEX Events fetch', error);
 			return false;
 		}
