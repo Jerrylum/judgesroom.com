@@ -59,7 +59,7 @@
 					"name": "DB_WRITE_LIMITER",
 					"namespace_id": "31001",
 					"simple": {
-						"limit": 500,
+						"limit": 1000,
 						"period": 60
 					}
 				}
