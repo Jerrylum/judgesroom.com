@@ -81,6 +81,7 @@
 				"run_worker_first": [
 					"/ws",
 					"/join",
+					"/rooms",
 					"/media/*"
 				],
 				"binding": "ASSETS"
@@ -134,6 +135,7 @@
 				"run_worker_first": [
 					"/ws",
 					"/join",
+					"/rooms",
 					"/media/*"
 				],
 				"binding": "ASSETS"
