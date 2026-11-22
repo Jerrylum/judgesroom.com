@@ -40,7 +40,8 @@
 					teamNumber: team.number,
 					teamName: team.name,
 					notebookDone: caches.some((cache) => Boolean(cache.enrId)),
-					interviewDone: caches.some((cache) => Boolean(cache.tiId))
+					interviewDone: caches.some((cache) => Boolean(cache.tiId)),
+					notebookDevelopmentStatus: team.notebookDevelopmentStatus
 				};
 			})
 			.filter((team): team is NonNullable<typeof team> => team !== null);
@@ -161,6 +162,7 @@
 								{groupId}
 								notebookDone={team.notebookDone}
 								interviewDone={team.interviewDone}
+								notebookDevelopmentStatus={team.notebookDevelopmentStatus}
 								{canReassign}
 							/>
 						{/each}

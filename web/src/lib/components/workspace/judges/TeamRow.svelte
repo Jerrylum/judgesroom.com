@@ -5,6 +5,7 @@
 	import ChatIcon from '$lib/icon/ChatIcon.svelte';
 	import ReassignTeamDialog from './ReassignTeamDialog.svelte';
 	import RowOverflowMenu from './RowOverflowMenu.svelte';
+	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {
 		teamId: string;
@@ -13,10 +14,18 @@
 		groupId: string;
 		notebookDone: boolean;
 		interviewDone: boolean;
+		notebookDevelopmentStatus: NotebookDevelopmentStatus;
 		canReassign: boolean;
 	}
 
-	let { teamId, teamNumber, teamName, groupId, notebookDone, interviewDone, canReassign }: Props = $props();
+	let { teamId, teamNumber, teamName, groupId, notebookDone, interviewDone, notebookDevelopmentStatus, canReassign }: Props = $props();
+
+	const notebookStatus = $derived.by(() => {
+		if (notebookDevelopmentStatus === 'fully_developed') return { text: m.fully_developed_notebook_status(), class: 'text-green-600' };
+		if (notebookDevelopmentStatus === 'developing') return { text: m.developing_notebook_status(), class: 'text-yellow-600' };
+		if (notebookDevelopmentStatus === 'not_submitted') return { text: m.not_submitted_notebook_status(), class: 'text-gray-500' };
+		return { text: m.undetermined_notebook_status(), class: 'text-gray-400' };
+	});
 
 	const teamLabel = $derived(`${teamNumber} · ${teamName}`);
 
@@ -38,21 +47,20 @@
 		<div class="truncate text-xs text-gray-600">{teamName}</div>
 		<div class="mt-2 flex items-center gap-2">
 			<span
-				class="inline-flex"
-				class:text-green-600={notebookDone}
-				class:text-gray-300={!notebookDone}
+				class={['inline-flex', notebookDone ? 'text-green-600' : 'text-gray-300']}
 				title={notebookDone ? m.notebook_done() : m.not_done()}
 			>
 				<NotebookIcon size={14} />
 			</span>
 			<span
-				class="inline-flex"
-				class:text-green-600={interviewDone}
-				class:text-gray-300={!interviewDone}
+				class={['inline-flex', interviewDone ? 'text-green-600' : 'text-gray-300']}
 				title={interviewDone ? m.interview_done() : m.not_done()}
 			>
 				<ChatIcon size={14} />
 			</span>
+		</div>
+		<div class={['mt-1 truncate text-xs', notebookStatus.class]} title={notebookStatus.text}>
+			{notebookStatus.text}
 		</div>
 	</div>
 	{#if canReassign}
