@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { env } from '$env/dynamic/public';
-	import { app, dialogs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { PUBLIC_TURNSTILE_SITE_KEY } from '$app/env/public';
+	import { app, dialogs } from '#lib/index.svelte.ts';
 	import { rubricScoreStepOptions } from '@judgesroom.com/protocol/src/event';
 	import RemoveAwardsDialog from './RemoveAwardsDialog.svelte';
 	import TurnstileWidget from './TurnstileWidget.svelte';
@@ -40,7 +40,7 @@
 	let turnstileToken = $state<string | null>(null);
 	let turnstileReset = $state(0);
 	let turnstileFailure = $state<string | null>(null);
-	const turnstileSiteKey = $derived((env.PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
+	const turnstileSiteKey = $derived((PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
 	const turnstileRequired = $derived(!isJudgesRoomJoined && turnstileSiteKey.length > 0);
 	const turnstileError = $derived(turnstileToken ? null : turnstileFailure);
 
@@ -223,10 +223,8 @@
 				type="button"
 				onclick={handleComplete}
 				class={['success', (blockers.length > 0 || (turnstileRequired && !turnstileToken)) && 'cursor-not-allowed opacity-50']}
-				disabled={blockers.length > 0 || (turnstileRequired && !turnstileToken)}
+				disabled={blockers.length > 0 || (turnstileRequired && !turnstileToken)}>{m.complete_setup()}</button
 			>
-				{m.complete_setup()}
-			</button>
 		{:else}
 			<div></div>
 			<button disabled class="success cursor-not-allowed opacity-75">

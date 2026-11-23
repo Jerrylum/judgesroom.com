@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { generateQrCodeDataUrl } from '$lib/qrcode';
+	import { m } from '#lib/paraglide/messages.js';
+	import { generateQrCodeDataUrl } from '#lib/qrcode.ts';
 	import './rubric.css';
-	import { app, tabs, subscriptions } from '$lib/index.svelte';
-	import type { NotebookRubricTab } from '$lib/tab.svelte';
-	import { errorToString, generateUUID } from '$lib/utils.svelte';
+	import { app, tabs, subscriptions } from '#lib/index.svelte.ts';
+	import type { NotebookRubricTab } from '#lib/tab.svelte.ts';
+	import { errorToString, generateUUID } from '#lib/utils.svelte.ts';
 	import { untrack } from 'svelte';
-	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '$lib/team.svelte';
+	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '#lib/team.svelte.ts';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import NotebookRubricTable1_0 from './NotebookRubricTable1_0.svelte';
 	import NotebookRubricTable2_0 from './NotebookRubricTable2_0.svelte';
-	import { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
+	import { NotebookRubricDocument } from '#lib/notebook-rubric-document.svelte.ts';
 	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import WarningSign from './WarningSign.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { getLocale } from '$lib/paraglide/runtime';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
+	import { getLocale } from '#lib/paraglide/runtime.js';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 
 	interface Props {

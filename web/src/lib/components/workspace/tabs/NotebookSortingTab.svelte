@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
-	import type { NotebookSortingTab } from '$lib/tab.svelte';
-	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '$lib/team.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
+	import type { NotebookSortingTab } from '#lib/tab.svelte.ts';
+	import { sortByAssignedTeams, sortByTeamNumber, readNotebookLinksExcel } from '#lib/team.svelte.ts';
 	import NotebookSortingTeamGrid from './NotebookSortingTeamGrid.svelte';
 	import NotebookSortingTeamTable from './NotebookSortingTeamTable.svelte';
-	import GridViewIcon from '$lib/icon/GridViewIcon.svelte';
-	import ColumnViewIcon from '$lib/icon/ColumnViewIcon.svelte';
+	import GridViewIcon from '#lib/icon/GridViewIcon.svelte';
+	import ColumnViewIcon from '#lib/icon/ColumnViewIcon.svelte';
 	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { errorToString } from '$lib/utils.svelte';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		tab: NotebookSortingTab;

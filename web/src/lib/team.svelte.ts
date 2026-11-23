@@ -157,9 +157,7 @@ export function readNotebookLinksExcel(excelContent: Uint8Array): NotebookLinksE
 		if (isBlankExcelRow(row)) continue;
 		const result = NotebookLinksExcelRowSchema.safeParse(row);
 		if (!result.success) {
-			const reason = result.error.issues
-				.map((issue) => `${issue.path.join('.') || 'row'}: ${issue.message}`)
-				.join('; ');
+			const reason = result.error.issues.map((issue) => `${issue.path.join('.') || 'row'}: ${issue.message}`).join('; ');
 			errors.push(`Row ${index + 2}: ${reason}`);
 			continue;
 		}

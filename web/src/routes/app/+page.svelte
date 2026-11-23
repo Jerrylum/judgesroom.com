@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import { onMount, tick } from 'svelte';
-	import { replaceState } from '$app/navigation';
-	import { app, AppUI, dialogs, googleAnalytics } from '$lib/index.svelte';
-	import EventSetup from '$lib/components/event-setup/EventSetup.svelte';
-	import Workspace from '$lib/components/workspace/Workspace.svelte';
-	import RoleSelection from '$lib/components/role-selection/RoleSelection.svelte';
-	import Loading from '$lib/components/loading/Loading.svelte';
-	import Begin from '$lib/components/begin/Begin.svelte';
-	import JoiningJudgesRoom from '$lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
-	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
-	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
-	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
-	import { errorToString, parseAuthTokenFromUrl, parseJudgesRoomUrl } from '$lib/utils.svelte';
-	import Notice from '$lib/components/notice/Notice.svelte';
-	import Leaving from '$lib/components/leaving/Leaving.svelte';
-	import I18n from '$lib/components/i18n/I18n.svelte';
-	import { translateConnectionCloseReason } from '$lib/app.svelte';
+	import { goto } from '$app/navigation';
+	import { app, AppUI, dialogs, googleAnalytics } from '#lib/index.svelte.ts';
+	import EventSetup from '#lib/components/event-setup/EventSetup.svelte';
+	import Workspace from '#lib/components/workspace/Workspace.svelte';
+	import RoleSelection from '#lib/components/role-selection/RoleSelection.svelte';
+	import Loading from '#lib/components/loading/Loading.svelte';
+	import Begin from '#lib/components/begin/Begin.svelte';
+	import JoiningJudgesRoom from '#lib/components/joining-judges-room/JoiningJudgesRoom.svelte';
+	import AlertDialog from '#lib/components/dialog/AlertDialog.svelte';
+	import ConfirmationDialog from '#lib/components/dialog/ConfirmationDialog.svelte';
+	import PromptDialog from '#lib/components/dialog/PromptDialog.svelte';
+	import { errorToString, parseAuthTokenFromUrl, parseJudgesRoomUrl } from '#lib/utils.svelte.ts';
+	import Notice from '#lib/components/notice/Notice.svelte';
+	import Leaving from '#lib/components/leaving/Leaving.svelte';
+	import I18n from '#lib/components/i18n/I18n.svelte';
+	import { translateConnectionCloseReason } from '#lib/app.svelte.ts';
 
 	const currentUser = $derived(app.getCurrentUser());
 	const currentUserJudge = $derived(app.getCurrentUserJudge());
@@ -63,10 +63,10 @@
 				return;
 			}
 
-			// Clear join params from the address bar (roomId / auth)
-			// Use tick() to avoid "cannot call replaceState(...) before router is initialized"
+			// Clear join params from the address bar (roomId / auth).
+			// Wait a tick so the router is initialized before goto replaces the URL.
 			tick().then(() => {
-				replaceState('/app', {});
+				goto('/app', { shallow: true, replace: true });
 			});
 		}
 
@@ -89,14 +89,18 @@
 			await app.joinJudgesRoomFromUrl(window.location.href);
 
 			// Clear join params from the address bar (roomId / auth)
-			replaceState('/app', {});
+			goto('/app', { shallow: true, replace: true });
 		} catch (error) {
 			console.error("Error joining Judges' Room from URL:", error);
 			AppUI.appPhase = 'begin';
 
 			const message = translateConnectionCloseReason(errorToString(error));
 			if (message) {
-				dialogs.showAlert({ title: m.failed_to_join(), message: message, confirmButtonClass: 'primary' });
+				dialogs.showAlert({
+					title: m.failed_to_join(),
+					message,
+					confirmButtonClass: 'primary'
+				});
 			}
 		}
 	}
@@ -112,7 +116,11 @@
 
 			const message = translateConnectionCloseReason(errorToString(error));
 			if (message) {
-				dialogs.showAlert({ title: m.failed_to_rejoin(), message: message, confirmButtonClass: 'primary' });
+				dialogs.showAlert({
+					title: m.failed_to_rejoin(),
+					message,
+					confirmButtonClass: 'primary'
+				});
 			}
 		}
 	}

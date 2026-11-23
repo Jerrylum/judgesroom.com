@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import CompetitionSetupStep from './CompetitionSetupStep.svelte';
 	import AwardSelectionStep from './AwardSelectionStep.svelte';
 	import TeamGroupsStep from './TeamGroupsStep.svelte';
 	import JudgeSetupStep from './JudgeSetupStep.svelte';
 	import ReviewStep from './ReviewStep.svelte';
 	import { onMount, untrack } from 'svelte';
-	import { app, AppUI, dialogs, gtag } from '$lib/index.svelte';
-	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '$lib/award.svelte';
-	import { EditingJudgeGroup, isJudgeSetupReady } from '$lib/judging.svelte';
-	import { type TeamInfoAndData } from '$lib/team.svelte';
+	import { app, AppUI, dialogs, gtag } from '#lib/index.svelte.ts';
+	import { AwardOptions, getOfficialAwardOptionsList, restoreAwardOptions } from '#lib/award.svelte.ts';
+	import { EditingJudgeGroup, isJudgeSetupReady } from '#lib/judging.svelte.ts';
+	import { type TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import { MAX_JUDGES_PER_ROOM, type JudgingMethod, type Judge, type JudgingStep } from '@judgesroom.com/protocol/src/judging';
-	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
+	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '#lib/event.svelte.ts';
 	import { DEFAULT_RUBRIC_SCORE_STEP } from '@judgesroom.com/protocol/src/event';
 	import EventCodeSetup from './EventCodeSetup.svelte';
-	import AccessLinkVerifyDialog from '$lib/components/access/AccessLinkVerifyDialog.svelte';
-	import { translateConnectionCloseReason } from '$lib/app.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import AccessLinkVerifyDialog from '#lib/components/access/AccessLinkVerifyDialog.svelte';
+	import { translateConnectionCloseReason } from '#lib/app.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	// Step management
 	let currentStep = $state(0);

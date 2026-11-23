@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app } from '#lib/index.svelte.ts';
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
-	import { translateConnectionCloseReason } from '$lib/app.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { translateConnectionCloseReason } from '#lib/app.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 	import { WebSocketConnectionFailedCloseReason } from '@judgesroom.com/protocol/src/room-id';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());

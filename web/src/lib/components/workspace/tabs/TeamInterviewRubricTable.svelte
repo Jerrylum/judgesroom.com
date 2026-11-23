@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { m } from '#lib/paraglide/messages.js';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { formatRubricScore, sumRubricScores, teamInterviewRubricConfig } from '@judgesroom.com/protocol/src/rubric';
-	import { getRubricCriterionTitle, getRubricProficiencyText, type ProficiencyLevel } from '$lib/rubric-messages';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
+	import { getRubricCriterionTitle, getRubricProficiencyText, type ProficiencyLevel } from '#lib/rubric-messages.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
 	import ScoringSlider from './ScoringSlider.svelte';
-	import { app } from '$lib/index.svelte';
+	import { app } from '#lib/index.svelte.ts';
 
 	interface Props {
 		rubricScores: number[];

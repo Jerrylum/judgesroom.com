@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { AppUI, dialogs, gtag } from '$lib/index.svelte';
-	import type { AwardOptions } from '$lib/award.svelte';
-	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { AppUI, dialogs, gtag } from '#lib/index.svelte.ts';
+	import type { AwardOptions } from '#lib/award.svelte.ts';
+	import RefreshIcon from '#lib/icon/RefreshIcon.svelte';
 	import {
 		getEventDivisionRankings,
 		getRobotEventsClient,
 		importFromRobotEvents,
 		type RobotEventsImportedData
-	} from '$lib/robotevents-source';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	} from '#lib/robotevents-source.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { untrack } from 'svelte';
@@ -45,7 +45,9 @@
 	}: Props = $props();
 
 	let importMethod = $state<'robotevents' | 'manual'>(
-		isEditingEventSetup ? (robotEventsSku && robotEventsEventId && divisionId ? 'robotevents' : 'manual') : 'robotevents'
+		untrack(() =>
+			isEditingEventSetup ? (robotEventsSku && robotEventsEventId && divisionId ? 'robotevents' : 'manual') : 'robotevents'
+		)
 	);
 	let inputRobotEventsSku = $state(robotEventsSku);
 	let inputDivisionId = $state(divisionId);

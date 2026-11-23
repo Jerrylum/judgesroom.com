@@ -1,10 +1,10 @@
 <script lang="ts">
-	import '$lib/components/workspace/tabs/rubric.css';
-	import TeamInterviewRubricTable2_0 from '$lib/components/workspace/tabs/TeamInterviewRubricTable2_0.svelte';
-	import { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
-	import { app } from '$lib/index.svelte';
-	import { m } from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
+	import '#lib/components/workspace/tabs/rubric.css';
+	import TeamInterviewRubricTable2_0 from '#lib/components/workspace/tabs/TeamInterviewRubricTable2_0.svelte';
+	import { TeamInterviewRubricDocument } from '#lib/interview-rubric-document.svelte.ts';
+	import { app } from '#lib/index.svelte.ts';
+	import { m } from '#lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '#lib/paraglide/runtime.js';
 
 	const form = TeamInterviewRubricDocument.createBlank('2.0');
 	let isSubmitted = $state(false);

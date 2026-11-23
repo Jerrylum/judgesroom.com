@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { dialogs } from '$lib/index.svelte';
-	import NotebookIcon from '$lib/icon/NotebookIcon.svelte';
-	import ChatIcon from '$lib/icon/ChatIcon.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import NotebookIcon from '#lib/icon/NotebookIcon.svelte';
+	import ChatIcon from '#lib/icon/ChatIcon.svelte';
 	import ReassignTeamDialog from './ReassignTeamDialog.svelte';
 	import RowOverflowMenu from './RowOverflowMenu.svelte';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';

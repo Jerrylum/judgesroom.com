@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import './eligibility-table.css';
-	import type { ExcellenceAwardCandidatesTab } from '$lib/tab.svelte';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
-	import { app } from '$lib/index.svelte';
-	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
-	import { excellenceReportsFromInsight, sortByTeamNumberAndEligibility } from '$lib/robotevents-source';
+	import type { ExcellenceAwardCandidatesTab } from '#lib/tab.svelte.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
+	import { app } from '#lib/index.svelte.ts';
+	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '#lib/robot-events-cache.svelte.ts';
+	import { excellenceReportsFromInsight, sortByTeamNumberAndEligibility } from '#lib/robotevents-source.ts';
 	import { isExcellenceAward } from '@judgesroom.com/protocol/src/award';
-	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import RefreshIcon from '#lib/icon/RefreshIcon.svelte';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 
 	interface Props {
 		tab: ExcellenceAwardCandidatesTab;

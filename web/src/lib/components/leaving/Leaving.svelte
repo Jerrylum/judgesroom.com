@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, AppUI, dialogs, tabs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, AppUI, dialogs, tabs } from '#lib/index.svelte.ts';
 	import { onMount } from 'svelte';
 
 	// This app phase is important to trigger unmounting before calling leaveJudgesRoom

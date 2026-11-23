@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import EllipsisVerticalIcon from '$lib/icon/EllipsisVerticalIcon.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import EllipsisVerticalIcon from '#lib/icon/EllipsisVerticalIcon.svelte';
 	import { onDestroy, type Snippet } from 'svelte';
 
 	interface Props {

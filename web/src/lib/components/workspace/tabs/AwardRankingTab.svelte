@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
-	import type { AwardRankingTab } from '$lib/tab.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
+	import type { AwardRankingTab } from '#lib/tab.svelte.ts';
 	import './award-ranking.css';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 

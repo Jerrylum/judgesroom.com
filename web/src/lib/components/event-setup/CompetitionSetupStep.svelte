@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import { onDestroy } from 'svelte';
-	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '$lib/event.svelte';
-	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
+	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '#lib/event.svelte.ts';
+	import { getOfficialAwardOptionsList, type AwardOptions } from '#lib/award.svelte.ts';
 	import { type Program, ProgramSchema } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
-	import { parseTournamentManagerCSV, type TeamInfoAndData } from '$lib/team.svelte';
+	import { parseTournamentManagerCSV, type TeamInfoAndData } from '#lib/team.svelte.ts';
 	import { v4 as uuidv4 } from 'uuid';
-	import { gtag } from '$lib/index.svelte';
+	import { gtag } from '#lib/index.svelte.ts';
 
 	gtag('event', 'competition_setup_step_loaded');
 
@@ -292,12 +292,7 @@
 		<div class="flex space-x-3">
 			<button onclick={onPrev} class="secondary">{m.back()}</button>
 		</div>
-		<button
-			type="button"
-			onclick={handleNext}
-			class={['primary', nextDisabled && 'cursor-not-allowed opacity-50']}
-			disabled={nextDisabled}
-		>
+		<button type="button" onclick={handleNext} class={['primary', nextDisabled && 'cursor-not-allowed opacity-50']} disabled={nextDisabled}>
 			{m.next_team_groups()}
 		</button>
 	</div>

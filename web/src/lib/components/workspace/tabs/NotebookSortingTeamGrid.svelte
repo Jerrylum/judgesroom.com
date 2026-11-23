@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs, tabs } from '$lib/index.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import { NotebookRubricTab } from '$lib/tab.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs, tabs } from '#lib/index.svelte.ts';
+	import EditIcon from '#lib/icon/EditIcon.svelte';
+	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		team: TeamInfoAndData;

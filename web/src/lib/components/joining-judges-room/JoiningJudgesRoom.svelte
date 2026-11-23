@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, AppUI } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, AppUI } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	// Watch for app data to become available and transition UI automatically
 	$effect(() => {

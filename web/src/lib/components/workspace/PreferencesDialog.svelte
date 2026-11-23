@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { app, dialogs } from '$lib/index.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '#lib/paraglide/runtime.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 
 	let enableGoogleAnalytics = $state(app.getPreferences().get('isGoogleAnalyticsEnabled'));
 

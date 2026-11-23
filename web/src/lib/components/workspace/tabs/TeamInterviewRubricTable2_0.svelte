@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
-	import { m } from '$lib/paraglide/messages.js';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { m } from '#lib/paraglide/messages.js';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import {
 		INTERVIEW_2_0_CRITERION_MAX,
 		INTERVIEW_2_0_MAX_SCORE,
 		interview2_0RubricSections
 	} from '@judgesroom.com/protocol/src/interview-2.0';
 	import { formatRubricScore } from '@judgesroom.com/protocol/src/rubric';
-	import { getRubricCriterionTitle, getRubricSectionHeading } from '$lib/rubric-messages';
-	import type { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
+	import { getRubricCriterionTitle, getRubricSectionHeading } from '#lib/rubric-messages.ts';
+	import type { TeamInterviewRubricDocument } from '#lib/interview-rubric-document.svelte.ts';
 	import ScoringSlider from './ScoringSlider.svelte';
-	import { app } from '$lib/index.svelte';
+	import { app } from '#lib/index.svelte.ts';
 
 	interface Props {
 		document: TeamInterviewRubricDocument;
@@ -173,11 +173,11 @@
 								<p class="text-lg tabular-nums">{formatRubricScore(criterion.points)}</p>
 							{:else}
 								<ScoringSlider
-								bind:variable={criterion.points}
-								max={INTERVIEW_2_0_CRITERION_MAX}
-								step={scoreStep}
-								showError={showValidationErrors}
-							/>
+									bind:variable={criterion.points}
+									max={INTERVIEW_2_0_CRITERION_MAX}
+									step={scoreStep}
+									showError={showValidationErrors}
+								/>
 							{/if}
 						</scoring>
 					</row>

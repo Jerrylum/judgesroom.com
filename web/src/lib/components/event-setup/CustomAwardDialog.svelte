@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { dialogs } from '$lib/index.svelte';
-	import { AwardOptions, createCustomAwardOptions } from '$lib/award.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import { AwardOptions, createCustomAwardOptions } from '#lib/award.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 	import { type Program, type Grade, type AwardType, AwardTypeSchema } from '@judgesroom.com/protocol/src/award';
 
 	interface Props {

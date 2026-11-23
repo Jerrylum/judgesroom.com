@@ -1,4 +1,4 @@
-import { m } from '$lib/paraglide/messages.js';
+import { m } from '#lib/paraglide/messages.js';
 import type { Component, ComponentProps } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import { generateUUID } from './utils.svelte';

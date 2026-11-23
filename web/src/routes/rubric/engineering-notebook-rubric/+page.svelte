@@ -1,10 +1,10 @@
 <script lang="ts">
-	import '$lib/components/workspace/tabs/rubric.css';
-	import NotebookRubricTable2_0 from '$lib/components/workspace/tabs/NotebookRubricTable2_0.svelte';
-	import { app } from '$lib/index.svelte';
-	import { m } from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
+	import '#lib/components/workspace/tabs/rubric.css';
+	import NotebookRubricTable2_0 from '#lib/components/workspace/tabs/NotebookRubricTable2_0.svelte';
+	import { app } from '#lib/index.svelte.ts';
+	import { m } from '#lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '#lib/paraglide/runtime.js';
+	import { NotebookRubricDocument } from '#lib/notebook-rubric-document.svelte.ts';
 
 	// Default values for the rubric
 	const form = NotebookRubricDocument.createBlank('2.0');

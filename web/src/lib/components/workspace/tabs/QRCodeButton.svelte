@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { dialogs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { dialogs } from '#lib/index.svelte.ts';
 	import QRCodeDialog from './QRCodeDialog.svelte';
-	import QRCodeIcon from '$lib/icon/QRCodeIcon.svelte';
+	import QRCodeIcon from '#lib/icon/QRCodeIcon.svelte';
 
 	interface Props {
 		link: string;

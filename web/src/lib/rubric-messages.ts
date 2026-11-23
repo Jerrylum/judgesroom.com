@@ -1,4 +1,4 @@
-import { m } from '$lib/paraglide/messages.js';
+import { m } from '#lib/paraglide/messages.js';
 import type { NotebookProficiencyHeaderScale } from '@judgesroom.com/protocol/src/rubric-shared';
 
 export type ProficiencyLevel = 'exemplary' | 'proficient' | 'developing' | 'beginning';

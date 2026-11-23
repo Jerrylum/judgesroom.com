@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import './teams-rubrics-list.css';
-	import { app, subscriptions, tabs } from '$lib/index.svelte';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
-	import { NotebookRubricTab, TeamInterviewRubricTab } from '$lib/tab.svelte';
-	import { sortByTeamNumber } from '$lib/team.svelte';
+	import { app, subscriptions, tabs } from '#lib/index.svelte.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
+	import { NotebookRubricTab, TeamInterviewRubricTab } from '#lib/tab.svelte.ts';
+	import { sortByTeamNumber } from '#lib/team.svelte.ts';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
 	import { formatGradeShort, type Grade } from '@judgesroom.com/protocol/src/award';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';

@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import CustomAwardDialog from './CustomAwardDialog.svelte';
-	import { dialogs } from '$lib/index.svelte';
-	import { getOfficialAwardOptionsList, type AwardOptions } from '$lib/award.svelte';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import { getOfficialAwardOptionsList, type AwardOptions } from '#lib/award.svelte.ts';
 	import { isExcellenceAward, isDesignAward, type AwardType, type Program } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
-	import { getEventGradeLevelOptions } from '$lib/event.svelte';
+	import { getEventGradeLevelOptions } from '#lib/event.svelte.ts';
 	import ExcellenceAwardOptions from './ExcellenceAwardOptions.svelte';
 	import DesignAwardOptions from './DesignAwardOptions.svelte';
 	import AwardSelectionColumn from './AwardSelectionColumn.svelte';
 	import { onDestroy, tick, untrack } from 'svelte';
-	import { gtag } from '$lib/index.svelte';
+	import { gtag } from '#lib/index.svelte.ts';
 
 	gtag('event', 'award_selection_step_loaded');
 

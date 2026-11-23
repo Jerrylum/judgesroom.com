@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { generateQrCodeDataUrl } from '$lib/qrcode';
-	import { dialogs } from '$lib/index.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import { generateQrCodeDataUrl } from '#lib/qrcode.ts';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
 
 	interface Props {
 		link: string;

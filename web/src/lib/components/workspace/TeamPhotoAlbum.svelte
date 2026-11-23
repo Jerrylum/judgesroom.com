@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
-	import { getPhotoObjectUrl, uploadTeamPhoto } from '$lib/media';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
+	import { getPhotoObjectUrl, uploadTeamPhoto } from '#lib/media.ts';
 	import { MAX_PHOTOS_PER_TEAM } from '@judgesroom.com/protocol/src/media';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
-	import { errorToString, generateUUID } from '$lib/utils.svelte';
-	import ImagesIcon from '$lib/icon/ImagesIcon.svelte';
+	import { errorToString, generateUUID } from '#lib/utils.svelte.ts';
+	import ImagesIcon from '#lib/icon/ImagesIcon.svelte';
 	import TeamPhotoLightbox from './TeamPhotoLightbox.svelte';
 
 	interface Props {

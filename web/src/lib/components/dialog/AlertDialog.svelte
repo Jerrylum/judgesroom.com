@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { AlertDialog } from '$lib/dialog.svelte';
-	import { dialogs } from '$lib/index.svelte';
+	import type { AlertDialog } from '#lib/dialog.svelte.ts';
+	import { dialogs } from '#lib/index.svelte.ts';
 	import Dialog from './Dialog.svelte';
 
 	interface Props {

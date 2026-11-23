@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs } from '$lib/index.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
-	import { errorToString } from '$lib/utils.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		teamId: string;

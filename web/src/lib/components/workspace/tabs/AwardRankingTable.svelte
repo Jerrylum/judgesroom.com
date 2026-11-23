@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
 	import RankingButtons from './RankingButtons.svelte';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import { formatGradeMark } from '@judgesroom.com/protocol/src/award';
-	import { sortByTeamNumberInMap } from '$lib/team.svelte';
+	import { sortByTeamNumberInMap } from '#lib/team.svelte.ts';
 
 	interface Props {
 		title: string;

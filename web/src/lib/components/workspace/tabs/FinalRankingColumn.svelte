@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import { isExcellenceAward, isDesignAward, getPairedExcellenceAwardName, type Award } from '@judgesroom.com/protocol/src/award';
 	import { dndzone, SHADOW_ITEM_MARKER_PROPERTY_NAME, TRIGGERS, type DndEvent } from 'svelte-dnd-action';
-	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
+	import TrashBinIcon from '#lib/icon/TrashBinIcon.svelte';
 	import { flip } from 'svelte/animate';
 	import AwardNominationComponent from './AwardNomination.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import AddNominationDialog from './AddNominationDialog.svelte';
-	import type { ExcellenceAwardTeamEligibility } from '$lib/robotevents-source';
+	import type { ExcellenceAwardTeamEligibility } from '#lib/robotevents-source.ts';
 
 	interface Props {
 		award: Award;

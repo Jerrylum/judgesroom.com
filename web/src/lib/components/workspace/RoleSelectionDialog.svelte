@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { createJudgeFromString } from '$lib/judging.svelte';
-	import { type User } from '$lib/user.svelte';
-	import { app, dialogs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { createJudgeFromString } from '#lib/judging.svelte.ts';
+	import { type User } from '#lib/user.svelte.ts';
+	import { app, dialogs } from '#lib/index.svelte.ts';
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');

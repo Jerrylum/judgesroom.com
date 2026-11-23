@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import JudgeCard from './JudgeCard.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { type EditingJudgeGroup } from '$lib/judging.svelte';
-	import { type TeamInfoAndData, EditingTeamList } from '$lib/team.svelte';
+	import { type EditingJudgeGroup } from '#lib/judging.svelte.ts';
+	import { type TeamInfoAndData, EditingTeamList } from '#lib/team.svelte.ts';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
+	import EditIcon from '#lib/icon/EditIcon.svelte';
+	import TrashBinIcon from '#lib/icon/TrashBinIcon.svelte';
 	import { tick } from 'svelte';
 
 	interface Props {

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { app, AppUI, dialogs } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import { translateConnectionCloseReason } from '$lib/app.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '#lib/paraglide/runtime.js';
+	import { app, AppUI, dialogs } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import { translateConnectionCloseReason } from '#lib/app.svelte.ts';
 
 	let judgesRoomUrl = $state('');
 

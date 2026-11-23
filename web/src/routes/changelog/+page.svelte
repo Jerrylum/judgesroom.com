@@ -26,13 +26,13 @@
 									filter to one group or to teams that are not assigned.
 								</li>
 								<li>
-									Each team row has a plus to start a blank notebook or interview rubric. A score you already submitted opens that rubric, and
-									your own scores are marked <strong>(you)</strong>. On <strong>Notebook Sorting</strong>, your notebook button shows the score
-									you submitted and opens that rubric.
+									Each team row has a plus to start a blank notebook or interview rubric. A score you already submitted opens that rubric,
+									and your own scores are marked <strong>(you)</strong>. On <strong>Notebook Sorting</strong>, your notebook button shows
+									the score you submitted and opens that rubric.
 								</li>
 								<li>
-									On a notebook rubric, set the notebook to <strong>Developing</strong> or <strong>Fully Developed</strong>. The control shows
-									the official definition and the current total.
+									On a notebook rubric, set the notebook to <strong>Developing</strong> or <strong>Fully Developed</strong>. The control
+									shows the official definition and the current total.
 								</li>
 								<li>
 									On <strong>Other Settings</strong>, choose a score step of 0.1, 0.2, 0.5, or 1 for the notebook rubric and the interview
@@ -40,12 +40,12 @@
 									until you change the setting.
 								</li>
 								<li>
-									Ranking and nomination tables list the judges under each group name. In a blended event, elementary, middle, and high school
-									teams show <strong>ES</strong>, <strong>MS</strong>, or <strong>HS</strong>. College teams stay unmarked.
+									Ranking and nomination tables list the judges under each group name. In a blended event, elementary, middle, and high
+									school teams show <strong>ES</strong>, <strong>MS</strong>, or <strong>HS</strong>. College teams stay unmarked.
 								</li>
 								<li>
-									On <strong>Final Ranking</strong>, mark an award as having no winner without clearing its nominees. A team on a declined award
-									can still win a later award. A corner button widens the tab so more columns fit.
+									On <strong>Final Ranking</strong>, mark an award as having no winner without clearing its nominees. A team on a declined
+									award can still win a later award. A corner button widens the tab so more columns fit.
 								</li>
 								<li>
 									If the connection gives up, <strong>Retry connection</strong> in the header opens a new connection without leaving the page,
@@ -59,19 +59,19 @@
 							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
 								<li>Closing a tab returns to the tab you were using before it, instead of the tab to its left.</li>
 								<li>
-									Once a room exists, the event setup step numbers open any step. Going back to the Judges' Room asks before discarding unsaved
-									setup. Completing setup confirms before it deletes saved awards. Changing the program or grade replaces the award list.
-									Rankings and nominations for a removed award are deleted. Notebook and interview rubrics stay.
+									Once a room exists, the event setup step numbers open any step. Going back to the Judges' Room asks before discarding
+									unsaved setup. Completing setup confirms before it deletes saved awards. Changing the program or grade replaces the award
+									list. Rankings and nominations for a removed award are deleted. Notebook and interview rubrics stay.
 								</li>
 								<li>
-									<strong>Event Overview</strong> sits beside <strong>Start</strong>, and <strong>Teams &amp; Rubrics</strong> uses the width of
-									the page. Extra notebook and interview scores wrap onto more lines instead of scrolling sideways.
+									<strong>Event Overview</strong> sits beside <strong>Start</strong>, and <strong>Teams &amp; Rubrics</strong> uses the width
+									of the page. Extra notebook and interview scores wrap onto more lines instead of scrolling sideways.
 								</li>
 								<li>
 									<strong>Team Attendance</strong>, <strong>Excellence Award Candidates</strong>, and <strong>Final Ranking</strong> share
-									RobotEvents data inside the room, so several judges opening those tabs together are less likely to be told there were too many
-									requests. A tab you just opened uses data from the last minute. <strong>Refresh</strong> downloads again when no one else is
-									already fetching.
+									RobotEvents data inside the room, so several judges opening those tabs together are less likely to be told there were too
+									many requests. A tab you just opened uses data from the last minute. <strong>Refresh</strong> downloads again when no one else
+									is already fetching.
 								</li>
 							</ul>
 						</div>
@@ -80,8 +80,9 @@
 							<h3 class="mb-3 text-xl font-semibold">Fixed</h3>
 							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
 								<li>
-									A team from another grade already sitting on a <strong>Final Ranking</strong> column no longer freezes every reorder. Grade is
-									checked when a team enters an award. An <strong>Excellence</strong> column still refuses another team once it has a nominee.
+									A team from another grade already sitting on a <strong>Final Ranking</strong> column no longer freezes every reorder.
+									Grade is checked when a team enters an award. An <strong>Excellence</strong> column still refuses another team once it has
+									a nominee.
 								</li>
 								<li>A refused access link shows the reason and leaves the room, instead of staying on Offline.</li>
 							</ul>
@@ -121,12 +122,12 @@
 							<h3 class="mb-3 text-xl font-semibold">Fixed</h3>
 							<ul class="ml-4 list-inside list-disc space-y-2 text-gray-700">
 								<li>
-									A blended event with one <strong>Design</strong> award and two <strong>Excellence</strong> awards, or the reverse, can
-									move a team from the single column onto either of the split columns.
+									A blended event with one <strong>Design</strong> award and two <strong>Excellence</strong> awards, or the reverse, can move
+									a team from the single column onto either of the split columns.
 								</li>
 								<li>
-									Moving a team from one award to another updates both lists together. A failed save cannot leave the team on both awards
-									or on neither.
+									Moving a team from one award to another updates both lists together. A failed save cannot leave the team on both awards or
+									on neither.
 								</li>
 								<li>The left and right scroll buttons on wide tables now keep every row lined up.</li>
 							</ul>

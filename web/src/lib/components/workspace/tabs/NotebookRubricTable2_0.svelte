@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { m } from '#lib/paraglide/messages.js';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { notebook2_0RubricSections } from '@judgesroom.com/protocol/src/notebook-2.0';
-	import type { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
+	import type { NotebookRubricDocument } from '#lib/notebook-rubric-document.svelte.ts';
 	import NotebookRubricTableView from './NotebookRubricTableView.svelte';
 
 	interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Notice } from '$lib/app.svelte';
+	import type { Notice } from '#lib/app.svelte.ts';
 
 	interface Props {
 		notice: Notice;

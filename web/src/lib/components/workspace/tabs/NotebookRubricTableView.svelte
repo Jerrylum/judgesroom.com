@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
-	import { m } from '$lib/paraglide/messages.js';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
+	import { m } from '#lib/paraglide/messages.js';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { formatRubricScore, sumRubricScores, type NotebookProficiencyHeaderScale } from '@judgesroom.com/protocol/src/rubric';
 	import {
 		getRubricCriterionTitle,
@@ -9,11 +9,11 @@
 		getRubricProficiencyText,
 		getRubricSectionHeading,
 		type ProficiencyLevel
-	} from '$lib/rubric-messages';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
+	} from '#lib/rubric-messages.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
 	import ScoringSlider from './ScoringSlider.svelte';
-	import { app } from '$lib/index.svelte';
-	import type { NotebookRubricDocument } from '$lib/notebook-rubric-document.svelte';
+	import { app } from '#lib/index.svelte.ts';
+	import type { NotebookRubricDocument } from '#lib/notebook-rubric-document.svelte.ts';
 
 	type TableSection = {
 		categoryKey: string;
@@ -144,11 +144,11 @@
 								<p class="text-lg tabular-nums">{formatRubricScore(document.scores[scoreIndex])}</p>
 							{:else}
 								<ScoringSlider
-								bind:variable={document.scores[scoreIndex]}
-								max={row.maxPoints}
-								step={scoreStep}
-								showError={showValidationErrors}
-							/>
+									bind:variable={document.scores[scoreIndex]}
+									max={row.maxPoints}
+									step={scoreStep}
+									showError={showValidationErrors}
+								/>
 							{/if}
 						</scoring>
 					</row>
@@ -157,7 +157,11 @@
 			<row class="footer-row border-t-3! bg-gray-100">
 				<div class="p-2">
 					<p class="text-sm font-bold">{m.rubric_notes()}</p>
-					<textarea class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1" maxlength="5000" bind:value={document.notes} readonly={isSubmitted}
+					<textarea
+						class="mt-2 block h-20 min-h-20 w-full border border-gray-300 p-1"
+						maxlength="5000"
+						bind:value={document.notes}
+						readonly={isSubmitted}
 					></textarea>
 				</div>
 				<scoring class="flex-col! gap-2">

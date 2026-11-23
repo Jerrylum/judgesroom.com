@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import './notebook-sorting.css';
-	import { app, dialogs, tabs } from '$lib/index.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import { NotebookRubricTab } from '$lib/tab.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import { app, dialogs, tabs } from '#lib/index.svelte.ts';
+	import EditIcon from '#lib/icon/EditIcon.svelte';
+	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface SubmittedNotebook {
 		rubricId: string;

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { dialogs } from '$lib/index.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import { canUseClipboard } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		generateReportText: (config: TeamPresentationConfig) => string;

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
-	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
-	import EditIcon from '$lib/icon/EditIcon.svelte';
-	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
-	import { tick } from 'svelte';
+	import { EditingTeamList, type TeamInfoAndData } from '#lib/team.svelte.ts';
+	import EditIcon from '#lib/icon/EditIcon.svelte';
+	import TrashBinIcon from '#lib/icon/TrashBinIcon.svelte';
+	import { tick, untrack } from 'svelte';
 
 	interface Props {
 		groupName: string;
@@ -31,8 +31,8 @@
 	const flipDurationMs = 200;
 
 	let isEditingName = $state(false);
-	let editingName = $state(groupName);
-	let zoneId = `zone-${groupName}-${Math.floor(Math.random() * 1000000)}`;
+	let editingName = $state(untrack(() => groupName));
+	let zoneId = `zone-${untrack(() => groupName)}-${Math.floor(Math.random() * 1000000)}`;
 
 	function startEditingName() {
 		isEditingName = true;

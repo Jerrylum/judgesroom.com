@@ -9,17 +9,17 @@ if (typeof window !== 'undefined') {
 		const url = typeof input === 'object' && 'url' in input ? input.url : null;
 		switch (url) {
 			case 'https://events.vex.com/api/v2/events?sku[]=RE-VIQRC-24-9999':
-				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchEvents.json'));
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchEvents.json'));
 			case 'https://events.vex.com/api/v2/events/59999':
-				return resolveDemoData((await import('$lib/demo-data/roboteventsFetchEvents.json')).data[0]);
+				return resolveDemoData((await import('#lib/demo-data/roboteventsFetchEvents.json')).data[0]);
 			case 'https://events.vex.com/api/v2/events/59999/teams?page=1&per_page=250':
-				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchTeams.json'));
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchTeams.json'));
 			case 'https://events.vex.com/api/v2/events/59999/awards?page=1&per_page=250':
-				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchAwards.json'));
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchAwards.json'));
 			case 'https://events.vex.com/api/v2/events/59999/divisions/1/rankings?page=1&per_page=250':
-				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchRanking.json'));
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchRanking.json'));
 			case 'https://events.vex.com/api/v2/events/59999/skills?page=1&per_page=250':
-				return resolveDemoData(await import('$lib/demo-data/roboteventsFetchSkills.json'));
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchSkills.json'));
 			default:
 				return origin(input, init);
 		}

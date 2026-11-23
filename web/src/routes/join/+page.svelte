@@ -9,9 +9,9 @@
 		if (roomId) {
 			const next = new URLSearchParams({ roomId });
 			if (auth) next.set('auth', auth);
-			goto(`/app?${next.toString()}`, { replaceState: true });
+			goto(`/app?${next.toString()}`, { replace: true });
 		} else {
-			goto('/app', { replaceState: true });
+			goto('/app', { replace: true });
 		}
 	});
 </script>

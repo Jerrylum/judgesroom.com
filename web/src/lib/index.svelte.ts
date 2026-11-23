@@ -1,7 +1,7 @@
 import './demo-data.svelte';
-import { App, AppStorage } from '$lib/app.svelte';
+import { App, AppStorage } from '#lib/app.svelte.ts';
 import { DialogController } from './dialog.svelte';
-import { TabController } from '$lib/tab.svelte';
+import { TabController } from '#lib/tab.svelte.ts';
 import type { SubscriptionsStorage } from './subscriptions.svelte';
 import { GoogleAnalytics } from './google-analytics.svelte';
 

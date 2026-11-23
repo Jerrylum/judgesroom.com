@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app } from '#lib/index.svelte.ts';
 	import ConnectionStatusIndicator from './ConnectionStatusIndicator.svelte';
 	import UserMenu from './UserMenu.svelte';
 

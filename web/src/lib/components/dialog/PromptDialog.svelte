@@ -1,15 +1,16 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import type { PromptDialog } from '$lib/dialog.svelte';
-	import { dialogs } from '$lib/index.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { untrack } from 'svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import type { PromptDialog } from '#lib/dialog.svelte.ts';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 
 	interface Props {
 		dialog: PromptDialog;
 	}
 
 	let { dialog }: Props = $props();
-	let inputValue = $state(dialog.defaultValue || '');
+	let inputValue = $state(untrack(() => dialog.defaultValue || ''));
 	let inputElement: HTMLInputElement;
 
 	// Focus the input when component mounts

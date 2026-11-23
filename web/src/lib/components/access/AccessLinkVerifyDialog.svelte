@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { dialogs } from '$lib/index.svelte';
-	import { canUseClipboard } from '$lib/utils.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import { canUseClipboard } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		accessLink: string;

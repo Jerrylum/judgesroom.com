@@ -20,10 +20,11 @@
 		"@eslint/js": "^9.38.0",
 		"@inlang/paraglide-js": "^2.6.0",
 		"@judgesroom.com/worker": "workspace:*",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.47.3",
-		"@sveltejs/vite-plugin-svelte": "^6.2.1",
-		"@tailwindcss/vite": "^4.1.16",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.4.0",
+		"@sveltejs/load-config": "^0.2.2",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tailwindcss/vite": "^4.3.5",
 		"@types/node": "^24.9.1",
 		"@types/papaparse": "^5.3.16",
 		"@types/qrcode": "^1.5.6",
@@ -36,19 +37,19 @@
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
-		"svelte": "^5.42.2",
-		"svelte-check": "^4.3.3",
-		"tailwindcss": "^4.1.16",
-		"typescript": "^5.9.3",
+		"svelte": "^5.57.2",
+		"svelte-check": "^4.7.5",
+		"tailwindcss": "^4.3.5",
+		"typescript": "^6.0.0",
 		"typescript-eslint": "^8.46.2",
-		"vite": "^7.1.12",
-		"vite-plugin-devtools-json": "^0.2.1",
+		"vite": "^8.0.12",
+		"vite-plugin-devtools-json": "^1.1.2",
 		"vitest": "^4.1.12",
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"dependencies": {
-		"@judgesroom.com/protocol": "workspace:*",
 		"@jerrylum/wrpc": "^1.3.0",
+		"@judgesroom.com/protocol": "workspace:*",
 		"crypto-js": "^4.2.0",
 		"dompurify": "^3.3.1",
 		"events": "^3.3.0",
@@ -59,5 +60,9 @@
 		"uuid": "^13.0.0",
 		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
 		"zod": "^4.1.12"
+	},
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
 	}
 }

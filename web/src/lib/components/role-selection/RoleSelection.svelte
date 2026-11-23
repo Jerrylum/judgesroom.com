@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { setLocale, getLocale, type Locale } from '$lib/paraglide/runtime';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { createJudgeFromString } from '$lib/judging.svelte';
-	import { type User } from '$lib/user.svelte';
-	import { app, AppUI } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { setLocale, getLocale, type Locale } from '#lib/paraglide/runtime.js';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
+	import { createJudgeFromString } from '#lib/judging.svelte.ts';
+	import { type User } from '#lib/user.svelte.ts';
+	import { app, AppUI } from '#lib/index.svelte.ts';
 	import type { ConnectionState } from '@jerrylum/wrpc/client';
-	import { errorToString } from '$lib/utils.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	let connectionState: ConnectionState = $derived(app.getConnectionState());
 	let selectedJudgeId = $state('');

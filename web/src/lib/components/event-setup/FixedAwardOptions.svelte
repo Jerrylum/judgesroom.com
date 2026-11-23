@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import type { AwardOptions } from '$lib/award.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import type { AwardOptions } from '#lib/award.svelte.ts';
 
 	interface Props {
 		award: AwardOptions;

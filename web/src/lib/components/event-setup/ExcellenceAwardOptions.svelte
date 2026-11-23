@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import type { AwardOptions } from '$lib/award.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import type { AwardOptions } from '#lib/award.svelte.ts';
 
 	const GENERIC_AWARD_NAME = 'Excellence Award';
 

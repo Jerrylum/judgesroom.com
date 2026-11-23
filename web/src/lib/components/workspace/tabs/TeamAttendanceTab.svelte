@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import CheckIcon from '$lib/icon/CheckIcon.svelte';
-	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import { sortByTeamNumber } from '$lib/team.svelte';
-	import { ATTENDANCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app } from '#lib/index.svelte.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import CheckIcon from '#lib/icon/CheckIcon.svelte';
+	import RefreshIcon from '#lib/icon/RefreshIcon.svelte';
+	import { sortByTeamNumber } from '#lib/team.svelte.ts';
+	import { ATTENDANCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '#lib/robot-events-cache.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		isActive: boolean;

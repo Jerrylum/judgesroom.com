@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import type { ConfirmationDialog } from '$lib/dialog.svelte';
-	import { dialogs } from '$lib/index.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import type { ConfirmationDialog } from '#lib/dialog.svelte.ts';
+	import { dialogs } from '#lib/index.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 
 	interface Props {
 		dialog: ConfirmationDialog;

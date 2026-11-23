@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
-	import { scrollSync } from '$lib/scroll-sync.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
+	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
 	import NominationButtons from './NominationButtons.svelte';
-	import { sortByTeamNumberInMap } from '$lib/team.svelte';
+	import { sortByTeamNumberInMap } from '#lib/team.svelte.ts';
 	import { formatGradeMark, getPairedExcellenceAwardName, isDesignAward } from '@judgesroom.com/protocol/src/award';
 	import type { JudgeGroup } from '@judgesroom.com/protocol/src/judging';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';

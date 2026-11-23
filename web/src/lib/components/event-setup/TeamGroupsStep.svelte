@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import TeamGroup from './TeamGroup.svelte';
-	import { EditingTeamList, type TeamInfoAndData, groupTeamsByGroup } from '$lib/team.svelte';
-	import { gtag } from '$lib/index.svelte';
+	import { EditingTeamList, type TeamInfoAndData, groupTeamsByGroup } from '#lib/team.svelte.ts';
+	import { gtag } from '#lib/index.svelte.ts';
 
 	gtag('event', 'team_groups_step_loaded');
 

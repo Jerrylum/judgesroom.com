@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import TrashBinIcon from '$lib/icon/TrashBinIcon.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import TrashBinIcon from '#lib/icon/TrashBinIcon.svelte';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
 
 	interface Props {

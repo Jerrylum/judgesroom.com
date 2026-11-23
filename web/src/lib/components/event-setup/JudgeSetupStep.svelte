@@ -1,14 +1,20 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import JudgeGroup from './JudgeGroup.svelte';
 	import TeamPlate from './TeamPlate.svelte';
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { tick } from 'svelte';
-	import { EditingJudgeGroup, createJudgeFromString, randomlyAssignTeamsToGroups, getJudgesInGroup, isJudgeSetupReady } from '$lib/judging.svelte';
-	import { EditingTeamList, type TeamInfoAndData } from '$lib/team.svelte';
+	import {
+		EditingJudgeGroup,
+		createJudgeFromString,
+		randomlyAssignTeamsToGroups,
+		getJudgesInGroup,
+		isJudgeSetupReady
+	} from '#lib/judging.svelte.ts';
+	import { EditingTeamList, type TeamInfoAndData } from '#lib/team.svelte.ts';
 	import { MAX_JUDGES_PER_ROOM, type JudgingMethod, type Judge } from '@judgesroom.com/protocol/src/judging';
-	import { app, dialogs } from '$lib/index.svelte';
+	import { app, dialogs } from '#lib/index.svelte.ts';
 
 	interface Props {
 		isEditingEventSetup: boolean;

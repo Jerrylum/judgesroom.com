@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs, subscriptions } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs, subscriptions } from '#lib/index.svelte.ts';
 	import JudgeAccessLinkDialog from './JudgeAccessLinkDialog.svelte';
 	import RemoveJudgeConfirmDialog from './RemoveJudgeConfirmDialog.svelte';
 	import RowOverflowMenu from './RowOverflowMenu.svelte';
 	import { JudgeNameSchema } from '@judgesroom.com/protocol/src/judging';
-	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
+	import { canUseClipboard, errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		rowKey: string;
@@ -180,6 +180,7 @@
 			</div>
 		</div>
 		<div
+			role="none"
 			class="pointer-events-none hidden shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 sm:flex"
 			class:pointer-events-auto={selected}
 			class:opacity-100={selected}
@@ -194,7 +195,7 @@
 				</button>
 			{/if}
 		</div>
-		<div onpointerdown={(event) => event.stopPropagation()}>
+		<div role="none" onpointerdown={(event) => event.stopPropagation()}>
 			<RowOverflowMenu align="right">
 				{#snippet children({ close })}
 					<button

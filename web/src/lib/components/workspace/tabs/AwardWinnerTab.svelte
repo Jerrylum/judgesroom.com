@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs } from '$lib/index.svelte';
-	import type { AwardWinnerTab } from '$lib/tab.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import type { AwardWinnerTab } from '#lib/tab.svelte.ts';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-	import { sortByTeamNumber } from '$lib/team.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '$lib/award.svelte';
+	import { sortByTeamNumber } from '#lib/team.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '#lib/award.svelte.ts';
 	import AwardWinnersReportDialog, { type TeamPresentationConfig } from './AwardWinnersReportDialog.svelte';
 
 	interface Props {

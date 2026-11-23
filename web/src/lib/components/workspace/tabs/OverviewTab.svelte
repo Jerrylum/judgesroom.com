@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs, subscriptions, tabs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs, subscriptions, tabs } from '#lib/index.svelte.ts';
 	import {
 		AwardNominationTab,
 		AwardRankingTab,
@@ -12,12 +12,12 @@
 		TeamInterviewRubricTab,
 		ExcellenceAwardCandidatesTab,
 		type OverviewTab
-	} from '$lib/tab.svelte';
+	} from '#lib/tab.svelte.ts';
 	import TeamsRubricsList from './TeamsRubricsList.svelte';
-	import { gtag } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import NotebookIcon from '$lib/icon/NotebookIcon.svelte';
-	import ChatIcon from '$lib/icon/ChatIcon.svelte';
+	import { gtag } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import NotebookIcon from '#lib/icon/NotebookIcon.svelte';
+	import ChatIcon from '#lib/icon/ChatIcon.svelte';
 
 	interface Props {
 		tab: OverviewTab;

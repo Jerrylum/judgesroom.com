@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
 	import type { AwardRankingsFullUpdate } from '@judgesroom.com/protocol/src/rubric';
-	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
+	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '#lib/award.svelte.ts';
 
 	interface Props {
 		awardIndex: number;

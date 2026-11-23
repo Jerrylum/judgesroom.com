@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { generateQrCodeDataUrl } from '$lib/qrcode';
+	import { m } from '#lib/paraglide/messages.js';
+	import { generateQrCodeDataUrl } from '#lib/qrcode.ts';
 	import './rubric.css';
-	import { app, tabs, subscriptions } from '$lib/index.svelte';
-	import type { TeamInterviewRubricTab } from '$lib/tab.svelte';
-	import { NotebookRubricTab } from '$lib/tab.svelte';
-	import { errorToString, generateUUID } from '$lib/utils.svelte';
+	import { app, tabs, subscriptions } from '#lib/index.svelte.ts';
+	import type { TeamInterviewRubricTab } from '#lib/tab.svelte.ts';
+	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
+	import { errorToString, generateUUID } from '#lib/utils.svelte.ts';
 	import { untrack } from 'svelte';
-	import { sortByAssignedTeams, sortByTeamNumber } from '$lib/team.svelte';
+	import { sortByAssignedTeams, sortByTeamNumber } from '#lib/team.svelte.ts';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import WarningSign from './WarningSign.svelte';
 	import AwardRankingTable from './AwardRankingTable.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
 	import TeamInterviewRubricTable2_0 from './TeamInterviewRubricTable2_0.svelte';
-	import { TeamInterviewRubricDocument } from '$lib/interview-rubric-document.svelte';
+	import { TeamInterviewRubricDocument } from '#lib/interview-rubric-document.svelte.ts';
 	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { getLocale } from '$lib/paraglide/runtime';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
+	import { getLocale } from '#lib/paraglide/runtime.js';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;

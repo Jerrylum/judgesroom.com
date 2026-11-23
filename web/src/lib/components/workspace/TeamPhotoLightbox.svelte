@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import ChevronLeftIcon from '$lib/icon/ChevronLeftIcon.svelte';
-	import ChevronRightIcon from '$lib/icon/ChevronRightIcon.svelte';
-	import { deleteTeamPhoto, getPhotoObjectUrl } from '$lib/media';
-	import { app, dialogs, subscriptions } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import ChevronLeftIcon from '#lib/icon/ChevronLeftIcon.svelte';
+	import ChevronRightIcon from '#lib/icon/ChevronRightIcon.svelte';
+	import { deleteTeamPhoto, getPhotoObjectUrl } from '#lib/media.ts';
+	import { app, dialogs, subscriptions } from '#lib/index.svelte.ts';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
-	import { errorToString } from '$lib/utils.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		open: boolean;

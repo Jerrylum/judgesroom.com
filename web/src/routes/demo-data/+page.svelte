@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { app, dialogs } from '$lib/index.svelte';
-	import { env } from '$env/dynamic/public';
-	import { m } from '$lib/paraglide/messages.js';
-	import { errorToString } from '$lib/utils.svelte';
-	import TurnstileWidget from '$lib/components/event-setup/TurnstileWidget.svelte';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import { PUBLIC_TURNSTILE_SITE_KEY } from '$app/env/public';
+	import { m } from '#lib/paraglide/messages.js';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import TurnstileWidget from '#lib/components/event-setup/TurnstileWidget.svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
@@ -15,15 +15,15 @@
 		interview2_0ScoresToPayload,
 		notebook2_0ScoresToPayload
 	} from '@judgesroom.com/protocol/src/rubric';
-	import AlertDialog from '$lib/components/dialog/AlertDialog.svelte';
-	import ConfirmationDialog from '$lib/components/dialog/ConfirmationDialog.svelte';
-	import PromptDialog from '$lib/components/dialog/PromptDialog.svelte';
-	import initialData from '$lib/demo-data/initialData.json';
-	import teamAttendance from '$lib/demo-data/teamAttendance.json';
-	import insertNotebookLinks from '$lib/demo-data/insertNotebookLinks.json';
-	import sortNotebookLinks from '$lib/demo-data/sortNotebookLinks.json';
-	import awardRanking from '$lib/demo-data/awardRanking.json';
-	import awardNomination from '$lib/demo-data/awardNomination.json';
+	import AlertDialog from '#lib/components/dialog/AlertDialog.svelte';
+	import ConfirmationDialog from '#lib/components/dialog/ConfirmationDialog.svelte';
+	import PromptDialog from '#lib/components/dialog/PromptDialog.svelte';
+	import initialData from '#lib/demo-data/initialData.json';
+	import teamAttendance from '#lib/demo-data/teamAttendance.json';
+	import insertNotebookLinks from '#lib/demo-data/insertNotebookLinks.json';
+	import sortNotebookLinks from '#lib/demo-data/sortNotebookLinks.json';
+	import awardRanking from '#lib/demo-data/awardRanking.json';
+	import awardNomination from '#lib/demo-data/awardNomination.json';
 
 	const currentDialog = $derived(dialogs.currentDialog);
 
@@ -43,7 +43,7 @@
 	let turnstileToken = $state<string | null>(null);
 	let turnstileReset = $state(0);
 	let turnstileFailure = $state<string | null>(null);
-	const turnstileSiteKey = $derived((env.PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
+	const turnstileSiteKey = $derived((PUBLIC_TURNSTILE_SITE_KEY ?? '').trim());
 	const turnstileRequired = $derived(turnstileSiteKey.length > 0);
 	const turnstileError = $derived(turnstileToken ? null : turnstileFailure);
 
@@ -349,13 +349,12 @@
 					onclick={() => executeAllSteps()}
 					class="primary"
 					disabled={stepStatus.some((status) => status === 'running') ||
-						(stepStatus[0] !== 'completed' && turnstileRequired && !turnstileToken)}
+						(stepStatus[0] !== 'completed' && turnstileRequired && !turnstileToken)}>Execute All Steps</button
 				>
-					Execute All Steps
-				</button>
-				<button onclick={() => resetSteps()} class="secondary" disabled={stepStatus.some((status) => status === 'running')}>
-					Reset All Steps
-				</button>
+
+				<button onclick={() => resetSteps()} class="secondary" disabled={stepStatus.some((status) => status === 'running')}
+					>Reset All Steps</button
+				>
 			</div>
 		</div>
 

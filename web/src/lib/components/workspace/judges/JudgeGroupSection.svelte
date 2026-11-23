@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions } from '#lib/index.svelte.ts';
 	import JudgeRow from './JudgeRow.svelte';
 	import TeamRow from './TeamRow.svelte';
 	import { JudgeNameSchema } from '@judgesroom.com/protocol/src/judging';
-	import { errorToString, generateUUID } from '$lib/utils.svelte';
+	import { errorToString, generateUUID } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		groupId: string;

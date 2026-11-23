@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import WarningIcon from '$lib/icon/WarningIcon.svelte';
+	import WarningIcon from '#lib/icon/WarningIcon.svelte';
 
 	interface Props {
 		title: string;

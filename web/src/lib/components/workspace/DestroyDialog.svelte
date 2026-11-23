@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
 
 	let destroyConfirmText = $state('');
 	let isDestroying = $state(false);

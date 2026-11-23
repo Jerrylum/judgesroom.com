@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TabButton from './tabs/TabButton.svelte';
-	import type { Tab } from '$lib/tab.svelte';
+	import type { Tab } from '#lib/tab.svelte.ts';
 
 	// Props
 	interface Props {

@@ -3,7 +3,7 @@ import type { TeamData } from '@judgesroom.com/protocol/src/team';
 import { AuthTokenSchema } from '@judgesroom.com/protocol/src/access';
 import { RoomIdSchema } from '@judgesroom.com/protocol/src/room-id';
 import { isWRPCError } from '@judgesroom.com/protocol/src/wrpc-error';
-import { m } from '$lib/paraglide/messages.js';
+import { m } from '#lib/paraglide/messages.js';
 import { SvelteSet, SvelteURL } from 'svelte/reactivity';
 import { v4 } from 'uuid';
 

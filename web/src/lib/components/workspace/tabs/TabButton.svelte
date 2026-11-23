@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import type { Tab } from '$lib/tab.svelte';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import type { Tab } from '#lib/tab.svelte.ts';
 
 	interface Props {
 		tab: Tab;

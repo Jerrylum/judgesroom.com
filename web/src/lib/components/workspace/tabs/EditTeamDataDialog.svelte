@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs } from '$lib/index.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
+	import { untrack } from 'svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 
 	interface Props {
 		team: Readonly<TeamInfoAndData>;
@@ -11,11 +12,13 @@
 
 	let { team }: Props = $props();
 
-	// Clone the team data for editing
-	let editedTeam = $state({
-		notebookLink: team.notebookLink || '',
-		absent: team.absent || false
-	});
+	// Clone the team data for editing. This is a snapshot of the team when the dialog opens.
+	let editedTeam = $state(
+		untrack(() => ({
+			notebookLink: team.notebookLink || '',
+			absent: team.absent || false
+		}))
+	);
 
 	// Validation states
 	let validationError = $state('');

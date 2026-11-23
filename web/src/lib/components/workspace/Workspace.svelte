@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, subscriptions, tabs, dialogs } from '$lib/index.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, subscriptions, tabs, dialogs } from '#lib/index.svelte.ts';
 	import {
 		isJudgeGuideVersionOlderThanLatest,
 		LATEST_JUDGE_GUIDE_VERSION,
 		resolveJudgeGuideVersion
 	} from '@judgesroom.com/protocol/src/judge-guide';
-	import { dismissJudgeGuideNotice, wasJudgeGuideNoticeDismissed } from '$lib/judge-guide-notice';
+	import { dismissJudgeGuideNotice, wasJudgeGuideNoticeDismissed } from '#lib/judge-guide-notice.ts';
 	import Header from './Header.svelte';
 	import TabBar from './TabBar.svelte';
 	import type { AwardRankingsFullUpdate, SubmissionCache } from '@judgesroom.com/protocol/src/rubric';
 	import type { TeamPhoto } from '@judgesroom.com/protocol/src/media';
-	import { JudgesTab, type Tab } from '$lib/tab.svelte';
-	import { errorToString } from '$lib/utils.svelte';
+	import { JudgesTab, type Tab } from '#lib/tab.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	// Get tab state
 	const allTabs = $derived(tabs.allTabs);

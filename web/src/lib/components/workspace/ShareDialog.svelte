@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { generateQrCodeDataUrl } from '$lib/qrcode';
-	import { app, dialogs } from '$lib/index.svelte';
-	import ClientsIcon from '$lib/icon/ClientsIcon.svelte';
-	import CloseIcon from '$lib/icon/CloseIcon.svelte';
-	import DenialIcon from '$lib/icon/DenialIcon.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { canUseClipboard, errorToString } from '$lib/utils.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { generateQrCodeDataUrl } from '#lib/qrcode.ts';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import ClientsIcon from '#lib/icon/ClientsIcon.svelte';
+	import CloseIcon from '#lib/icon/CloseIcon.svelte';
+	import DenialIcon from '#lib/icon/DenialIcon.svelte';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import { canUseClipboard, errorToString } from '#lib/utils.svelte.ts';
 
 	let qrCodeDataUrl = $state('');
 	let copyButtonText = $state(m.copy());

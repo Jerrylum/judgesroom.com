@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app } from '$lib/index.svelte';
-	import { errorToString } from '$lib/utils.svelte';
-	import DenialIcon from '$lib/icon/DenialIcon.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app } from '#lib/index.svelte.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
+	import DenialIcon from '#lib/icon/DenialIcon.svelte';
 	import JudgeGroupSection from './JudgeGroupSection.svelte';
-	import { buildAccessLinksCsv, downloadTextFile } from '$lib/judges-csv';
+	import { buildAccessLinksCsv, downloadTextFile } from '#lib/judges-csv.ts';
 	import type { AccessLinks } from '@judgesroom.com/protocol/src/access';
 	import { onMount } from 'svelte';
 

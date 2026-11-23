@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
-	import { app, dialogs } from '$lib/index.svelte';
-	import type { FinalAwardRankingTab } from '$lib/tab.svelte';
+	import { m } from '#lib/paraglide/messages.js';
+	import { app, dialogs } from '#lib/index.svelte.ts';
+	import type { FinalAwardRankingTab } from '#lib/tab.svelte.ts';
 	import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
 	import { isExcellenceAward, getDesignExcellenceSwapZone, type Award } from '@judgesroom.com/protocol/src/award';
 	import FinalRankingColumn from './FinalRankingColumn.svelte';
 	import { tick } from 'svelte';
-	import { getJudgedAwardWinners } from '$lib/award.svelte';
-	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '$lib/robot-events-cache.svelte';
-	import { excellenceReportsFromInsight, type ExcellenceAwardTeamEligibility } from '$lib/robotevents-source';
-	import RefreshIcon from '$lib/icon/RefreshIcon.svelte';
-	import EnlargeIcon from '$lib/icon/EnlargeIcon.svelte';
-	import ReduceIcon from '$lib/icon/ReduceIcon.svelte';
-	import { sanitizeHTMLMessage } from '$lib/i18n';
-	import { errorToString } from '$lib/utils.svelte';
+	import { getJudgedAwardWinners } from '#lib/award.svelte.ts';
+	import { EXCELLENCE_ROBOT_EVENTS_RESOURCES, robotEventsCache } from '#lib/robot-events-cache.svelte.ts';
+	import { excellenceReportsFromInsight, type ExcellenceAwardTeamEligibility } from '#lib/robotevents-source.ts';
+	import RefreshIcon from '#lib/icon/RefreshIcon.svelte';
+	import EnlargeIcon from '#lib/icon/EnlargeIcon.svelte';
+	import ReduceIcon from '#lib/icon/ReduceIcon.svelte';
+	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
+	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		tab: FinalAwardRankingTab;
@@ -239,9 +239,7 @@
 		const status = await robotEventsCache.refresh(EXCELLENCE_ROBOT_EVENTS_RESOURCES);
 		if (status === 'failed') {
 			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
-			app.addErrorNotice(
-				m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError })
-			);
+			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError }));
 		}
 	}
 
@@ -253,9 +251,7 @@
 		void robotEventsCache.retain(eventId, divisionId, EXCELLENCE_ROBOT_EVENTS_RESOURCES).then((status) => {
 			if (cancelled || status !== 'failed') return;
 			console.error('Failed to get event from RobotEvents', robotEventsCache.lastError);
-			app.addErrorNotice(
-				m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError })
-			);
+			app.addErrorNotice(m.failed_to_get_excellence_award_eligibility_data_from_robotevents({ error: robotEventsCache.lastError }));
 		});
 		return () => {
 			cancelled = true;

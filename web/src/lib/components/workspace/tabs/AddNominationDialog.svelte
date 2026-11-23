@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '#lib/paraglide/messages.js';
 	import { formatGradesShort, type Award } from '@judgesroom.com/protocol/src/award';
-	import type { TeamInfoAndData } from '$lib/team.svelte';
-	import Dialog from '$lib/components/dialog/Dialog.svelte';
-	import { subscriptions } from '$lib/index.svelte';
-	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '$lib/award.svelte';
+	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
+	import Dialog from '#lib/components/dialog/Dialog.svelte';
+	import { subscriptions } from '#lib/index.svelte.ts';
+	import { meetsAwardNotebookRequirement, requiresFullyDevelopedNotebook } from '#lib/award.svelte.ts';
 
 	interface Props {
 		open: boolean;
