@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import { app } from '#lib/index.svelte.ts';
-	import { notebookDevelopmentStatusLabel, notebookSortingRadioChecked } from '#lib/notebook-status.ts';
+	import { notebookDevelopmentStatusLabel, notebookSortingRadioChecked, notebookSortingRadioDisabled } from '#lib/notebook-status.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import { errorToString } from '#lib/utils.svelte.ts';
@@ -14,7 +14,12 @@
 	let { team, options }: Props = $props();
 
 	async function updateNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		if (notebookSortingRadioChecked(notebookDevelopmentStatus, team.notebookDevelopmentStatus)) return;
+		if (
+			notebookSortingRadioChecked(notebookDevelopmentStatus, team.notebookDevelopmentStatus) ||
+			notebookSortingRadioDisabled(notebookDevelopmentStatus, team.notebookDevelopmentStatus)
+		) {
+			return;
+		}
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({
 				...team,
@@ -33,11 +38,14 @@
 				type="radio"
 				name={`notebook-status-${team.id}`}
 				checked={notebookSortingRadioChecked(option, team.notebookDevelopmentStatus)}
+				disabled={notebookSortingRadioDisabled(option, team.notebookDevelopmentStatus)}
 				value={option}
 				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus(option)}
 			/>
-			<span class="text-sm text-gray-700">{notebookDevelopmentStatusLabel(option)}</span>
+			<span class={['text-sm', notebookSortingRadioDisabled(option, team.notebookDevelopmentStatus) ? 'text-gray-400' : 'text-gray-700']}
+				>{notebookDevelopmentStatusLabel(option)}</span
+			>
 		</label>
 	{/each}
 </div>

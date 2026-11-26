@@ -53,15 +53,20 @@ export function notebookSortingControls(
 	};
 }
 
-/** The positive radio stands for a submitted notebook, including one already scored. */
+/**
+ * Submitted stays selected after a physical notebook is scored, because it is still submitted.
+ * Not Reviewed is only the digital status before scoring, so a scored notebook does not show it as selected.
+ */
 export function notebookSortingRadioChecked(option: NotebookDevelopmentStatus, status: NotebookDevelopmentStatus): boolean {
 	if (option === 'turned_in') {
 		return status === 'turned_in' || status === 'developing' || status === 'fully_developed';
 	}
-	if (option === 'undetermined') {
-		return status === 'undetermined' || status === 'developing' || status === 'fully_developed';
-	}
 	return status === option;
+}
+
+/** Not Reviewed cannot replace Developing or Fully Developed from the sorting radios. */
+export function notebookSortingRadioDisabled(option: NotebookDevelopmentStatus, status: NotebookDevelopmentStatus): boolean {
+	return option === 'undetermined' && (status === 'developing' || status === 'fully_developed');
 }
 
 /** Submit sets these statuses to Developing, including a notebook another judge marked Link Broken. */
