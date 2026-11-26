@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AwardSchema } from './award';
 import { ProgramSchema } from './award';
-import { TeamInfoSchema } from './team';
+import { NotebookSubmissionMethodSchema, TeamInfoSchema } from './team';
 import { JudgingMethodSchema, JudgingStepSchema } from './judging';
 import { JudgeGroupSchema } from './judging';
 import { JudgeGuideVersionSchema } from './judge-guide';
@@ -55,6 +55,7 @@ export const EssentialDataSchema = z.object({
 	judgeGuideVersion: JudgeGuideVersionSchema,
 	notebookRubricScoreStep: RubricScoreStepSchema,
 	interviewRubricScoreStep: RubricScoreStepSchema,
+	notebookSubmissionMethod: NotebookSubmissionMethodSchema,
 	teamInfos: z.array(TeamInfoSchema),
 	judgeGroups: z.array(JudgeGroupSchema).min(1),
 	awards: z.array(AwardSchema)

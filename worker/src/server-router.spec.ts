@@ -148,6 +148,61 @@ describe('ServerRouter', () => {
 			const after = await getTeamData(context.db);
 			expect(after.find((t) => t.id === team.id)?.absent).toBe(true);
 		});
+
+		it('applies digital link rules and keeps the stored status', async () => {
+			const updateResolver = serverRouter.team.updateTeamData._def._resolver!;
+			const teams = await getTeamData(context.db);
+			const team = teams.find((row) => row.notebookLink !== '') ?? teams[0];
+			await updateResolver({
+				input: { ...team, notebookLink: '', notebookDevelopmentStatus: 'undetermined' },
+				session,
+				ctx: context
+			});
+			expect((await getTeamData(context.db)).find((row) => row.id === team.id)?.notebookDevelopmentStatus).toBe('not_submitted');
+
+			await updateResolver({
+				input: { ...team, notebookLink: 'https://notes.example', notebookDevelopmentStatus: 'not_submitted' },
+				session,
+				ctx: context
+			});
+			const reviewed = (await getTeamData(context.db)).find((row) => row.id === team.id);
+			expect(reviewed?.notebookDevelopmentStatus).toBe('undetermined');
+
+			await updateResolver({
+				input: { ...reviewed!, notebookDevelopmentStatus: 'developing' },
+				session,
+				ctx: context
+			});
+			await updateResolver({
+				input: { ...reviewed!, notebookLink: '', notebookDevelopmentStatus: 'not_submitted' },
+				session,
+				ctx: context
+			});
+			const scored = (await getTeamData(context.db)).find((row) => row.id === team.id);
+			expect(scored?.notebookLink).toBe('');
+			expect(scored?.notebookDevelopmentStatus).toBe('developing');
+		});
+	});
+
+	describe('notebook submission method change', () => {
+		it('turns notebook link broken into not reviewed when switching to physical', async () => {
+			const updateTeam = serverRouter.team.updateTeamData._def._resolver!;
+			const updateEssential = serverRouter.essential.updateEssentialData._def._resolver!;
+			const [team] = await getTeamData(context.db);
+			await updateTeam({
+				input: { ...team, notebookDevelopmentStatus: 'notebook_link_broken' },
+				session,
+				ctx: context
+			});
+			const current = await getEssentialData(context.db);
+			await updateEssential({
+				input: { ...current, notebookSubmissionMethod: 'physical' },
+				session,
+				ctx: context
+			});
+			expect((await getTeamData(context.db)).find((row) => row.id === team.id)?.notebookDevelopmentStatus).toBe('undetermined');
+			expect((await getEssentialData(context.db)).notebookSubmissionMethod).toBe('physical');
+		});
 	});
 
 	describe('judge router', () => {

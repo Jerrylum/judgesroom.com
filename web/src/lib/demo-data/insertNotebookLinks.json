@@ -17,14 +17,14 @@
 		"id": "80418629-c38a-4c7c-857a-e1932364c7fc",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
 		"id": "eb60bb42-3cc3-4844-b113-a787b0695e57",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
@@ -45,35 +45,35 @@
 		"id": "50efc995-0ceb-4f9b-8427-5d337039e4d7",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
 		"id": "fea0fb1b-4514-40e5-b465-6d18a0c3beb7",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
 		"id": "07596558-a5e9-4ede-ade3-c66744be5d0e",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
 		"id": "99c1d501-306e-4c7c-b9f0-76261b1c6d39",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
 		"id": "ed4c9c5e-b972-4131-8282-96cfe96febed",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
@@ -108,7 +108,7 @@
 		"id": "8261696f-1cb5-46e0-9d4e-e746013db852",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
@@ -122,7 +122,7 @@
 		"id": "630725e7-b90c-4b1a-af8b-fdaa01d21879",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
@@ -157,28 +157,28 @@
 		"id": "e5975fe1-5622-443e-9241-cac2bb8f2252",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
 		"id": "32dab0e6-4253-484c-b50f-603a3d590c89",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
 		"id": "3269b867-85d4-404f-bcf2-1dec1f2b0673",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
 		"id": "b72d7d5e-d31e-4b0a-b805-316cdcc7a22e",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": true
 	},
 	{
@@ -192,14 +192,14 @@
 		"id": "f52b0f95-5cc7-4f7c-ab28-22d51306e779",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
 		"id": "16c45934-1534-420d-8646-40ab393dfd09",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
@@ -234,14 +234,14 @@
 		"id": "1f30db9b-1cc5-4318-b40c-925156acfd30",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
 		"id": "aadb986b-6e43-4124-94e8-5cd8b482a0f2",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	},
 	{
@@ -255,7 +255,7 @@
 		"id": "44a4c6ac-2d1a-45de-898a-d0cf969c6f82",
 		"notebookLink": "",
 		"hasInnovateAwardSubmissionForm": false,
-		"notebookDevelopmentStatus": "undetermined",
+		"notebookDevelopmentStatus": "not_submitted",
 		"absent": false
 	}
 ]

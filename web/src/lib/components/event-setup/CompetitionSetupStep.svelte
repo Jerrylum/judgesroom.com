@@ -6,6 +6,7 @@
 	import { type Program, ProgramSchema } from '@judgesroom.com/protocol/src/award';
 	import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 	import { parseTournamentManagerCSV, type TeamInfoAndData } from '#lib/team.svelte.ts';
+	import { initialNotebookDevelopmentStatus, type NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
 	import { v4 as uuidv4 } from 'uuid';
 	import { gtag } from '#lib/index.svelte.ts';
 
@@ -18,6 +19,7 @@
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: TeamInfoAndData[];
 		awardOptions: AwardOptions[];
+		notebookSubmissionMethod: NotebookSubmissionMethod;
 		allowIncompleteNext?: boolean;
 		onNext: () => void;
 		onPrev: () => void;
@@ -30,6 +32,7 @@
 		selectedEventGradeLevel = $bindable(),
 		teams = $bindable(),
 		awardOptions = $bindable(),
+		notebookSubmissionMethod,
 		allowIncompleteNext = false,
 		onNext,
 		onPrev
@@ -130,7 +133,8 @@
 					group: existingTeam?.group ?? team.group ?? '',
 					notebookLink: existingTeam?.notebookLink ?? '',
 					hasInnovateAwardSubmissionForm: existingTeam?.hasInnovateAwardSubmissionForm ?? false,
-					notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? 'undetermined',
+					notebookDevelopmentStatus:
+						existingTeam?.notebookDevelopmentStatus ?? initialNotebookDevelopmentStatus(notebookSubmissionMethod, ''),
 					absent: existingTeam?.absent ?? false
 				} satisfies TeamInfoAndData;
 			});

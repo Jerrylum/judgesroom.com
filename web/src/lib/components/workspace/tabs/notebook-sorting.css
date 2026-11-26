@@ -51,7 +51,7 @@ notebook-sorting-table {
 		}
 
 		> row {
-			@apply flex h-12 flex-row;
+			@apply flex min-h-28 flex-row;
 
 			> :first-child {
 				@apply border-l-3;

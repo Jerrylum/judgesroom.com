@@ -7,7 +7,8 @@
 	import { sortByTeamNumber } from '#lib/team.svelte.ts';
 	import type { Submission } from '@judgesroom.com/protocol/src/rubric';
 	import { formatGradeShort, type Grade } from '@judgesroom.com/protocol/src/award';
-	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import { isScoredNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import { notebookDevelopmentStatusClass, notebookDevelopmentStatusLabel, notebookSortingControls } from '#lib/notebook-status.ts';
 	import QRCodeButton from './QRCodeButton.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 
@@ -35,6 +36,7 @@
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const isPhysicalNotebook = $derived(essentialData?.notebookSubmissionMethod === 'physical');
 	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
 	const judgeGroups = $derived(essentialData?.judgeGroups ?? []);
@@ -126,10 +128,10 @@
 
 	// Get notebook status display
 	function getNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		if (notebookDevelopmentStatus === 'fully_developed') return { text: m.fully_developed_notebook_status(), class: 'text-green-600' };
-		if (notebookDevelopmentStatus === 'developing') return { text: m.developing_notebook_status(), class: 'text-yellow-600' };
-		if (notebookDevelopmentStatus === 'not_submitted') return { text: m.not_submitted_notebook_status(), class: 'text-gray-600' };
-		return { text: m.undetermined_notebook_status(), class: 'text-gray-600' };
+		return {
+			text: notebookDevelopmentStatusLabel(notebookDevelopmentStatus),
+			class: notebookDevelopmentStatusClass(notebookDevelopmentStatus)
+		};
 	}
 
 	// Get judge name by ID
@@ -165,11 +167,11 @@
 		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
 		const totalTeams = teamsToShow.length;
 
-		// 2. Teams with submitted notebook rubrics / evaluable notebooks (Developing + Fully Developed)
-		const evaluableTeams = teamsToShow.filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus));
-		const evaluableCount = evaluableTeams.length;
-
-		const evaluableWithRubrics = evaluableTeams.filter((team) => {
+		const notebookSubmissionMethod = essentialData?.notebookSubmissionMethod ?? 'digital';
+		const rubricTeams = teamsToShow.filter(
+			(team) => notebookSortingControls(notebookSubmissionMethod, team.notebookDevelopmentStatus).showStartRubric
+		);
+		const evaluableWithRubrics = rubricTeams.filter((team) => {
 			const teamRubricsAndNotes = data[team.id] ?? getEmptyRubricsAndNotesPerTeam();
 			return teamRubricsAndNotes.engineeringNotebookRubrics.length > 0;
 		}).length;
@@ -183,7 +185,7 @@
 
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
-			evaluableWithRubrics: { count: evaluableWithRubrics, total: evaluableCount },
+			evaluableWithRubrics: { count: evaluableWithRubrics, total: rubricTeams.length },
 			teamsInterviewed: { count: teamsInterviewed, total: presentTeams }
 		};
 	});
@@ -247,6 +249,8 @@
 			<select bind:value={notebookFilter} class="rounded border border-gray-300 px-2 py-1">
 				<option value="all">{m.teams_rubrics_filter_all()}</option>
 				<option value="undetermined">{m.undetermined_notebook_status()}</option>
+				<option value="turned_in">{m.turned_in_notebook_status()}</option>
+				<option value="notebook_link_broken">{m.notebook_link_broken_status()}</option>
 				<option value="not_submitted">{m.not_submitted_notebook_status()}</option>
 				<option value="developing">{m.developing_notebook_status()}</option>
 				<option value="fully_developed">{m.fully_developed_notebook_status()}</option>
@@ -317,7 +321,9 @@
 					<div class="col-group flex w-32 max-w-32 min-w-32 items-center justify-center">{m.assigned_group_table()}</div>
 				{/if}
 				<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center">{m.notebook_status_table()}</div>
-				<div class="col-link flex w-40 max-w-40 min-w-40 items-center justify-center">{m.notebook_link_table()}</div>
+				{#if !isPhysicalNotebook}
+					<div class="col-link flex w-40 max-w-40 min-w-40 items-center justify-center">{m.notebook_link_table()}</div>
+				{/if}
 				<div class="col-flex flex items-center justify-center">{m.notebook_rubrics_table()}</div>
 				<div class="col-flex flex items-center justify-center">{m.team_interview_rubrics_table()}</div>
 				<div class="col-photos flex w-20 max-w-20 min-w-20 items-center justify-center">{m.photos_album()}</div>
@@ -357,27 +363,28 @@
 						<div class="col-status flex w-36 max-w-36 min-w-36 items-center justify-center text-center text-xs">
 							<span class={notebookStatus.class}>{notebookStatus.text}</span>
 						</div>
-						<!-- Notebook Link Column -->
-						<div class="col-link flex w-40 max-w-40 min-w-40 items-center gap-2 p-2">
-							{#if team.notebookLink}
-								<a
-									href={team.notebookLink}
-									target="_blank"
-									class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
-									title={team.notebookLink}
-								>
-									{team.notebookLink.replace(/^https?:\/\//, '')}
-								</a>
-								<QRCodeButton link={team.notebookLink} />
-							{:else}
-								<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
-							{/if}
-						</div>
+						{#if !isPhysicalNotebook}
+							<div class="col-link flex w-40 max-w-40 min-w-40 items-center gap-2 p-2">
+								{#if team.notebookLink}
+									<a
+										href={team.notebookLink}
+										target="_blank"
+										class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+										title={team.notebookLink}
+									>
+										{team.notebookLink.replace(/^https?:\/\//, '')}
+									</a>
+									<QRCodeButton link={team.notebookLink} />
+								{:else}
+									<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
+								{/if}
+							</div>
+						{/if}
 
 						<!-- Notebook Rubrics Column -->
 						<div class="col-flex flex items-center">
 							<div class="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1 p-1">
-								{#if isSubmittedNotebook(team.notebookDevelopmentStatus)}
+								{#if isScoredNotebook(team.notebookDevelopmentStatus)}
 									{#each teamRubricsAndNotes.engineeringNotebookRubrics as rubric (rubric.id)}
 										<button
 											onclick={() => openNotebookRubric(team.id, rubric.id)}

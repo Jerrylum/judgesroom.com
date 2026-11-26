@@ -3,7 +3,13 @@ import * as XLSX from 'xlsx';
 import { List } from './list.svelte';
 import { SvelteSet } from 'svelte/reactivity';
 import { type Grade } from '@judgesroom.com/protocol/src/award';
-import { type TeamInfo, type TeamData, TeamNumberSchema, TeamGroupNameSchema } from '@judgesroom.com/protocol/src/team';
+import {
+	type TeamInfo,
+	type TeamData,
+	type NotebookDevelopmentStatus,
+	TeamNumberSchema,
+	TeamGroupNameSchema
+} from '@judgesroom.com/protocol/src/team';
 import z from 'zod';
 
 export type TeamInfoAndData = TeamInfo & TeamData;
@@ -264,18 +270,15 @@ export function sortByAssignedTeams(
 	return assignedTeamIds.map((id) => includedTeams[id]);
 }
 
+const NOTEBOOK_STATUS_RANK: Record<NotebookDevelopmentStatus, number> = {
+	fully_developed: 0,
+	developing: 1,
+	turned_in: 2,
+	undetermined: 3,
+	notebook_link_broken: 4,
+	not_submitted: 5
+};
+
 export function sortByNotebookDevelopmentStatus(teams: TeamInfoAndData[]): TeamInfoAndData[] {
-	return teams.sort((a, b) => {
-		const aIsDeveloped = a.notebookDevelopmentStatus;
-		const bIsDeveloped = b.notebookDevelopmentStatus;
-		if (aIsDeveloped !== bIsDeveloped) {
-			if (aIsDeveloped === 'fully_developed') return -1;
-			if (bIsDeveloped === 'fully_developed') return 1;
-			if (aIsDeveloped === 'developing') return -1;
-			if (bIsDeveloped === 'developing') return 1;
-			if (aIsDeveloped === 'not_submitted') return -1;
-			if (bIsDeveloped === 'not_submitted') return 1;
-		}
-		return 0;
-	});
+	return teams.sort((a, b) => NOTEBOOK_STATUS_RANK[a.notebookDevelopmentStatus] - NOTEBOOK_STATUS_RANK[b.notebookDevelopmentStatus]);
 }

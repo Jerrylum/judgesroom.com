@@ -14,7 +14,7 @@ import type { ClientRouter } from '../client-router';
 import type { WRPCRootObject } from '@jerrylum/wrpc/server';
 import { transaction } from '../utils';
 import { getAwardNoWinners, getFinalAwardNominations } from './judging';
-import { getTeamData } from './team';
+import { getTeamData, reconcileNotebookStatusesForMethodChange } from './team';
 import { getJudges } from './judge';
 import { generateAuthToken, uncontrolledAuthentication } from '@judgesroom.com/protocol/src/access';
 import { assertAuthenticatedJudgeAdvisor, upsertJudgeAdvisorAuthToken } from '../access/tokens';
@@ -116,6 +116,7 @@ export async function getEssentialData(db: DatabaseOrTransaction): Promise<Essen
 			judgeGuideVersion: resolveJudgeGuideVersion(metadataRows[0].judgeGuideVersion),
 			notebookRubricScoreStep: normalizeRubricScoreStep(metadataRows[0].notebookRubricScoreStep),
 			interviewRubricScoreStep: normalizeRubricScoreStep(metadataRows[0].interviewRubricScoreStep),
+			notebookSubmissionMethod: metadataRows[0].notebookSubmissionMethod,
 			awards: await getAwards(tx),
 			teamInfos: await getTeamInfos(tx),
 			judgeGroups: await getJudgeGroups(tx)
@@ -277,11 +278,14 @@ export async function updateEssentialData(db: DatabaseOrTransaction, essentialDa
 	// DISCUSS: Should we update cache?
 
 	return transaction(db, async (tx) => {
-		await tx.delete(metadata);
+		const [previous] = await tx.delete(metadata).returning({ notebookSubmissionMethod: metadata.notebookSubmissionMethod });
 		await tx.insert(metadata).values({ ...essentialData, updatedAt: new Date() });
 		await updateInsertAndDeleteAwards(tx, essentialData.awards);
 		await updateInsertAndDeleteTeams(tx, essentialData.teamInfos);
 		await updateInsertAndDeleteJudgeGroups(tx, essentialData.judgeGroups);
+		if (previous) {
+			await reconcileNotebookStatusesForMethodChange(tx, previous.notebookSubmissionMethod, essentialData.notebookSubmissionMethod);
+		}
 	});
 }
 

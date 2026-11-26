@@ -6,6 +6,7 @@
 	import ReassignTeamDialog from './ReassignTeamDialog.svelte';
 	import RowOverflowMenu from './RowOverflowMenu.svelte';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import { notebookDevelopmentStatusClass, notebookDevelopmentStatusLabel } from '#lib/notebook-status.ts';
 
 	interface Props {
 		teamId: string;
@@ -20,11 +21,9 @@
 
 	let { teamId, teamNumber, teamName, groupId, notebookDone, interviewDone, notebookDevelopmentStatus, canReassign }: Props = $props();
 
-	const notebookStatus = $derived.by(() => {
-		if (notebookDevelopmentStatus === 'fully_developed') return { text: m.fully_developed_notebook_status(), class: 'text-green-600' };
-		if (notebookDevelopmentStatus === 'developing') return { text: m.developing_notebook_status(), class: 'text-yellow-600' };
-		if (notebookDevelopmentStatus === 'not_submitted') return { text: m.not_submitted_notebook_status(), class: 'text-gray-500' };
-		return { text: m.undetermined_notebook_status(), class: 'text-gray-400' };
+	const notebookStatus = $derived({
+		text: notebookDevelopmentStatusLabel(notebookDevelopmentStatus),
+		class: notebookDevelopmentStatusClass(notebookDevelopmentStatus)
 	});
 
 	const teamLabel = $derived(`${teamNumber} · ${teamName}`);

@@ -183,6 +183,7 @@ describe('Integration Tests', () => {
 			judgeGuideVersion: '1.0',
 			notebookRubricScoreStep: 0.1,
 			interviewRubricScoreStep: 0.1,
+			notebookSubmissionMethod: 'digital',
 			awards: [
 				{
 					name: 'Tournament Champions',
@@ -255,6 +256,7 @@ describe('Integration Tests', () => {
 			judgeGuideVersion: '1.0',
 			notebookRubricScoreStep: 0.1,
 			interviewRubricScoreStep: 0.1,
+			notebookSubmissionMethod: 'digital',
 			teamInfos: [],
 			awards: [],
 			judgeGroups: [

@@ -3,6 +3,7 @@
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$app/env/public';
 	import { app, dialogs } from '#lib/index.svelte.ts';
 	import { rubricScoreStepOptions } from '@judgesroom.com/protocol/src/event';
+	import type { NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
 	import RemoveAwardsDialog from './RemoveAwardsDialog.svelte';
 	import TurnstileWidget from './TurnstileWidget.svelte';
 
@@ -16,6 +17,7 @@
 		accessControlEnabled?: boolean;
 		notebookRubricScoreStep?: number;
 		interviewRubricScoreStep?: number;
+		notebookSubmissionMethod?: NotebookSubmissionMethod;
 		onAccessControlEnabledChange?: (value: boolean) => void;
 	}
 
@@ -29,6 +31,7 @@
 		accessControlEnabled = $bindable(false),
 		notebookRubricScoreStep = $bindable(0.1),
 		interviewRubricScoreStep = $bindable(0.1),
+		notebookSubmissionMethod = $bindable('digital'),
 		onAccessControlEnabledChange
 	}: Props = $props();
 
@@ -109,6 +112,21 @@
 
 <div class="space-y-6">
 	<h2 class="text-xl font-semibold text-gray-900">{m.other_settings()}</h2>
+
+	<fieldset class="max-w-lg">
+		<legend class="font-medium text-gray-900">{m.notebook_submission_method()}</legend>
+		<p class="mt-1 text-sm text-gray-600">{m.notebook_submission_method_description()}</p>
+		<div class="mt-3 flex flex-col gap-2">
+			<label class="flex items-center gap-2">
+				<input type="radio" name="notebookSubmissionMethod" value="digital" bind:group={notebookSubmissionMethod} disabled={isLoading} />
+				<span class="text-sm text-gray-700">{m.notebook_submission_method_digital()}</span>
+			</label>
+			<label class="flex items-center gap-2">
+				<input type="radio" name="notebookSubmissionMethod" value="physical" bind:group={notebookSubmissionMethod} disabled={isLoading} />
+				<span class="text-sm text-gray-700">{m.notebook_submission_method_physical()}</span>
+			</label>
+		</div>
+	</fieldset>
 
 	<label class="block max-w-sm">
 		<div class="font-medium text-gray-900">{m.notebook_rubric_score_step()}</div>

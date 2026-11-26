@@ -18,6 +18,7 @@
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
 	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { getLocale } from '#lib/paraglide/runtime.js';
+	import { notebookDevelopmentStatusClass, notebookDevelopmentStatusLabel } from '#lib/notebook-status.ts';
 
 	interface Props {
 		tab: TeamInterviewRubricTab;
@@ -29,6 +30,7 @@
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const isPhysicalNotebook = $derived(essentialData?.notebookSubmissionMethod === 'physical');
 	const accessControlEnabled = $derived(app.isAccessControlEnabled());
 	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const currentJudge = $derived(app.getCurrentUserJudge());
@@ -103,7 +105,7 @@
 		if (tab.teamId) {
 			(async () => {
 				const notebookLink = includedTeams[tab.teamId].notebookLink;
-				if (notebookLink === '') {
+				if (isPhysicalNotebook || notebookLink === '') {
 					qrCodeDataUrl = null;
 					return;
 				}
@@ -324,29 +326,25 @@
 				{@const selectedTeam = includedTeams[tab.teamId]}
 				{@const notebookLink = selectedTeam.notebookLink || '(Not provided)'}
 				{@const devStatus = selectedTeam.notebookDevelopmentStatus}
-				{@const devStatusText =
-					devStatus === 'fully_developed' ? 'Fully Developed' : devStatus === 'developing' ? 'Developing' : 'Not Submitted/Not Reviewed'}
 				<div class="mb-4 flex flex-row justify-between gap-2 rounded-lg bg-gray-50 p-4">
 					<div class=" text-sm text-gray-800">
 						<p><strong>{m.team_hash()}{selectedTeam.number}:</strong> {selectedTeam.name}</p>
 						<p><strong>{m.school_colon()}</strong>{selectedTeam.school}</p>
 						<p><strong>{m.grade_level_colon()}</strong>{selectedTeam.grade}</p>
+						{#if !isPhysicalNotebook}
+							<p>
+								{#if notebookLink === '(Not provided)'}
+									<strong>{m.notebook_link_colon()}</strong>{notebookLink}
+								{:else}
+									<strong>{m.notebook_link_colon()}</strong><a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank"
+										>{notebookLink}</a
+									>
+								{/if}
+							</p>
+						{/if}
 						<p>
-							{#if notebookLink === '(Not provided)'}
-								<strong>{m.notebook_link_colon()}</strong>{notebookLink}
-							{:else}
-								<strong>{m.notebook_link_colon()}</strong><a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank"
-									>{notebookLink}</a
-								>
-							{/if}
-						</p>
-						<p>
-							<strong>{m.notebook_development_status_colon()}</strong><span
-								class:text-green-600={devStatus === 'fully_developed'}
-								class:text-yellow-600={devStatus === 'developing'}
-								class:text-gray-600={devStatus === 'undetermined'}
-							>
-								{devStatusText}
+							<strong>{m.notebook_development_status_colon()}</strong><span class={notebookDevelopmentStatusClass(devStatus)}>
+								{notebookDevelopmentStatusLabel(devStatus)}
 							</span>
 						</p>
 						{#if notebookRubricsForTeam.length > 0}
@@ -360,7 +358,7 @@
 						{/if}
 					</div>
 
-					{#if qrCodeDataUrl}
+					{#if !isPhysicalNotebook && qrCodeDataUrl}
 						<img src={qrCodeDataUrl} alt="QR Code for engineering notebook" class="h-48 w-48 rounded max-sm:hidden" />
 					{/if}
 				</div>

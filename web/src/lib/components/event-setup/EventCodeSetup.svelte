@@ -12,6 +12,7 @@
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import { RobotEventsSkuSchema, type EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+	import { initialNotebookDevelopmentStatus, type NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
 	import { untrack } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import RobotEventsImportDialog, { type ImportChoice } from './RobotEventsImportDialog.svelte';
@@ -28,6 +29,7 @@
 		selectedEventGradeLevel: EventGradeLevel;
 		teams: TeamInfoAndData[];
 		awardOptions: AwardOptions[];
+		notebookSubmissionMethod: NotebookSubmissionMethod;
 		onNext: () => void;
 	}
 
@@ -41,13 +43,12 @@
 		selectedEventGradeLevel = $bindable(),
 		teams = $bindable(),
 		awardOptions = $bindable(),
+		notebookSubmissionMethod,
 		onNext
 	}: Props = $props();
 
 	let importMethod = $state<'robotevents' | 'manual'>(
-		untrack(() =>
-			isEditingEventSetup ? (robotEventsSku && robotEventsEventId && divisionId ? 'robotevents' : 'manual') : 'robotevents'
-		)
+		untrack(() => (isEditingEventSetup ? (robotEventsSku && robotEventsEventId && divisionId ? 'robotevents' : 'manual') : 'robotevents'))
 	);
 	let inputRobotEventsSku = $state(robotEventsSku);
 	let inputDivisionId = $state(divisionId);
@@ -146,7 +147,8 @@
 				group: existingTeam?.group ?? team.group,
 				notebookLink: existingTeam?.notebookLink ?? team.notebookLink,
 				hasInnovateAwardSubmissionForm: existingTeam?.hasInnovateAwardSubmissionForm ?? team.hasInnovateAwardSubmissionForm,
-				notebookDevelopmentStatus: existingTeam?.notebookDevelopmentStatus ?? team.notebookDevelopmentStatus,
+				notebookDevelopmentStatus:
+					existingTeam?.notebookDevelopmentStatus ?? initialNotebookDevelopmentStatus(notebookSubmissionMethod, team.notebookLink),
 				absent: existingTeam?.absent ?? team.absent
 			};
 		});

@@ -7,7 +7,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import type { EssentialData } from '@judgesroom.com/protocol/src/event';
 	import type { Judge } from '@judgesroom.com/protocol/src/judging';
-	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
+	import { isScoredNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
 	import type { AwardRankingsPartialUpdate } from '@judgesroom.com/protocol/src/rubric';
 	import {
 		generateInterview2_0Scores,
@@ -107,7 +107,8 @@
 		},
 		{
 			title: 'Setup Team Data',
-			description: 'Configure team attendance and engineering notebook links. This prepares teams for the judging process.',
+			description:
+				'Configure team attendance and engineering notebook links. Teams with no link stay Not Submitted. Teams with a link stay Not Reviewed until a rubric is submitted.',
 			action: async () => {
 				await app.wrpcClient.team.updateAllTeamData.mutation(teamAttendance as TeamData[]);
 
@@ -115,38 +116,37 @@
 					await app.wrpcClient.team.updateTeamData.mutation(data as TeamData);
 				}
 
-				for (const data of sortNotebookLinks) {
-					await app.wrpcClient.team.updateTeamData.mutation(data as TeamData);
-				}
-
 				const teams = app.getAllTeamInfoAndData();
 				const attendingTeams = Object.values(teams).filter((team) => !team.absent).length;
-				const teamsWithNotebooks = Object.values(teams).filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus)).length;
+				const teamsWithLinks = Object.values(teams).filter((team) => team.notebookLink !== '').length;
 
-				return `Updated ${attendingTeams} attending teams, ${teamsWithNotebooks} with completed notebooks.`;
+				return `Updated ${attendingTeams} attending teams, ${teamsWithLinks} with notebook links.`;
 			}
 		},
 		{
 			title: 'Complete Notebook Evaluations',
-			description: 'Generate engineering notebook rubric submissions for all teams with completed notebooks.',
+			description:
+				'Submit engineering notebook rubrics for teams that have a notebook, then set each one to Developing or Fully Developed.',
 			action: async () => {
 				const teams = app.getAllTeamInfoAndData();
 				const judgeGroups = app.getAllJudgeGroups();
 				let submissionCount = 0;
+				let scoredCount = 0;
 
-				for (const team of Object.values(teams)) {
-					if (!isSubmittedNotebook(team.notebookDevelopmentStatus)) {
+				for (const sorted of sortNotebookLinks as TeamData[]) {
+					if (!isScoredNotebook(sorted.notebookDevelopmentStatus)) {
 						continue;
 					}
+					const team = teams[sorted.id];
 					for (const judge of judges) {
-						if (judgeGroups[judge.groupIdx].assignedTeams.includes(team.id) === false) {
+						if (judgeGroups[judge.groupIdx].assignedTeams.includes(sorted.id) === false) {
 							continue;
 						}
 						await app.wrpcClient.judging.completeEngineeringNotebookRubric.mutation({
 							judgeGroupId: judge.groupId,
 							submission: {
 								id: uuidv4(),
-								teamId: team.id,
+								teamId: sorted.id,
 								judgeId: judge.id,
 								rubric: notebook2_0ScoresToPayload(generateNotebook2_0Scores()),
 								notes: '',
@@ -155,9 +155,17 @@
 						});
 						submissionCount++;
 					}
+					await app.wrpcClient.team.updateTeamData.mutation({
+						id: team.id,
+						notebookLink: team.notebookLink,
+						hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
+						notebookDevelopmentStatus: sorted.notebookDevelopmentStatus,
+						absent: team.absent
+					});
+					scoredCount++;
 				}
 
-				return `Completed ${submissionCount} engineering notebook evaluations.`;
+				return `Completed ${submissionCount} engineering notebook evaluations and set ${scoredCount} notebooks to Developing or Fully Developed.`;
 			}
 		},
 		{

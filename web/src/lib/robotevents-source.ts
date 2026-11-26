@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
-import type { TeamInfo } from '@judgesroom.com/protocol/src/team';
+import { initialNotebookDevelopmentStatus, type TeamInfo } from '@judgesroom.com/protocol/src/team';
 import { GradeSchema, type Award, type Program } from '@judgesroom.com/protocol/src/award';
 import { Client, type Division, type Event, type Grade, type TeamData, type VexEventsClient } from 'events.vex';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
@@ -469,7 +469,7 @@ export async function importFromRobotEvents(client: VexEventsClient, evtSku: str
 				group: extractGroupFromTeamNumber(team.number),
 				notebookLink: '',
 				hasInnovateAwardSubmissionForm: false,
-				notebookDevelopmentStatus: 'undetermined',
+				notebookDevelopmentStatus: initialNotebookDevelopmentStatus('digital', ''),
 				absent: false
 			}) satisfies TeamInfoAndData
 	);

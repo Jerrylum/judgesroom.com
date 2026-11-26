@@ -19,6 +19,7 @@ const starterKit = {
 		judgeGuideVersion: '2.0' as const,
 		notebookRubricScoreStep: 0.1,
 		interviewRubricScoreStep: 0.1,
+		notebookSubmissionMethod: 'digital' as const,
 		teamInfos: [
 			{
 				id: team.id,

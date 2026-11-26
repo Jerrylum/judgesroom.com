@@ -30,6 +30,10 @@ export const metadata = sqliteTable('Metadata', {
 	accessControlEnabled: integer('accessControlEnabled', { mode: 'boolean' }).notNull().default(false),
 	/** Slider increment for notebook rubrics. Existing rooms stay on 0.1. */
 	notebookRubricScoreStep: real('notebookRubricScoreStep').notNull().default(0.1),
+	/** Digital rooms use notebook links. Physical rooms do not. Existing rooms stay digital. */
+	notebookSubmissionMethod: text('notebookSubmissionMethod', { enum: ['digital', 'physical'] })
+		.notNull()
+		.default('digital'),
 	/** Slider increment for interview rubrics. Existing rooms stay on 0.1. */
 	interviewRubricScoreStep: real('interviewRubricScoreStep').notNull().default(0.1),
 	/** Null in SQLite = pre-pin rooms; getEssentialData resolves that to 1.0. */
@@ -77,7 +81,7 @@ export const teams = sqliteTable(
 		notebookLink: text('notebookLink').notNull().default(''),
 		hasInnovateAwardSubmissionForm: integer('hasInnovateAwardSubmissionForm', { mode: 'boolean' }).notNull().default(false),
 		notebookDevelopmentStatus: text('notebookDevelopmentStatus', {
-			enum: ['undetermined', 'not_submitted', 'developing', 'fully_developed']
+			enum: ['undetermined', 'not_submitted', 'developing', 'fully_developed', 'notebook_link_broken', 'turned_in']
 		})
 			.notNull()
 			.default('undetermined'),

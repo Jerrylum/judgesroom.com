@@ -12,6 +12,8 @@
 
 	let { team }: Props = $props();
 
+	const isPhysicalNotebook = $derived(app.getEssentialData()?.notebookSubmissionMethod === 'physical');
+
 	// Clone the team data for editing. This is a snapshot of the team when the dialog opens.
 	let editedTeam = $state(
 		untrack(() => ({
@@ -92,19 +94,20 @@
 			<div class="text-sm text-gray-600">{team.school} • {team.grade}</div>
 		</div>
 
-		<!-- Notebook Link -->
-		<div>
-			<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700">{m.notebook_link()}</label>
-			<input
-				id="team-notebook-link"
-				type="url"
-				maxlength="200"
-				bind:value={editedTeam.notebookLink}
-				class="classic block w-full"
-				placeholder="https://..."
-			/>
-			<p class="mt-1 text-xs text-gray-500">{m.enter_the_url_to_the_team_s_engineering_notebook({ teamNumber: team.number })}</p>
-		</div>
+		{#if !isPhysicalNotebook}
+			<div>
+				<label for="team-notebook-link" class="mb-1 block text-sm font-medium text-gray-700">{m.notebook_link()}</label>
+				<input
+					id="team-notebook-link"
+					type="url"
+					maxlength="200"
+					bind:value={editedTeam.notebookLink}
+					class="classic block w-full"
+					placeholder="https://..."
+				/>
+				<p class="mt-1 text-xs text-gray-500">{m.enter_the_url_to_the_team_s_engineering_notebook({ teamNumber: team.number })}</p>
+			</div>
+		{/if}
 	</div>
 	<div class="mt-6 flex justify-end space-x-3">
 		<button onclick={handleCancel} class="cancel" disabled={isSaving}>{m.cancel()}</button>

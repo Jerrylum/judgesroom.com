@@ -12,6 +12,11 @@
 	import { type TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { Program } from '@judgesroom.com/protocol/src/award';
 	import type { EssentialData, EventGradeLevel } from '@judgesroom.com/protocol/src/event';
+	import {
+		initialNotebookDevelopmentStatus,
+		notebookDevelopmentStatusForSetupSave,
+		type NotebookSubmissionMethod
+	} from '@judgesroom.com/protocol/src/team';
 	import { LATEST_JUDGE_GUIDE_VERSION, type JudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import { MAX_JUDGES_PER_ROOM, type JudgingMethod, type Judge, type JudgingStep } from '@judgesroom.com/protocol/src/judging';
 	import { getEventGradeLevelOptions, isCompetitionSetupReady } from '#lib/event.svelte.ts';
@@ -31,6 +36,7 @@
 	let wasAccessControlEnabled = $state(false);
 	let notebookRubricScoreStep = $state(DEFAULT_RUBRIC_SCORE_STEP);
 	let interviewRubricScoreStep = $state(DEFAULT_RUBRIC_SCORE_STEP);
+	let notebookSubmissionMethod: NotebookSubmissionMethod = $state('digital');
 
 	// RobotEvents import state
 	let robotEventsSku: string | null = $state(null);
@@ -91,7 +97,7 @@
 					id: teamInfo.id,
 					notebookLink: '',
 					hasInnovateAwardSubmissionForm: false,
-					notebookDevelopmentStatus: 'undetermined' as const,
+					notebookDevelopmentStatus: initialNotebookDevelopmentStatus(eventSetup.notebookSubmissionMethod, ''),
 					absent: false
 				};
 				return { ...teamInfo, ...teamData } satisfies TeamInfoAndData;
@@ -105,6 +111,7 @@
 			wasAccessControlEnabled = eventSetup.accessControlEnabled;
 			notebookRubricScoreStep = eventSetup.notebookRubricScoreStep;
 			interviewRubricScoreStep = eventSetup.interviewRubricScoreStep;
+			notebookSubmissionMethod = eventSetup.notebookSubmissionMethod;
 			judgeGroups = eventSetup.judgeGroups.map((group) => {
 				const judgeGroup = new EditingJudgeGroup(group.name);
 				// Copy the properties instead of setting id directly
@@ -219,6 +226,7 @@
 				judgeGuideVersion,
 				notebookRubricScoreStep,
 				interviewRubricScoreStep,
+				notebookSubmissionMethod,
 				teamInfos: teams.map((team) => ({
 					id: team.id,
 					number: team.number,
@@ -239,11 +247,19 @@
 				awards: awardOptions.filter((award) => award.isSelected).map((award) => award.generateAward())
 			} satisfies EssentialData;
 
+			const previousMethod = app.getEssentialData()?.notebookSubmissionMethod ?? notebookSubmissionMethod;
+			const isNewRoom = !app.isJudgesRoomJoined();
 			const teamData = teams.map((team) => ({
 				id: team.id,
 				notebookLink: team.notebookLink,
 				hasInnovateAwardSubmissionForm: team.hasInnovateAwardSubmissionForm,
-				notebookDevelopmentStatus: team.notebookDevelopmentStatus,
+				notebookDevelopmentStatus: notebookDevelopmentStatusForSetupSave({
+					isNewRoom,
+					previousMethod,
+					nextMethod: notebookSubmissionMethod,
+					notebookLink: team.notebookLink,
+					status: team.notebookDevelopmentStatus
+				}),
 				absent: team.absent
 			}));
 
@@ -404,6 +420,7 @@
 					bind:selectedEventGradeLevel
 					bind:teams
 					bind:awardOptions
+					{notebookSubmissionMethod}
 					onNext={nextStep}
 				/>
 			{:else if currentStep === 2}
@@ -415,6 +432,7 @@
 					bind:selectedEventGradeLevel
 					bind:teams
 					bind:awardOptions
+					{notebookSubmissionMethod}
 					onNext={nextStep}
 					onPrev={prevStep}
 				/>
@@ -451,6 +469,7 @@
 					bind:accessControlEnabled
 					bind:notebookRubricScoreStep
 					bind:interviewRubricScoreStep
+					bind:notebookSubmissionMethod
 				/>
 			{/if}
 		</div>

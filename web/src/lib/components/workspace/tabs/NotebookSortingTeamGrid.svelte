@@ -1,35 +1,26 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
-	import { app, dialogs, tabs } from '#lib/index.svelte.ts';
+	import { dialogs, tabs } from '#lib/index.svelte.ts';
 	import EditIcon from '#lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
-	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import type { NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
+	import { notebookDevelopmentStatusLabel, notebookSortingControls } from '#lib/notebook-status.ts';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
+	import NotebookStatusRadios from './NotebookStatusRadios.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
-	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface Props {
 		team: TeamInfoAndData;
 		submittedNotebook: { rubricId: string; score: number | null } | null;
+		notebookSubmissionMethod: NotebookSubmissionMethod;
 	}
 
-	let { team, submittedNotebook }: Props = $props();
+	let { team, submittedNotebook, notebookSubmissionMethod }: Props = $props();
 
 	const devStatus = $derived(team.notebookDevelopmentStatus);
-	const isSubmittedNotebookStatus = $derived(isSubmittedNotebook(devStatus));
-
-	// Function to update notebook development status
-	async function updateNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		try {
-			await app.wrpcClient.team.updateTeamData.mutation({
-				...team,
-				notebookDevelopmentStatus
-			});
-		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_notebook_status({ error: errorToString(error) }));
-		}
-	}
+	const isDigital = $derived(notebookSubmissionMethod === 'digital');
+	const controls = $derived(notebookSortingControls(notebookSubmissionMethod, devStatus));
 
 	function openNotebookRubric() {
 		const tab = submittedNotebook
@@ -45,22 +36,30 @@
 </script>
 
 <div
-	class="relative flex min-h-53 flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg"
-	class:border-green-500={devStatus === 'fully_developed'}
-	class:border-yellow-500={devStatus === 'developing'}
-	class:border-gray-500={devStatus === 'not_submitted'}
+	class={[
+		'relative flex min-h-53 flex-col rounded-lg border border-gray-200 bg-white p-3 transition-shadow hover:shadow-lg',
+		{
+			'border-green-500': devStatus === 'fully_developed',
+			'border-yellow-500': devStatus === 'developing',
+			'border-gray-500': devStatus === 'not_submitted',
+			'border-blue-500': devStatus === 'turned_in',
+			'border-red-500': devStatus === 'notebook_link_broken'
+		}
+	]}
 >
 	<!-- Team Info Header -->
 	<div class="mb-2 flex items-center justify-between">
 		<div class="flex items-center gap-2">
 			<span class="font-medium text-gray-900">{team.number}</span>
-			<button
-				onclick={() => openEditTeamDataDialog(team)}
-				class="text-gray-400 hover:text-gray-600 active:text-gray-800"
-				title={m.edit_team_data({ teamNumber: team.number })}
-			>
-				<EditIcon size={16} />
-			</button>
+			{#if isDigital}
+				<button
+					onclick={() => openEditTeamDataDialog(team)}
+					class="text-gray-400 hover:text-gray-600 active:text-gray-800"
+					title={m.edit_team_data({ teamNumber: team.number })}
+				>
+					<EditIcon size={16} />
+				</button>
+			{/if}
 			{#if team.absent}
 				<span class="text-xs font-bold text-red-600" title="Absent">ABS</span>
 			{/if}
@@ -68,66 +67,39 @@
 	</div>
 
 	<!-- Notebook Link -->
-	{#if team.notebookLink}
-		<div class="relative mb-2 flex flex-row items-center justify-end gap-1">
-			<a
-				href={team.notebookLink}
-				target="_blank"
-				class="absolute left-0 w-[calc(100%-30px)] overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
-				title={team.notebookLink}
-			>
-				{team.notebookLink.replace(/^https?:\/\//, '')}
-			</a>
-			<QRCodeButton link={team.notebookLink} />
-		</div>
-	{:else}
-		<div class="mb-2 flex h-6 items-center">
-			<span class="block text-xs text-gray-400">{m.no_notebook_link()}</span>
-		</div>
+	{#if isDigital}
+		{#if team.notebookLink}
+			<div class="relative mb-2 flex h-6 flex-row items-center justify-end gap-1">
+				<a
+					href={team.notebookLink}
+					target="_blank"
+					class="absolute left-0 w-[calc(100%-30px)] overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+					title={team.notebookLink}
+				>
+					{team.notebookLink.replace(/^https?:\/\//, '')}
+				</a>
+				<QRCodeButton link={team.notebookLink} />
+			</div>
+		{:else}
+			<div class="mb-2 flex h-6 items-center">
+				<span class="block text-xs text-gray-400">{m.no_notebook_link()}</span>
+			</div>
+		{/if}
 	{/if}
 
-	<div class="flex flex-col gap-2">
-		<label class="flex items-center gap-2">
-			<input
-				type="radio"
-				checked={devStatus === 'fully_developed'}
-				value="fully_developed"
-				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
-				onchange={() => updateNotebookStatus('fully_developed')}
-			/>
-			<span class="text-sm text-gray-700">{m.fully_developed_notebook_status()}</span>
-		</label>
-		<label class="flex items-center gap-2">
-			<input
-				type="radio"
-				checked={devStatus === 'developing'}
-				value="developing"
-				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
-				onchange={() => updateNotebookStatus('developing')}
-			/>
-			<span class="text-sm text-gray-700">{m.developing_notebook_status()}</span>
-		</label>
-		<label class="flex items-center gap-2">
-			<input
-				type="radio"
-				checked={devStatus === 'not_submitted'}
-				value="not_submitted"
-				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
-				onchange={() => updateNotebookStatus('not_submitted')}
-			/>
-			<span class="text-sm text-gray-700">{m.not_submitted_notebook_status()}</span>
-		</label>
+	<NotebookStatusRadios {team} options={controls.options} />
+
+	<div class="mt-2 min-h-8">
+		{#if controls.showStartRubric}
+			<button onclick={openNotebookRubric} class={['primary tiny w-full', { 'bg-green-800!': submittedNotebook !== null }]}>
+				{#if submittedNotebook}
+					{m.you_submitted({ score: submittedNotebook.score === null ? '—' : String(submittedNotebook.score) })}
+				{:else}
+					{m.start_rubric()}
+				{/if}
+			</button>
+		{/if}
 	</div>
-
-	{#if isSubmittedNotebookStatus}
-		<button onclick={openNotebookRubric} class="primary tiny mt-2 w-full" class:bg-green-800!={submittedNotebook !== null}>
-			{#if submittedNotebook}
-				{m.you_submitted({ score: submittedNotebook.score === null ? '—' : String(submittedNotebook.score) })}
-			{:else}
-				{m.start_rubric()}
-			{/if}
-		</button>
-	{/if}
 
 	<!-- Status Indicator -->
 	{#if devStatus !== 'undetermined'}
@@ -136,6 +108,10 @@
 				<div class="h-2 w-2 rounded-full bg-green-500" title={m.fully_developed_notebook_status()}></div>
 			{:else if devStatus === 'developing'}
 				<div class="h-2 w-2 rounded-full bg-yellow-500" title={m.developing_notebook_status()}></div>
+			{:else if devStatus === 'notebook_link_broken'}
+				<div class="h-2 w-2 rounded-full bg-red-500" title={notebookDevelopmentStatusLabel(devStatus)}></div>
+			{:else if devStatus === 'turned_in'}
+				<div class="h-2 w-2 rounded-full bg-blue-500" title={notebookDevelopmentStatusLabel(devStatus)}></div>
 			{:else}
 				<div class="h-2 w-2 rounded-full bg-gray-400" title={m.not_submitted_notebook_status()}></div>
 			{/if}

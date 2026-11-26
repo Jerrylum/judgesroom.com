@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import './notebook-sorting.css';
-	import { app, dialogs, tabs } from '#lib/index.svelte.ts';
+	import { dialogs, tabs } from '#lib/index.svelte.ts';
 	import EditIcon from '#lib/icon/EditIcon.svelte';
 	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
-	import { isSubmittedNotebook, type NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import type { NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
+	import { notebookSortingControls } from '#lib/notebook-status.ts';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
+	import NotebookStatusRadios from './NotebookStatusRadios.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
 	import { scrollSync } from '#lib/scroll-sync.svelte.ts';
-	import { errorToString } from '#lib/utils.svelte.ts';
 
 	interface SubmittedNotebook {
 		rubricId: string;
@@ -19,23 +20,14 @@
 	interface Props {
 		teams: TeamInfoAndData[];
 		submittedNotebookByTeam: Record<string, SubmittedNotebook>;
+		notebookSubmissionMethod: NotebookSubmissionMethod;
 	}
 
-	let { teams, submittedNotebookByTeam }: Props = $props();
+	let { teams, submittedNotebookByTeam, notebookSubmissionMethod }: Props = $props();
+
+	const isDigital = $derived(notebookSubmissionMethod === 'digital');
 
 	const { registerScrollContainer, scrollLeft, scrollRight } = scrollSync();
-
-	// Function to update notebook development status
-	async function updateNotebookStatus(team: TeamInfoAndData, notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		try {
-			await app.wrpcClient.team.updateTeamData.mutation({
-				...team,
-				notebookDevelopmentStatus
-			});
-		} catch (error) {
-			app.addErrorNotice(m.failed_to_update_notebook_status({ error: errorToString(error) }));
-		}
-	}
 
 	function submittedScoreText(score: number | null): string {
 		return score === null ? '—' : String(score);
@@ -62,8 +54,10 @@
 		<team>{m.team_number()}</team>
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
-				<div class="flex max-w-90 min-w-90 flex-col items-center justify-center">{m.notebook_link_table()}</div>
-				<div class="flex max-w-40 min-w-40 items-center justify-center">{m.notebook_status_table()}</div>
+				{#if isDigital}
+					<div class="flex max-w-90 min-w-90 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+				{/if}
+				<div class="flex max-w-56 min-w-56 items-center justify-center">{m.notebook_status_table()}</div>
 				<div class="flex min-w-50 items-center justify-center">{m.actions_table()}</div>
 			</content>
 		</scroll-container>
@@ -71,7 +65,7 @@
 	<table-body>
 		{#each teams as team (team.id)}
 			{@const devStatus = team.notebookDevelopmentStatus}
-			{@const isSubmittedNotebookStatus = isSubmittedNotebook(devStatus)}
+			{@const controls = notebookSortingControls(notebookSubmissionMethod, devStatus)}
 			{@const submittedNotebook = submittedNotebookByTeam[team.id]}
 			<row>
 				<team>
@@ -84,62 +78,52 @@
 				</team>
 				<scroll-container use:registerScrollContainer>
 					<content>
-						<!-- Notebook Link Column -->
-						<div class="flex max-w-90 min-w-90 items-center gap-2 p-2">
-							{#if team.notebookLink}
-								<a
-									href={team.notebookLink}
-									target="_blank"
-									class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
-									title={team.notebookLink}
-								>
-									{team.notebookLink.replace(/^https?:\/\//, '')}
-								</a>
-								<QRCodeButton link={team.notebookLink} />
-							{:else}
-								<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
-							{/if}
+						{#if isDigital}
+							<div class="flex max-w-90 min-w-90 items-center gap-2 p-2">
+								{#if team.notebookLink}
+									<a
+										href={team.notebookLink}
+										target="_blank"
+										class="flex-1 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+										title={team.notebookLink}
+									>
+										{team.notebookLink.replace(/^https?:\/\//, '')}
+									</a>
+									<QRCodeButton link={team.notebookLink} />
+								{:else}
+									<span class="text-xs text-gray-400">{m.no_notebook_link()}</span>
+								{/if}
+							</div>
+						{/if}
+
+						<div class="flex max-w-56 min-w-56 items-center p-2">
+							<NotebookStatusRadios {team} options={controls.options} />
 						</div>
 
-						<!-- Development Status Dropdown -->
-						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
-							<select
-								value={devStatus}
-								onchange={(e) => updateNotebookStatus(team, e.currentTarget.value as NotebookDevelopmentStatus)}
-								class="w-full rounded border border-gray-300 px-2 py-1 text-sm"
-								class:border-green-500={devStatus === 'fully_developed'}
-								class:border-yellow-500={devStatus === 'developing'}
-								class:border-gray-500={devStatus === 'not_submitted'}
-							>
-								<option value="undetermined">{m.undetermined_notebook_status()}</option>
-								<option value="fully_developed">{m.fully_developed_notebook_status()}</option>
-								<option value="developing">{m.developing_notebook_status()}</option>
-								<option value="not_submitted">{m.not_submitted_notebook_status()}</option>
-							</select>
-						</div>
-
-						<!-- Actions Column -->
 						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
-							{#if isSubmittedNotebookStatus}
+							<div class="min-h-8">
+								{#if controls.showStartRubric}
+									<button
+										onclick={() => openNotebookRubric(team.id, submittedNotebook?.rubricId ?? null)}
+										class={['primary tiny text-nowrap', { 'bg-green-800!': submittedNotebook !== undefined }]}
+									>
+										{#if submittedNotebook}
+											{m.you_submitted({ score: submittedScoreText(submittedNotebook.score) })}
+										{:else}
+											{m.start_rubric()}
+										{/if}
+									</button>
+								{/if}
+							</div>
+							{#if isDigital}
 								<button
-									onclick={() => openNotebookRubric(team.id, submittedNotebook?.rubricId ?? null)}
-									class="primary tiny text-nowrap"
-									class:bg-green-800!={submittedNotebook !== undefined}
+									onclick={() => openEditTeamDataDialog(team)}
+									class="text-gray-400 hover:text-gray-600 active:text-gray-800"
+									title={m.edit_team_data({ teamNumber: team.number })}
 								>
-									{#if submittedNotebook}
-										{m.you_submitted({ score: submittedScoreText(submittedNotebook.score) })}
-									{:else}
-										{m.start_rubric()}
-									{/if}
+									<EditIcon size={16} />
 								</button>
 							{/if}
-							<button
-								onclick={() => openEditTeamDataDialog(team)}
-								class="text-gray-400 hover:text-gray-600 active:text-gray-800"
-								title="Edit team data"
-							>
-								<EditIcon size={16} />
-							</button>
 						</div>
 					</content>
 				</scroll-container>

@@ -1,7 +1,7 @@
 import { type Program, type AwardType, type Grade, type Award, isExcellenceAward, isDesignAward } from '@judgesroom.com/protocol/src/award';
 import { generateUUID } from './utils.svelte';
 import type { AwardNomination } from '@judgesroom.com/protocol/src/rubric';
-import { type TeamInfo, type NotebookDevelopmentStatus, isSubmittedNotebook } from '@judgesroom.com/protocol/src/team';
+import { type TeamInfo, type NotebookDevelopmentStatus, isScoredNotebook } from '@judgesroom.com/protocol/src/team';
 
 /**
  * GRSF award eligibility helpers.
@@ -19,7 +19,7 @@ export function meetsAwardNotebookRequirement(
 	if (requiresFullyDevelopedNotebook(award.name)) {
 		return notebookDevelopmentStatus === 'fully_developed';
 	}
-	return isSubmittedNotebook(notebookDevelopmentStatus);
+	return isScoredNotebook(notebookDevelopmentStatus);
 }
 
 export class AwardOptions {

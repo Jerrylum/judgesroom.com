@@ -7,7 +7,8 @@
 	import NotebookSortingTeamTable from './NotebookSortingTeamTable.svelte';
 	import GridViewIcon from '#lib/icon/GridViewIcon.svelte';
 	import ColumnViewIcon from '#lib/icon/ColumnViewIcon.svelte';
-	import { isSubmittedNotebook, type TeamData } from '@judgesroom.com/protocol/src/team';
+	import { type TeamData } from '@judgesroom.com/protocol/src/team';
+	import { notebookSortingControls } from '#lib/notebook-status.ts';
 	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { errorToString } from '#lib/utils.svelte.ts';
 
@@ -23,6 +24,8 @@
 
 	// Check if the event uses assigned judging method
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const notebookSubmissionMethod = $derived(essentialData?.notebookSubmissionMethod ?? 'digital');
+	const isDigitalNotebook = $derived(notebookSubmissionMethod === 'digital');
 
 	const currentJudge = $derived(app.getCurrentUserJudge());
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
@@ -79,21 +82,25 @@
 		const scannedTeams = teamsToShow.filter((team) => team.notebookDevelopmentStatus !== 'undetermined').length;
 		const totalTeams = teamsToShow.length;
 
-		// 2. Teams with submitted notebook rubrics / evaluable notebooks (Developing + Fully Developed)
-		const evaluableTeams = teamsToShow.filter((team) => isSubmittedNotebook(team.notebookDevelopmentStatus));
-		const evaluableCount = evaluableTeams.length;
-
-		const teamsWithSubmittedRubrics = evaluableTeams.filter((team) => {
+		// Notebooks that can start a rubric, and how many of those have a saved rubric.
+		const rubricTeams = teamsToShow.filter(
+			(team) => notebookSortingControls(notebookSubmissionMethod, team.notebookDevelopmentStatus).showStartRubric
+		);
+		const teamsWithSubmittedRubrics = rubricTeams.filter((team) => {
 			return Object.values(subscriptions.allSubmissionCaches).some((sub) => sub.enrId && sub.teamId === team.id);
 		}).length;
+		const currentJudgeFinishedCount = rubricTeams.filter((team) => submittedNotebookByTeam[team.id] !== undefined).length;
 
-		// 3. Teams current judge finished / evaluable notebooks
-		const currentJudgeFinishedCount = evaluableTeams.filter((team) => submittedNotebookByTeam[team.id] !== undefined).length;
+		const submittedNotebooks = teamsToShow.filter((team) => {
+			const status = team.notebookDevelopmentStatus;
+			return status === 'turned_in' || status === 'developing' || status === 'fully_developed';
+		}).length;
 
 		return {
 			scanned: { count: scannedTeams, total: totalTeams },
-			withRubrics: { count: teamsWithSubmittedRubrics, total: evaluableCount },
-			currentJudgeFinished: { count: currentJudgeFinishedCount, total: evaluableCount }
+			submitted: { count: submittedNotebooks, total: totalTeams },
+			withRubrics: { count: teamsWithSubmittedRubrics, total: rubricTeams.length },
+			currentJudgeFinished: { count: currentJudgeFinishedCount, total: rubricTeams.length }
 		};
 	});
 
@@ -181,11 +188,7 @@
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h2 class="mb-4 text-xl font-semibold text-gray-900">{m.notebook_sorting_title()}</h2>
 			<p class="mb-2 text-sm text-gray-600">
-				<!-- Judges perform a quick scan of all the Engineering Notebooks and divide them into three categories:
-				<b>Not Submitted</b>, <b>Developing</b>, and <b>Fully Developed</b>. If it is unclear whether a notebook should be categorized as
-				Developing or Fully Developed, either another Judge can help make that determination or the notebook should be given the benefit of
-				the doubt and categorized as Fully Developed. -->
-				{@html sanitizeHTMLMessage(m.notebook_sorting_description1)}
+				{@html sanitizeHTMLMessage(isDigitalNotebook ? m.notebook_sorting_description1_digital : m.notebook_sorting_description1_physical)}
 			</p>
 			<p class="mb-2 text-sm text-gray-600">
 				{@html sanitizeHTMLMessage(m.notebook_sorting_description2)}
@@ -201,24 +204,25 @@
 		<!-- Import Section -->
 		<div class="rounded-lg bg-white p-4 shadow-sm sm:p-6">
 			<h3 class="mb-4 text-lg font-medium text-gray-900">{m.notebook_sorting_import_title()}</h3>
-			<p class="mb-4 text-sm text-gray-600">
-				<!-- If Engineering Notebooks are submitted digitally, please ask the Event Partner to provide digital notebook links report. This report
-				can be downloaded from RobotEvents → Event Admin → "Downloads & Links" → "Download Digital Engineering Notebook Links report".
-				Import the Excel file to this Judges' Room to set notebook links for teams in your event. -->
-				{m.notebook_sorting_import_description1()}
-			</p>
+			{#if isDigitalNotebook}
+				<p class="mb-4 text-sm text-gray-600">
+					{m.notebook_sorting_import_description1()}
+				</p>
 
-			<div class="flex items-center gap-4">
-				<button onclick={() => fileInput.click()} disabled={isImporting} class="primary tiny">
-					{#if isImporting}
-						{m.importing()}
-					{:else}
-						{m.import_button()}
-					{/if}
-				</button>
+				<div class="flex items-center gap-4">
+					<button onclick={() => fileInput.click()} disabled={isImporting} class="primary tiny">
+						{#if isImporting}
+							{m.importing()}
+						{:else}
+							{m.import_button()}
+						{/if}
+					</button>
 
-				<input bind:this={fileInput} type="file" accept=".xlsx,.xls" onchange={handleFileSelect} class="hidden" />
-			</div>
+					<input bind:this={fileInput} type="file" accept=".xlsx,.xls" onchange={handleFileSelect} class="hidden" />
+				</div>
+			{:else}
+				<p class="text-sm text-gray-600">{m.notebook_sorting_import_physical_only()}</p>
+			{/if}
 
 			<!-- Status Messages -->
 			{#if importError}
@@ -263,7 +267,7 @@
 				</div>
 
 				<!-- Progress Indicators -->
-				<div class="mt-4 grid gap-4 sm:grid-cols-3">
+				<div class={['mt-4 grid gap-4', isDigitalNotebook ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4']}>
 					<div class="rounded-lg bg-gray-50 p-3">
 						<div class="text-base font-medium text-gray-900">{m.teams_scanned()}</div>
 						{#if isShowingOnlyAssignedTeams}
@@ -278,6 +282,25 @@
 							{progressMetrics.scanned.total > 0 ? Math.round((progressMetrics.scanned.count / progressMetrics.scanned.total) * 100) : 0}%
 						</div>
 					</div>
+
+					{#if !isDigitalNotebook}
+						<div class="rounded-lg bg-gray-50 p-3">
+							<div class="text-base font-medium text-gray-900">{m.submitted_notebooks()}</div>
+							{#if isShowingOnlyAssignedTeams}
+								<div class="mb-2 text-sm text-gray-900">{m.your_judge_group({ name: currentJudgeGroup!.name })}</div>
+							{:else}
+								<div class="mb-2 text-sm text-gray-900">{m.all_judge_groups()}</div>
+							{/if}
+							<div class="text-lg font-semibold text-gray-700">
+								{progressMetrics.submitted.count} / {progressMetrics.submitted.total}
+							</div>
+							<div class="text-xs text-gray-600">
+								{progressMetrics.submitted.total > 0
+									? Math.round((progressMetrics.submitted.count / progressMetrics.submitted.total) * 100)
+									: 0}%
+							</div>
+						</div>
+					{/if}
 
 					<div class="rounded-lg bg-gray-50 p-3">
 						<div class="text-base font-medium text-gray-900">{m.notebooks_rubric_completed()}</div>
@@ -346,11 +369,11 @@
 			{:else if viewMode === 'grid'}
 				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 					{#each teamsToShow as team (team.id)}
-						<NotebookSortingTeamGrid {team} submittedNotebook={submittedNotebookByTeam[team.id] ?? null} />
+						<NotebookSortingTeamGrid {team} {notebookSubmissionMethod} submittedNotebook={submittedNotebookByTeam[team.id] ?? null} />
 					{/each}
 				</div>
 			{:else}
-				<NotebookSortingTeamTable teams={teamsToShow} {submittedNotebookByTeam} />
+				<NotebookSortingTeamTable teams={teamsToShow} {submittedNotebookByTeam} {notebookSubmissionMethod} />
 			{/if}
 		</div>
 	</div>

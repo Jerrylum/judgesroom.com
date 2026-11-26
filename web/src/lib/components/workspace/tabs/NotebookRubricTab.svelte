@@ -15,9 +15,8 @@
 	import JudgeAuthorSelect from './JudgeAuthorSelect.svelte';
 	import WarningSign from './WarningSign.svelte';
 	import TeamPhotoAlbum from '../TeamPhotoAlbum.svelte';
-	import { sanitizeHTMLMessage } from '#lib/i18n.ts';
 	import { getLocale } from '#lib/paraglide/runtime.js';
-	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
+	import { notebookDevelopmentStatusLabel, promotesToDevelopingOnSubmit } from '#lib/notebook-status.ts';
 
 	interface Props {
 		tab: NotebookRubricTab;
@@ -29,6 +28,7 @@
 	const includedTeams = $derived(app.getAllTeamInfoAndData());
 	const essentialData = $derived(app.getEssentialData());
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
+	const isPhysicalNotebook = $derived(essentialData?.notebookSubmissionMethod === 'physical');
 	const accessControlEnabled = $derived(app.isAccessControlEnabled());
 	const isJudgeAdvisor = $derived(app.getCurrentUser()?.role === 'judge_advisor');
 	const currentJudge = $derived(app.getCurrentUserJudge());
@@ -103,7 +103,7 @@
 		if (tab.teamId) {
 			(async () => {
 				const notebookLink = includedTeams[tab.teamId].notebookLink;
-				if (notebookLink === '') {
+				if (isPhysicalNotebook || notebookLink === '') {
 					qrCodeDataUrl = null;
 					return;
 				}
@@ -158,8 +158,8 @@
 		}
 	});
 
-	function showNoNotebookSubmittedWarning(team: (typeof includedTeams)[string]): boolean {
-		return !isSubmitted && (team.notebookDevelopmentStatus === 'not_submitted' || team.notebookDevelopmentStatus === 'undetermined');
+	function showSubmitSetsDevelopingNote(team: (typeof includedTeams)[string]): boolean {
+		return !isSubmitted && promotesToDevelopingOnSubmit(team.notebookDevelopmentStatus);
 	}
 
 	function getAssignedGroupIdForTeam(teamId: string): string | null {
@@ -197,7 +197,7 @@
 
 		try {
 			const selectedTeam = includedTeams[tab.teamId];
-			if (selectedTeam.notebookDevelopmentStatus === 'not_submitted' || selectedTeam.notebookDevelopmentStatus === 'undetermined') {
+			if (promotesToDevelopingOnSubmit(selectedTeam.notebookDevelopmentStatus)) {
 				await app.wrpcClient.team.updateTeamData.mutation({
 					...selectedTeam,
 					notebookDevelopmentStatus: 'developing'
@@ -249,13 +249,6 @@
 	}
 
 	let isUpdatingNotebookStatus = $state(false);
-
-	function notebookStatusLabel(status: NotebookDevelopmentStatus): string {
-		if (status === 'fully_developed') return m.fully_developed_notebook_status();
-		if (status === 'developing') return m.developing_notebook_status();
-		if (status === 'not_submitted') return m.not_submitted_notebook_status();
-		return m.undetermined_notebook_status();
-	}
 
 	async function setNotebookStatus(notebookDevelopmentStatus: 'developing' | 'fully_developed') {
 		if (!tab.teamId || isUpdatingNotebookStatus) return;
@@ -316,10 +309,9 @@
 					<select id="team-select" bind:this={teamsSelectElement} class="classic mt-1 mb-2 block w-full" onchange={handleTeamSelectChange}>
 						<option value="">{m.select_a_team()}</option>
 						{#each teamsToShow as team (team.id)}
-							{@const devStatus = team.notebookDevelopmentStatus ?? null}
-							{@const statusText =
-								devStatus === 'fully_developed' ? ' (Fully Developed)' : devStatus === 'developing' ? ' (Developing)' : ''}
-							<option value={team.id} selected={team.id === tab.teamId}>{team.number}{statusText}</option>
+							<option value={team.id} selected={team.id === tab.teamId}
+								>{team.number} ({notebookDevelopmentStatusLabel(team.notebookDevelopmentStatus)})</option
+							>
 						{/each}
 					</select>
 				{/if}
@@ -350,18 +342,20 @@
 						<p><strong>{m.team_hash()}{selectedTeam.number}:</strong> {selectedTeam.name}</p>
 						<p><strong>{m.school_colon()}</strong>{selectedTeam.school}</p>
 						<p><strong>{m.grade_level_colon()}</strong>{selectedTeam.grade}</p>
-						<p>
-							{#if notebookLink === '(Not provided)'}
-								<strong>{m.notebook_link_colon()}</strong>{notebookLink}
-							{:else}
-								<strong>{m.notebook_link_colon()}</strong><a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank"
-									>{notebookLink}</a
-								>
-							{/if}
-						</p>
+						{#if !isPhysicalNotebook}
+							<p>
+								{#if notebookLink === '(Not provided)'}
+									<strong>{m.notebook_link_colon()}</strong>{notebookLink}
+								{:else}
+									<strong>{m.notebook_link_colon()}</strong><a class="text-blue-500 hover:text-blue-600" href={notebookLink} target="_blank"
+										>{notebookLink}</a
+									>
+								{/if}
+							</p>
+						{/if}
 					</div>
 
-					{#if qrCodeDataUrl}
+					{#if !isPhysicalNotebook && qrCodeDataUrl}
 						<img src={qrCodeDataUrl} alt="QR Code for engineering notebook" class="h-48 w-48 rounded max-sm:hidden" />
 					{/if}
 				</div>
@@ -370,13 +364,6 @@
 					<TeamPhotoAlbum teamId={tab.teamId} allowCapture={false} />
 				</div>
 
-				{#if showNoNotebookSubmittedWarning(selectedTeam)}
-					<WarningSign title={m.notebook_development_status()}>
-						<p>
-							{@html sanitizeHTMLMessage(m.notebook_development_status_warning)}
-						</p>
-					</WarningSign>
-				{/if}
 				{#if selectedTeam.absent}
 					<WarningSign title={m.absent_team()}>
 						<p>{m.absent_team_description()}</p>
@@ -412,6 +399,10 @@
 				{m.judging_materials_strictly_confidential_description()}
 			</p>
 
+			{#if tab.teamId && showSubmitSetsDevelopingNote(includedTeams[tab.teamId])}
+				<p class="mt-6 text-center text-sm text-gray-600">{m.notebook_submit_sets_developing()}</p>
+			{/if}
+
 			<div class="mt-6 flex justify-center gap-4">
 				{#if isSubmitted}
 					{#if canEditCurrentRubric}
@@ -435,7 +426,10 @@
 			{@const rubricTotal = form.totalScore()}
 			<div class="rounded-lg bg-white p-6 shadow-sm">
 				<h3 class="text-lg font-semibold text-gray-900">{m.notebook_development_status()}</h3>
-				<p class="mt-2 text-sm text-gray-700">{m.notebook_status_current({ status: notebookStatusLabel(notebookStatus) })}</p>
+				<p class="mt-2 text-sm text-gray-700">{m.notebook_status_current({ status: notebookDevelopmentStatusLabel(notebookStatus) })}</p>
+				{#if promotesToDevelopingOnSubmit(notebookStatus)}
+					<p class="mt-2 text-sm text-gray-600">{m.notebook_status_choice_replaces_sorting()}</p>
+				{/if}
 				{#if rubricTotal !== null}
 					<p class="mt-1 text-sm text-gray-700">{m.notebook_status_current_score({ score: String(rubricTotal) })}</p>
 				{/if}
