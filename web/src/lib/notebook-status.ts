@@ -35,21 +35,33 @@ export function notebookDevelopmentStatusClass(status: NotebookDevelopmentStatus
 	}
 }
 
-/** One radio pair at a time. Start Rubric is hidden for Link Broken and Not Submitted. */
+/** One radio pair at a time. Developing and Fully Developed are chosen on the rubric page. */
 export function notebookSortingControls(
 	method: NotebookSubmissionMethod,
 	status: NotebookDevelopmentStatus
 ): { options: NotebookDevelopmentStatus[]; showStartRubric: boolean } {
-	if (status === 'developing' || status === 'fully_developed') {
-		return { options: ['developing', 'fully_developed'], showStartRubric: true };
-	}
+	const scored = status === 'developing' || status === 'fully_developed';
 	if (method === 'physical') {
-		return { options: ['not_submitted', 'turned_in'], showStartRubric: status === 'turned_in' };
+		return { options: ['not_submitted', 'turned_in'], showStartRubric: status === 'turned_in' || scored };
 	}
 	if (status === 'not_submitted') {
 		return { options: ['not_submitted'], showStartRubric: false };
 	}
-	return { options: ['undetermined', 'notebook_link_broken'], showStartRubric: status === 'undetermined' || status === 'turned_in' };
+	return {
+		options: ['undetermined', 'notebook_link_broken'],
+		showStartRubric: status === 'undetermined' || status === 'turned_in' || scored
+	};
+}
+
+/** The positive radio stands for a submitted notebook, including one already scored. */
+export function notebookSortingRadioChecked(option: NotebookDevelopmentStatus, status: NotebookDevelopmentStatus): boolean {
+	if (option === 'turned_in') {
+		return status === 'turned_in' || status === 'developing' || status === 'fully_developed';
+	}
+	if (option === 'undetermined') {
+		return status === 'undetermined' || status === 'developing' || status === 'fully_developed';
+	}
+	return status === option;
 }
 
 /** Submit sets these statuses to Developing, including a notebook another judge marked Link Broken. */

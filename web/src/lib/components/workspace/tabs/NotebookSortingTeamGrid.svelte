@@ -5,7 +5,7 @@
 	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
-	import { notebookDevelopmentStatusLabel, notebookSortingControls } from '#lib/notebook-status.ts';
+	import { notebookDevelopmentStatusClass, notebookDevelopmentStatusLabel, notebookSortingControls } from '#lib/notebook-status.ts';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import NotebookStatusRadios from './NotebookStatusRadios.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
@@ -48,7 +48,7 @@
 	]}
 >
 	<!-- Team Info Header -->
-	<div class="mb-2 flex items-center justify-between">
+	<div class={['mb-2 flex items-center justify-between', { 'pr-28': devStatus === 'developing' || devStatus === 'fully_developed' }]}>
 		<div class="flex items-center gap-2">
 			<span class="font-medium text-gray-900">{team.number}</span>
 			{#if isDigital}
@@ -102,13 +102,14 @@
 	</div>
 
 	<!-- Status Indicator -->
-	{#if devStatus !== 'undetermined'}
+	{#if devStatus === 'developing' || devStatus === 'fully_developed'}
+		<div class="absolute top-2 right-2 flex items-center gap-1">
+			<span class={['text-xs font-medium', notebookDevelopmentStatusClass(devStatus)]}>{notebookDevelopmentStatusLabel(devStatus)}</span>
+			<div class={['h-2 w-2 rounded-full', devStatus === 'fully_developed' ? 'bg-green-500' : 'bg-yellow-500']}></div>
+		</div>
+	{:else if devStatus !== 'undetermined'}
 		<div class="absolute top-2 right-2">
-			{#if devStatus === 'fully_developed'}
-				<div class="h-2 w-2 rounded-full bg-green-500" title={m.fully_developed_notebook_status()}></div>
-			{:else if devStatus === 'developing'}
-				<div class="h-2 w-2 rounded-full bg-yellow-500" title={m.developing_notebook_status()}></div>
-			{:else if devStatus === 'notebook_link_broken'}
+			{#if devStatus === 'notebook_link_broken'}
 				<div class="h-2 w-2 rounded-full bg-red-500" title={notebookDevelopmentStatusLabel(devStatus)}></div>
 			{:else if devStatus === 'turned_in'}
 				<div class="h-2 w-2 rounded-full bg-blue-500" title={notebookDevelopmentStatusLabel(devStatus)}></div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import { app } from '#lib/index.svelte.ts';
-	import { notebookDevelopmentStatusLabel } from '#lib/notebook-status.ts';
+	import { notebookDevelopmentStatusLabel, notebookSortingRadioChecked } from '#lib/notebook-status.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { NotebookDevelopmentStatus } from '@judgesroom.com/protocol/src/team';
 	import { errorToString } from '#lib/utils.svelte.ts';
@@ -14,7 +14,7 @@
 	let { team, options }: Props = $props();
 
 	async function updateNotebookStatus(notebookDevelopmentStatus: NotebookDevelopmentStatus) {
-		if (team.notebookDevelopmentStatus === notebookDevelopmentStatus) return;
+		if (notebookSortingRadioChecked(notebookDevelopmentStatus, team.notebookDevelopmentStatus)) return;
 		try {
 			await app.wrpcClient.team.updateTeamData.mutation({
 				...team,
@@ -32,7 +32,7 @@
 			<input
 				type="radio"
 				name={`notebook-status-${team.id}`}
-				checked={team.notebookDevelopmentStatus === option}
+				checked={notebookSortingRadioChecked(option, team.notebookDevelopmentStatus)}
 				value={option}
 				class="mt-0.5 mr-2 rounded border-gray-300 sm:mt-0"
 				onchange={() => updateNotebookStatus(option)}

@@ -6,7 +6,7 @@
 	import { NotebookRubricTab } from '#lib/tab.svelte.ts';
 	import type { TeamInfoAndData } from '#lib/team.svelte.ts';
 	import type { NotebookSubmissionMethod } from '@judgesroom.com/protocol/src/team';
-	import { notebookSortingControls } from '#lib/notebook-status.ts';
+	import { notebookDevelopmentStatusClass, notebookDevelopmentStatusLabel, notebookSortingControls } from '#lib/notebook-status.ts';
 	import EditTeamDataDialog from './EditTeamDataDialog.svelte';
 	import NotebookStatusRadios from './NotebookStatusRadios.svelte';
 	import QRCodeButton from './QRCodeButton.svelte';
@@ -58,6 +58,7 @@
 					<div class="flex max-w-90 min-w-90 flex-col items-center justify-center">{m.notebook_link_table()}</div>
 				{/if}
 				<div class="flex max-w-56 min-w-56 items-center justify-center">{m.notebook_status_table()}</div>
+				<div class="flex max-w-40 min-w-40 items-center justify-center">{m.notebook_development_table()}</div>
 				<div class="flex min-w-50 items-center justify-center">{m.actions_table()}</div>
 			</content>
 		</scroll-container>
@@ -98,6 +99,12 @@
 
 						<div class="flex max-w-56 min-w-56 items-center p-2">
 							<NotebookStatusRadios {team} options={controls.options} />
+						</div>
+
+						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
+							<span class={['text-sm font-medium', notebookDevelopmentStatusClass(devStatus)]}
+								>{notebookDevelopmentStatusLabel(devStatus)}</span
+							>
 						</div>
 
 						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
