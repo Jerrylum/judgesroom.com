@@ -26,6 +26,11 @@
 	const isAssignedJudging = $derived(essentialData?.judgingMethod === 'assigned');
 	const notebookSubmissionMethod = $derived(essentialData?.notebookSubmissionMethod ?? 'digital');
 	const isDigitalNotebook = $derived(notebookSubmissionMethod === 'digital');
+	const notebookLinksReportUrl = $derived(
+		essentialData?.robotEventsEventId == null
+			? null
+			: `https://events.vex.com/admin/eventEntities/${essentialData.robotEventsEventId}/digital_engineering_notebook_csv`
+	);
 
 	const currentJudge = $derived(app.getCurrentUserJudge());
 	const currentJudgeGroup = $derived(app.getCurrentUserJudgeGroup());
@@ -208,6 +213,20 @@
 				<p class="mb-4 text-sm text-gray-600">
 					{m.notebook_sorting_import_description1()}
 				</p>
+
+				{#if notebookLinksReportUrl}
+					<p class="mb-4 text-sm text-gray-600">
+						{m.notebook_sorting_import_download_hint()}
+						<a
+							href={notebookLinksReportUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="ml-1 text-blue-600 underline hover:text-blue-800 active:text-blue-900"
+						>
+							{m.notebook_sorting_import_download()}
+						</a>
+					</p>
+				{/if}
 
 				<div class="flex items-center gap-4">
 					<button onclick={() => fileInput.click()} disabled={isImporting} class="primary tiny">
