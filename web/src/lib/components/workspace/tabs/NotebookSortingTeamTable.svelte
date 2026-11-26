@@ -55,7 +55,7 @@
 		<scroll-container use:registerScrollContainer class="bg-gray-200">
 			<content>
 				{#if isDigital}
-					<div class="flex max-w-90 min-w-90 flex-col items-center justify-center">{m.notebook_link_table()}</div>
+					<div class="flex max-w-48 min-w-48 flex-col items-center justify-center">{m.notebook_link_table()}</div>
 				{/if}
 				<div class="flex max-w-56 min-w-56 items-center justify-center">{m.notebook_status_table()}</div>
 				<div class="flex max-w-40 min-w-40 items-center justify-center">{m.notebook_development_table()}</div>
@@ -80,7 +80,7 @@
 				<scroll-container use:registerScrollContainer>
 					<content>
 						{#if isDigital}
-							<div class="flex max-w-90 min-w-90 items-center gap-2 p-2">
+							<div class="flex max-w-48 min-w-48 items-center gap-2">
 								{#if team.notebookLink}
 									<a
 										href={team.notebookLink}
@@ -97,17 +97,17 @@
 							</div>
 						{/if}
 
-						<div class="flex max-w-56 min-w-56 items-center p-2">
+						<div class="flex max-w-56 min-w-56 items-center">
 							<NotebookStatusRadios {team} options={controls.options} />
 						</div>
 
-						<div class="flex max-w-40 min-w-40 items-center justify-center p-2">
+						<div class="flex max-w-40 min-w-40 items-center justify-center">
 							<span class={['text-sm font-medium', notebookDevelopmentStatusClass(devStatus)]}
 								>{notebookDevelopmentStatusLabel(devStatus)}</span
 							>
 						</div>
 
-						<div class="flex min-w-50 items-center justify-center gap-2 p-2">
+						<div class="flex min-w-50 items-center justify-center gap-2">
 							<div class="min-h-8">
 								{#if controls.showStartRubric}
 									<button

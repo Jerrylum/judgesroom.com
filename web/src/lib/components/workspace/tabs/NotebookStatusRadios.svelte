@@ -26,7 +26,7 @@
 	}
 </script>
 
-<div class="flex min-h-16 flex-col justify-start gap-2">
+<div class="flex flex-col justify-start gap-1">
 	{#each options as option (option)}
 		<label class="flex items-center gap-2">
 			<input
