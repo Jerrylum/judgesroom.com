@@ -9,6 +9,7 @@
 		NotebookRubricTab,
 		NotebookSortingTab,
 		TeamAttendanceTab,
+		TeamScheduleTab,
 		TeamInterviewRubricTab,
 		ExcellenceAwardCandidatesTab,
 		type OverviewTab
@@ -66,6 +67,10 @@
 
 	function addTeamAttendanceTab() {
 		tabs.addOrReuseTab(new TeamAttendanceTab());
+	}
+
+	function addTeamScheduleTab() {
+		tabs.addOrReuseTab(new TeamScheduleTab());
 	}
 
 	async function startAwardDeliberation() {
@@ -157,6 +162,23 @@
 						<div>
 							<div class="font-medium">{m.notebook_review()}</div>
 							<div class="text-sm text-gray-500">{m.notebook_review_description()}</div>
+						</div>
+					</button>
+
+					<button
+						onclick={addTeamScheduleTab}
+						class="flex items-center space-x-3 rounded-lg border border-gray-300 p-3 text-left hover:bg-gray-50 active:bg-gray-100"
+					>
+						<div class="rounded-full bg-slate-300 p-2">
+							<svg class="h-5 w-5 text-slate-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+								><path
+									d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"
+								/></svg
+							>
+						</div>
+						<div>
+							<div class="font-medium">{m.team_schedule()}</div>
+							<div class="text-sm text-gray-500">{m.team_schedule_description()}</div>
 						</div>
 					</button>
 

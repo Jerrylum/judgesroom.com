@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { eq } from 'drizzle-orm';
 import type { AnyRouter, Session } from '@jerrylum/wrpc/server';
-import type { RobotEventsCachePayload, RobotEventsCacheUpdate, RobotEventsResource } from '@judgesroom.com/protocol/src/robotevents-insight';
+import type {
+	RobotEventsCachePayload,
+	RobotEventsCacheUpdate,
+	RobotEventsResource
+} from '@judgesroom.com/protocol/src/robotevents-insight';
 import { ROBOT_EVENTS_CACHE_FETCH_MS } from '@judgesroom.com/protocol/src/robotevents-insight';
 import { serverRouter, type ServerContext } from '../server-router';
 import { createTestServerContext, seedTestDatabase } from '../test-utils';
@@ -10,7 +14,8 @@ import { robotEventsCache, subscriptions } from '../db/schema';
 const lists: RobotEventsCachePayload = {
 	teams: [{ number: '123A', grade: 'Middle School' }],
 	rankings: [{ teamNumber: '123A', divisionId: 1, rank: 1 }],
-	skills: [{ teamNumber: '123A', rank: 1, driverScore: 10, programmingScore: 20, overallScore: 30 }]
+	skills: [{ teamNumber: '123A', rank: 1, driverScore: 10, programmingScore: 20, overallScore: 30 }],
+	matches: [{ id: 1, name: 'Q1', scheduled: '2026-11-27T09:00:00-05:00', field: '1', started: '', teamNumbers: [{ number: '123A', color: 'red' }] }]
 };
 
 describe('VEX Events cache', () => {
@@ -49,7 +54,13 @@ describe('VEX Events cache', () => {
 	async function provide(
 		clientId: string,
 		input:
-			| { state: 'RESULT'; fetchedAt: number; teams?: RobotEventsCachePayload['teams']; rankings?: RobotEventsCachePayload['rankings']; skills?: RobotEventsCachePayload['skills'] }
+			| {
+					state: 'RESULT';
+					fetchedAt: number;
+					teams?: RobotEventsCachePayload['teams'];
+					rankings?: RobotEventsCachePayload['rankings'];
+					skills?: RobotEventsCachePayload['skills'];
+			  }
 			| { state: 'FETCH_FAILED'; resources: RobotEventsResource[] }
 	) {
 		return serverRouter.robotevents.provideRobotEventsCache._def._resolver!({

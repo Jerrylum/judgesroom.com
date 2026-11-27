@@ -1,6 +1,7 @@
 import {
 	ATTENDANCE_ROBOT_EVENTS_RESOURCES,
 	EXCELLENCE_ROBOT_EVENTS_RESOURCES,
+	TEAM_SCHEDULE_ROBOT_EVENTS_RESOURCES,
 	ROBOT_EVENTS_CACHE_FETCH_MS,
 	parseRobotEventsResourcePayload,
 	type RobotEventsCachePayload,
@@ -28,9 +29,10 @@ class RobotEventsCacheStore {
 	teams = $state<Slot<RobotEventsCachePayload['teams']>>(blank());
 	rankings = $state<Slot<RobotEventsCachePayload['rankings']>>(blank());
 	skills = $state<Slot<RobotEventsCachePayload['skills']>>(blank());
+	matches = $state<Slot<RobotEventsCachePayload['matches']>>(blank());
 	lastError = $state('');
 
-	private holders: Record<RobotEventsResource, number> = { teams: 0, rankings: 0, skills: 0 };
+	private holders: Record<RobotEventsResource, number> = { teams: 0, rankings: 0, skills: 0, matches: 0 };
 	private eventId: number | null = null;
 	private divisionId: number | null = null;
 	private wanted = new Set<RobotEventsResource>();
@@ -39,7 +41,12 @@ class RobotEventsCacheStore {
 
 	get excellencePayload(): RobotEventsCachePayload | null {
 		if (!this.teams.payload || !this.rankings.payload || !this.skills.payload) return null;
-		return { teams: this.teams.payload, rankings: this.rankings.payload, skills: this.skills.payload };
+		return {
+			teams: this.teams.payload,
+			rankings: this.rankings.payload,
+			skills: this.skills.payload,
+			matches: this.matches.payload ?? []
+		};
 	}
 
 	isFetching(resources: readonly RobotEventsResource[]): boolean {
@@ -106,6 +113,7 @@ class RobotEventsCacheStore {
 		this.teams = blank();
 		this.rankings = blank();
 		this.skills = blank();
+		this.matches = blank();
 	}
 
 	private async sync(resources: readonly RobotEventsResource[], refresh: boolean): Promise<InsightSyncStatus> {
@@ -186,7 +194,7 @@ class RobotEventsCacheStore {
 
 	private async download(resources: RobotEventsResource[]): Promise<boolean> {
 		if (this.eventId == null || this.divisionId == null) return false;
-		const order = (['teams', 'rankings', 'skills'] as const).filter((resource) => resources.includes(resource));
+		const order = (['teams', 'rankings', 'skills', 'matches'] as const).filter((resource) => resources.includes(resource));
 		const fetched: Partial<RobotEventsCachePayload> = {};
 		const failed: RobotEventsResource[] = [];
 
@@ -200,9 +208,12 @@ class RobotEventsCacheStore {
 				} else if (resource === 'rankings') {
 					if (!part.rankings) throw new Error('Missing rankings');
 					fetched.rankings = part.rankings;
-				} else {
+				} else if (resource === 'skills') {
 					if (!part.skills) throw new Error('Missing skills');
 					fetched.skills = part.skills;
+				} else {
+					if (!part.matches) throw new Error('Missing matches');
+					fetched.matches = part.matches;
 				}
 			} catch (error) {
 				this.lastError = error instanceof Error ? error.message : 'Unknown error';
@@ -214,7 +225,7 @@ class RobotEventsCacheStore {
 
 		try {
 			const robotevents = app.wrpcClient.robotevents;
-			if (fetched.teams || fetched.rankings || fetched.skills) {
+			if (fetched.teams || fetched.rankings || fetched.skills || fetched.matches) {
 				const fetchedAt = Date.now();
 				await robotevents.provideRobotEventsCache.mutation({ state: 'RESULT', fetchedAt, ...fetched });
 				if (fetched.teams) {
@@ -228,6 +239,10 @@ class RobotEventsCacheStore {
 				if (fetched.skills) {
 					this.write('skills', { payload: fetched.skills, fetchedAt, fetchingStarted: 0, phase: 'idle' });
 					this.clearExpiry('skills');
+				}
+				if (fetched.matches) {
+					this.write('matches', { payload: fetched.matches, fetchedAt, fetchingStarted: 0, phase: 'idle' });
+					this.clearExpiry('matches');
 				}
 			}
 			if (failed.length > 0) {
@@ -254,7 +269,8 @@ class RobotEventsCacheStore {
 	private write(resource: RobotEventsResource, slot: Slot<RobotEventsCachePayload[RobotEventsResource]>): void {
 		if (resource === 'teams') this.teams = slot as Slot<RobotEventsCachePayload['teams']>;
 		else if (resource === 'rankings') this.rankings = slot as Slot<RobotEventsCachePayload['rankings']>;
-		else this.skills = slot as Slot<RobotEventsCachePayload['skills']>;
+		else if (resource === 'skills') this.skills = slot as Slot<RobotEventsCachePayload['skills']>;
+		else this.matches = slot as Slot<RobotEventsCachePayload['matches']>;
 	}
 
 	private armExpiry(resource: RobotEventsResource, started: number): void {
@@ -276,4 +292,4 @@ class RobotEventsCacheStore {
 
 export const robotEventsCache = new RobotEventsCacheStore();
 
-export { ATTENDANCE_ROBOT_EVENTS_RESOURCES, EXCELLENCE_ROBOT_EVENTS_RESOURCES };
+export { ATTENDANCE_ROBOT_EVENTS_RESOURCES, EXCELLENCE_ROBOT_EVENTS_RESOURCES, TEAM_SCHEDULE_ROBOT_EVENTS_RESOURCES };

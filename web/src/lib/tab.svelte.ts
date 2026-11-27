@@ -12,6 +12,7 @@ import AwardNominationTabComponent from './components/workspace/tabs/AwardNomina
 import FinalRankingTabComponent from './components/workspace/tabs/FinalRankingTab.svelte';
 import AwardWinnerTabComponent from './components/workspace/tabs/AwardWinnerTab.svelte';
 import TeamAttendanceTabComponent from './components/workspace/tabs/TeamAttendanceTab.svelte';
+import TeamScheduleTabComponent from './components/workspace/tabs/TeamScheduleTab.svelte';
 import ExcellenceAwardEligibilityTabComponent from './components/workspace/tabs/ExcellenceAwardCandidatesTab.svelte';
 import JudgesTabComponent from './components/workspace/judges/JudgesTab.svelte';
 
@@ -41,6 +42,34 @@ export class OverviewTab implements BaseTab<typeof OverviewTabComponent> {
 
 	get title() {
 		return m.overview_tab_title();
+	}
+
+	get hash() {
+		return JSON.stringify({ type: this.type });
+	}
+
+	isEqual(other: BaseTab<any>): boolean {
+		return this.hash === other.hash;
+	}
+
+	isDataUnsaved(): boolean {
+		return false;
+	}
+
+	constructor() {
+		this.id = generateUUID();
+	}
+}
+
+export class TeamScheduleTab implements BaseTab<typeof TeamScheduleTabComponent> {
+	readonly id: string;
+	readonly isPinned = false;
+	readonly type = 'team_schedule';
+	readonly component = TeamScheduleTabComponent;
+	readonly props = {};
+
+	get title() {
+		return m.team_schedule();
 	}
 
 	get hash() {
@@ -386,6 +415,7 @@ export type Tab =
 	| OverviewTab
 	| JudgesTab
 	| TeamAttendanceTab
+	| TeamScheduleTab
 	| NotebookSortingTab
 	| NotebookRubricTab
 	| TeamInterviewRubricTab

@@ -27,6 +27,15 @@ export interface TeamSkillsRecord {
 	overallScore: number;
 }
 
+export interface DivisionMatch {
+	id: number;
+	name: string;
+	scheduled: string;
+	field: string;
+	started: string;
+	teamNumbers: { number: string; color: 'red' | 'blue' }[];
+}
+
 export interface ExcellenceAwardTeamEligibilityCriterion {
 	result: 'eligible' | 'ineligible' | 'no data';
 	// Here, "no" is unique and starts from 1, so it can be used to determine the eligibility
@@ -164,6 +173,46 @@ export async function getEventDivisionRankings(client: VexEventsClient, evtId: n
 		rtn.push({ teamNumber: teamName, divisionId, rank });
 	}
 	return rtn.sort((a, b) => a.rank - b.rank);
+}
+
+function clip(value: string, max: number): string {
+	return value.length <= max ? value : value.slice(0, max);
+}
+
+/** Scheduled matches in one division, trimmed to the fields the schedule tab shows. */
+export async function getEventDivisionMatches(client: VexEventsClient, evtId: number, divisionId: number): Promise<DivisionMatch[]> {
+	const result = await client.api.PaginatedGET('/events/{id}/divisions/{div}/matches', {
+		params: {
+			path: {
+				id: evtId,
+				div: divisionId
+			}
+		}
+	});
+
+	if (result.error) throw new Error('Failed to get event division matches from RobotEvents');
+
+	const matches: DivisionMatch[] = [];
+	for (const match of result.data) {
+		const scheduled = match.scheduled?.trim();
+		if (!scheduled || match.id == null || !match.name) continue;
+		const teamNumbers = match.alliances.flatMap((alliance) =>
+			alliance.teams.flatMap((entry) => {
+				if (entry.sitting) return [];
+				const name = entry.team?.name?.trim();
+				return name ? [{ number: clip(name, 10), color: alliance.color }] : [];
+			})
+		);
+		matches.push({
+			id: match.id,
+			name: clip(match.name, 80),
+			scheduled: clip(scheduled, 40),
+			field: clip(match.field?.trim() ?? '', 40),
+			started: clip(match.started?.trim() ?? '', 40),
+			teamNumbers: teamNumbers.slice(0, 16)
+		});
+	}
+	return matches;
 }
 
 /**
@@ -391,6 +440,7 @@ export async function downloadRobotEventsResources(
 	}
 	if (wanted.has('rankings')) payload.rankings = await getEventDivisionRankings(client, evtId, divisionId);
 	if (wanted.has('skills')) payload.skills = await getEventSkills(client, evtId);
+	if (wanted.has('matches')) payload.matches = await getEventDivisionMatches(client, evtId, divisionId);
 
 	return payload;
 }

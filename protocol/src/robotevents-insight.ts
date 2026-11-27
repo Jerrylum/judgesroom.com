@@ -6,11 +6,12 @@ export const ROBOT_EVENTS_CACHE_FRESH_MS = 60_000;
 /** A download that never reports back is idle again after this. */
 export const ROBOT_EVENTS_CACHE_FETCH_MS = 20_000;
 
-export const RobotEventsResourceSchema = z.enum(['teams', 'rankings', 'skills']);
+export const RobotEventsResourceSchema = z.enum(['teams', 'rankings', 'skills', 'matches']);
 export type RobotEventsResource = z.infer<typeof RobotEventsResourceSchema>;
 
 export const EXCELLENCE_ROBOT_EVENTS_RESOURCES = ['teams', 'rankings', 'skills'] as const satisfies readonly RobotEventsResource[];
 export const ATTENDANCE_ROBOT_EVENTS_RESOURCES = ['rankings'] as const satisfies readonly RobotEventsResource[];
+export const TEAM_SCHEDULE_ROBOT_EVENTS_RESOURCES = ['matches'] as const satisfies readonly RobotEventsResource[];
 
 export function robotEventsCacheTopic(resource: RobotEventsResource): string {
 	return `robotEventsCache:${resource}`;
@@ -39,10 +40,22 @@ export type RobotEventsTeam = z.infer<typeof RobotEventsTeamSchema>;
 export type RobotEventsRanking = z.infer<typeof RobotEventsRankingSchema>;
 export type RobotEventsSkills = z.infer<typeof RobotEventsSkillsSchema>;
 
+export const RobotEventsMatchSchema = z.object({
+	id: z.number().int(),
+	name: z.string().max(80),
+	scheduled: z.string().max(40),
+	field: z.string().max(40),
+	started: z.string().max(40),
+	teamNumbers: z.array(z.object({ number: z.string().max(10), color: z.enum(['red', 'blue']) })).max(16)
+});
+
+export type RobotEventsMatch = z.infer<typeof RobotEventsMatchSchema>;
+
 export const RobotEventsCachePayloadSchema = z.object({
 	teams: z.array(RobotEventsTeamSchema),
 	rankings: z.array(RobotEventsRankingSchema),
-	skills: z.array(RobotEventsSkillsSchema)
+	skills: z.array(RobotEventsSkillsSchema),
+	matches: z.array(RobotEventsMatchSchema)
 });
 
 export type RobotEventsCachePayload = z.infer<typeof RobotEventsCachePayloadSchema>;
@@ -50,7 +63,8 @@ export type RobotEventsCachePayload = z.infer<typeof RobotEventsCachePayloadSche
 const payloadSchemaByResource = {
 	teams: z.array(RobotEventsTeamSchema),
 	rankings: z.array(RobotEventsRankingSchema),
-	skills: z.array(RobotEventsSkillsSchema)
+	skills: z.array(RobotEventsSkillsSchema),
+	matches: z.array(RobotEventsMatchSchema)
 } as const;
 
 export function parseRobotEventsResourcePayload<T extends RobotEventsResource>(resource: T, payload: unknown) {
@@ -85,7 +99,8 @@ export const ProvideRobotEventsCacheInputSchema = z.discriminatedUnion('state', 
 		fetchedAt: z.number(),
 		teams: z.array(RobotEventsTeamSchema).optional(),
 		rankings: z.array(RobotEventsRankingSchema).optional(),
-		skills: z.array(RobotEventsSkillsSchema).optional()
+		skills: z.array(RobotEventsSkillsSchema).optional(),
+		matches: z.array(RobotEventsMatchSchema).optional()
 	}),
 	z.object({
 		state: z.literal('FETCH_FAILED'),

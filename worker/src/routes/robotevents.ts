@@ -11,6 +11,7 @@ import {
 	UnsubscribeRobotEventsCacheInputSchema,
 	type ProvideRobotEventsCacheInput,
 	type RobotEventsCacheUpdate,
+	type RobotEventsMatch,
 	type RobotEventsRanking,
 	type RobotEventsResource,
 	type RobotEventsResourceStatus,
@@ -107,10 +108,13 @@ export async function provideRobotEventsCache(
 		}
 
 		const updates: RobotEventsCacheUpdate[] = [];
-		const entries: Array<['teams', RobotEventsTeam[]] | ['rankings', RobotEventsRanking[]] | ['skills', RobotEventsSkills[]]> = [];
+		const entries: Array<
+			['teams', RobotEventsTeam[]] | ['rankings', RobotEventsRanking[]] | ['skills', RobotEventsSkills[]] | ['matches', RobotEventsMatch[]]
+		> = [];
 		if (input.teams) entries.push(['teams', input.teams]);
 		if (input.rankings) entries.push(['rankings', input.rankings]);
 		if (input.skills) entries.push(['skills', input.skills]);
+		if (input.matches) entries.push(['matches', input.matches]);
 
 		for (const [resource, payload] of entries) {
 			const row = await readResource(tx, resource);
@@ -143,12 +147,7 @@ export function buildRobotEventsRoute(w: WRPCRootObject<object, ServerContext, R
 			.output(SubscribeRobotEventsCacheResultSchema)
 			.mutation(async ({ ctx, input, session }) => {
 				await ctx.limits.consumeWriteBudget(Math.max(1, 3 * input.resources.length));
-				const { result, updates } = await subscribeRobotEventsCache(
-					ctx.db,
-					session.currentClient.clientId,
-					input.resources,
-					input.refresh
-				);
+				const { result, updates } = await subscribeRobotEventsCache(ctx.db, session.currentClient.clientId, input.resources, input.refresh);
 				for (const update of updates) await broadcastUpdate(ctx.db, session, update);
 				return result;
 			}),
@@ -164,7 +163,7 @@ export function buildRobotEventsRoute(w: WRPCRootObject<object, ServerContext, R
 			const weight =
 				input.state === 'FETCH_FAILED'
 					? input.resources.length
-					: Number(input.teams != null) + Number(input.rankings != null) + Number(input.skills != null);
+					: Number(input.teams != null) + Number(input.rankings != null) + Number(input.skills != null) + Number(input.matches != null);
 			await ctx.limits.consumeWriteBudget(Math.max(1, weight));
 			const updates = await provideRobotEventsCache(ctx.db, input);
 			for (const update of updates) await broadcastUpdate(ctx.db, session, update);

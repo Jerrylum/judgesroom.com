@@ -277,7 +277,7 @@ export const teamPhotos = sqliteTable(
 
 /** One row per VEX list. Rankings are shared by attendance and Excellence. */
 export const robotEventsCache = sqliteTable('RobotEventsCache', {
-	resource: text('resource', { enum: ['teams', 'rankings', 'skills'] }).primaryKey(),
+	resource: text('resource', { enum: ['teams', 'rankings', 'skills', 'matches'] }).primaryKey(),
 	payload: text('payload', { mode: 'json' }).$type<unknown[] | null>(),
 	fetchedAt: integer('fetchedAt'),
 	fetchingStarted: integer('fetchingStarted').notNull().default(0)
