@@ -10,7 +10,7 @@
 	import { sortByAssignedTeams, sortByTeamNumber } from '#lib/team.svelte.ts';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
 	import WarningSign from './WarningSign.svelte';
-	import AwardRankingTable from './AwardRankingTable.svelte';
+	import AwardCandidateRankingList from './AwardCandidateRankingList.svelte';
 	import TeamInterviewRubricTable from './TeamInterviewRubricTable.svelte';
 	import TeamInterviewRubricTable2_0 from './TeamInterviewRubricTable2_0.svelte';
 	import { TeamInterviewRubricDocument } from '#lib/interview-rubric-document.svelte.ts';
@@ -429,12 +429,7 @@
 				<p class="mb-4 text-sm text-gray-600">
 					{m.rubric_award_candidate_ranking_description()}
 				</p>
-				<AwardRankingTable
-					title=""
-					judgeGroup={effectiveJudgeGroup}
-					showingTeams={{ targetTeams: [tab.teamId] }}
-					bypassAwardRequirements={false}
-				/>
+				<AwardCandidateRankingList judgeGroup={effectiveJudgeGroup} teamId={tab.teamId} bypassAwardRequirements={false} />
 			</div>
 		{/if}
 	</div>

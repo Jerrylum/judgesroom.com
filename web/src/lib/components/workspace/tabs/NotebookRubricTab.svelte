@@ -8,7 +8,7 @@
 	import { untrack } from 'svelte';
 	import { sortByAssignedTeams, sortByNotebookDevelopmentStatus, sortByTeamNumber } from '#lib/team.svelte.ts';
 	import { resolveJudgeGuideVersion } from '@judgesroom.com/protocol/src/judge-guide';
-	import AwardRankingTable from './AwardRankingTable.svelte';
+	import AwardCandidateRankingList from './AwardCandidateRankingList.svelte';
 	import NotebookRubricTable1_0 from './NotebookRubricTable1_0.svelte';
 	import NotebookRubricTable2_0 from './NotebookRubricTable2_0.svelte';
 	import { NotebookRubricDocument } from '#lib/notebook-rubric-document.svelte.ts';
@@ -484,12 +484,7 @@
 				<p class="mb-4 text-sm text-gray-600">
 					{m.notebook_rubric_award_candidate_ranking_description()}
 				</p>
-				<AwardRankingTable
-					title=""
-					judgeGroup={effectiveJudgeGroup}
-					showingTeams={{ targetTeams: [tab.teamId] }}
-					bypassAwardRequirements={false}
-				/>
+				<AwardCandidateRankingList judgeGroup={effectiveJudgeGroup} teamId={tab.teamId} bypassAwardRequirements={false} />
 			</div>
 		{/if}
 	</div>

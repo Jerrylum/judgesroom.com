@@ -14,9 +14,11 @@
 		team: TeamInfoAndData;
 		judgeGroupId: string;
 		bypassAwardRequirements: boolean;
+		/** Show five clickable stars. The award table still reveals plus and minus on hover. */
+		showAllStars?: boolean;
 	}
 
-	let { judgeGroupId, team, awardIndex, awardRankings, award, bypassAwardRequirements }: Props = $props();
+	let { judgeGroupId, team, awardIndex, awardRankings, award, bypassAwardRequirements, showAllStars = false }: Props = $props();
 
 	// State for edit mode
 	let isEditMode = $state(false);
@@ -27,6 +29,7 @@
 	const needsFullyDevelopedNotebook = $derived(requiresFullyDevelopedNotebook(award.name));
 	const isMeetGradeRequirement = $derived(award.acceptedGrades.includes(team.grade));
 	const isDisabled = $derived(bypassAwardRequirements ? false : !isMeetNotebookRequirement || !isMeetGradeRequirement);
+	const starValues = [1, 2, 3, 4, 5];
 
 	// Handle ranking update
 	async function updateRanking(newRanking: number) {
@@ -99,70 +102,102 @@
 	}
 </script>
 
-<div
-	class={['relative max-w-40 min-w-40 p-2 text-center select-none', isDisabled ? 'cursor-not-allowed' : 'cursor-pointer']}
-	role="button"
-	tabindex="0"
-	onmouseenter={handleMouseEnter}
-	onmouseleave={handleMouseLeave}
-	onclick={handleTouch}
-	onkeydown={(e) => e.key === 'Enter' && handleTouch()}
->
-	{#if isDisabled}
-		<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
-			{#if !isMeetNotebookRequirement}
-				{#if needsFullyDevelopedNotebook}
-					<p>{m.fully_developed_required_btn()}</p>
-				{:else}
-					<p>{m.notebook_required_btn()}</p>
+{#if showAllStars}
+	<div class="shrink-0 py-2">
+		{#if isDisabled}
+			<p class="text-xs whitespace-nowrap text-gray-600">
+				{#if !isMeetNotebookRequirement}
+					{needsFullyDevelopedNotebook ? m.fully_developed_required_btn() : m.notebook_required_btn()}
 				{/if}
-			{/if}
-			{#if !isMeetGradeRequirement}
-				<p>{m.grade_must_be_btn({ grades: formatGradesShort(award.acceptedGrades) })}</p>
-			{/if}
-		</div>
-	{:else if isEditMode}
-		<!-- Edit mode: show minus, stars with count, and plus buttons -->
-		<div class="flex items-center justify-center gap-2">
-			<button
-				class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm font-bold hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={ranking <= 0}
-				onclick={(e) => {
-					e.stopPropagation();
-					handleDecrease();
-				}}
-			>
-				−
-			</button>
-
-			<div class="flex items-center gap-1 text-gray-600">
-				{#if ranking === 0}
-					<span class="text-xs">({ranking})</span>
-				{:else}
-					<span class="text-lg">{getStars(ranking)}</span>
+				{#if !isMeetNotebookRequirement && !isMeetGradeRequirement}
+					<span> · </span>
+				{/if}
+				{#if !isMeetGradeRequirement}
+					{m.grade_must_be_btn({ grades: formatGradesShort(award.acceptedGrades) })}
+				{/if}
+			</p>
+		{:else}
+			<div class="flex items-center">
+				{#each starValues as star (star)}
+					<button
+						type="button"
+						class={['flex h-8 w-7 items-center justify-center text-xl leading-none', star <= ranking ? 'text-gray-700' : 'text-gray-300']}
+						aria-label={m.award_ranking_stars({ count: star })}
+						aria-pressed={star <= ranking}
+						onclick={() => updateRanking(ranking === star ? 0 : star)}
+					>
+						★
+					</button>
+				{/each}
+			</div>
+		{/if}
+	</div>
+{:else}
+	<div
+		class={['relative max-w-40 min-w-40 p-2 text-center select-none', isDisabled ? 'cursor-not-allowed' : 'cursor-pointer']}
+		role="button"
+		tabindex="0"
+		onmouseenter={handleMouseEnter}
+		onmouseleave={handleMouseLeave}
+		onclick={handleTouch}
+		onkeydown={(e) => e.key === 'Enter' && handleTouch()}
+	>
+		{#if isDisabled}
+			<div class="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center text-xs text-gray-600">
+				{#if !isMeetNotebookRequirement}
+					{#if needsFullyDevelopedNotebook}
+						<p>{m.fully_developed_required_btn()}</p>
+					{:else}
+						<p>{m.notebook_required_btn()}</p>
+					{/if}
+				{/if}
+				{#if !isMeetGradeRequirement}
+					<p>{m.grade_must_be_btn({ grades: formatGradesShort(award.acceptedGrades) })}</p>
 				{/if}
 			</div>
+		{:else if isEditMode}
+			<!-- Edit mode: show minus, stars with count, and plus buttons -->
+			<div class="flex items-center justify-center gap-2">
+				<button
+					class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm font-bold hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={ranking <= 0}
+					onclick={(e) => {
+						e.stopPropagation();
+						handleDecrease();
+					}}
+				>
+					−
+				</button>
 
-			<button
-				class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm font-bold hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={ranking >= 5}
-				onclick={(e) => {
-					e.stopPropagation();
-					handleIncrease();
-				}}
-			>
-				+
-			</button>
-		</div>
-	{:else}
-		<!-- Display mode: show only stars or empty if 0 -->
-		<div class="flex min-h-6 items-center justify-center text-lg text-gray-600">
-			{#if ranking > 0}
-				{getStars(ranking)}
-			{/if}
-		</div>
-	{/if}
-</div>
+				<div class="flex items-center gap-1 text-gray-600">
+					{#if ranking === 0}
+						<span class="text-xs">({ranking})</span>
+					{:else}
+						<span class="text-lg">{getStars(ranking)}</span>
+					{/if}
+				</div>
+
+				<button
+					class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm font-bold hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={ranking >= 5}
+					onclick={(e) => {
+						e.stopPropagation();
+						handleIncrease();
+					}}
+				>
+					+
+				</button>
+			</div>
+		{:else}
+			<!-- Display mode: show only stars or empty if 0 -->
+			<div class="flex min-h-6 items-center justify-center text-lg text-gray-600">
+				{#if ranking > 0}
+					{getStars(ranking)}
+				{/if}
+			</div>
+		{/if}
+	</div>
+{/if}
 
 <style>
 	/* Ensure consistent height for the container */
