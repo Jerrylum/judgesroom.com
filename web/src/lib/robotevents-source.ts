@@ -3,6 +3,7 @@ import type { EventGradeLevel } from '@judgesroom.com/protocol/src/event';
 import { initialNotebookDevelopmentStatus, type TeamInfo } from '@judgesroom.com/protocol/src/team';
 import { GradeSchema, type Award, type Program } from '@judgesroom.com/protocol/src/award';
 import { Client, type Division, type Event, type Grade, type TeamData, type VexEventsClient } from 'events.vex';
+import type { EliminationMatch } from './performance-award-fill.ts';
 import { extractGroupFromTeamNumber, type TeamInfoAndData } from './team.svelte';
 import { getOfficialAwardOptionsList, type AwardOptions } from './award.svelte';
 import { getEventGradeLevelOptions } from './event.svelte';
@@ -175,6 +176,33 @@ export async function getEventDivisionRankings(client: VexEventsClient, evtId: n
 	return rtn.sort((a, b) => a.rank - b.rank);
 }
 
+/** Finalist rankings for one division, in API order. Partners that share a rank stay together. */
+export async function getEventDivisionFinalistRankings(
+	client: VexEventsClient,
+	evtId: number,
+	divisionId: number
+): Promise<{ rank: number; teamNumber: string }[]> {
+	const result = await client.api.PaginatedGET('/events/{id}/divisions/{div}/finalistRankings', {
+		params: {
+			path: {
+				id: evtId,
+				div: divisionId
+			}
+		}
+	});
+
+	if (result.error) throw new Error('Failed to get event division finalist rankings from RobotEvents');
+
+	const rankings: { rank: number; teamNumber: string }[] = [];
+	for (const ranking of result.data) {
+		const teamNumber = ranking.team?.name?.trim();
+		const rank = ranking.rank;
+		if (!teamNumber || !rank) continue;
+		rankings.push({ rank, teamNumber });
+	}
+	return rankings;
+}
+
 function clip(value: string, max: number): string {
 	return value.length <= max ? value : value.slice(0, max);
 }
@@ -210,6 +238,46 @@ export async function getEventDivisionMatches(client: VexEventsClient, evtId: nu
 			field: clip(match.field?.trim() ?? '', 40),
 			started: clip(match.started?.trim() ?? '', 40),
 			teamNumbers: teamNumbers.slice(0, 16)
+		});
+	}
+	return matches;
+}
+
+/**
+ * V5 elimination matches, including score, for every game in a series.
+ * The `scored` flag is not used: finished events still return scored matches as unscored.
+ */
+export async function getEventDivisionEliminationMatches(
+	client: VexEventsClient,
+	evtId: number,
+	divisionId: number
+): Promise<EliminationMatch[]> {
+	const result = await client.api.PaginatedGET('/events/{id}/divisions/{div}/matches', {
+		params: {
+			path: {
+				id: evtId,
+				div: divisionId
+			}
+		}
+	});
+
+	if (result.error) throw new Error('Failed to get event division matches from RobotEvents');
+
+	const matches: EliminationMatch[] = [];
+	for (const match of result.data) {
+		if (match.round !== 3 && match.round !== 4 && match.round !== 5 && match.round !== 6) continue;
+		matches.push({
+			round: match.round,
+			instance: match.instance,
+			matchnum: match.matchnum,
+			alliances: match.alliances.map((alliance) => ({
+				score: alliance.score,
+				teamNumbers: alliance.teams.flatMap((entry) => {
+					if (entry.sitting) return [];
+					const name = entry.team?.name?.trim();
+					return name ? [name] : [];
+				})
+			}))
 		});
 	}
 	return matches;

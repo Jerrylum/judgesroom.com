@@ -6,6 +6,18 @@
 	import { sortByTeamNumber } from '#lib/team.svelte.ts';
 	import { errorToString } from '#lib/utils.svelte.ts';
 	import { getAwardWinners, groupAwardWinnersByTeamGroup } from '#lib/award.svelte.ts';
+	import {
+		mapIQPerformanceAwardWinners,
+		mapV5PerformanceAwardWinners,
+		type PerformanceAwardFillProblem,
+		type PerformanceAwardFillResult
+	} from '#lib/performance-award-fill.ts';
+	import {
+		getEventDivisionEliminationMatches,
+		getEventDivisionFinalistRankings,
+		getEventSkills,
+		getRobotEventsClient
+	} from '#lib/robotevents-source.ts';
 	import AwardWinnersReportDialog, { type TeamPresentationConfig } from './AwardWinnersReportDialog.svelte';
 
 	interface Props {
@@ -17,6 +29,9 @@
 
 	const allTeams = $derived(app.getAllTeamInfoAndData());
 	const allSortedTeams = $derived(sortByTeamNumber(Object.values(allTeams)));
+	const essentialData = $derived(app.getEssentialData());
+	const hasRobotEventsId = $derived(!!essentialData?.robotEventsEventId && !!essentialData?.divisionId);
+	let isFillingPerformanceAwards = $state(false);
 
 	const allAwards = $derived(app.getAllAwards());
 	const allPerformanceAwards = $derived(allAwards.filter((award) => award.type === 'performance'));
@@ -27,6 +42,97 @@
 
 	const allAwardWinners = $derived(getAwardWinners(allAwards, allFinalAwardNominations, new Set(awardsWithNoWinner))); // award name -> team ids
 	const allAwardWinnersByTeamGroup = $derived(groupAwardWinnersByTeamGroup(allAwardWinners, allTeams)); // group id -> team id -> award names
+
+	function describeFillProblem(problem: PerformanceAwardFillProblem): string {
+		if (problem.kind === 'elimination_tie') {
+			const series =
+				problem.round === 'final'
+					? m.fill_performance_awards_series_final({ instance: problem.instance })
+					: problem.round === 'semifinal'
+						? m.fill_performance_awards_series_semifinal({ instance: problem.instance })
+						: problem.round === 'quarterfinal'
+							? m.fill_performance_awards_series_quarterfinal({ instance: problem.instance })
+							: m.fill_performance_awards_series_round_of_16({ instance: problem.instance });
+			const teams = problem.alliances.map((alliance) => alliance.join(' & ')).join(' vs ');
+			return m.fill_performance_awards_elimination_tie({ award: problem.awardName, series, teams });
+		}
+		const teams = problem.teamNumbers.join(', ');
+		if (problem.kind === 'count')
+			return m.fill_performance_awards_count({ award: problem.awardName, teams, count: problem.teamNumbers.length });
+		if (problem.kind === 'missing_team') return m.fill_performance_awards_missing_team({ award: problem.awardName, teams });
+		return m.fill_performance_awards_skills_tie({ award: problem.awardName, teams });
+	}
+
+	async function fillPerformanceAwards() {
+		const event = essentialData;
+		if (!event || event.robotEventsEventId == null || event.divisionId == null || isFillingPerformanceAwards) return;
+		const eventId = event.robotEventsEventId;
+		const divisionId = event.divisionId;
+		const program = event.program;
+		isFillingPerformanceAwards = true;
+		try {
+			const client = getRobotEventsClient();
+			const roomTeams = Object.values(allTeams);
+			let result: PerformanceAwardFillResult;
+			if (program === 'V5RC') {
+				const [matches, skills] = await Promise.all([
+					getEventDivisionEliminationMatches(client, eventId, divisionId),
+					getEventSkills(client, eventId)
+				]);
+				result = mapV5PerformanceAwardWinners({ awards: allPerformanceAwards, matches, skills, roomTeams });
+			} else {
+				const [finalists, skills] = await Promise.all([
+					getEventDivisionFinalistRankings(client, eventId, divisionId),
+					getEventSkills(client, eventId)
+				]);
+				result = mapIQPerformanceAwardWinners({ awards: allPerformanceAwards, finalists, skills, roomTeams });
+			}
+			if (result.status === 'empty') {
+				await dialogs.showAlert({
+					title: m.fill_performance_awards(),
+					message: m.fill_performance_awards_none(),
+					confirmText: 'OK',
+					confirmButtonClass: 'primary'
+				});
+				return;
+			}
+			if (result.status === 'refused') {
+				await dialogs.showAlert({
+					title: m.fill_performance_awards(),
+					message: result.problems.map(describeFillProblem).join('\n\n'),
+					confirmText: 'OK',
+					confirmButtonClass: 'primary'
+				});
+				return;
+			}
+			const confirmed = await dialogs.showConfirmation({
+				title: m.fill_performance_awards(),
+				message: m.fill_performance_awards_confirm({
+					awards: result.fills.map((fill) => `${fill.awardName}: ${fill.teamNumbers.join(', ')}`).join('\n')
+				}),
+				confirmText: m.confirm(),
+				cancelText: m.cancel(),
+				confirmButtonClass: 'primary'
+			});
+			if (!confirmed) return;
+			const teamIdByNumber = new Map(Object.values(allTeams).map((team) => [team.number, team.id]));
+			await app.wrpcClient.judging.updateFinalRankingsBatch.mutation({
+				rankings: result.fills.map((fill) => ({
+					awardName: fill.awardName,
+					nominations: fill.teamNumbers.map((teamNumber) => {
+						const teamId = teamIdByNumber.get(teamNumber);
+						if (!teamId) throw new Error(`Team ${teamNumber} is not in this room`);
+						return { teamId, judgeGroupId: null };
+					})
+				}))
+			});
+		} catch (error) {
+			console.error('Failed to fill performance awards:', error);
+			app.addErrorNotice(m.failed_to_fill_performance_awards({ error: errorToString(error) }));
+		} finally {
+			isFillingPerformanceAwards = false;
+		}
+	}
 
 	async function updateInputFinalRankings(awardName: string, position: number, teamId: string) {
 		try {
@@ -111,7 +217,14 @@
 
 		<!-- Performance Awards -->
 		<div class="rounded-lg bg-white p-6 shadow-sm">
-			<h2 class="mb-2 text-xl font-semibold text-gray-900">{m.performance_awards()}</h2>
+			<div class="mb-2 flex flex-wrap items-start justify-between gap-3">
+				<h2 class="text-xl font-semibold text-gray-900">{m.performance_awards()}</h2>
+				{#if hasRobotEventsId && allPerformanceAwards.length > 0}
+					<button onclick={fillPerformanceAwards} disabled={isFillingPerformanceAwards} class="lightweight tiny">
+						{isFillingPerformanceAwards ? m.fetching() : m.fill_performance_awards()}
+					</button>
+				{/if}
+			</div>
 			<p class="mb-6 text-sm text-gray-600">
 				{m.award_winner_tab_performance_awards_description()}
 			</p>

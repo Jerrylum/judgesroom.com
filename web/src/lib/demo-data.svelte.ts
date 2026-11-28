@@ -18,6 +18,8 @@ if (typeof window !== 'undefined') {
 				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchAwards.json'));
 			case 'https://events.vex.com/api/v2/events/59999/divisions/1/rankings?page=1&per_page=250':
 				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchRanking.json'));
+			case 'https://events.vex.com/api/v2/events/59999/divisions/1/finalistRankings?page=1&per_page=250':
+				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchFinalistRankings.json'));
 			case 'https://events.vex.com/api/v2/events/59999/divisions/1/matches?page=1&per_page=250':
 				return resolveDemoData(await import('#lib/demo-data/roboteventsFetchMatches.json'));
 			case 'https://events.vex.com/api/v2/events/59999/skills?page=1&per_page=250':

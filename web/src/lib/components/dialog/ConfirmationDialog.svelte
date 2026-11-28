@@ -24,7 +24,7 @@
 	<h3 id="dialog-title" class="mb-4 text-lg font-semibold text-gray-900">{dialog.title}</h3>
 
 	<!-- Message -->
-	<p id="dialog-message" class="mb-6 text-sm text-gray-600">{dialog.message}</p>
+	<p id="dialog-message" class="mb-6 text-sm whitespace-pre-line text-gray-600">{dialog.message}</p>
 
 	<!-- Buttons -->
 	<div class="flex justify-end space-x-3">

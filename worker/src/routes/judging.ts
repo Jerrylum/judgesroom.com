@@ -413,8 +413,9 @@ export function buildJudgingRoute(w: WRPCRootObject<object, ServerContext, Recor
 		}),
 
 		// One transaction so a move cannot remain on the target award after the source update fails.
+		// The higher limit also covers filling every configured performance award at once.
 		updateFinalRankingsBatch: w.procedure
-			.input(z.object({ rankings: z.array(FinalAwardRankingUpdateSchema).min(1).max(2) }))
+			.input(z.object({ rankings: z.array(FinalAwardRankingUpdateSchema).min(1).max(32) }))
 			.mutation(async ({ ctx, input, session }) => {
 				const awardNames = input.rankings.map((ranking) => ranking.awardName);
 				if (new Set(awardNames).size !== awardNames.length) {

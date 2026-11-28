@@ -220,6 +220,25 @@
 	"award_winner_tab_title": "獎項得獎者",
 	"award_winner_tab_description": "評判顧問應在下方輸入所有獎項得獎者以作最終確認。在頒獎典禮之前，評判顧問應將結果輸入至 Tournament Manager。",
 	"award_winner_tab_performance_awards_description": "表現獎項基於機器人在比賽和技能挑戰中的表現。這些獎項不影響隊伍獲得評判獎項的資格。",
+	"fill_performance_awards": "從 VEX Events 填入",
+	"fill_performance_awards_confirm": "VEX Events 的結果會取代以下獎項目前的得獎者：\n\n{awards}",
+	"fill_performance_awards_none": "此評審室的表現獎項無法從現有的 VEX Events 結果填入。",
+	"fill_performance_awards_count": [
+		{
+			"match": {
+				"count=0": "{award} 沒有隊伍，與該獎項的得獎者人數不符。",
+				"count=*": "{award} 的得獎隊伍為 {teams}，與該獎項的得獎者人數不符。"
+			}
+		}
+	],
+	"fill_performance_awards_missing_team": "{award} 包含不在此評審室的隊伍：{teams}。",
+	"fill_performance_awards_skills_tie": "{award} 無法定出得獎者，因為以下隊伍同分：{teams}。",
+	"fill_performance_awards_series_final": "決賽 #{instance}",
+	"fill_performance_awards_series_semifinal": "準決賽 #{instance}",
+	"fill_performance_awards_series_quarterfinal": "八強 #{instance}",
+	"fill_performance_awards_series_round_of_16": "十六強 #{instance}",
+	"fill_performance_awards_elimination_tie": "{award} 無法定出得獎者，因為 {series} 由 {teams} 打成平手。結果必須由活動夥伴決定。",
+	"failed_to_fill_performance_awards": "無法從 VEX Events 填入表現獎得獎者。{error}",
 	"no_performance_awards_configured_for_this_event": "沒有配置表現獎項。",
 	"number_of_winners_count": [
 		{

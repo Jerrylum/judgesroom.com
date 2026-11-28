@@ -220,6 +220,25 @@
 	"award_winner_tab_title": "Award Winner",
 	"award_winner_tab_description": "The Judge Advisor should enter all award winners below for final confirmation. Before the award ceremony, the Judge Advisor should enter the result to the Tournament Manager.",
 	"award_winner_tab_performance_awards_description": "Performance Awards are based on robot performance on the competition field in match play and Skills Challenges. These awards do not impact a team's eligibility to earn a Judged Award.",
+	"fill_performance_awards": "Fill from VEX Events",
+	"fill_performance_awards_confirm": "VEX Events results will replace the current winners for the following awards:\n\n{awards}",
+	"fill_performance_awards_none": "None of the performance awards in this room can be filled from the available VEX Events results.",
+	"fill_performance_awards_count": [
+		{
+			"match": {
+				"count=0": "{award} has no teams, which does not match the number of winners for that award.",
+				"count=*": "{award} has {teams}, which does not match the number of winners for that award."
+			}
+		}
+	],
+	"fill_performance_awards_missing_team": "{award} includes teams that are not in this Judges' Room: {teams}.",
+	"fill_performance_awards_skills_tie": "{award} cannot be decided because these teams are tied: {teams}.",
+	"fill_performance_awards_series_final": "Finals #{instance}",
+	"fill_performance_awards_series_semifinal": "Semi-Finals #{instance}",
+	"fill_performance_awards_series_quarterfinal": "Quarter-Finals #{instance}",
+	"fill_performance_awards_series_round_of_16": "Round of 16 #{instance}",
+	"fill_performance_awards_elimination_tie": "{award} cannot be decided because {series} ended in a tie: {teams}. The Event Partner must resolve the result.",
+	"failed_to_fill_performance_awards": "Failed to fill performance award winners from VEX Events. {error}",
 	"no_performance_awards_configured_for_this_event": "No performance awards configured for this event.",
 	"number_of_winners_count": [
 		{

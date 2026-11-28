@@ -1,0 +1,434 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`performance award fill for finished events > RE-V5RC-26-4288 1`] = `
+{
+  "awards": [
+    {
+      "name": "Tournament Champions",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Tournament Finalists",
+      "winnersCount": 2,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Tournament Champions",
+            "teamNumbers": [
+              "52222X",
+              "96969Y",
+            ],
+          },
+          {
+            "awardName": "Tournament Finalists",
+            "teamNumbers": [
+              "17022A",
+              "60206Y",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "HS Only",
+  "eventName": "Hong Kong VEX V5 Robotics Competition™ (HS) Signature Event: VEX V5 High School",
+  "program": "V5RC",
+}
+`;
+
+exports[`performance award fill for finished events > RE-V5RC-26-5000 1`] = `
+{
+  "awards": [
+    {
+      "name": "Tournament Champions",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Tournament Champions",
+            "teamNumbers": [
+              "936B",
+              "936C",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "33316H",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "Stamford Robotics Open VEX V5 Robotics Competition™ (MS/HS): VEX V5 Middle School and High School - ACAMIS Event",
+  "program": "V5RC",
+}
+`;
+
+exports[`performance award fill for finished events > RE-VIQRC-26-4289 1`] = `
+{
+  "awards": [
+    {
+      "name": "Teamwork Champion Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Teamwork 2nd Place Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Teamwork 3rd Place Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+    {
+      "name": "Robot Skills 2nd Place",
+      "winnersCount": 1,
+    },
+    {
+      "name": "Robot Skills 3rd Place",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Teamwork Champion Award",
+            "teamNumbers": [
+              "7755B",
+              "6966G",
+            ],
+          },
+          {
+            "awardName": "Teamwork 2nd Place Award",
+            "teamNumbers": [
+              "7755A",
+              "1512X",
+            ],
+          },
+          {
+            "awardName": "Teamwork 3rd Place Award",
+            "teamNumbers": [
+              "9799A",
+              "9237G",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "1512X",
+            ],
+          },
+          {
+            "awardName": "Robot Skills 2nd Place",
+            "teamNumbers": [
+              "7755B",
+            ],
+          },
+          {
+            "awardName": "Robot Skills 3rd Place",
+            "teamNumbers": [
+              "7755A",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "MS Only",
+  "eventName": "Hong Kong VEX IQ Robotics Competition™ (MS) Signature Event: VEX IQ Middle School",
+  "program": "VIQRC",
+}
+`;
+
+exports[`performance award fill for finished events > RE-VIQRC-26-4822 1`] = `
+{
+  "awards": [
+    {
+      "name": "Teamwork Champion Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Teamwork 2nd Place Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Teamwork 3rd Place Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+    {
+      "name": "Robot Skills 2nd Place",
+      "winnersCount": 1,
+    },
+    {
+      "name": "Robot Skills 3rd Place",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Teamwork Champion Award",
+            "teamNumbers": [
+              "6627B",
+              "2034V",
+            ],
+          },
+          {
+            "awardName": "Teamwork 2nd Place Award",
+            "teamNumbers": [
+              "85201A",
+              "19375A",
+            ],
+          },
+          {
+            "awardName": "Teamwork 3rd Place Award",
+            "teamNumbers": [
+              "40200B",
+              "3299A",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "6627B",
+            ],
+          },
+          {
+            "awardName": "Robot Skills 2nd Place",
+            "teamNumbers": [
+              "85201A",
+            ],
+          },
+          {
+            "awardName": "Robot Skills 3rd Place",
+            "teamNumbers": [
+              "2034V",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "Choi Cheung Kok Cup VEX IQ Robotics Competition™ (ES/MS): 香港少年工程挑戰賽 - 蔡章閣盃 - VEX IQ Elementary and Middle School",
+  "program": "VIQRC",
+}
+`;
+
+exports[`performance award fill for finished events > RE-VIQRC-26-4999 1`] = `
+{
+  "awards": [
+    {
+      "name": "Teamwork Champion Award",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Teamwork Champion Award",
+            "teamNumbers": [
+              "9360W",
+              "21169K",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "9360W",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "Stamford Robotics Open VEX IQ Robotics Competition™ (ES/MS): VEX IQ  Elementary and Middle School  - ACAMIS Event",
+  "program": "VIQRC",
+}
+`;
+
+exports[`performance award fill for finished events > VE-V5-26-65665 1`] = `
+{
+  "awards": [
+    {
+      "name": "Tournament Champions",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Tournament Finalists",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Tournament Champions",
+            "teamNumbers": [
+              "99919A",
+              "91252B",
+            ],
+          },
+          {
+            "awardName": "Tournament Finalists",
+            "teamNumbers": [
+              "4815R",
+              "2572B",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "91252B",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "VEX V5 MS/HS Scrimmage: VEX V5 Middle and High School - Kowloon Central",
+  "program": "V5RC",
+}
+`;
+
+exports[`performance award fill for finished events > VE-V5-26-65668 1`] = `
+{
+  "awards": [
+    {
+      "name": "Tournament Champions",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Tournament Finalists",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Robot Skills Champion",
+      "winnersCount": 1,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "fills": [
+          {
+            "awardName": "Tournament Champions",
+            "teamNumbers": [
+              "3297A",
+              "3708E",
+            ],
+          },
+          {
+            "awardName": "Tournament Finalists",
+            "teamNumbers": [
+              "4275N",
+              "15383K",
+            ],
+          },
+          {
+            "awardName": "Robot Skills Champion",
+            "teamNumbers": [
+              "11131A",
+            ],
+          },
+        ],
+        "status": "ready",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "Kowloon Central VEX V5 (MS/HS) Tournament: VEX V5 Middle and High School",
+  "program": "V5RC",
+}
+`;
+
+exports[`performance award fill for finished events > VE-V5-26-66819 1`] = `
+{
+  "awards": [
+    {
+      "name": "Tournament Champions",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Tournament Finalists",
+      "winnersCount": 2,
+    },
+    {
+      "name": "Tournament Semifinalists",
+      "winnersCount": 4,
+    },
+  ],
+  "divisions": [
+    {
+      "division": "Division 1",
+      "result": {
+        "problems": [
+          {
+            "awardName": "Tournament Semifinalists",
+            "kind": "missing_team",
+            "teamNumbers": [
+              "Missing",
+            ],
+          },
+        ],
+        "status": "refused",
+      },
+    },
+  ],
+  "eventGradeLevel": "Blended",
+  "eventName": "Kadoorie Hill VEX V5 (MS/HS) Scrimmage: VEX V5 Middle and High School",
+  "program": "V5RC",
+}
+`;
